@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EasyEnglish_API.Models;
 
-public partial class Aiprompt
+public partial class AIprompt
 {
     public int PromptId { get; set; }
 
@@ -15,5 +15,5 @@ public partial class Aiprompt
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<Aisubmission> Aisubmissions { get; set; } = new List<Aisubmission>();
+    public virtual ICollection<AIsubmission> AIsubmissions { get; set; } = new List<AIsubmission>();
 }

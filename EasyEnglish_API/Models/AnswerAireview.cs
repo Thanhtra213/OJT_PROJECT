@@ -31,5 +31,5 @@ public partial class AnswerAireview
 
     public decimal? ScoreFluency { get; set; }
 
-    public virtual Aisubmission Submission { get; set; } = null!;
+    public virtual AIsubmission Submission { get; set; } = null!;
 }

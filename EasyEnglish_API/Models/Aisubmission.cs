@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EasyEnglish_API.Models;
 
-public partial class Aisubmission
+public partial class AIsubmission
 {
     public long SubmissionId { get; set; }
 
@@ -21,7 +21,7 @@ public partial class Aisubmission
 
     public virtual ICollection<AnswerAireview> AnswerAireviews { get; set; } = new List<AnswerAireview>();
 
-    public virtual Aiprompt Prompt { get; set; } = null!;
+    public virtual AIprompt Prompt { get; set; } = null!;
 
     public virtual Account User { get; set; } = null!;
 }

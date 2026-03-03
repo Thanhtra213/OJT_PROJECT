@@ -18,9 +18,9 @@ public partial class EasyEnglishDbContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<Aiprompt> Aiprompts { get; set; }
+    public virtual DbSet<AIprompt> Aiprompts { get; set; }
 
-    public virtual DbSet<Aisubmission> Aisubmissions { get; set; }
+    public virtual DbSet<AIsubmission> Aisubmissions { get; set; }
 
     public virtual DbSet<Answer> Answers { get; set; }
 
@@ -124,7 +124,7 @@ public partial class EasyEnglishDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Aiprompt>(entity =>
+        modelBuilder.Entity<AIprompt>(entity =>
         {
             entity.HasKey(e => e.PromptId).HasName("PK__AIPrompt__456CA7738653124B");
 
@@ -138,7 +138,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(200);
         });
 
-        modelBuilder.Entity<Aisubmission>(entity =>
+        modelBuilder.Entity<AIsubmission>(entity =>
         {
             entity.HasKey(e => e.SubmissionId).HasName("PK__AISubmis__449EE105D6C1C4BC");
 
@@ -150,12 +150,12 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.PromptId).HasColumnName("PromptID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.Prompt).WithMany(p => p.Aisubmissions)
+            entity.HasOne(d => d.Prompt).WithMany(p => p.AIsubmissions)
                 .HasForeignKey(d => d.PromptId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AISubmission_Prompt");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Aisubmissions)
+            entity.HasOne(d => d.User).WithMany(p => p.AIsubmissions)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AISubmission_User");
@@ -626,10 +626,10 @@ public partial class EasyEnglishDbContext : DbContext
 
             entity.HasIndex(e => new { e.ActorId, e.CreatedAt }, "IX_RequestLog_Actor_Time").IsDescending(false, true);
 
-            entity.Property(e => e.LogId).HasColumnName("LogID");
-            entity.Property(e => e.ActorId).HasColumnName("ActorID");
+            entity.Property(e => e.LogId).HasColumnName("LogId");
+            entity.Property(e => e.ActorId).HasColumnName("ActorId");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.Ip)
+            entity.Property(e => e.IP)
                 .HasMaxLength(45)
                 .IsUnicode(false)
                 .HasColumnName("IP");
