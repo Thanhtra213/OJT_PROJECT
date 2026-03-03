@@ -1,10 +1,19 @@
 ﻿using EasyEnglish_API.Data;
+using EasyEnglish_API.Exceptions;
 using EasyEnglish_API.Interfaces.Authentication;
+using EasyEnglish_API.Interfaces.Feedbacks;
+using EasyEnglish_API.Interfaces.Membership;
+using EasyEnglish_API.Interfaces.User;
+using EasyEnglish_API.Middleware;
 using EasyEnglish_API.Repositories.Authentication;
+using EasyEnglish_API.Repositories.FeedbackRepo;
+using EasyEnglish_API.Repositories.Membership;
+using EasyEnglish_API.Repositories.User;
 using EasyEnglish_API.Sercurity;
 using EasyEnglish_API.Services.AuthService;
+using EasyEnglish_API.Services.FeedbackService;
+using EasyEnglish_API.Services.Membership;
 using EasyEnglish_API.Utils;
-using EasyEnglish_API.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -124,7 +133,6 @@ namespace EasyEnglish_API {
                     .WithOrigins(
                         "http://localhost:3000",
                         "https://localhost:3000",
-                        "http://localhost:3002",             // 👈 thêm FE port
                         "https://beerier-superlogically-maxwell.ngrok-free.dev" // 👈 và cả domain ngrok
                     )
                     .AllowAnyHeader()
@@ -133,10 +141,14 @@ namespace EasyEnglish_API {
             });
 
             // == Repositories ==
-            builder.Services.AddScoped<IAuthRepositories, AuthRepositories>();
+            builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
+            builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+            builder.Services.AddScoped<IMembershipService, MembershipService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
@@ -158,6 +170,34 @@ namespace EasyEnglish_API {
             });
             var app = builder.Build();
 
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    var exception = context.Features
+                        .Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
+
+                    context.Response.ContentType = "application/json";
+
+                    int statusCode = 500;
+                    string message = "Internal server error.";
+
+                    if (exception is ApiException apiEx)
+                    {
+                        statusCode = apiEx.StatusCode;
+                        message = apiEx.Message;
+                    }
+
+                    context.Response.StatusCode = statusCode;
+
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        success = false,
+                        statusCode,
+                        message
+                    });
+                });
+            });
             // ===== Swagger =====
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {
