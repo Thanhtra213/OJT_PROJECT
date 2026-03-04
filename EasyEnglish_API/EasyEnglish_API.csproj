@@ -21,10 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\Feedback\" />
     <Folder Include="Interfaces\AIExam\" />
     <Folder Include="Interfaces\Flashcard\" />
-    <Folder Include="Interfaces\Course\" />
     <Folder Include="Interfaces\Dashboard\" />
   </ItemGroup>
 

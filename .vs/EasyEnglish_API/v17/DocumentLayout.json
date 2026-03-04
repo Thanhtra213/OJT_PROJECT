@@ -7,12 +7,20 @@
       "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\adminfeedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\adminfeedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\userservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -34,8 +42,33 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AdminFeedbackController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T07:32:44.086Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T07:26:57.078Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -44,14 +77,14 @@
               "RelativeDocumentMoniker": "EasyEnglish_API\\Program.cs",
               "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
               "RelativeToolTip": "EasyEnglish_API\\Program.cs",
-              "ViewState": "AgIAAH8AAAAAAAAAAAAgwJAAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAIgAAAAAAAAAAAAgwJsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-04T07:07:39.987Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "AssignRoleRequest.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
@@ -59,8 +92,7 @@
               "RelativeToolTip": "EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:47:40.635Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:47:40.635Z"
             },
             {
               "$type": "Document",
@@ -70,14 +102,14 @@
               "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
               "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
               "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAkwGgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAGcAAAAAAAAAAAAQwGgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-04T06:34:56.725Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "IUserService.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
@@ -85,12 +117,11 @@
               "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
               "ViewState": "AgIAAAUAAAAAAAAAAAAxwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:27:53.738Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:27:53.738Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "UserRepository.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
@@ -103,7 +134,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "UserService.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
@@ -111,8 +142,7 @@
               "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
               "ViewState": "AgIAAFAAAAAAAAAAAAAuwFQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:27:35.638Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:27:35.638Z"
             }
           ]
         }

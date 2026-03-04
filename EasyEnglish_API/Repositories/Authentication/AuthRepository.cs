@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EasyEnglish_API.Repositories.Authentication
 {
-    public class AuthRepositories : IAuthRepositories
+    public class AuthRepository : IAuthRepository
     {
         private readonly EasyEnglishDbContext _db;
 
-        public AuthRepositories(EasyEnglishDbContext db)
+        public AuthRepository(EasyEnglishDbContext db)
         {
             _db = db;
         }

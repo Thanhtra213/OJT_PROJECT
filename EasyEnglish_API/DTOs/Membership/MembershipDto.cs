@@ -1,4 +1,4 @@
-﻿namespace EasyEnglish_API.DTOs.Authentication
+﻿namespace EasyEnglish_API.DTOs.Membership
 {
     public class MembershipRequestDto
     {
@@ -12,5 +12,15 @@
         public DateTime? EndsAt { get; set; }
         public string? PlanName { get; set; }
         public string? Status { get; set; }
+    }
+
+    public class MembershipHistoryDto
+    {
+        public long MembershipId { get; set; }
+        public DateTime StartsAt { get; set; }
+        public DateTime EndsAt { get; set; }
+        public string Status { get; set; } = null!;
+        public DateTime CreateAt { get; set; }
+        public DateTime? CanceleAt { get; set; }
     }
 }
