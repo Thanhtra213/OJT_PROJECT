@@ -22,6 +22,9 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using EasyEnglish_API.Interfaces.User;
+using EasyEnglish_API.Repositories.User;
+using EasyEnglish_API.Services.UserService;
 
 namespace EasyEnglish_API {
     public class Program
@@ -141,6 +144,15 @@ namespace EasyEnglish_API {
             });
 
             // == Repositories ==
+<<<<<<< HEAD
+            builder.Services.AddScoped<IAuthRepositories, AuthRepositories>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            
+
+            // == Serviecs ==
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+=======
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
@@ -149,6 +161,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
+>>>>>>> b57d59603ca901cea442005544b3f51b5bacf3a8
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));

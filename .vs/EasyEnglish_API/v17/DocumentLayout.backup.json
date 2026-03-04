@@ -1,117 +1,34 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\",
+  "WorkspaceRootPath": "D:\\FPT.exe6\\abc-project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\services\\authservice\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\authservice\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\forgotpasswordrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\forgotpasswordrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\membershipdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\membershipdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\authresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\authresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\sercurity\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\sercurity\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\utils\\emailtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\utils\\emailtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\answeraireview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\answeraireview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\data\\easyenglishdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\data\\easyenglishdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\aiprompt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\aiprompt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\userservice\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\userservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\userservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\aisubmission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\aisubmission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\user\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\user\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\requestlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\requestlog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\middleware\\requestloggingmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\middleware\\requestloggingmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\answer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\answer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\models\\feedback.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\feedback.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Dell\\AppData\\Roaming\\Microsoft\\UserSecrets\\2ba083c9-4caf-4d90-abe8-0aa205ee8bd6\\secrets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\services\\authservice\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\authservice\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\sendotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\sendotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\resetpasswordrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\resetpasswordrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\registerrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\registerrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\dtos\\authentication\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\authentication\\loginrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\utils\\emailsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\utils\\emailsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\utils\\emailsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\utils\\emailsetting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|c:\\users\\dell\\source\\repos\\easyenglish_api\\easyenglish_api\\easyenglish_api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\easyenglish_api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\user\\assignrolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\user\\assignrolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -121,371 +38,94 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MembershipDto.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\MembershipDto.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\MembershipDto.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\MembershipDto.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\MembershipDto.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAowA4AAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:30:14.245Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ForgotPasswordRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\ForgotPasswordRequest.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\ForgotPasswordRequest.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\ForgotPasswordRequest.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\ForgotPasswordRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:29:45.635Z",
+              "WhenOpened": "2026-03-04T07:26:57.078Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AuthService.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Services\\AuthService\\AuthService.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\AuthService\\AuthService.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Services\\AuthService\\AuthService.cs*",
-              "RelativeToolTip": "EasyEnglish_API\\Services\\AuthService\\AuthService.cs*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAcAAAAAAAAAA==",
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Program.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Program.cs",
+              "ViewState": "AgIAAIgAAAAAAAAAAAAgwJsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:18:01.654Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AuthResponse.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\AuthResponse.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\AuthResponse.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\AuthResponse.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\AuthResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:29:26.769Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEUAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T15:49:07.272Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\appsettings.json",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\appsettings.json",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\appsettings.json",
-              "RelativeToolTip": "EasyEnglish_API\\appsettings.json",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAowB8AAABhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-02T15:56:03.639Z",
+              "WhenOpened": "2026-03-04T07:07:39.987Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "TokenService.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Sercurity\\TokenService.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Sercurity\\TokenService.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Sercurity\\TokenService.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Sercurity\\TokenService.cs",
-              "ViewState": "AgIAAEoAAAAAAAAAAAAAAGIAAAAAAAAAAAAAAA==",
+              "Title": "AssignRoleRequest.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:41:23.204Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:47:40.635Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "EmailTemplate.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailTemplate.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Utils\\EmailTemplate.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailTemplate.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Utils\\EmailTemplate.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAgwG4AAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAkwGgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:05:57.059Z",
+              "WhenOpened": "2026-03-04T06:34:56.725Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Properties\\launchSettings.json",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Properties\\launchSettings.json",
-              "RelativeToolTip": "EasyEnglish_API\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-02T16:14:33.609Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Program.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Program.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Program.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Program.cs",
-              "ViewState": "AgIAAJQAAAAAAAAAAAAIwLYAAAABAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:06:11.913Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:27:53.738Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "AIsubmission.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AIsubmission.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\AIsubmission.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AIsubmission.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\AIsubmission.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABMAAAArAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:21:33.927Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:27:36.924Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "AnswerAireview.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AnswerAireview.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\AnswerAireview.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AnswerAireview.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\AnswerAireview.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAA3wCMAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "ViewState": "AgIAAFAAAAAAAAAAAAAuwFQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:23:29.617Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "AIprompt.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AIprompt.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\AIprompt.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\AIprompt.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\AIprompt.cs",
-              "ViewState": "AgIAAAQAAAAAAAAAAAAwwBEAAABWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:21:39.916Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Account.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Account.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\Account.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Account.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\Account.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAqwB8AAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:22:04.021Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "EasyEnglishDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Data\\EasyEnglishDbContext.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Data\\EasyEnglishDbContext.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Data\\EasyEnglishDbContext.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Data\\EasyEnglishDbContext.cs",
-              "ViewState": "AgIAAIsAAAAAAAAAAAAkwJ0AAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:04:29.736Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "RequestLog.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\RequestLog.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\RequestLog.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\RequestLog.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\RequestLog.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAiAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:03:28.21Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "RequestLoggingMiddleware.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Middleware\\RequestLoggingMiddleware.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Middleware\\RequestLoggingMiddleware.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Middleware\\RequestLoggingMiddleware.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Middleware\\RequestLoggingMiddleware.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAA5wCcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:01:42.388Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "Answer.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Answer.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\Answer.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Answer.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\Answer.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:04:19.002Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "Feedback.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Feedback.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\Feedback.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Models\\Feedback.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Models\\Feedback.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T16:04:17.408Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "secrets.json",
-              "DocumentMoniker": "C:\\Users\\Dell\\AppData\\Roaming\\Microsoft\\UserSecrets\\2ba083c9-4caf-4d90-abe8-0aa205ee8bd6\\secrets.json",
-              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Roaming\\Microsoft\\UserSecrets\\2ba083c9-4caf-4d90-abe8-0aa205ee8bd6\\secrets.json",
-              "ToolTip": "C:\\Users\\Dell\\AppData\\Roaming\\Microsoft\\UserSecrets\\2ba083c9-4caf-4d90-abe8-0aa205ee8bd6\\secrets.json",
-              "RelativeToolTip": "..\\..\\..\\AppData\\Roaming\\Microsoft\\UserSecrets\\2ba083c9-4caf-4d90-abe8-0aa205ee8bd6\\secrets.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-02T14:50:55.452Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "IAuthService.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Services\\AuthService\\IAuthService.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\AuthService\\IAuthService.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Services\\AuthService\\IAuthService.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Services\\AuthService\\IAuthService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:17:48.428Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "SendOtpRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\SendOtpRequest.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\SendOtpRequest.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\SendOtpRequest.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\SendOtpRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:31:14.573Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "ResetPasswordRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\ResetPasswordRequest.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\ResetPasswordRequest.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\ResetPasswordRequest.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\ResetPasswordRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:30:50.584Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "RegisterRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\RegisterRequest.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\RegisterRequest.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\RegisterRequest.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\RegisterRequest.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAIwA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:30:30.502Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "LoginRequest.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\LoginRequest.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Authentication\\LoginRequest.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\DTOs\\Authentication\\LoginRequest.cs",
-              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Authentication\\LoginRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:30:01.303Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "EmailSender.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailSender.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Utils\\EmailSender.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailSender.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Utils\\EmailSender.cs",
-              "ViewState": "AgIAABoAAAAAAAAAAAAAADIAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:05:06.602Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "EmailSetting.cs",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailSetting.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Utils\\EmailSetting.cs",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\Utils\\EmailSetting.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Utils\\EmailSetting.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-02T14:04:38.685Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 27,
-              "Title": "EasyEnglish_API",
-              "DocumentMoniker": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\EasyEnglish_API.csproj",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\EasyEnglish_API.csproj",
-              "ToolTip": "C:\\Users\\Dell\\source\\repos\\EasyEnglish_API\\EasyEnglish_API\\EasyEnglish_API.csproj",
-              "RelativeToolTip": "EasyEnglish_API\\EasyEnglish_API.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAkwCAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-02T14:11:49.357Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-04T06:27:35.638Z"
             }
           ]
         }
