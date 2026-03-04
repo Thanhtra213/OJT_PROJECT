@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EasyEnglish_API.Repositories.User
 {
-    public class UserRepositories
+    public class UserRepository
     {
         //Admin: user management
         private readonly EasyEnglishDbContext _db;
 
-        public UserRepositories(EasyEnglishDbContext db)
+        public UserRepository(EasyEnglishDbContext db)
         {
             _db = db;
         }

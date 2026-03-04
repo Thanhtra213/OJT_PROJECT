@@ -2,7 +2,7 @@
 
 namespace EasyEnglish_API.Interfaces.Authentication
 {
-    public interface IAuthRepositories
+    public interface IAuthRepository
     {
         Task<Account?> GetByEmailOrUsernameAsync(string emailOrUsername);
         Task<Account?> GetByEmailAsync(string email);

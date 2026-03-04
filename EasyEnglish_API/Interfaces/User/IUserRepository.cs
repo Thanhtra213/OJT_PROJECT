@@ -2,7 +2,7 @@
 
 namespace EasyEnglish_API.Interfaces.User
 {
-    public interface IUserRepositories
+    public interface IUserRepository
     {
         // Admin: user management
         Task<List<Account>> GetAllUsersAsync();
