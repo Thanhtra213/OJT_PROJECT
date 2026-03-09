@@ -5,11 +5,8 @@ using EasyEnglish_API.Interfaces.User;
 
 namespace EasyEnglish_API.Repositories.User
 {
-<<<<<<< HEAD
     public class UserRepository : IUserRepository
-=======
-    public class UserRepository
->>>>>>> b57d59603ca901cea442005544b3f51b5bacf3a8
+
     {
         //Admin: user management
         private readonly EasyEnglishDbContext _db;

@@ -13,10 +13,10 @@ namespace EasyEnglish_API.Services.UserService
             _userRepository = userRepositories;
         }
 
-        public async Task<List<GetUserRespone>> GetAllUsersAsync()
+        public async Task<List<GetUserResponse>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllUsersAsync();
-            var data = users.Select(u => new GetUserRespone
+            var data = users.Select(u => new GetUserResponse
             {
                 AccountId = u.AccountId,
                 UserName = u.Username,
@@ -27,10 +27,10 @@ namespace EasyEnglish_API.Services.UserService
             return data;
         }
 
-        public async Task<List<GetUserRespone>> GetAllStudentsAsync()
+        public async Task<List<GetUserResponse>> GetAllStudentsAsync()
         {
             var users = await _userRepository.GetAllStudentsAsync();
-            var data = users.Select(u => new GetUserRespone
+            var data = users.Select(u => new GetUserResponse
             {
                 AccountId = u.AccountId,
                 UserName = u.Username,
@@ -41,10 +41,10 @@ namespace EasyEnglish_API.Services.UserService
             return data;
         }
 
-        public async Task<List<GetUserRespone>> GetAllTeachersAsync()
+        public async Task<List<GetUserResponse>> GetAllTeachersAsync()
         {
             var users = await _userRepository.GetAllTeachersAsync();
-            var data = users.Select(u => new GetUserRespone
+            var data = users.Select(u => new GetUserResponse
             {
                 AccountId = u.AccountId,
                 UserName = u.Username,
@@ -65,13 +65,13 @@ namespace EasyEnglish_API.Services.UserService
             return _userRepository.UnlockUserAsync(id);
         }
 
-        public async Task<List<GetUserRespone>> SearchUsersAsync(string? keyword, string? role, string? status)
+        public async Task<List<GetUserResponse>> SearchUsersAsync(string? keyword, string? role, string? status)
         {
             var users = await _userRepository.SearchUsersAsync(keyword, role, status);
-            List<GetUserRespone> data = new List<GetUserRespone>();
+            List<GetUserResponse> data = new List<GetUserResponse>();
             foreach (var user in users)
             {
-                data.Add(new GetUserRespone
+                data.Add(new GetUserResponse
                 {
                     AccountId = user.AccountId,
                     UserName = user.Username,
