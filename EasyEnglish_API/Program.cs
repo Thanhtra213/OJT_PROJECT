@@ -25,6 +25,12 @@ using System.Text;
 using EasyEnglish_API.Interfaces.User;
 using EasyEnglish_API.Repositories.User;
 using EasyEnglish_API.Services.UserService;
+using EasyEnglish_API.Interfaces;
+using EasyEnglish_API.Repositories.Courses;
+using EasyEnglish_API.Services.Courses;
+using EasyEnglish_API.Interfaces.Dashboard;
+using EasyEnglish_API.Repositories.Dashboard;
+using EasyEnglish_API.Services.Dashboard;
 
 namespace EasyEnglish_API {
     public class Program
@@ -144,24 +150,20 @@ namespace EasyEnglish_API {
             });
 
             // == Repositories ==
-<<<<<<< HEAD
-            builder.Services.AddScoped<IAuthRepositories, AuthRepositories>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            
-
-            // == Serviecs ==
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IUserService, UserService>();
-=======
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+            builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
->>>>>>> b57d59603ca901cea442005544b3f51b5bacf3a8
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));

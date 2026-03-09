@@ -3,12 +3,20 @@
   "WorkspaceRootPath": "D:\\FPT.exe6\\abc-project\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\dashboard\\dashboardrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\dashboard\\dashboardrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\dashboard\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\dashboard\\dashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\scorecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\scorecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -23,8 +31,128 @@
       "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\userservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\course\\courseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\course\\courseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\course\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\course\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\dashboard\\overviewresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\dashboard\\overviewresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\dashboard\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\dashboard\\idashboardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\course\\courseresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\course\\courseresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\subscriptionplancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\subscriptionplancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\quizs\\quizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\quizs\\quizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\quizs\\iquizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\quizs\\iquizservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\quizs\\quizrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\quizs\\quizrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\quizs\\iquizrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\quizs\\iquizrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\score\\scoreservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\score\\scoreservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\score\\iscoreservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\score\\iscoreservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\score\\iscorerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\score\\iscorerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\score\\scorerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\score\\scorerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\course\\courserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\course\\courserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\course\\courserequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\course\\courserequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\course\\icourseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\course\\icourseservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\auth\\membershipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\membershipcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\models\\subscriptionplan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\models\\subscriptionplan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\membership\\membershiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\membership\\membershiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\subscriptionplan\\isubscriptionplanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\subscriptionplan\\isubscriptionplanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\dashboard\\idashboardrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\dashboard\\idashboardrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\course\\icourserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\course\\icourserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\repositories\\user\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\repositories\\user\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\user\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\user\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\interfaces\\membership\\imembershiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\interfaces\\membership\\imembershiprepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\adminfeedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\adminfeedbackcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\user\\assignrolerequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -38,37 +166,447 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 10,
+              "Title": "CourseController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Course\\CourseController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Course\\CourseController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Course\\CourseController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Course\\CourseController.cs",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAowLgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T07:26:57.078Z",
+              "WhenOpened": "2026-03-06T08:06:34.403Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DashboardRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Dashboard\\DashboardRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\Dashboard\\DashboardRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Dashboard\\DashboardRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\Dashboard\\DashboardRepository.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAwwDwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:24:41.11Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CourseController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAA1wA8AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T09:36:29.801Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
+              "ViewState": "AgIAAGgAAAAAAAAAAAAAwGsAAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T07:29:43.72Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAIAwwA0AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T06:27:53.738Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
+              "ViewState": "AgIAAFAAAAAAAAAAAAAuwFQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T06:27:35.638Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "DashboardController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\DashboardController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\DashboardController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\DashboardController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\DashboardController.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAwwCUAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:42:38.967Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DashboardService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Dashboard\\DashboardService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Dashboard\\DashboardService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Dashboard\\DashboardService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Dashboard\\DashboardService.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwAwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:38:40.427Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ScoreController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\ScoreController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\ScoreController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\ScoreController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\ScoreController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:23:52.824Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "OverviewResponse.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Dashboard\\OverviewResponse.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Dashboard\\OverviewResponse.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Dashboard\\OverviewResponse.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Dashboard\\OverviewResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAkAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-09T01:59:08.488Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CourseService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Course\\CourseService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Course\\CourseService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Course\\CourseService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Course\\CourseService.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAA1wBcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T09:22:01.727Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\Program.cs",
               "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
               "RelativeToolTip": "EasyEnglish_API\\Program.cs",
-              "ViewState": "AgIAAIgAAAAAAAAAAAAgwJsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHMAAAAAAAAAAAAgwKcAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-04T07:07:39.987Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 12,
+              "Title": "IDashboardService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Dashboard\\IDashboardService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Dashboard\\IDashboardService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Dashboard\\IDashboardService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Dashboard\\IDashboardService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:38:52.462Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "CourseResponse.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Course\\CourseResponse.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Course\\CourseResponse.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Course\\CourseResponse.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Course\\CourseResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T07:24:58.289Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "SubscriptionPlanController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-09T01:55:46.625Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "QuizService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Quizs\\QuizService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Quizs\\QuizService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Quizs\\QuizService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Quizs\\QuizService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:26:38.281Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "CourseRequest.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Course\\CourseRequest.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Course\\CourseRequest.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Course\\CourseRequest.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Course\\CourseRequest.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAwwBwAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T08:24:20.899Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "IScoreRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Score\\IScoreRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Score\\IScoreRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Score\\IScoreRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Score\\IScoreRepository.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAiwBQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:16:29.796Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "ScoreRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Score\\ScoreRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\Score\\ScoreRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Score\\ScoreRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\Score\\ScoreRepository.cs",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAwwFkAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:16:55.576Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "IScoreService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Score\\IScoreService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Score\\IScoreService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Score\\IScoreService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Score\\IScoreService.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAgwBIAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:17:31.636Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ScoreService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Score\\ScoreService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Score\\ScoreService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Score\\ScoreService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Score\\ScoreService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAwwCQAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:17:40.896Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "IQuizRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Quizs\\IQuizRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Quizs\\IQuizRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Quizs\\IQuizRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Quizs\\IQuizRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:25:25.435Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "QuizRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Quizs\\QuizRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\Quizs\\QuizRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Quizs\\QuizRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\Quizs\\QuizRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:25:59.784Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "IQuizService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Quizs\\IQuizService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Quizs\\IQuizService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Quizs\\IQuizService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Quizs\\IQuizService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T09:26:25.365Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "Course.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Models\\Course.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\Course.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Models\\Course.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Models\\Course.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAIwBMAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T08:19:07.672Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "ICourseService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Course\\ICourseService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Course\\ICourseService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Course\\ICourseService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Course\\ICourseService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAgAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-05T09:21:49.453Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "CourseRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Course\\CourseRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\Course\\CourseRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Course\\CourseRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\Course\\CourseRepository.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAAwHIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:17:49.054Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "MembershipController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\MembershipController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\MembershipController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\MembershipController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\MembershipController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T08:06:29.807Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "SubscriptionPlan.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Models\\SubscriptionPlan.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Models\\SubscriptionPlan.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Models\\SubscriptionPlan.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Models\\SubscriptionPlan.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAA5wAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:49:16.304Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "ISubscriptionPlanRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Subscriptionplan\\ISubscriptionPlanRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Subscriptionplan\\ISubscriptionPlanRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Subscriptionplan\\ISubscriptionPlanRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Subscriptionplan\\ISubscriptionPlanRepository.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAowAIAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:44:27.741Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "IDashboardRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Dashboard\\IDashboardRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Dashboard\\IDashboardRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Dashboard\\IDashboardRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Dashboard\\IDashboardRepository.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAgwBcAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T06:23:19.836Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "MembershipRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Membership\\MembershipRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\Membership\\MembershipRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\Membership\\MembershipRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Repositories\\Membership\\MembershipRepository.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:22:26.362Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "IMembershipRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Membership\\IMembershipRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Membership\\IMembershipRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Membership\\IMembershipRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Membership\\IMembershipRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:16:50.493Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "IUserRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\User\\IUserRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\User\\IUserRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\User\\IUserRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\User\\IUserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:16:30.307Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "ICourseRepository.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Course\\ICourseRepository.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Interfaces\\Course\\ICourseRepository.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Interfaces\\Course\\ICourseRepository.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Interfaces\\Course\\ICourseRepository.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAA0wBgAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T08:13:15.291Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
               "Title": "AssignRoleRequest.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\User\\AssignRoleRequest.cs",
@@ -80,52 +618,39 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "UserController.cs",
-              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
-              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\UserController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAkwGgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:34:56.725Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "IUserService.cs",
-              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
-              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\IUserService.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\IUserService.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAxwBAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:27:53.738Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 33,
               "Title": "UserRepository.cs",
               "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
               "RelativeDocumentMoniker": "EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
               "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
               "RelativeToolTip": "EasyEnglish_API\\Repositories\\User\\UserRepository.cs",
-              "ViewState": "AgIAAD4AAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-04T06:27:36.924Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "UserService.cs",
-              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
-              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
-              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\UserService\\UserService.cs",
-              "RelativeToolTip": "EasyEnglish_API\\Services\\UserService\\UserService.cs",
-              "ViewState": "AgIAAFAAAAAAAAAAAAAuwFQAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 37,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Auth\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-04T06:27:35.638Z"
+              "WhenOpened": "2026-03-04T07:26:57.078Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "AdminFeedbackController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\AdminFeedbackController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-04T07:32:44.086Z"
             }
           ]
         }

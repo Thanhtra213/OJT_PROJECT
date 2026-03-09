@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Interfaces\AIExam\" />
     <Folder Include="Interfaces\Flashcard\" />
-    <Folder Include="Interfaces\Dashboard\" />
   </ItemGroup>
 
 </Project>

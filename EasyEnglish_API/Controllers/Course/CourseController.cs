@@ -1,5 +1,8 @@
 ﻿//using EasyEnglish_API.DTOs.Feedback;
+//using EasyEnglish_API.Services.Courses;
 //using EasyEnglish_API.Services.FeedbackService;
+//using EasyEnglish_API.Services.Membership;
+//using EasyEnglish_API.Models;
 //using Microsoft.AspNetCore.Authorization;
 //using Microsoft.AspNetCore.Mvc;
 //using System.Security.Claims;
@@ -10,18 +13,18 @@
 //    [Route("api/user/course")]
 //    public class CourseController : ControllerBase
 //    {
-//        private readonly ICourseDAO _courseDao;
-//        private readonly IMembershipDAO _membershipDao;
-//        private readonly IFeedbackService _feedbackRepo;
+//        private readonly ICourseService _courseService;
+//        private readonly IMembershipService _membershipService;
+//        private readonly IFeedbackService _feedbackService;
 
 //        public CourseController(
-//            ICourseDAO courseDao,
-//            IMembershipDAO membershipDao,
-//            IFeedbackService feedbackRepo)
+//            ICourseService courseService,
+//            IMembershipService membershipService,
+//            IFeedbackService feedbackService)
 //        {
-//            _courseDao = courseDao;
-//            _membershipDao = membershipDao;
-//            _feedbackRepo = feedbackRepo;
+//            _courseService = courseService;
+//            _membershipService = membershipService;
+//            _feedbackService = feedbackService;
 //        }
 
 //        private int GetUserId()
@@ -38,7 +41,7 @@
 //        [HttpGet]
 //        public async Task<IActionResult> GetCourses()
 //        {
-//            var courses = await _courseDao.GetAllCoursesAsync();
+//            var courses = await _courseService.GetAllCoursesAsync();
 
 //            var result = courses.Select(course =>
 //            {

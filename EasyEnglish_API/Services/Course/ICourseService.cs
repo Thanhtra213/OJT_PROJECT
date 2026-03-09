@@ -1,12 +1,13 @@
-﻿using EasyEnglish_API.Models;
+﻿using EasyEnglish_API.DTOs.Course;
+using EasyEnglish_API.Models;
+using EasyEnglish_API.Repositories.Courses;
 
-namespace EasyEnglish_API.Interfaces
+namespace EasyEnglish_API.Services.Courses
 {
-    public interface ICourseRepository
+    public interface ICourseService
     {
-        // -------- COURSE BASE --------
-        Task<List<Course>> GetAllCoursesAsync();
-        Task<Course?> GetCourseDetailAsync(int courseId);
+        Task<List<CourseResponse>> GetAllCoursesAsync();
+        Task<object?> GetCourseDetailAsync(int courseId);
         Task<bool> CourseExistsAsync(int courseId);
 
         // -------- TEACHER SIDE --------

@@ -1,6 +1,6 @@
 ﻿namespace EasyEnglish_API.DTOs.User
 {
-    public class GetUserRespone
+    public class GetUserResponse
     {
         public int AccountId { get; set; }
 
