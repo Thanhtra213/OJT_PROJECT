@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Interfaces\AIExam\" />
-    <Folder Include="Interfaces\Flashcard\" />
   </ItemGroup>
 
 </Project>
