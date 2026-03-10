@@ -1,12 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EasyEnglish_API.Services.Score;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EasyEnglish_API.Controllers.Admin
 {
-    public class ScoreController : Controller
+    [ApiController]
+    [Route("api/admin/score-management")]
+    [Authorize(Roles = "ADMIN")]
+    public class ScoreController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IScoreService _scoreService;
+
+        public ScoreController(IScoreService scoreService)
         {
-            return View();
+            _scoreService = scoreService;
         }
+
+
     }
 }
