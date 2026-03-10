@@ -18,13 +18,13 @@ public partial class EasyEnglishDbContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<AIprompt> Aiprompts { get; set; }
+    public virtual DbSet<AIPrompt> AIPrompts { get; set; }
 
-    public virtual DbSet<AIsubmission> Aisubmissions { get; set; }
+    public virtual DbSet<AISubmission> AISubmissions { get; set; }
 
     public virtual DbSet<Answer> Answers { get; set; }
 
-    public virtual DbSet<AnswerAireview> AnswerAireviews { get; set; }
+    public virtual DbSet<AnswerAIReview> AnswerAIReviews { get; set; }
 
     public virtual DbSet<AnswerTeacherReview> AnswerTeacherReviews { get; set; }
 
@@ -124,7 +124,7 @@ public partial class EasyEnglishDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<AIprompt>(entity =>
+        modelBuilder.Entity<AIPrompt>(entity =>
         {
             entity.HasKey(e => e.PromptId).HasName("PK__AIPrompt__456CA7738653124B");
 
@@ -138,7 +138,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.Title).HasMaxLength(200);
         });
 
-        modelBuilder.Entity<AIsubmission>(entity =>
+        modelBuilder.Entity<AISubmission>(entity =>
         {
             entity.HasKey(e => e.SubmissionId).HasName("PK__AISubmis__449EE105D6C1C4BC");
 
@@ -150,7 +150,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.PromptId).HasColumnName("PromptID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.Prompt).WithMany(p => p.AIsubmissions)
+            entity.HasOne(d => d.Prompt).WithMany(p => p.AISubmissions)
                 .HasForeignKey(d => d.PromptId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_AISubmission_Prompt");
@@ -196,7 +196,7 @@ public partial class EasyEnglishDbContext : DbContext
                 .HasConstraintName("FK_Answer_Question");
         });
 
-        modelBuilder.Entity<AnswerAireview>(entity =>
+        modelBuilder.Entity<AnswerAIReview>(entity =>
         {
             entity.HasKey(e => e.AireviewId).HasName("PK__AnswerAI__D0B4D52A3DA8DD51");
 

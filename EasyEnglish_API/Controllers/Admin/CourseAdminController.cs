@@ -7,16 +7,16 @@ namespace EasyEnglish_API.Controllers.Admin
     [ApiController]
     [Route("api/admin/courses")]
     [Authorize(Roles = "ADMIN")]
-    public class CourseController : ControllerBase
+    public class CourseAdminController : ControllerBase
     {
         private readonly ICourseService _courseService;
 
-        public CourseController(ICourseService courseService)
+        public CourseAdminController(ICourseService courseService)
         {
             _courseService = courseService;
         }
 
-        [HttpGet()]
+        [HttpGet("view")]
         public async Task<IActionResult> GetAllCourses()
         {
             var courses = await _courseService.GetAllCoursesAsync();

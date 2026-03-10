@@ -14,6 +14,11 @@ namespace EasyEnglish_API.Repositories.Courses
             _db = db;
         }
 
+        public async Task<CourseChapter> GetChapterAsync(int courseId)
+        {
+            return await _db.CourseChapters.FindAsync(courseId);
+        }
+
         public async Task<CourseChapter?> AddChapterAsync(CourseChapter chapter)
         {
             _db.CourseChapters.Add(chapter);

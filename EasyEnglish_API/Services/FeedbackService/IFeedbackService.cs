@@ -8,10 +8,10 @@ namespace EasyEnglish_API.Services.FeedbackService
         //-----Teacher-----
         Task<IEnumerable<FeedbackViewDto>> GetTeacherFeedbacksAsync(int teacherId);
         //-----Public------
-        //Task<(double average, int total)> GetCourseRatingAsync(int courseId);
-        //Task<List<FeedbackViewDto>> GetCourseFeedbacksAsync(int courseId);
+        Task<(double average, int total)> GetCourseRatingAsync(int courseId);
+        Task<List<FeedbackViewDto>> GetCourseFeedbacksAsync(int courseId);
         //_----User-----
-        //Task<Feedback> CreateFeedbackAsync(int userId, FeedbackCreateRequest req);
+        Task<Feedback> CreateFeedbackAsync(int userId, FeedbackCreateRequest req);
         //-----Admin----
         Task<List<FeedbackViewDto>> GetAllFeedbacksAsync();
         Task<bool> ToggleVisibilityAsync(int feedbackId);

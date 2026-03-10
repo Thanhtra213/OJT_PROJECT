@@ -4,7 +4,6 @@ using EasyEnglish_API.Models;
 using EasyEnglish_API.Security;
 using EasyEnglish_API.Sercurity;
 using EasyEnglish_API.Services.AuthService;
-using EasyEnglish_API.Exceptions;
 using EasyEnglish_API.Utils;
 using Google.Apis.Auth;
 using System.Security.Claims;
@@ -39,19 +38,19 @@ public class AuthService : IAuthService
             string.IsNullOrWhiteSpace(req.Password) ||
             string.IsNullOrWhiteSpace(req.ConfirmPassword) ||
             string.IsNullOrWhiteSpace(req.Otp))
-            throw new BadRequestException("Vui lòng nhập đầy đủ thông tin.");
+            throw new Exception("Vui lòng nhập đầy đủ thông tin.");
 
         if (req.Password != req.ConfirmPassword)
-            throw new BadRequestException("Mật khẩu xác nhận không khớp.");
+            throw new Exception("Mật khẩu xác nhận không khớp.");
 
         if (!_otp.Verify(req.Email, req.Otp))
-            throw new BadRequestException("OTP không hợp lệ hoặc đã hết hạn.");
+            throw new Exception("OTP không hợp lệ hoặc đã hết hạn.");
 
         if (await _repo.IsEmailExistsAsync(req.Email))
-            throw new ConflictException("Email đã tồn tại.");
+            throw new Exception("Email đã tồn tại.");
 
         if (await _repo.IsUsernameExistsAsync(req.Username))
-            throw new ConflictException("Username đã tồn tại.");
+            throw new Exception("Username đã tồn tại.");
 
         var acc = new Account
         {
@@ -76,16 +75,16 @@ public class AuthService : IAuthService
             string.IsNullOrWhiteSpace(req.Username) ||
             string.IsNullOrWhiteSpace(req.Password) ||
             string.IsNullOrWhiteSpace(req.ConfirmPassword))
-            throw new BadRequestException("Vui lòng nhập đầy đủ thông tin.");
+            throw new Exception("Vui lòng nhập đầy đủ thông tin.");
 
         if (req.Password != req.ConfirmPassword)
-            throw new BadRequestException("Mật khẩu xác nhận không khớp.");
+            throw new Exception("Mật khẩu xác nhận không khớp.");
 
         if (await _repo.IsEmailExistsAsync(req.Email))
-            throw new ConflictException("Email đã tồn tại.");
+            throw new Exception("Email đã tồn tại.");
 
         if (await _repo.IsUsernameExistsAsync(req.Username))
-            throw new ConflictException("Username đã tồn tại.");
+            throw new Exception("Username đã tồn tại.");
 
         var acc = new Account
         {
@@ -109,18 +108,18 @@ public class AuthService : IAuthService
     {
         if (string.IsNullOrWhiteSpace(req.EmailOrUsername) ||
             string.IsNullOrWhiteSpace(req.Password))
-            throw new BadRequestException("Vui lòng nhập đầy đủ email/username và mật khẩu.");
+            throw new Exception("Vui lòng nhập đầy đủ email/username và mật khẩu.");
 
         var user = await _repo.GetByEmailOrUsernameAsync(req.EmailOrUsername);
 
         if (user == null)
-            throw new UnauthorizedException("Email/username không đúng.");
+            throw new Exception("Email/username không đúng.");
 
         if (!PasswordHasher.Verify(req.Password, user.Hashpass))
-            throw new UnauthorizedException("Mật khẩu không đúng.");
+            throw new Exception("Mật khẩu không đúng.");
 
         if (user.Status != "ACTIVE")
-            throw new BadRequestException("Tài khoản đã bị khoá.");
+            throw new Exception("Tài khoản đã bị khoá.");
 
 
         return user;
@@ -158,10 +157,10 @@ public class AuthService : IAuthService
         var user = await _repo.GetByIdAsync(userId);
 
         if (user == null)
-            throw new NotFoundException("User không tồn tại.");
+            throw new Exception("User không tồn tại.");
 
         if (user.RefreshTokenExpiresAt <= DateTime.UtcNow)
-            throw new UnauthorizedException("Refresh token expired.");
+            throw new Exception("Refresh token expired.");
 
         var hash = _tokens.HashRefreshToken(refreshToken);
 
@@ -172,7 +171,7 @@ public class AuthService : IAuthService
             user.RefreshTokenExpiresAt = null;
             await _repo.UpdateAccountAsync(user);
 
-            throw new UnauthorizedException("Refresh token reuse detected.");
+            throw new Exception("Refresh token reuse detected.");
         }
 
         return user;
@@ -207,15 +206,15 @@ public class AuthService : IAuthService
     public async Task ResetPasswordAsync(ResetPasswordRequest req)
     {
         if (req.NewPassword != req.ConfirmNewPassword)
-            throw new BadRequestException("Mật khẩu xác nhận không khớp.");
+            throw new Exception("Mật khẩu xác nhận không khớp.");
 
         if (!ResetPasswordTokenService.TryValidate(req.Token, _cfg, out var id, out _))
-            throw new UnauthorizedException("Token không hợp lệ.");
+            throw new Exception("Token không hợp lệ.");
 
         var acc = await _repo.GetByIdAsync(id);
 
         if (acc == null)
-            throw new NotFoundException("Tài khoản không tồn tại.");
+            throw new Exception("Tài khoản không tồn tại.");
 
 
         acc.Hashpass = PasswordHasher.Hash(req.NewPassword);

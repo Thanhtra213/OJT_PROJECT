@@ -15,6 +15,7 @@ namespace EasyEnglish_API.Interfaces
         Task<bool> UpdateCourseAsync(Course course);
         Task<bool> DeleteCourseAsync(int courseId);
 
+        Task<CourseChapter> GetChapterAsync(int courseId);
         Task<CourseChapter?> AddChapterAsync(CourseChapter chapter);
         Task<bool> UpdateChapterAsync(CourseChapter chapter);
         Task<bool> DeleteChapterAsync(int chapterId);
