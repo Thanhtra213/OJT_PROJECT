@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EasyEnglish_API.Models;
 
-public partial class AnswerAireview
+public partial class AnswerAIReview
 {
     public long AireviewId { get; set; }
 
@@ -31,5 +31,5 @@ public partial class AnswerAireview
 
     public decimal? ScoreFluency { get; set; }
 
-    public virtual AIsubmission Submission { get; set; } = null!;
+    public virtual AISubmission Submission { get; set; } = null!;
 }

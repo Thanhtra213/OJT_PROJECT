@@ -1,5 +1,4 @@
 ﻿using EasyEnglish_API.Data;
-using EasyEnglish_API.Exceptions;
 using EasyEnglish_API.Interfaces.Authentication;
 using EasyEnglish_API.Interfaces.Feedbacks;
 using EasyEnglish_API.Interfaces.Membership;
@@ -31,6 +30,10 @@ using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Services.Dashboard;
+using EasyEnglish_API.Interfaces.Quiz;
+using EasyEnglish_API.Repositories.Quizs;
+using EasyEnglish_API.Services;
+using EasyEnglish_API.ExternalService;
 
 namespace EasyEnglish_API {
     public class Program
@@ -149,6 +152,7 @@ namespace EasyEnglish_API {
                     .AllowCredentials());
             });
 
+            builder.Services.AddScoped<CloudflareExternal>();
             // == Repositories ==
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -156,6 +160,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+            builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -164,6 +169,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
+            builder.Services.AddScoped<IQuizService, QuizService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
@@ -185,34 +191,7 @@ namespace EasyEnglish_API {
             });
             var app = builder.Build();
 
-            app.UseExceptionHandler(errorApp =>
-            {
-                errorApp.Run(async context =>
-                {
-                    var exception = context.Features
-                        .Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
-
-                    context.Response.ContentType = "application/json";
-
-                    int statusCode = 500;
-                    string message = "Internal server error.";
-
-                    if (exception is ApiException apiEx)
-                    {
-                        statusCode = apiEx.StatusCode;
-                        message = apiEx.Message;
-                    }
-
-                    context.Response.StatusCode = statusCode;
-
-                    await context.Response.WriteAsJsonAsync(new
-                    {
-                        success = false,
-                        statusCode,
-                        message
-                    });
-                });
-            });
+            
             // ===== Swagger =====
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {

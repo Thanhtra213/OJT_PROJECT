@@ -29,7 +29,7 @@ public partial class Account
 
     public int RefreshTokenVersion { get; set; }
 
-    public virtual ICollection<AIsubmission> AIsubmissions { get; set; } = new List<AIsubmission>();
+    public virtual ICollection<AISubmission> AIsubmissions { get; set; } = new List<AISubmission>();
 
     public virtual ICollection<Attempt> Attempts { get; set; } = new List<Attempt>();
 
