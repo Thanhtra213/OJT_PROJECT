@@ -30,10 +30,19 @@ using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Services.Dashboard;
+<<<<<<< HEAD
 using EasyEnglish_API.Interfaces.Quiz;
 using EasyEnglish_API.Repositories.Quizs;
 using EasyEnglish_API.Services;
 using EasyEnglish_API.ExternalService;
+=======
+using EasyEnglish_API.Interfaces.Subscriptionplan;
+using EasyEnglish_API.Repositories.Subscriptionplan;
+using EasyEnglish_API.Services.Subscriptionplan;
+using EasyEnglish_API.Interfaces.Flashcard;
+using EasyEnglish_API.Repositories.Flashcard;
+using EasyEnglish_API.Services.Flashcard;
+>>>>>>> 49e6feaa775c2ef1b6bace49679c57ea9a621975
 
 namespace EasyEnglish_API {
     public class Program
@@ -158,6 +167,8 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+            builder.Services.AddScoped<IFlashcardRepository, FlashcardRepository>();
+            builder.Services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
@@ -167,6 +178,8 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+            builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
             builder.Services.AddScoped<IQuizService, QuizService>();

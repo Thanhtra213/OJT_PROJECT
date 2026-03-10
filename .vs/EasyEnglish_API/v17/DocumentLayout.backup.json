@@ -1,0 +1,224 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\FPT.exe6\\abc-project\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\flashcardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\flashcardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\subscriptionplancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\subscriptionplancontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\controllers\\admin\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\controllers\\admin\\coursecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\flashcard\\flashcardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\flashcard\\flashcardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\services\\flashcard\\iflashcardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\services\\flashcard\\iflashcardservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\createflashcarditemrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\createflashcarditemrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\flashcarddetailresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\flashcarddetailresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\updateflashcardsetrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\updateflashcardsetrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\createflashcardsetrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\createflashcardsetrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\flashcarditemresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\flashcarditemresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|d:\\fpt.exe6\\abc-project\\easyenglish_api\\dtos\\flashcard\\flashcardsetresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE7E490B-C519-4710-8ADD-55AE5B276328}|EasyEnglish_API\\EasyEnglish_API.csproj|solutionrelative:easyenglish_api\\dtos\\flashcard\\flashcardsetresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SubscriptionPlanController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\SubscriptionPlanController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T07:40:23.666Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CourseController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\CourseController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T07:39:45.23Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Program.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Program.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Program.cs",
+              "ViewState": "AgIAAJoAAAAAAAAAAAAgwKwAAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T07:27:17.014Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CreateFlashcardItemRequest.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardItemRequest.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardItemRequest.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardItemRequest.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardItemRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:45:28.986Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CreateFlashcardSetRequest.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardSetRequest.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardSetRequest.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardSetRequest.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\CreateFlashcardSetRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:44:46.919Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FlashcardDetailResponse.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardDetailResponse.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardDetailResponse.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardDetailResponse.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardDetailResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:42:34.089Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FlashcardController.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\FlashcardController.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Controllers\\Admin\\FlashcardController.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Controllers\\Admin\\FlashcardController.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Controllers\\Admin\\FlashcardController.cs",
+              "ViewState": "AgIAADAAAAAAAAAAAAAAwDsAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:39:16.822Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UpdateFlashcardSetRequest.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\UpdateFlashcardSetRequest.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\UpdateFlashcardSetRequest.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\UpdateFlashcardSetRequest.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\UpdateFlashcardSetRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:47:05.545Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FlashcardService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Flashcard\\FlashcardService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Flashcard\\FlashcardService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Flashcard\\FlashcardService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Flashcard\\FlashcardService.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAowCYAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:25:52.712Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IFlashcardService.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Flashcard\\IFlashcardService.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\Services\\Flashcard\\IFlashcardService.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\Services\\Flashcard\\IFlashcardService.cs",
+              "RelativeToolTip": "EasyEnglish_API\\Services\\Flashcard\\IFlashcardService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAxwBMAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:25:56.205Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FlashcardItemResponse.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardItemResponse.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardItemResponse.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardItemResponse.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardItemResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:44:04.259Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "FlashcardSetResponse.cs",
+              "DocumentMoniker": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardSetResponse.cs",
+              "RelativeDocumentMoniker": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardSetResponse.cs",
+              "ToolTip": "D:\\FPT.exe6\\abc-project\\EasyEnglish_API\\DTOs\\Flashcard\\FlashcardSetResponse.cs",
+              "RelativeToolTip": "EasyEnglish_API\\DTOs\\Flashcard\\FlashcardSetResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-10T06:41:10.818Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
