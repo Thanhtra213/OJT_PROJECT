@@ -1,5 +1,4 @@
 ﻿using EasyEnglish_API.Data;
-using EasyEnglish_API.Exceptions;
 using EasyEnglish_API.Interfaces.Authentication;
 using EasyEnglish_API.Interfaces.Feedbacks;
 using EasyEnglish_API.Interfaces.Membership;
@@ -31,12 +30,19 @@ using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Services.Dashboard;
+<<<<<<< HEAD
+using EasyEnglish_API.Interfaces.Quiz;
+using EasyEnglish_API.Repositories.Quizs;
+using EasyEnglish_API.Services;
+using EasyEnglish_API.ExternalService;
+=======
 using EasyEnglish_API.Interfaces.Subscriptionplan;
 using EasyEnglish_API.Repositories.Subscriptionplan;
 using EasyEnglish_API.Services.Subscriptionplan;
 using EasyEnglish_API.Interfaces.Flashcard;
 using EasyEnglish_API.Repositories.Flashcard;
 using EasyEnglish_API.Services.Flashcard;
+>>>>>>> 49e6feaa775c2ef1b6bace49679c57ea9a621975
 
 namespace EasyEnglish_API {
     public class Program
@@ -155,6 +161,7 @@ namespace EasyEnglish_API {
                     .AllowCredentials());
             });
 
+            builder.Services.AddScoped<CloudflareExternal>();
             // == Repositories ==
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -164,6 +171,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+            builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -174,6 +182,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
+            builder.Services.AddScoped<IQuizService, QuizService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
@@ -195,34 +204,7 @@ namespace EasyEnglish_API {
             });
             var app = builder.Build();
 
-            app.UseExceptionHandler(errorApp =>
-            {
-                errorApp.Run(async context =>
-                {
-                    var exception = context.Features
-                        .Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error;
-
-                    context.Response.ContentType = "application/json";
-
-                    int statusCode = 500;
-                    string message = "Internal server error.";
-
-                    if (exception is ApiException apiEx)
-                    {
-                        statusCode = apiEx.StatusCode;
-                        message = apiEx.Message;
-                    }
-
-                    context.Response.StatusCode = statusCode;
-
-                    await context.Response.WriteAsJsonAsync(new
-                    {
-                        success = false,
-                        statusCode,
-                        message
-                    });
-                });
-            });
+            
             // ===== Swagger =====
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {

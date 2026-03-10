@@ -9,20 +9,34 @@ namespace EasyEnglish_API.Services.Courses
         Task<List<CourseResponse>> GetAllCoursesAsync();
         Task<object?> GetCourseDetailAsync(int courseId);
         Task<bool> CourseExistsAsync(int courseId);
-
-        // -------- TEACHER SIDE --------
-        Task<List<Course>> GetCoursesByTeacherAsync(int teacherId);
-        Task<Course?> CreateCourseAsync(Course course);
-        Task<bool> UpdateCourseAsync(Course course);
         Task<bool> DeleteCourseAsync(int courseId);
 
-        Task<CourseChapter?> AddChapterAsync(CourseChapter chapter);
-        Task<bool> UpdateChapterAsync(CourseChapter chapter);
-        Task<bool> DeleteChapterAsync(int chapterId);
+        // -------- TEACHER SIDE --------
+        Task<List<CourseResponse>> GetCoursesByTeacherAsync(int teacherId);
 
-        //Video
+        Task<CourseResponse?> GetTeacherCourseDetailAsync(int teacherId, int courseId);
+
+        Task<int> CreateCourseAsync(int teacherId, CreateCourseRequest req);
+
+        Task<bool> UpdateCourseAsync(int teacherId, int courseId, UpdateCourseRequest req);
+
+        Task<bool> DeleteCourseAsync(int teacherId, int courseId);
+
+
+        // ===== CHAPTER =====
+
+        Task<int> AddChapterAsync(int teacherId, int courseId, CreateChapterRequest req);
+
+        Task<bool> UpdateChapterAsync(int teacherId, int chapterId, UpdateChapterRequest req);
+
+        Task<bool> DeleteChapterAsync(int teacherId, int chapterId);
+
+
+        // ===== VIDEO =====
+
+        Task<int> AddVideoAsync(int teacherId, int chapterId, CreateVideoRequest req);
+
+        Task<bool> DeleteVideoAsync(int teacherId, int videoId);
         Task<CourseVideo?> GetVideoAsync(int videoId);
-        Task<CourseVideo?> AddVideoAsync(CourseVideo video);
-        Task<bool> DeleteVideoAsync(int videoId);
     }
 }

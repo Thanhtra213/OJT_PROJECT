@@ -9,62 +9,61 @@ namespace EasyEnglish_API.Services.FeedbackService
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedback;
-        //private readonly IMembershipRepository _membership;
-        //private readonly ICourseRepository _course;
+        private readonly IMembershipRepository _membership;
+        private readonly ICourseRepository _course;
 
-        public FeedbackService(IFeedbackRepository feedback)
-            //, ICourseDAO course) IMembershipRepository membership
+        public FeedbackService(IFeedbackRepository feedback, ICourseRepository course, IMembershipRepository membership)
         {
             _feedback = feedback;
-            //_membership = membership;
-            //_course = course;
+            _membership = membership;
+            _course = course;
         }
 
         //===== User =====   
-        //public async Task<Feedback> CreateFeedbackAsync(int userId, FeedbackCreateRequest req)
-        //{
-        //    bool hasMembership = await _membership.HasActiveMembershipAsync(userId);
-        //    if (!hasMembership)
-        //        throw new UnauthorizedAccessException("You need an active membership to submit feedback.");
+        public async Task<Feedback> CreateFeedbackAsync(int userId, FeedbackCreateRequest req)
+        {
+            bool hasMembership = await _membership.HasActiveMembershipAsync(userId);
+            if (!hasMembership)
+                throw new UnauthorizedAccessException("You need an active membership to submit feedback.");
 
-        //    if (!await _course.CourseExistsAsync(req.CourseID))
-        //        throw new KeyNotFoundException("Course not found.");
+            if (!await _course.CourseExistsAsync(req.CourseID))
+                throw new KeyNotFoundException("Course not found.");
 
-        //    if (await _feedback.HasFeedbackAsync(req.CourseID, userId))
-        //        throw new InvalidOperationException("You have already submitted feedback for this course.");
+            if (await _feedback.HasFeedbackAsync(req.CourseID, userId))
+                throw new InvalidOperationException("You have already submitted feedback for this course.");
 
-        //    if (req.Rating < 1 || req.Rating > 5)
-        //        throw new ArgumentException("Rating must be between 1 and 5.");
+            if (req.Rating < 1 || req.Rating > 5)
+                throw new ArgumentException("Rating must be between 1 and 5.");
 
-        //    var feedback = new Feedback
-        //    {
-        //        UserId = userId,
-        //        CourseId = req.CourseID,
-        //        Rating = req.Rating,
-        //        Comment = req.Comment,
-        //        CreatedAt = DateTime.UtcNow,
-        //        IsVisible = true
-        //    };
+            var feedback = new Feedback
+            {
+                UserId = userId,
+                CourseId = req.CourseID,
+                Rating = req.Rating,
+                Comment = req.Comment,
+                CreatedAt = DateTime.UtcNow,
+                IsVisible = true
+            };
 
-        //    return await _feedback.CreateFeedbackAsync(feedback);
-        //}
+            return await _feedback.CreateFeedbackAsync(feedback);
+        }
 
         //===== Public =====
 
-        //public async Task<(double average, int total)> GetCourseRatingAsync(int courseId)
-        //{
-        //    if (!await _course.CourseExistsAsync(courseId))
-        //        throw new Exception("Course not found");
+        public async Task<(double average, int total)> GetCourseRatingAsync(int courseId)
+        {
+            if (!await _course.CourseExistsAsync(courseId))
+                throw new Exception("Course not found");
 
-        //    return await _feedback.GetCourseRatingAsync(courseId);
-        //}
+            return await _feedback.GetCourseRatingAsync(courseId);
+        }
 
-        //public async Task<List<FeedbackViewDto>> GetCourseFeedbacksAsync(int courseId)
-        //{
-        //    if (!await _course.CourseExistsAsync(courseId))
-        //        throw new Exception("Course not found. ");
-        //    return await _feedback.GetCourseFeedbacksAsync(courseId);
-        //}
+        public async Task<List<FeedbackViewDto>> GetCourseFeedbacksAsync(int courseId)
+        {
+            if (!await _course.CourseExistsAsync(courseId))
+                throw new Exception("Course not found. ");
+            return await _feedback.GetCourseFeedbacksAsync(courseId);
+        }
         //===== Teacher Feeback =====
         public async Task<IEnumerable<FeedbackViewDto>> GetTeacherFeedbacksAsync(int teacherId)
         {
