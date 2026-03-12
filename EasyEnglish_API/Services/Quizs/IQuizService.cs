@@ -1,6 +1,6 @@
-﻿using EasyEnglish_API.DTOs.Quiz;
+﻿using EasyEnglish_API.DTOs.Quizs;
 
-namespace EasyEnglish_API.Interfaces.Quiz
+namespace EasyEnglish_API.Interfaces.Quizs
 {
     public interface IQuizService
     {

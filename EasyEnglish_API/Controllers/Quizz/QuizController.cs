@@ -1,5 +1,5 @@
-﻿using EasyEnglish_API.DTOs.Quiz;
-using EasyEnglish_API.Interfaces.Quiz;
+﻿using EasyEnglish_API.DTOs.Quizs;
+using EasyEnglish_API.Interfaces.Quizs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

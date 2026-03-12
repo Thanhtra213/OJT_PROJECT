@@ -16,18 +16,106 @@ namespace EasyEnglish_API.Services.Courses
             _r2 = r2;
         }
 
+        
+        private async Task<int> ResolveTeacherIdAsync(int accountId)
+        {
+            var teacherId = await _courseRepository.GetTeacherIdByAccountIdAsync(accountId);
+            if (teacherId == null)
+                throw new KeyNotFoundException("Teacher profile not found for this account.");
+            return teacherId.Value;
+        }
+
+        // ── COURSE ───────────────────────────────────────────────────────────
+
         public async Task<bool> CourseExistsAsync(int courseId)
         {
             return await _courseRepository.CourseExistsAsync(courseId);
         }
 
+        public async Task<List<CourseResponse>> GetAllCoursesAsync()
+        {
+            var data = await _courseRepository.GetAllCoursesAsync();
 
-        public async Task<CourseResponse?> GetTeacherCourseDetailAsync(int teacherId, int courseId)
+            return data.Select(c => new CourseResponse
+            {
+                CourseID = c.CourseId,
+                CourseName = c.CourseName,
+                CourseDescription = c.Description,
+                TeacherID = c.TeacherId,
+                TeacherName = c.Teacher?.TeacherNavigation?.Username ?? "(No Teacher)",
+                CreateAt = c.CreateAt
+            }).ToList();
+        }
+
+        public async Task<object?> GetCourseDetailAsync(int courseId)
         {
             var course = await _courseRepository.GetCourseDetailAsync(courseId);
+            if (course == null)
+                throw new KeyNotFoundException("Course not found");
 
+            var chapters = course.CourseChapters.Select(ch => new
+            {
+                ch.ChapterId,
+                ch.ChapterName,
+                Videos = ch.CourseVideos.Select(v => new
+                {
+                    v.VideoId,
+                    v.VideoName,
+                    v.VideoUrl,
+                    v.IsPreview
+                })
+            });
+
+            var orphanVideos = course.CourseVideos
+                .Where(v => v.ChapterId == null)
+                .Select(v => new
+                {
+                    v.VideoId,
+                    v.VideoName,
+                    v.VideoUrl,
+                    v.IsPreview
+                }).ToList();
+
+            return new
+            {
+                course.CourseId,
+                course.CourseName,
+                course.Description,
+                Teacher = course.Teacher != null ? new
+                {
+                    course.Teacher.TeacherId,
+                    TeacherName = course.Teacher.TeacherNavigation?.Username ?? "(Unknown)"
+                } : null,
+                course.CreateAt,
+                Chapters = chapters,
+                OrphanVideos = orphanVideos
+            };
+        }
+
+        public async Task<List<CourseResponse>> GetCoursesByTeacherAsync(int accountId)
+        {
+            var teacherId = await ResolveTeacherIdAsync(accountId);
+
+            var courses = await _courseRepository.GetCoursesByTeacherAsync(teacherId);
+
+            return courses.Select(c => new CourseResponse
+            {
+                CourseID = c.CourseId,
+                CourseName = c.CourseName,
+                CourseDescription = c.Description,
+                TeacherID = c.TeacherId,
+                TeacherName = c.Teacher?.TeacherNavigation?.Username ?? "(Unknown)",
+                CreateAt = c.CreateAt
+            }).ToList();
+        }
+
+        public async Task<CourseResponse?> GetTeacherCourseDetailAsync(int accountId, int courseId)
+        {
+            var teacherId = await ResolveTeacherIdAsync(accountId);
+
+            var course = await _courseRepository.GetCourseDetailAsync(courseId);
             if (course == null || course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
             return new CourseResponse
             {
@@ -40,9 +128,11 @@ namespace EasyEnglish_API.Services.Courses
             };
         }
 
-
-        public async Task<int> CreateCourseAsync(int teacherId, CreateCourseRequest req)
+        public async Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req)
         {
+            // ✅ Fix: dùng TeacherId thật, không phải AccountId
+            var teacherId = await ResolveTeacherIdAsync(accountId);
+
             var course = new Course
             {
                 TeacherId = teacherId,
@@ -53,20 +143,18 @@ namespace EasyEnglish_API.Services.Courses
             };
 
             var created = await _courseRepository.CreateCourseAsync(course);
-
             return created!.CourseId;
         }
 
-
-        public async Task<bool> UpdateCourseAsync(int teacherId, int courseId, UpdateCourseRequest req)
+        public async Task<bool> UpdateCourseAsync(int accountId, int courseId, UpdateCourseRequest req)
         {
-            var course = await _courseRepository.GetCourseDetailAsync(courseId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (course == null)
-                throw new Exception("Course not found");
+            var course = await _courseRepository.GetCourseDetailAsync(courseId)
+                ?? throw new KeyNotFoundException("Course not found");
 
             if (course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
             course.CourseName = req.CourseName;
             course.Description = req.Description;
@@ -74,30 +162,30 @@ namespace EasyEnglish_API.Services.Courses
             return await _courseRepository.UpdateCourseAsync(course);
         }
 
-
-        public async Task<bool> DeleteCourseAsync(int teacherId, int courseId)
+        public async Task<bool> DeleteCourseAsync(int accountId, int courseId)
         {
-            var course = await _courseRepository.GetCourseDetailAsync(courseId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (course == null)
-                throw new Exception("Course not found");
+            var course = await _courseRepository.GetCourseDetailAsync(courseId)
+                ?? throw new KeyNotFoundException("Course not found");
 
             if (course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
             return await _courseRepository.DeleteCourseAsync(courseId);
         }
 
-        // =========================
-        // CHAPTER
-        // =========================
+        // ── CHAPTER ──────────────────────────────────────────────────────────
 
-        public async Task<int> AddChapterAsync(int teacherId, int courseId, CreateChapterRequest req)
+        public async Task<int> AddChapterAsync(int accountId, int courseId, CreateChapterRequest req)
         {
-            var course = await _courseRepository.GetCourseDetailAsync(courseId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (course == null || course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+            var course = await _courseRepository.GetCourseDetailAsync(courseId)
+                ?? throw new KeyNotFoundException("Course not found");
+
+            if (course.TeacherId != teacherId)
+                throw new UnauthorizedAccessException("Forbidden");
 
             var chapter = new CourseChapter
             {
@@ -106,56 +194,49 @@ namespace EasyEnglish_API.Services.Courses
             };
 
             var created = await _courseRepository.AddChapterAsync(chapter);
-
             return created!.ChapterId;
         }
 
-
-        public async Task<bool> UpdateChapterAsync(int teacherId, int chapterId, UpdateChapterRequest req)
+        public async Task<bool> UpdateChapterAsync(int accountId, int chapterId, UpdateChapterRequest req)
         {
-            var chapter = await _courseRepository.GetChapterAsync(chapterId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (chapter == null)
-                throw new Exception("Chapter not found");
+            var chapter = await _courseRepository.GetChapterAsync(chapterId)
+                ?? throw new KeyNotFoundException("Chapter not found");
 
             if (chapter.Course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
             chapter.ChapterName = req.ChapterName;
 
             return await _courseRepository.UpdateChapterAsync(chapter);
         }
 
-
-        public async Task<bool> DeleteChapterAsync(int teacherId, int chapterId)
+        public async Task<bool> DeleteChapterAsync(int accountId, int chapterId)
         {
-            var chapter = await _courseRepository.GetChapterAsync(chapterId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (chapter == null)
-                throw new Exception("Chapter not found");
+            var chapter = await _courseRepository.GetChapterAsync(chapterId)
+                ?? throw new KeyNotFoundException("Chapter not found");
 
             if (chapter.Course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
             return await _courseRepository.DeleteChapterAsync(chapterId);
         }
 
+        // ── VIDEO ────────────────────────────────────────────────────────────
 
-        // =========================
-        // VIDEO
-        // =========================
-
-        public async Task<int> AddVideoAsync(int teacherId, int chapterId, CreateVideoRequest req)
+        public async Task<int> AddVideoAsync(int accountId, int chapterId, CreateVideoRequest req)
         {
-            var chapter = await _courseRepository.GetChapterAsync(chapterId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (chapter == null)
-                throw new Exception("Chapter not found");
+            var chapter = await _courseRepository.GetChapterAsync(chapterId)
+                ?? throw new KeyNotFoundException("Chapter not found");
 
             if (chapter.Course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
-            // upload video lên Cloudflare R2
             var videoUrl = await _r2.UploadVideoAsync(
                 req.VideoFile.OpenReadStream(),
                 req.VideoFile.FileName,
@@ -172,121 +253,32 @@ namespace EasyEnglish_API.Services.Courses
             };
 
             var created = await _courseRepository.AddVideoAsync(video);
-
             return created!.VideoId;
         }
 
-
-        public async Task<bool> DeleteVideoAsync(int teacherId, int videoId)
+        public async Task<bool> DeleteVideoAsync(int accountId, int videoId)
         {
-            var video = await _courseRepository.GetVideoAsync(videoId);
+            var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            if (video == null)
-                throw new Exception("Video not found");
+            var video = await _courseRepository.GetVideoAsync(videoId)
+                ?? throw new KeyNotFoundException("Video not found");
 
             if (video.Course.TeacherId != teacherId)
-                throw new Exception("Forbidden");
+                throw new UnauthorizedAccessException("Forbidden");
 
-            // xoá file trên Cloudflare
             await _r2.DeleteFileAsync(video.VideoUrl);
 
             return await _courseRepository.DeleteVideoAsync(videoId);
         }
 
-        public async Task<List<CourseResponse>> GetAllCoursesAsync()
+        public async Task<CourseVideo?> GetVideoAsync(int videoId)
         {
-            var data = await _courseRepository.GetAllCoursesAsync();
-            var result = data.Select(c => new CourseResponse
-            {
-                CourseID = c.CourseId,
-                CourseName = c.CourseName,
-                CourseDescription = c.Description,
-                TeacherID = c.TeacherId,
-                TeacherName = c.Teacher?.TeacherNavigation?.Username ?? "(No Teacher)",
-                CreateAt = c.CreateAt
-            }).ToList();
-            return result;
-        }
-
-        public async Task<object?> GetCourseDetailAsync(int courseId)
-        {
-            var course = await _courseRepository.GetCourseDetailAsync(courseId);
-            var response = new
-            {
-                course.CourseId,
-                course.CourseName,
-                course.Description,
-                Teacher = course.Teacher != null ? new
-                {
-                    course.Teacher.TeacherId,
-                    TeacherName = course.Teacher.TeacherNavigation?.Username ?? "(Unknown)"
-                } : null,
-                course.CreateAt,
-                Chapters = course.CourseChapters.Select(ch => new
-                {
-                    ch.ChapterId,
-                    ch.ChapterName
-                }),
-                Videos = course.CourseChapters.SelectMany(ch => ch.CourseVideos).Select(v => new
-                {
-                    v.VideoId,
-                    v.VideoName,
-                    v.VideoUrl,
-                    v.IsPreview
-                })
-            };
-
-            var orphanVideos = course.CourseVideos
-                .Where(v => v.ChapterId == null)
-                .Select(v => new
-                {
-                    v.VideoId,
-                    v.VideoName,
-                    v.VideoUrl,
-                    v.IsPreview
-                }).ToList();
-
-            if (orphanVideos.Any())
-            {
-                response = new
-                {
-                    response.CourseId,
-                    response.CourseName,
-                    response.Description,
-                    response.Teacher,
-                    response.CreateAt,
-                    Chapters = response.Chapters,
-                    Videos = response.Videos.Concat(orphanVideos)
-                };
-            }
-            return response;
-        }
-
-        public async Task<List<CourseResponse>> GetCoursesByTeacherAsync(int teacherId)
-        {
-            var courses = await _courseRepository.GetCoursesByTeacherAsync(teacherId);
-
-            return courses.Select(c => new CourseResponse
-            {
-                CourseID = c.CourseId,
-                CourseName = c.CourseName,
-                CourseDescription = c.Description,
-                TeacherID = c.TeacherId,
-                TeacherName = c.Teacher?.TeacherNavigation?.Username ?? "(Unknown)",
-                CreateAt = c.CreateAt
-            }).ToList();
-        }
-
-        public Task<CourseVideo?> GetVideoAsync(int videoId)
-        {
-            throw new NotImplementedException();
+            return await _courseRepository.GetVideoAsync(videoId);
         }
 
         public async Task<bool> DeleteCourseAsync(int courseId)
         {
             return await _courseRepository.DeleteCourseAsync(courseId);
         }
-
-
     }
 }

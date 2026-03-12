@@ -1,4 +1,4 @@
-﻿namespace EasyEnglish_API.DTOs.Quiz
+﻿namespace EasyEnglish_API.DTOs.Quizs
 {
     // Tạo quiz shell
     public class TeacherCreateQuizRequest

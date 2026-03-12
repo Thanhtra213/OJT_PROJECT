@@ -18,36 +18,28 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             _courseService = courseService;
         }
 
-        private int GetUserId()
-        {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        }
+        private int GetUserId() =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        // ── COURSE ───────────────────────────────────────────────────────────
 
         [HttpGet]
         public async Task<IActionResult> GetMyCourses()
         {
-            var teacherId = GetUserId();
-
-            var courses = await _courseService.GetCoursesByTeacherAsync(teacherId);
-
-            return Ok(new
-            {
-                Courses = courses
-            });
+            var courses = await _courseService.GetCoursesByTeacherAsync(GetUserId());
+            return Ok(new { Courses = courses });
         }
 
-       
         [HttpGet("{courseId:int}")]
         public async Task<IActionResult> GetCourseDetail(int courseId)
         {
-            var teacherId = GetUserId();
-
-            var course = await _courseService.GetTeacherCourseDetailAsync(teacherId, courseId);
-
-            if (course == null)
-                return NotFound(new { message = "Course not found" });
-
-            return Ok(course);
+            try
+            {
+                var course = await _courseService.GetTeacherCourseDetailAsync(GetUserId(), courseId);
+                return Ok(course);
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
         [HttpPost]
@@ -56,123 +48,111 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             if (string.IsNullOrWhiteSpace(req.CourseName))
                 return BadRequest(new { message = "Course name is required" });
 
-            var teacherId = GetUserId();
-
-            var courseId = await _courseService.CreateCourseAsync(teacherId, req);
-
-            return Ok(new
+            try
             {
-                message = "Course created",
-                courseId
-            });
+                var courseId = await _courseService.CreateCourseAsync(GetUserId(), req);
+                return Ok(new { message = "Course created", courseId });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
         }
 
         [HttpPut("{courseId:int}")]
         public async Task<IActionResult> UpdateCourse(int courseId, [FromBody] UpdateCourseRequest req)
         {
-            var teacherId = GetUserId();
-
-            var ok = await _courseService.UpdateCourseAsync(teacherId, courseId, req);
-
-            if (!ok)
-                return NotFound(new { message = "Course not found" });
-
-            return Ok(new { message = "Course updated" });
+            try
+            {
+                var ok = await _courseService.UpdateCourseAsync(GetUserId(), courseId, req);
+                return ok ? Ok(new { message = "Course updated" })
+                          : NotFound(new { message = "Course not found" });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        
         [HttpDelete("{courseId:int}")]
         public async Task<IActionResult> DeleteCourse(int courseId)
         {
-            var teacherId = GetUserId();
-
-            var ok = await _courseService.DeleteCourseAsync(teacherId, courseId);
-
-            if (!ok)
-                return NotFound(new { message = "Course not found" });
-
-            return Ok(new { message = "Course deleted" });
+            try
+            {
+                var ok = await _courseService.DeleteCourseAsync(GetUserId(), courseId);
+                return ok ? Ok(new { message = "Course deleted" })
+                          : NotFound(new { message = "Course not found" });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // ADD CHAPTER
+        // ── CHAPTER ──────────────────────────────────────────────────────────
+
         [HttpPost("{courseId:int}/chapter")]
         public async Task<IActionResult> AddChapter(int courseId, [FromBody] CreateChapterRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.ChapterName))
                 return BadRequest(new { message = "Chapter name is required" });
 
-            var teacherId = GetUserId();
-
-            var chapterId = await _courseService.AddChapterAsync(teacherId, courseId, req);
-
-            return Ok(new
+            try
             {
-                message = "Chapter added",
-                chapterId
-            });
+                var chapterId = await _courseService.AddChapterAsync(GetUserId(), courseId, req);
+                return Ok(new { message = "Chapter added", chapterId });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // UPDATE CHAPTER
         [HttpPut("chapter/{chapterId:int}")]
         public async Task<IActionResult> UpdateChapter(int chapterId, [FromBody] UpdateChapterRequest req)
         {
-            var teacherId = GetUserId();
-
-            var ok = await _courseService.UpdateChapterAsync(teacherId, chapterId, req);
-
-            if (!ok)
-                return NotFound(new { message = "Chapter not found" });
-
-            return Ok(new { message = "Chapter updated" });
+            try
+            {
+                var ok = await _courseService.UpdateChapterAsync(GetUserId(), chapterId, req);
+                return ok ? Ok(new { message = "Chapter updated" })
+                          : NotFound(new { message = "Chapter not found" });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-
-        // DELETE CHAPTER
         [HttpDelete("chapter/{chapterId:int}")]
         public async Task<IActionResult> DeleteChapter(int chapterId)
         {
-            var teacherId = GetUserId();
-
-            var ok = await _courseService.DeleteChapterAsync(teacherId, chapterId);
-
-            if (!ok)
-                return NotFound(new { message = "Chapter not found" });
-
-            return Ok(new { message = "Chapter deleted" });
+            try
+            {
+                var ok = await _courseService.DeleteChapterAsync(GetUserId(), chapterId);
+                return ok ? Ok(new { message = "Chapter deleted" })
+                          : NotFound(new { message = "Chapter not found" });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // ADD VIDEO (UPLOAD R2)
+        // ── VIDEO ────────────────────────────────────────────────────────────
+
         [HttpPost("{chapterId:int}/video")]
-        public async Task<IActionResult> AddVideo(
-            int chapterId,
-            [FromForm] CreateVideoRequest req)
+        public async Task<IActionResult> AddVideo(int chapterId, [FromForm] CreateVideoRequest req)
         {
             if (req.VideoFile == null)
                 return BadRequest(new { message = "Video file is required" });
 
-            var teacherId = GetUserId();
-
-            var videoId = await _courseService.AddVideoAsync(teacherId, chapterId, req);
-
-            return Ok(new
+            try
             {
-                message = "Video uploaded",
-                videoId
-            });
+                var videoId = await _courseService.AddVideoAsync(GetUserId(), chapterId, req);
+                return Ok(new { message = "Video uploaded", videoId });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // DELETE VIDEO
         [HttpDelete("video/{videoId:int}")]
         public async Task<IActionResult> DeleteVideo(int videoId)
         {
-            var teacherId = GetUserId();
-
-            var ok = await _courseService.DeleteVideoAsync(teacherId, videoId);
-
-            if (!ok)
-                return NotFound(new { message = "Video not found" });
-
-            return Ok(new { message = "Video deleted" });
+            try
+            {
+                var ok = await _courseService.DeleteVideoAsync(GetUserId(), videoId);
+                return ok ? Ok(new { message = "Video deleted" })
+                          : NotFound(new { message = "Video not found" });
+            }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
     }
 }
