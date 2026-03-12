@@ -12,5 +12,6 @@ namespace EasyEnglish_API.Interfaces.User
         Task<Account?> UnlockUserAsync(int id);
         Task<List<Account>> SearchUsersAsync(string? keyword, string? role, string? status);
         Task<Account?> AssignRoleAsync(int userId, string newRole);
+        Task EnsureTeacherProfileAsync(int accountId);
     }
 }

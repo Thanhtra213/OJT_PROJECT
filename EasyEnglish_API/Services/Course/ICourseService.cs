@@ -6,37 +6,25 @@ namespace EasyEnglish_API.Services.Courses
 {
     public interface ICourseService
     {
+        Task<bool> CourseExistsAsync(int courseId);
         Task<List<CourseResponse>> GetAllCoursesAsync();
         Task<object?> GetCourseDetailAsync(int courseId);
-        Task<bool> CourseExistsAsync(int courseId);
         Task<bool> DeleteCourseAsync(int courseId);
+        Task<List<CourseResponse>> GetCoursesByTeacherAsync(int accountId);
+        Task<CourseResponse?> GetTeacherCourseDetailAsync(int accountId, int courseId);
+        Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req);
+        Task<bool> UpdateCourseAsync(int accountId, int courseId, UpdateCourseRequest req);
+        Task<bool> DeleteCourseAsync(int accountId, int courseId);
 
-        // -------- TEACHER SIDE --------
-        Task<List<CourseResponse>> GetCoursesByTeacherAsync(int teacherId);
+        // ── CHAPTER ──────────────────────────────────────────────────────────
+        Task<int> AddChapterAsync(int accountId, int courseId, CreateChapterRequest req);
+        Task<bool> UpdateChapterAsync(int accountId, int chapterId, UpdateChapterRequest req);
+        Task<bool> DeleteChapterAsync(int accountId, int chapterId);
 
-        Task<CourseResponse?> GetTeacherCourseDetailAsync(int teacherId, int courseId);
-
-        Task<int> CreateCourseAsync(int teacherId, CreateCourseRequest req);
-
-        Task<bool> UpdateCourseAsync(int teacherId, int courseId, UpdateCourseRequest req);
-
-        Task<bool> DeleteCourseAsync(int teacherId, int courseId);
-
-
-        // ===== CHAPTER =====
-
-        Task<int> AddChapterAsync(int teacherId, int courseId, CreateChapterRequest req);
-
-        Task<bool> UpdateChapterAsync(int teacherId, int chapterId, UpdateChapterRequest req);
-
-        Task<bool> DeleteChapterAsync(int teacherId, int chapterId);
-
-
-        // ===== VIDEO =====
-
-        Task<int> AddVideoAsync(int teacherId, int chapterId, CreateVideoRequest req);
-
-        Task<bool> DeleteVideoAsync(int teacherId, int videoId);
+        // ── VIDEO ────────────────────────────────────────────────────────────
+        Task<int> AddVideoAsync(int accountId, int chapterId, CreateVideoRequest req);
+        Task<bool> DeleteVideoAsync(int accountId, int videoId);
         Task<CourseVideo?> GetVideoAsync(int videoId);
     }
 }
+

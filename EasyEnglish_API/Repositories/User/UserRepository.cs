@@ -77,5 +77,20 @@ namespace EasyEnglish_API.Repositories.User
             await _db.SaveChangesAsync();
             return user;
         }
+
+        public async Task EnsureTeacherProfileAsync(int accountId)
+        {
+            var exists = await _db.Teachers
+                .AnyAsync(t => t.TeacherId == accountId);
+
+            if (!exists)
+            {
+                _db.Teachers.Add(new Teacher
+                {
+                    TeacherId = accountId
+                });
+                await _db.SaveChangesAsync();
+            }
+        }
     }
 }

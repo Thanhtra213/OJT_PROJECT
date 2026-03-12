@@ -86,13 +86,28 @@ namespace EasyEnglish_API.Services.UserService
         public async Task<Account?> AssignRoleAsync(AssignRoleRequest req)
         {
             var validRoles = new[] { "ADMIN", "TEACHER", "STUDENT" };
-            if (!validRoles.Contains(req.Role.ToUpper()))
+            var normalizedRole = req.Role.ToUpper();
+
+            if (!validRoles.Contains(normalizedRole))
                 throw new Exception("Invalid role. Role must be ADMIN, TEACHER, or STUDENT.");
 
-            var user = await _userRepository.AssignRoleAsync(req.UserId, req.Role.ToUpper());
+            var user = await _userRepository.AssignRoleAsync(req.UserId, normalizedRole);
             if (user == null)
                 throw new Exception("User not found.");
-            return await _userRepository.AssignRoleAsync(req.UserId, req.Role);
+
+            if (normalizedRole == "TEACHER")
+                await _userRepository.EnsureTeacherProfileAsync(req.UserId);
+
+            return user;
         }
+
+         private static GetUserResponse ToResponse(Account u) => new()
+        {
+            AccountId = u.AccountId,
+            UserName = u.Username,
+            Email = u.Email,
+            Status = u.Status,
+            Role = u.Role
+        };
     }
 }

@@ -14,6 +14,13 @@ namespace EasyEnglish_API.Repositories.Courses
             _db = db;
         }
 
+        public async Task<int?> GetTeacherIdByAccountIdAsync(int accountId)
+        {
+            var teacher = await _db.Teachers
+                .FirstOrDefaultAsync(t => t.TeacherNavigation.AccountId == accountId);
+            return teacher?.TeacherId;
+        }
+
         public async Task<CourseChapter> GetChapterAsync(int courseId)
         {
             return await _db.CourseChapters.FindAsync(courseId);
