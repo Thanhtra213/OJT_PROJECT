@@ -15,85 +15,74 @@ namespace EasyEnglish_API.ExternalService
         public AIQuizExternal(IConfiguration config, ILogger<AIQuizExternal> logger)
         {
             _http = new HttpClient();
-            _apiKey = config["OpenAI:ApiKey"] ?? throw new Exception("Missing OpenAI API key");
+            _apiKey = config["Gemini:ApiKey"] ?? throw new Exception("Missing Gemini API key");
             _logger = logger;
         }
 
         public async Task<string> GenerateQuizAsync(string teacherPrompt)
         {
+            var prompt = $@"
+Generate an IELTS quiz.
+
+Teacher request: {teacherPrompt}
+
+Return ONLY JSON in this schema:
+Return ONLY valid JSON.
+Do not use markdown.
+Do not wrap JSON in ```json```.
+
+{{
+  ""Title"": ""string"",
+  ""Description"": ""string"",
+  ""Questions"": [
+    {{
+      ""QuestionType"": number,
+      ""Content"": ""string"",
+      ""Options"": [
+        {{
+          ""Content"": ""string"",
+          ""IsCorrect"": true
+        }}
+      ]
+    }}
+  ]
+}}
+";
+
             var payload = new
             {
-                model = "gpt-4o-mini",
-                messages = new[]
+                contents = new[]
                 {
-                    new { role = "user", content = $"Generate an IELTS quiz.\nTeacher request: {teacherPrompt}" }
-                },
-                temperature = 0.7,
-
-                // ========================================
-                // 🔥 BẮT BUỘC AI TRẢ JSON CHUẨN THEO SCHEMA
-                // ========================================
-                response_format = new
-                {
-                    type = "json_schema",
-                    json_schema = new
+                    new
                     {
-                        name = "quiz_schema",
-                        schema = new
+                        parts = new[]
                         {
-                            type = "object",
-                            properties = new
-                            {
-                                Title = new { type = "string" },
-                                Description = new { type = "string" },
-
-                                Questions = new
-                                {
-                                    type = "array",
-                                    items = new
-                                    {
-                                        type = "object",
-                                        properties = new
-                                        {
-                                            QuestionType = new { type = "integer" },
-                                            Content = new { type = "string" },
-                                            Options = new
-                                            {
-                                                type = "array",
-                                                items = new
-                                                {
-                                                    type = "object",
-                                                    properties = new
-                                                    {
-                                                        Content = new { type = "string" },
-                                                        IsCorrect = new { type = "boolean" }
-                                                    },
-                                                    required = new[] { "Content", "IsCorrect" }
-                                                }
-                                            }
-                                        },
-                                        required = new[] { "QuestionType", "Content", "Options" }
-                                    }
-                                }
-                            },
-                            required = new[] { "Title", "Description", "Questions" }
+                            new { text = prompt }
                         }
                     }
                 }
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-            _http.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
 
-            var response = await _http.PostAsync("https://api.openai.com/v1/chat/completions", content);
+            var response = await _http.PostAsync(
+                $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
+                content
+            );
+
             var raw = await response.Content.ReadAsStringAsync();
 
             using var doc = JsonDocument.Parse(raw);
+
             var result = doc.RootElement
-                .GetProperty("choices")[0]
-                .GetProperty("message")
+                .GetProperty("candidates")[0]
                 .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
                 .GetString();
 
             return result ?? "{}";

@@ -1,8 +1,8 @@
 ﻿using EasyEnglish_API.Data;
-using EasyEnglish_API.DTOs.Quiz;
-using EasyEnglish_API.Interfaces.Quiz;
+using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
+using EasyEnglish_API.Models;
 
 namespace EasyEnglish_API.Repositories.Quizs
 {
@@ -15,62 +15,39 @@ namespace EasyEnglish_API.Repositories.Quizs
             _db = db;
         }
 
-        public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int courseId)
+        public async Task<List<Quiz>> GetQuizzesByCourseAsync(int courseId)
         {
             return await _db.Quizzes
                 .Where(q => q.CourseId == courseId && q.IsActive)
-                .Select(q => new QuizDto
-                {
-                    QuizID = q.QuizId,
-                    Title = q.Title,
-                    Description = q.Description,
-                    QuizType = q.QuizType
-                }).ToListAsync();
+                .ToListAsync();
         }
 
-        public async Task<List<QuizDto>> GetGlobalQuizzesAsync()
+        public async Task<List<Quiz>> GetGlobalQuizzesAsync()
         {
             return await _db.Quizzes
                 .Where(q => q.CourseId == null && q.IsActive)
-                .Select(q => new QuizDto
-                {
-                    QuizID = q.QuizId,
-                    Title = q.Title,
-                    Description = q.Description,
-                    QuizType = q.QuizType
-                }).ToListAsync();
+                .ToListAsync();
         }
 
-        public async Task<List<QuizDto>> GetAllGlobalQuizzesAsync()
+        public async Task<List<Quiz>> GetAllGlobalQuizzesAsync()
         {
             return await _db.Quizzes
                 .Where(q => q.CourseId == null)
-                .Select(q => new QuizDto
-                {
-                    QuizID = q.QuizId,
-                    Title = q.Title,
-                    Description = q.Description,
-                    QuizType = q.QuizType
-                }).ToListAsync();
+                .ToListAsync();
         }
 
-        public async Task<QuizDetailDto?> GetQuizDetailAsync(int quizId)
+        public async Task<Quiz?> GetQuizDetailAsync(int quizId)
         {
-            var quiz = await _db.Quizzes
+            return await _db.Quizzes
+                .Include(q => q.QuestionGroups)
+                    .ThenInclude(g => g.Questions)
+                        .ThenInclude(q => q.Options)
+                .Include(q => q.Questions)
+                    .ThenInclude(q => q.Options)
                 .FirstOrDefaultAsync(q => q.QuizId == quizId);
-
-            if (quiz == null) return null;
-
-            return new QuizDetailDto
-            {
-                QuizID = quiz.QuizId,
-                Title = quiz.Title,
-                Description = quiz.Description,
-                QuizType = quiz.QuizType
-            };
         }
 
-        public async Task<int> CreateQuizAsync(int? courseId, string title, string? description, byte quizType)
+        public async Task<Quiz?> CreateQuizAsync(int? courseId, string title, string? description, byte quizType)
         {
             var quiz = new Quiz
             {
@@ -84,8 +61,7 @@ namespace EasyEnglish_API.Repositories.Quizs
 
             _db.Quizzes.Add(quiz);
             await _db.SaveChangesAsync();
-
-            return quiz.QuizId;
+            return quiz;
         }
 
         public async Task<bool> UpdateQuizAsync(int quizId, string? title, string? description, int quizType, bool? isActive)
@@ -109,11 +85,47 @@ namespace EasyEnglish_API.Repositories.Quizs
 
             _db.Quizzes.Remove(quiz);
             await _db.SaveChangesAsync();
-
             return true;
         }
 
-        public async Task<int> CreateAttemptAsync(int quizId, int userId)
+        public async Task<Quiz?> CreateGlobalQuizAsync(string title, string? description, byte quizType)
+        {
+            var quiz = new Quiz
+            {
+                CourseId = null,
+                Title = title,
+                Description = description,
+                QuizType = quizType,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.Quizzes.Add(quiz);
+            await _db.SaveChangesAsync();
+            return quiz;
+        }
+
+        public async Task<bool> DeleteGlobalQuizAsync(int quizId)
+        {
+            return await DeleteQuizAsync(quizId);
+        }
+
+        public async Task<bool> UpdateGlobalQuizAsync(int quizId, string? title, string? description, bool? isActive)
+        {
+            var quiz = await _db.Quizzes.FindAsync(quizId);
+            if (quiz == null) return false;
+
+            if (title != null) quiz.Title = title;
+            if (description != null) quiz.Description = description;
+            if (isActive.HasValue) quiz.IsActive = isActive.Value;
+
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        // ── ATTEMPT ──────────────────────────────────────────────────────────
+
+        public async Task<Attempt?> CreateAttemptAsync(int quizId, int userId)
         {
             var attempt = new Attempt
             {
@@ -125,8 +137,7 @@ namespace EasyEnglish_API.Repositories.Quizs
 
             _db.Attempts.Add(attempt);
             await _db.SaveChangesAsync();
-
-            return attempt.AttemptId;
+            return attempt;
         }
 
         public Task<Attempt?> GetAttemptAsync(int attemptId, int userId)
@@ -141,6 +152,24 @@ namespace EasyEnglish_API.Repositories.Quizs
             await _db.SaveChangesAsync();
         }
 
+        public async Task<List<Attempt>> GetAttemptHistoryAsync(int userId)
+        {
+            return await _db.Attempts
+                .Where(a => a.UserId == userId)
+                .OrderByDescending(a => a.StartedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<Attempt>> GetAttemptsAsync(string role, int userId)
+        {
+            return await _db.Attempts
+                .Include(a => a.Quiz)
+                .OrderByDescending(a => a.SubmittedAt)
+                .ToListAsync();
+        }
+
+        // ── QUESTION ─────────────────────────────────────────────────────────
+
         public async Task<List<Question>> GetQuizQuestionsAsync(int quizId)
         {
             return await _db.Questions
@@ -149,11 +178,15 @@ namespace EasyEnglish_API.Repositories.Quizs
                 .ToListAsync();
         }
 
+        // ── ANSWER ───────────────────────────────────────────────────────────
+
         public async Task AddAnswersAsync(List<Answer> answers)
         {
             _db.Answers.AddRange(answers);
             await _db.SaveChangesAsync();
         }
+
+        // ── PERMISSION ───────────────────────────────────────────────────────
 
         public Task<bool> TeacherOwnsCourseAsync(int teacherId, int courseId)
         {
@@ -168,71 +201,24 @@ namespace EasyEnglish_API.Repositories.Quizs
                 .AnyAsync(q => q.QuizId == quizId && q.Course.TeacherId == teacherId);
         }
 
-        public async Task<List<object>> GetAttemptHistoryAsync(int userId)
-        {
-            return await _db.Attempts
-                .Where(a => a.UserId == userId)
-                .OrderByDescending(a => a.StartedAt)
-                .Select(a => new
-                {
-                    a.AttemptId,
-                    a.QuizId,
-                    a.StartedAt,
-                    a.SubmittedAt,
-                    a.Status,
-                    a.AutoScore
-                } as object)
-                .ToListAsync();
-        }
+        // ── GROUP ────────────────────────────────────────────────────────────
 
-        public async Task<List<object>> GetAttemptsAsync(string role, int userId)
+        public async Task<QuestionGroup?> CreateGroupAsync(int quizId, QuestionGroup group)
         {
-            return await _db.Attempts
-                .Include(a => a.Quiz)
-                .OrderByDescending(a => a.SubmittedAt)
-                .Select(a => new
-                {
-                    a.AttemptId,
-                    a.QuizId,
-                    QuizTitle = a.Quiz.Title,
-                    a.SubmittedAt,
-                    a.AutoScore,
-                    a.Status,
-                    StudentID = a.UserId
-                } as object)
-                .ToListAsync();
-        }
-
-        // GROUP CRUD
-        // =====================================================
-        public async Task<int> CreateGroupAsync(int quizId, CreateGroupRequest req)
-        {
-            var group = new QuestionGroup
-            {
-                QuizId = quizId,
-                Instruction = req.Instruction,
-                GroupType = req.GroupType,
-                GroupOrder = req.GroupOrder
-            };
-
+            group.QuizId = quizId;
             _db.QuestionGroups.Add(group);
             await _db.SaveChangesAsync();
-            return group.GroupId;
+            return group;
         }
 
-        public async Task<bool> UpdateGroupAsync(int groupId, UpdateGroupRequest req)
+        public async Task<bool> UpdateGroupAsync(int groupId, QuestionGroup updated)
         {
             var group = await _db.QuestionGroups.FindAsync(groupId);
             if (group == null) return false;
 
-            if (req.Instruction != null)
-                group.Instruction = req.Instruction;
-
-            if (req.GroupType.HasValue)
-                group.GroupType = req.GroupType.Value;
-
-            if (req.GroupOrder.HasValue)
-                group.GroupOrder = req.GroupOrder.Value;
+            if (updated.Instruction != null) group.Instruction = updated.Instruction;
+            if (updated.GroupType > 0) group.GroupType = updated.GroupType;
+            if (updated.GroupOrder > 0) group.GroupOrder = updated.GroupOrder;
 
             await _db.SaveChangesAsync();
             return true;
@@ -240,101 +226,58 @@ namespace EasyEnglish_API.Repositories.Quizs
 
         public async Task<bool> DeleteGroupAsync(int groupId)
         {
-            // tìm group
             var group = await _db.QuestionGroups.FindAsync(groupId);
             if (group == null) return false;
 
-            // 1) lấy question của group
             var questionIds = await _db.Questions
                 .Where(q => q.GroupId == groupId)
                 .Select(q => q.QuestionId)
                 .ToListAsync();
 
-            // 2) xoá option
             if (questionIds.Any())
             {
-                _db.Options.RemoveRange(
-                    _db.Options.Where(o => questionIds.Contains(o.QuestionId))
-                );
+                _db.Options.RemoveRange(_db.Options.Where(o => questionIds.Contains(o.QuestionId)));
+                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && questionIds.Contains(a.OwnerId)));
+                _db.Questions.RemoveRange(_db.Questions.Where(q => questionIds.Contains(q.QuestionId)));
             }
 
-            // 3) xoá assets (của question)
-            if (questionIds.Any())
-            {
-                _db.Assets.RemoveRange(
-                    _db.Assets.Where(a => a.OwnerType == 2 && questionIds.Contains(a.OwnerId))
-                );
-            }
-
-            // 4) xoá question
-            if (questionIds.Any())
-            {
-                _db.Questions.RemoveRange(
-                    _db.Questions.Where(q => questionIds.Contains(q.QuestionId))
-                );
-            }
-
-            // 5) xoá assets của group
-            _db.Assets.RemoveRange(
-                _db.Assets.Where(a => a.OwnerType == 1 && a.OwnerId == groupId)
-            );
-
-            // 6) xoá group
+            _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 1 && a.OwnerId == groupId));
             _db.QuestionGroups.Remove(group);
 
             await _db.SaveChangesAsync();
             return true;
         }
 
-        // =====================================================
-        // QUESTION CRUD
-        // =====================================================
-        public async Task<int> CreateQuestionAsync(int groupId, CreateQuestionRequest req)
+        // ── QUESTION (CRUD) ──────────────────────────────────────────────────
+
+        public async Task<Question?> CreateQuestionAsync(int groupId, Question question)
         {
-            // Lấy QuizID từ Group
             var quizId = await _db.QuestionGroups
                 .Where(g => g.GroupId == groupId)
                 .Select(g => g.QuizId)
                 .FirstOrDefaultAsync();
 
             if (quizId == 0)
-                throw new Exception("Group not found");
+                throw new KeyNotFoundException("Group not found");
 
-            var question = new Question
-            {
-                QuizId = quizId,
-                GroupId = groupId,
-                Content = req.Content,
-                QuestionType = req.QuestionType,
-                QuestionOrder = req.QuestionOrder,
-                ScoreWeight = req.ScoreWeight,
-                MetaJson = req.MetaJson
-            };
+            question.QuizId = quizId;
+            question.GroupId = groupId;
 
             _db.Questions.Add(question);
             await _db.SaveChangesAsync();
-            return question.QuestionId;
+            return question;
         }
 
-        public async Task<bool> UpdateQuestionAsync(int questionId, UpdateQuestionRequest req)
+        public async Task<bool> UpdateQuestionAsync(int questionId, Question updated)
         {
             var question = await _db.Questions.FindAsync(questionId);
             if (question == null) return false;
 
-            if (req.Content != null)
-                question.Content = req.Content;
-
-            if (req.QuestionType.HasValue)
-                question.QuestionType = req.QuestionType.Value;
-
-            if (req.QuestionOrder.HasValue)
-                question.QuestionOrder = req.QuestionOrder.Value;
-
-            if (req.ScoreWeight.HasValue)
-                question.ScoreWeight = req.ScoreWeight.Value;
-
-            if (req.MetaJson != null)
-                question.MetaJson = req.MetaJson;
+            if (updated.Content != null) question.Content = updated.Content;
+            if (updated.QuestionType > 0) question.QuestionType = updated.QuestionType;
+            if (updated.QuestionOrder > 0) question.QuestionOrder = updated.QuestionOrder;
+            if (updated.ScoreWeight > 0) question.ScoreWeight = updated.ScoreWeight;
+            if (updated.MetaJson != null) question.MetaJson = updated.MetaJson;
 
             await _db.SaveChangesAsync();
             return true;
@@ -345,55 +288,35 @@ namespace EasyEnglish_API.Repositories.Quizs
             var question = await _db.Questions.FindAsync(questionId);
             if (question == null) return false;
 
-            // 1) xoá options
-            _db.Options.RemoveRange(
-                _db.Options.Where(o => o.QuestionId == questionId)
-            );
-
-            // 2) xoá assets của question
-            _db.Assets.RemoveRange(
-                _db.Assets.Where(a => a.OwnerType == 2 && a.OwnerId == questionId)
-            );
-
-            // 3) xoá chính câu hỏi
+            _db.Options.RemoveRange(_db.Options.Where(o => o.QuestionId == questionId));
+            _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && a.OwnerId == questionId));
             _db.Questions.Remove(question);
 
             await _db.SaveChangesAsync();
             return true;
         }
-        // =====================================================
-        // OPTION CRUD
-        // =====================================================
 
-        public async Task<int> CreateOptionAsync(int questionId, CreateOptionRequest req)
+        // ── OPTION ───────────────────────────────────────────────────────────
+
+        public async Task<Option?> CreateOptionAsync(int questionId, Option option)
         {
-            // Kiểm tra question có tồn tại không
             var exists = await _db.Questions.AnyAsync(q => q.QuestionId == questionId);
             if (!exists)
-                throw new Exception("Question not found");
+                throw new KeyNotFoundException("Question not found");
 
-            var option = new Option
-            {
-                QuestionId = questionId,
-                Content = req.Content,
-                IsCorrect = req.IsCorrect
-            };
-
+            option.QuestionId = questionId;
             _db.Options.Add(option);
             await _db.SaveChangesAsync();
-            return option.OptionId;
+            return option;
         }
 
-        public async Task<bool> UpdateOptionAsync(int optionId, UpdateOptionRequest req)
+        public async Task<bool> UpdateOptionAsync(int optionId, Option updated)
         {
             var option = await _db.Options.FindAsync(optionId);
             if (option == null) return false;
 
-            if (req.Content != null)
-                option.Content = req.Content;
-
-            if (req.IsCorrect.HasValue)
-                option.IsCorrect = req.IsCorrect.Value;
+            if (updated.Content != null) option.Content = updated.Content;
+            option.IsCorrect = updated.IsCorrect;
 
             await _db.SaveChangesAsync();
             return true;
@@ -408,52 +331,33 @@ namespace EasyEnglish_API.Repositories.Quizs
             await _db.SaveChangesAsync();
             return true;
         }
-        // =====================================================
-        // ASSET CRUD
-        // =====================================================
 
-        public async Task<int> CreateAssetForGroupAsync(int groupId, CreateAssetRequest req)
+        // ── ASSET ────────────────────────────────────────────────────────────
+
+        public async Task<Asset?> CreateAssetForGroupAsync(int groupId, Asset asset)
         {
             var exists = await _db.QuestionGroups.AnyAsync(g => g.GroupId == groupId);
             if (!exists)
-                throw new Exception("Group not found");
+                throw new KeyNotFoundException("Group not found");
 
-            var asset = new Asset
-            {
-                OwnerType = 1,
-                OwnerId = groupId,
-                AssetType = req.AssetType,
-                Url = req.Url,
-                ContentText = req.ContentText,
-                Caption = req.Caption,
-                MimeType = req.MimeType
-            };
-
+            asset.OwnerType = 1;
+            asset.OwnerId = groupId;
             _db.Assets.Add(asset);
             await _db.SaveChangesAsync();
-            return asset.AssetId;
+            return asset;
         }
 
-        public async Task<int> CreateAssetForQuestionAsync(int questionId, CreateAssetRequest req)
+        public async Task<Asset?> CreateAssetForQuestionAsync(int questionId, Asset asset)
         {
             var exists = await _db.Questions.AnyAsync(q => q.QuestionId == questionId);
             if (!exists)
-                throw new Exception("Question not found");
+                throw new KeyNotFoundException("Question not found");
 
-            var asset = new Asset
-            {
-                OwnerType = 2,
-                OwnerId = questionId,
-                AssetType = req.AssetType,
-                Url = req.Url,
-                ContentText = req.ContentText,
-                Caption = req.Caption,
-                MimeType = req.MimeType
-            };
-
+            asset.OwnerType = 2;
+            asset.OwnerId = questionId;
             _db.Assets.Add(asset);
             await _db.SaveChangesAsync();
-            return asset.AssetId;
+            return asset;
         }
 
         public async Task<bool> DeleteAssetAsync(int assetId)
@@ -465,50 +369,5 @@ namespace EasyEnglish_API.Repositories.Quizs
             await _db.SaveChangesAsync();
             return true;
         }
-
-        public async Task<int> CreateGlobalQuizAsync(string title, string? description, byte quizType)
-        {
-            var quiz = new Quiz
-            {
-                CourseId = null,
-                Title = title,
-                Description = description,
-                QuizType = quizType,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _db.Quizzes.Add(quiz);
-            await _db.SaveChangesAsync();
-            return quiz.QuizId;
-        }
-
-        public async Task<bool> DeleteGlobalQuizAsync(int quizId)
-        {
-            return await DeleteQuizAsync(quizId);
-        }
-
-        public async Task<bool> UpdateGlobalQuizAsync(int quizId, UpdateQuizRequest req)
-        {
-            var quiz = await _db.Quizzes.FindAsync(quizId);
-            if (quiz == null) return false;
-
-            if (req.Title != null)
-                quiz.Title = req.Title;
-
-            if (req.Description != null)
-                quiz.Description = req.Description;
-
-            if (!string.IsNullOrWhiteSpace(req.QuizType) &&
-                byte.TryParse(req.QuizType, out var qt))
-                quiz.QuizType = qt;
-
-            if (req.IsActive.HasValue)
-                quiz.IsActive = req.IsActive.Value;
-
-            await _db.SaveChangesAsync();
-            return true;
-        }
     }
 }
-

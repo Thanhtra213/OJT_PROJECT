@@ -30,19 +30,23 @@ using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Services.Dashboard;
-<<<<<<< HEAD
-using EasyEnglish_API.Interfaces.Quiz;
+using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Repositories.Quizs;
 using EasyEnglish_API.Services;
 using EasyEnglish_API.ExternalService;
-=======
 using EasyEnglish_API.Interfaces.Subscriptionplan;
 using EasyEnglish_API.Repositories.Subscriptionplan;
 using EasyEnglish_API.Services.Subscriptionplan;
 using EasyEnglish_API.Interfaces.Flashcard;
 using EasyEnglish_API.Repositories.Flashcard;
 using EasyEnglish_API.Services.Flashcard;
->>>>>>> 49e6feaa775c2ef1b6bace49679c57ea9a621975
+using EasyEnglish_API.Services.AIExam;
+using EasyEnglish_API.Interfaces.AIExam;
+using EasyEnglish_API.Repositories.AIExam;
+using EasyEnglish_API.Interfaces.Profile;
+using EasyEnglish_API.Repositories.Profile;
+using EasyEnglish_API.Services.Profile;
+using EasyEnglish_API.Interfaces.Quizs;
 
 namespace EasyEnglish_API {
     public class Program
@@ -162,6 +166,9 @@ namespace EasyEnglish_API {
             });
 
             builder.Services.AddScoped<CloudflareExternal>();
+            builder.Services.AddScoped<AISpeakingExternal>();
+            builder.Services.AddScoped<AIWritingExternal>();
+            builder.Services.AddScoped<AIQuizExternal>();
             // == Repositories ==
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -172,6 +179,11 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+            builder.Services.AddScoped<IAIPromptRepository, AIPromptReposity>();
+            builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
+            builder.Services.AddScoped<IAISubmissionRepository, AISubmissionRepository>();
+            builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+            builder.Services.AddScoped<ITeacherInForRepository, TeacherInforRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -183,6 +195,12 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
+            builder.Services.AddScoped<IAISpeakingService, AISpeakingService>();
+            builder.Services.AddScoped<IAIWritingService,  AIWritingService>();
+            builder.Services.AddScoped<IAIQuizService, AIQuizService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
+
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
