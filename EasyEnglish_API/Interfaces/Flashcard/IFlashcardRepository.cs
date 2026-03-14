@@ -20,5 +20,8 @@ namespace EasyEnglish_API.Interfaces.Flashcard
         // ---- DELETE ----
         Task<bool> DeleteSetAsync(int setId);
         Task<bool> DeleteItemAsync(int itemId);
+
+        Task<bool> EnsureTeacherOwnsCourseAsync(int courseId, int userId);
+        Task<bool> EnsureTeacherOwnsSetAsync(int setId, int userId);
     }
 }

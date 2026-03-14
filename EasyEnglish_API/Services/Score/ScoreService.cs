@@ -1,5 +1,7 @@
-﻿using EasyEnglish_API.Interfaces.Score;
+﻿using EasyEnglish_API.DTOs.Score;
+using EasyEnglish_API.Interfaces.Score;
 using EasyEnglish_API.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EasyEnglish_API.Services.Score
 {
@@ -12,29 +14,103 @@ namespace EasyEnglish_API.Services.Score
             _scoreRepository = scoreRepository;
         }
 
-        public async Task<List<IGrouping<int?, Attempt>>> GetAllSystemExamScoresAsync()
+        public async Task<List<IGrouping<int, ScoreViewRequest>>> GetAllSystemExamScoresAsync()
         {
-            return await _scoreRepository.GetAllSystemExamScoresAsync();
+            var grouped = await _scoreRepository.GetAllSystemExamScoresAsync();
+            if (!grouped.Any()) 
+                throw new Exception ("No system exam scores found.");
+
+            var result = grouped
+                .Select(g => g.Select(a => new ScoreViewRequest
+                {
+                    AttemptId = a.AttemptId,
+                    QuizId = a.QuizId,
+                    QuizTitle = a.Quiz.Title,
+                    CourseId = null,
+                    CourseName = "System Exam",
+                    UserId = a.UserId,
+                    UserName = a.User.Username,
+                    Score = (double)((a.AutoScore ?? 0) + (a.ManualScore ?? 0)),
+                    AttemptDate = a.SubmittedAt ?? a.StartedAt
+                }).GroupBy(x => x.QuizId).First())
+                .ToList();
+
+            return result;
         }
 
-        public async Task<List<Attempt>> GetScoresByCourseAsync(int courseId)
+        public async Task<List<ScoreViewRequest>> GetScoresByCourseAsync(int courseId)
         {
-            return await _scoreRepository.GetScoresByCourseAsync(courseId);
+            var data = await _scoreRepository.GetScoresByCourseAsync(courseId);
+            if (!data.Any())
+                throw new Exception("No scores found for this course.");
+
+            var result = data.Select(a => new ScoreViewRequest
+            {
+                AttemptId = a.AttemptId,
+                QuizId = a.QuizId,
+                QuizTitle = a.Quiz.Title,
+                CourseId = a.Quiz.CourseId,
+                CourseName = a.Quiz.Course?.CourseName ?? "(No Course)",
+                UserId = a.UserId,
+                UserName = a.User.Username,
+                Score = (double)((a.AutoScore ?? 0) + (a.ManualScore ?? 0)),
+                AttemptDate = a.SubmittedAt ?? a.StartedAt
+            }).ToList();
+
+            return result;
         }
 
-        public async Task<List<Attempt>> GetScoresByTeacherAsync(int teacherId)
+        public async Task<List<ScoreViewRequest>> GetSystemExamScoresAsync()
         {
-            return await _scoreRepository.GetScoresByTeacherAsync(teacherId);
+            var data = await _scoreRepository.GetSystemExamScoresAsync();
+            if (!data.Any()) 
+                throw new Exception("No scores found for system exams.");
+
+            var result = data.Select(a => new ScoreViewRequest
+            {
+                AttemptId = a.AttemptId,
+                QuizId = a.QuizId,
+                QuizTitle = a.Quiz.Title,
+                CourseId = null,
+                CourseName = "System Exam",
+                UserId = a.UserId,
+                UserName = a.User.Username,
+                Score = (double)((a.AutoScore ?? 0) + (a.ManualScore ?? 0)),
+                AttemptDate = a.SubmittedAt ?? a.StartedAt
+            }).ToList();
+            return result;
         }
 
-        public async Task<List<Attempt>> GetSystemExamScoresAsync()
+        public async Task<(List<ScoreViewRequest> CourseScores, List<ScoreViewRequest> SystemScores)> GetUserScoresAsync(int userId)
         {
-            return await _scoreRepository.GetSystemExamScoresAsync();
-        }
+            var (courseScores, systemScores) = await _scoreRepository.GetUserScoresAsync(userId);
 
-        public async Task<(List<Attempt> CourseScores, List<Attempt> SystemScores)> GetUserScoresAsync(int userId)
-        {
-            return await _scoreRepository.GetUserScoresAsync(userId);
+            var result1 = courseScores.Select(a => new ScoreViewRequest
+            {
+                AttemptId = a.AttemptId,
+                QuizId = a.QuizId,
+                QuizTitle = a.Quiz.Title,
+                CourseId = a.Quiz.CourseId,
+                CourseName = a.Quiz.Course?.CourseName ?? "(No Course)",
+                UserId = a.UserId,
+                UserName = a.User.Username,
+                Score = (double)((a.AutoScore ?? 0) + (a.ManualScore ?? 0)),
+                AttemptDate = a.SubmittedAt ?? a.StartedAt
+            }).ToList();
+
+            var result2 = systemScores.Select(a => new ScoreViewRequest
+            {
+                    AttemptId = a.AttemptId,
+                    QuizId = a.QuizId,
+                    QuizTitle = a.Quiz.Title,
+                    CourseId = null,
+                    CourseName = "System Exam",
+                    UserId = a.UserId,
+                    UserName = a.User.Username,
+                    Score = (double)((a.AutoScore ?? 0) + (a.ManualScore ?? 0)),
+                    AttemptDate = a.SubmittedAt ?? a.StartedAt
+            }).ToList();
+            return (result1, result2);
         }
     }
 }
