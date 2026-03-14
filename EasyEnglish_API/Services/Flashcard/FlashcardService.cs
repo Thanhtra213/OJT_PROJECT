@@ -53,6 +53,16 @@ namespace EasyEnglish_API.Services.Flashcard
             return await _flashcardRepository.DeleteSetAsync(setId);
         }
 
+        public async Task<bool> EnsureTeacherOwnsCourse(int courseId, int userId)
+        {
+            return await _flashcardRepository.EnsureTeacherOwnsCourseAsync(courseId, userId);
+        }
+
+        public async Task<bool> EnsureTeacherOwnsSet(int setId, int userId)
+        {
+            return await _flashcardRepository.EnsureTeacherOwnsSetAsync(setId, userId);
+        }
+
         public async Task<List<FlashcardSetResponse>> GetAllPublicSetsAsync()
         {
             var sets = await _flashcardRepository.GetAllPublicSetsAsync();
