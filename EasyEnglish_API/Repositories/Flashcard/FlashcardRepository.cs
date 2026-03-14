@@ -56,20 +56,30 @@ namespace EasyEnglish_API.Repositories.Flashcard
         // ---- UPDATE ----
         public async Task<bool> UpdateSetAsync(FlashcardSet set)
         {
-            if (!await _db.FlashcardSets.AnyAsync(s => s.SetId == set.SetId))
+            var existing = await _db.FlashcardSets
+                .FirstOrDefaultAsync(s => s.SetId == set.SetId);
+
+            if (existing == null)
                 return false;
 
-            _db.FlashcardSets.Update(set);
+            existing.Title = set.Title;
+            existing.Description = set.Description;
             await _db.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> UpdateItemAsync(FlashcardItem item)
         {
-            if (!await _db.FlashcardItems.AnyAsync(i => i.ItemId == item.ItemId))
+            var existing = await _db.FlashcardItems
+                .FirstOrDefaultAsync(i => i.ItemId == item.ItemId);
+
+            if (existing == null)
                 return false;
 
-            _db.FlashcardItems.Update(item);
+            existing.FrontText = item.FrontText;
+            existing.BackText = item.BackText;
+            existing.Example = item.Example;
+
             await _db.SaveChangesAsync();
             return true;
         }
@@ -99,6 +109,26 @@ namespace EasyEnglish_API.Repositories.Flashcard
             _db.FlashcardItems.Remove(item);
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> EnsureTeacherOwnsCourseAsync(int courseId, int userId)
+        {
+            var course = await _db.Courses.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+            return course != null && course.TeacherId == userId;
+        }
+
+        public async Task<bool> EnsureTeacherOwnsSetAsync(int setId, int userId)
+        {
+            var set = await GetSetDetailAsync(setId);
+            if (set == null) 
+                return false;
+
+            if (set.CourseId == null) 
+                return false;
+
+            return await EnsureTeacherOwnsCourseAsync(set.CourseId.Value, userId);
         }
     }
 }

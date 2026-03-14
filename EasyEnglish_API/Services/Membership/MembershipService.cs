@@ -49,5 +49,10 @@ namespace EasyEnglish_API.Services.Membership
                 CanceleAt = m.CanceledAt 
             });
         }
+
+        public async Task<bool> HasActiveMembershipAsync(int userId)
+        {
+            return await _membership.HasActiveMembershipAsync(userId);
+        }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using EasyEnglish_API.Services.FeedbackService;
-using EasyEnglish_API.Services;
-using EasyEnglish_API.Services.FeedbackService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace EMT_API.Controllers.AdminSide
 {

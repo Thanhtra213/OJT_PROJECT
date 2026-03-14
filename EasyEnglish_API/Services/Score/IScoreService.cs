@@ -1,21 +1,20 @@
-﻿using EasyEnglish_API.Models;
+﻿using EasyEnglish_API.DTOs.Score;
+using EasyEnglish_API.Models;
 
 namespace EasyEnglish_API.Services.Score
 {
     public interface IScoreService
     {
-        Task<List<Attempt>> GetScoresByTeacherAsync(int teacherId);
-
         // 2️⃣ Lấy điểm bài kiểm tra hệ thống (quiz global)
-        Task<List<Attempt>> GetSystemExamScoresAsync();
+        Task<List<ScoreViewRequest>> GetSystemExamScoresAsync();
 
         // 3️⃣ Lấy điểm của 1 user (course + system exam)
-        Task<(List<Attempt> CourseScores, List<Attempt> SystemScores)> GetUserScoresAsync(int userId);
+        Task<(List<ScoreViewRequest> CourseScores, List<ScoreViewRequest> SystemScores)> GetUserScoresAsync(int userId);
 
         // 4️⃣ Lấy điểm theo khóa học
-        Task<List<Attempt>> GetScoresByCourseAsync(int courseId);
+        Task<List<ScoreViewRequest>> GetScoresByCourseAsync(int courseId);
 
         // 5️⃣ Lấy toàn bộ điểm system exam (group by quiz)
-        Task<List<IGrouping<int?, Attempt>>> GetAllSystemExamScoresAsync();
+        Task<List<IGrouping<int, ScoreViewRequest>>> GetAllSystemExamScoresAsync();
     }
 }

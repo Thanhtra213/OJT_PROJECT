@@ -15,14 +15,11 @@ using EasyEnglish_API.Services.Membership;
 using EasyEnglish_API.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
-using EasyEnglish_API.Interfaces.User;
-using EasyEnglish_API.Repositories.User;
 using EasyEnglish_API.Services.UserService;
 using EasyEnglish_API.Interfaces;
 using EasyEnglish_API.Repositories.Courses;
@@ -30,7 +27,10 @@ using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Services.Dashboard;
+
 using EasyEnglish_API.Interfaces.Quizs;
+
+
 using EasyEnglish_API.Repositories.Quizs;
 using EasyEnglish_API.Services;
 using EasyEnglish_API.ExternalService;
@@ -40,13 +40,21 @@ using EasyEnglish_API.Services.Subscriptionplan;
 using EasyEnglish_API.Interfaces.Flashcard;
 using EasyEnglish_API.Repositories.Flashcard;
 using EasyEnglish_API.Services.Flashcard;
+
 using EasyEnglish_API.Services.AIExam;
 using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Repositories.AIExam;
 using EasyEnglish_API.Interfaces.Profile;
 using EasyEnglish_API.Repositories.Profile;
 using EasyEnglish_API.Services.Profile;
-using EasyEnglish_API.Interfaces.Quizs;
+using EasyEnglish_API.Interfaces.Score;
+using EasyEnglish_API.Services.Score;
+using EasyEnglish_API.Repositories.Score;
+using EasyEnglish_API.Interfaces.Transaction;
+using EasyEnglish_API.Repositories.Transaction;
+using EasyEnglish_API.Services.Transaction;
+
+
 
 namespace EasyEnglish_API {
     public class Program
@@ -175,10 +183,12 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.AddScoped<IFlashcardRepository, FlashcardRepository>();
+            builder.Services.AddScoped<IScoreRepository, ScoreRepository>();
             builder.Services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
             builder.Services.AddScoped<IFeedbackRepository, FeedBackRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
             builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+            builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
             builder.Services.AddScoped<IAIPromptRepository, AIPromptReposity>();
             builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
             builder.Services.AddScoped<IAISubmissionRepository, AISubmissionRepository>();
@@ -191,10 +201,12 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+            builder.Services.AddScoped<IScoreService, ScoreService>();
             builder.Services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
             builder.Services.AddScoped<IAISpeakingService, AISpeakingService>();
             builder.Services.AddScoped<IAIWritingService,  AIWritingService>();
             builder.Services.AddScoped<IAIQuizService, AIQuizService>();

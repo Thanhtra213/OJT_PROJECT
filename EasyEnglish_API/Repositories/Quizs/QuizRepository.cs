@@ -2,7 +2,6 @@
 using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
-using EasyEnglish_API.Models;
 
 namespace EasyEnglish_API.Repositories.Quizs
 {
