@@ -7,6 +7,7 @@ namespace EasyEnglish_API.Services.Subscriptionplan
     {
         // --- CRUD ---
         Task<List<SubscriptionPlan>> GetAllPlansAsync();
+        Task<List<ViewSubscriptionPlanResponse>> ViewAllPlansAsync();
         Task<SubscriptionPlan?> GetPlanByIdAsync(int id);
         Task<SubscriptionPlan?> CreatePlanAsync(CreateSubscriptionPlanRequest req);
         Task<bool> UpdatePlanAsync(int id, UpdateSubscriptionPlanRequest req);
