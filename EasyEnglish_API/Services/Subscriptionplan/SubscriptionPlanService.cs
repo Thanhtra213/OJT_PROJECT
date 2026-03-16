@@ -41,6 +41,24 @@ namespace EasyEnglish_API.Services.Subscriptionplan
             return plans;
         }
 
+        public async Task<List<ViewSubscriptionPlanResponse>> ViewAllPlansAsync()
+        {
+            var data = await _subscriptionRepository.GetAllPlansAsync();
+
+            var plans = data
+                .Where(p => p.IsActive == true)
+                .Select(p => new ViewSubscriptionPlanResponse
+                {
+                    PlanID = p.PlanId,
+                    PlanCode = p.PlanCode,
+                    Name = p.Name,
+                    Price = p.Price,
+                    DurationDays = p.DurationDays
+                })
+                .ToList();
+            return plans;
+        }
+
         public async Task<SubscriptionPlan?> GetPlanByIdAsync(int id)
         {
             return await _subscriptionRepository.GetPlanByIdAsync(id);
