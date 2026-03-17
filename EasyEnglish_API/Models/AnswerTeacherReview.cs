@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasyEnglish_API.Models;
 
@@ -30,4 +31,7 @@ public partial class AnswerTeacherReview
     public decimal? ScoreFluency { get; set; }
 
     public virtual Teacher Teacher { get; set; } = null!;
+
+    [ForeignKey(nameof(AireviewId))]
+    public virtual AnswerAIReview AIReview { get; set; } = null!;
 }

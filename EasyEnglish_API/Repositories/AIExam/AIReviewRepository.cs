@@ -41,5 +41,57 @@ namespace EasyEnglish_API.Repositories.AIExam
         {
             return await _db.AnswerAIReviews.FirstOrDefaultAsync(a => a.AireviewId == id);
         }
+
+        public async Task<object?> GetStudentReviewAsync(int userId, long submissionId)
+        {
+            var result = await _db.AnswerAIReviews
+                .Include(r => r.Submission)
+                    .ThenInclude(s => s.Prompt)
+                .Include(r => r.AnswerTeacherReviews)
+                .Where(r => r.Submission.SubmissionId == submissionId
+                         && r.Submission.UserId == userId)
+                .Select(r => new
+                {
+                    Prompt = new
+                    {
+                        r.Submission.Prompt.Title,
+                        r.Submission.Prompt.Content
+                    },
+
+                    Answer = new
+                    {
+                        r.Submission.Transcript,
+                        r.Submission.AnswerText
+                    },
+
+                    AIReview = new
+                    {
+                        r.ScoreOverall,
+                        r.ScoreFluency,
+                        r.ScoreLexical,
+                        r.ScoreGrammar,
+                        r.ScorePronunciation,
+                        r.ScoreCoherence,
+                        r.Feedback
+                    },
+
+                    TeacherReview = r.AnswerTeacherReviews
+                        .Select(t => new
+                        {
+                            t.ScoreOverall,
+                            t.ScoreTask,
+                            t.ScoreLexial,
+                            t.ScoreGrammar,
+                            t.ScorePronunciation,
+                            t.ScoreFluency,
+                            t.ScoreCoherence,
+                            t.Feedback
+                        })
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
+        }
     }
 }
