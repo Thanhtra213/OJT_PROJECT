@@ -1,18 +1,54 @@
-﻿using EasyEnglish_API.Data;
+﻿using System.Reflection;
+using System.Security.Claims;
+using System.Text;
+using EasyEnglish_API.Data;
+using EasyEnglish_API.ExternalService;
+using EasyEnglish_API.Interfaces;
+using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Interfaces.Authentication;
+using EasyEnglish_API.Interfaces.Dashboard;
 using EasyEnglish_API.Interfaces.Feedbacks;
+using EasyEnglish_API.Interfaces.Flashcard;
 using EasyEnglish_API.Interfaces.Membership;
+using EasyEnglish_API.Interfaces.Payment;
+using EasyEnglish_API.Interfaces.Profile;
+using EasyEnglish_API.Interfaces.Quizs;
+using EasyEnglish_API.Interfaces.Score;
+using EasyEnglish_API.Interfaces.Subscriptionplan;
+using EasyEnglish_API.Interfaces.Transaction;
 using EasyEnglish_API.Interfaces.User;
 using EasyEnglish_API.Middleware;
+using EasyEnglish_API.Repositories.AIExam;
 using EasyEnglish_API.Repositories.Authentication;
+using EasyEnglish_API.Repositories.Courses;
+using EasyEnglish_API.Repositories.Dashboard;
 using EasyEnglish_API.Repositories.FeedbackRepo;
+using EasyEnglish_API.Repositories.Flashcard;
 using EasyEnglish_API.Repositories.Membership;
+using EasyEnglish_API.Repositories.Payment;
+using EasyEnglish_API.Repositories.Profile;
+using EasyEnglish_API.Repositories.Quizs;
+using EasyEnglish_API.Repositories.Score;
+using EasyEnglish_API.Repositories.Subscriptionplan;
+using EasyEnglish_API.Repositories.Transaction;
 using EasyEnglish_API.Repositories.User;
 using EasyEnglish_API.Sercurity;
+using EasyEnglish_API.Services;
+using EasyEnglish_API.Services.AIExam;
 using EasyEnglish_API.Services.AuthService;
+using EasyEnglish_API.Services.Courses;
+using EasyEnglish_API.Services.Dashboard;
 using EasyEnglish_API.Services.FeedbackService;
+using EasyEnglish_API.Services.Flashcard;
 using EasyEnglish_API.Services.Membership;
+using EasyEnglish_API.Services.Payment;
+using EasyEnglish_API.Services.Profile;
+using EasyEnglish_API.Services.Score;
+using EasyEnglish_API.Services.Subscriptionplan;
+using EasyEnglish_API.Services.Transaction;
+using EasyEnglish_API.Services.UserService;
 using EasyEnglish_API.Utils;
+using EMT_API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -234,6 +270,10 @@ namespace EasyEnglish_API {
             // ===== Token Service (tạo access/refresh token) =====
             builder.Services.AddSingleton<ITokenService, TokenService>();
             builder.Services.AddHttpContextAccessor();
+
+            // Payment Service
+            builder.Services.AddHttpClient<PayOSService>();
+            builder.Services.AddScoped<PayOSService>();
 
             //Json accept /n
             builder.Services.AddControllers().AddJsonOptions(options =>
