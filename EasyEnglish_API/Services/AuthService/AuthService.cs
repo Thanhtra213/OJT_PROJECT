@@ -63,7 +63,7 @@ public class AuthService : IAuthService
         };
 
         await _repo.CreateAccountAsync(acc);
-        await _repo.CreateUserDetailAsync(acc.AccountId);
+        await _repo.CreateUserDetailAsync(acc.AccountId); 
 
         return acc;
     }
