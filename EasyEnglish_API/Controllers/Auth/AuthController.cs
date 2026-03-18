@@ -1,11 +1,8 @@
 ﻿using EasyEnglish_API.DTOs.Authentication;
-using EasyEnglish_API.Interfaces.Authentication;
-using EasyEnglish_API.Models;
 using EasyEnglish_API.Sercurity;
 using EasyEnglish_API.Services.AuthService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace EasyEnglish_API.Controllers;
