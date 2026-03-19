@@ -41,10 +41,13 @@ namespace EasyEnglish_API.Services.Profile
                 var detail = await _repo.GetUserDetailAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");
 
-                if (string.IsNullOrEmpty(detail.AvatarUrl))
-                    throw new FileNotFoundException("User has no avatar.");
+            if (string.IsNullOrEmpty(detail.AvatarUrl))
+                throw new FileNotFoundException("User has no avatar.");
 
-                return detail.AvatarUrl;
+            //if (string.IsNullOrEmpty(detail.AvatarUrl))
+            //    return null;
+
+            return detail.AvatarUrl;
             }
 
             public async Task UpdateDetailAsync(int userId, UpdateUserDetailRequest req)
