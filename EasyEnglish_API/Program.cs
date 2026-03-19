@@ -203,7 +203,8 @@ namespace EasyEnglish_API {
                     .WithOrigins(
                         "http://localhost:3000",
                         "https://localhost:3000",
-                        "https://beerier-superlogically-maxwell.ngrok-free.dev" // 👈 và cả domain ngrok
+                        "https://beerier-superlogically-maxwell.ngrok-free.dev", // 👈 và cả domain ngrok
+                        "null"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -283,7 +284,10 @@ namespace EasyEnglish_API {
             });
             var app = builder.Build();
 
-            
+           
+
+
+
             // ===== Swagger =====
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {
