@@ -90,6 +90,9 @@ using EasyEnglish_API.Services.Course;
 using EasyEnglish_API.Interfaces.Streak;
 using EasyEnglish_API.Repositories.Streak;
 using EasyEnglish_API.Services.Streak;
+using EasyEnglish_API.Interfaces.Progress;
+using EasyEnglish_API.Repositories.Progress;
+using EasyEnglish_API.Services.Video;
 
 
 
@@ -236,6 +239,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
             builder.Services.AddScoped<IFlashcardProgressRepository, FlashcardProgressRepository>();
             builder.Services.AddScoped<IStreakRepository, StreakRepository>();
+            builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -259,6 +263,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IFlashcarProgressService, FlashcardProgressService>();
             builder.Services.AddScoped<IVideoService, VideoService>();
             builder.Services.AddScoped<IStreakService, StreakService>();
+            builder.Services.AddScoped<IVideoProgressService, VideoProgressService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
