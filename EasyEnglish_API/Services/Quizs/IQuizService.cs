@@ -10,7 +10,7 @@ namespace EasyEnglish_API.Interfaces.Quizs
         Task<QuizDetailDto?> GetQuizDetailAsync(int userId, int quizId);
 
         Task<int> StartQuizAsync(int userId, int quizId);
-        Task<decimal?> SubmitQuizAsync(int userId, int attemptId, SubmitQuizRequest request);
+        Task<SubmitQuizResponse> SubmitQuizAsync(int userId, int attemptId, SubmitQuizRequest req);
 
         Task<List<object>> GetAttemptHistoryAsync(int userId);
 

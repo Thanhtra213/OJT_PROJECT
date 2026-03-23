@@ -25,6 +25,7 @@ namespace EasyEnglish_API.Services.Video
                     VideoId = req.VideoId,
                     WatchDurationSec = req.WatchDurationSec,
                     WatchedAt = DateTime.UtcNow,
+                    LastPositionSec = req.LastPositionSec,
                     IsCompleted = req.IsCompleted
                 };
 
@@ -33,6 +34,7 @@ namespace EasyEnglish_API.Services.Video
             else
             {
                 progress.WatchDurationSec = req.WatchDurationSec;
+                progress.LastPositionSec = req.LastPositionSec;
                 progress.WatchedAt = DateTime.UtcNow;
 
                 if (req.IsCompleted)
