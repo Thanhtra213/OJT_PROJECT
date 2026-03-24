@@ -109,7 +109,7 @@ namespace EasyEnglish_API.Services.Courses
             }).ToList();
         }
 
-        public async Task<CourseResponse?> GetTeacherCourseDetailAsync(int accountId, int courseId)
+        public async Task<CourseDetailDto?> GetTeacherCourseDetailAsync(int accountId, int courseId)
         {
             var teacherId = await ResolveTeacherIdAsync(accountId);
 
@@ -117,15 +117,46 @@ namespace EasyEnglish_API.Services.Courses
             if (course == null || course.TeacherId != teacherId)
                 throw new UnauthorizedAccessException("Forbidden");
 
-            return new CourseResponse
+            var dto = new CourseDetailDto
             {
                 CourseID = course.CourseId,
                 CourseName = course.CourseName,
-                CourseDescription = course.Description,
-                TeacherID = course.TeacherId,
-                TeacherName = course.Teacher?.TeacherNavigation?.Username ?? "(Unknown)",
-                CreateAt = course.CreateAt
+                Description = course.Description ?? "",
+                CourseLevel = course.CourseLevel,
+                Chapters = course.CourseChapters.Select(ch => new ChapterDetailDto
+                {
+                    ChapterID = ch.ChapterId,
+                    ChapterName = ch.ChapterName,
+                    Videos = ch.CourseVideos.Select(v => new VideoDetailDto
+                    {
+                        VideoID = v.VideoId,
+                        VideoName = v.VideoName,
+                        VideoURL = v.VideoUrl,
+                        IsPreview = v.IsPreview
+                    }).ToList()
+                }).ToList()
             };
+            var orphanVideos = course.CourseVideos
+    .Where(v => v.ChapterId == null)
+    .Select(v => new VideoDetailDto
+    {
+        VideoID = v.VideoId,
+        VideoName = v.VideoName,
+        VideoURL = v.VideoUrl,
+        IsPreview = v.IsPreview
+    })
+    .ToList();
+
+            if (orphanVideos.Any())
+            {
+                dto.Chapters.Add(new ChapterDetailDto
+                {
+                    ChapterID = 0,
+                    ChapterName = "(Uncategorized Videos)",
+                    Videos = orphanVideos
+                });
+            }
+            return dto;
         }
 
         public async Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req)
