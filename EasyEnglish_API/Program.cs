@@ -54,6 +54,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using EasyEnglish_API.Services.Course;
+using EasyEnglish_API.Interfaces.Streak;
+using EasyEnglish_API.Repositories.Streak;
+using EasyEnglish_API.Services.Streak;
+using EasyEnglish_API.Interfaces.Progress;
+using EasyEnglish_API.Repositories.Progress;
+using EasyEnglish_API.Services.Video;
 
 
 
@@ -167,7 +174,8 @@ namespace EasyEnglish_API {
                     .WithOrigins(
                         "http://localhost:3000",
                         "https://localhost:3000",
-                        "https://beerier-superlogically-maxwell.ngrok-free.dev" // 👈 và cả domain ngrok
+                        "https://beerier-superlogically-maxwell.ngrok-free.dev", // 👈 và cả domain ngrok
+                        "null"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -195,7 +203,11 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAISubmissionRepository, AISubmissionRepository>();
             builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
             builder.Services.AddScoped<ITeacherInForRepository, TeacherInforRepository>();
-            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<ITeacherScoreRepository, TeacherScoreRepository>();
+            builder.Services.AddScoped<IAIReviewRepository, AIReviewRepository>();
+            builder.Services.AddScoped<IFlashcardProgressRepository, FlashcardProgressRepository>();
+            builder.Services.AddScoped<IStreakRepository, StreakRepository>();
+            builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -214,9 +226,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIQuizService, AIQuizService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
-            builder.Services.AddScoped<IPaymentService, PaymentService>();
-            builder.Services.AddScoped<IUpLoadService, UploadService>();
-
+          
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddSingleton<EmailSender>();
@@ -241,7 +251,10 @@ namespace EasyEnglish_API {
             });
             var app = builder.Build();
 
-            
+           
+
+
+
             // ===== Swagger =====
             if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {

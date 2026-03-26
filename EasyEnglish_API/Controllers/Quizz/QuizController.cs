@@ -44,16 +44,18 @@ namespace EasyEnglish_API.Controllers.Quizz
 
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
-            => Ok(await _service.StartQuizAsync(GetUserId(), quizId));
+        {
+            var attemptId = await _service.StartQuizAsync(GetUserId(), quizId);
+            return Ok(new { attemptId });
+        }
 
         [HttpPost("submit/{attemptId}")]
-        public async Task<IActionResult> SubmitQuiz(int attemptId, SubmitQuizRequest req)
+        public async Task<IActionResult> SubmitQuiz(int attemptId,[FromBody] SubmitQuizRequest req)
         {
             int userId = GetUserId();
-            var score = await _service.SubmitQuizAsync(attemptId, userId, req);
-            if (score == null)
-                return NotFound(new { message = "Attempt not found" });
-            return Ok(await _service.SubmitQuizAsync(userId, attemptId, req));
+
+            var score = await _service.SubmitQuizAsync(userId, attemptId, req); 
+            return Ok(new { score });
         }
 
         [HttpGet("attempts/history")]

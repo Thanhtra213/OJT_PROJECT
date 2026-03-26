@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EasyEnglish_API.Models;
 
@@ -32,4 +33,8 @@ public partial class AnswerAIReview
     public decimal? ScoreFluency { get; set; }
 
     public virtual AISubmission Submission { get; set; } = null!;
+
+    [InverseProperty("AIReview")]
+    public virtual ICollection<AnswerTeacherReview> AnswerTeacherReviews { get; set; }
+        = new List<AnswerTeacherReview>();
 }

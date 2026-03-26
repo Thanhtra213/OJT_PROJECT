@@ -17,9 +17,6 @@ namespace EasyEnglish_API.Controllers.AdminSide
             _service = service;
         }
 
-        // =====================================================
-        // GLOBAL QUIZ CRUD
-        // =====================================================
 
         [HttpGet]
         public async Task<IActionResult> GetAllGlobalQuizzes()
@@ -80,9 +77,6 @@ namespace EasyEnglish_API.Controllers.AdminSide
             return Ok(new { message = "Global quiz deleted" });
         }
 
-        // =====================================================
-        // GROUP CRUD
-        // =====================================================
 
         [HttpPost("{quizId:int}/group")]
         public async Task<IActionResult> CreateGroup(int quizId, [FromBody] CreateGroupRequest req)
@@ -117,10 +111,8 @@ namespace EasyEnglish_API.Controllers.AdminSide
 
             return Ok(new { message = "Group deleted" });
         }
-
-        // =====================================================
-        // QUESTION CRUD
-        // =====================================================
+                         
+      
 
         [HttpPost("group/{groupId:int}/question")]
         public async Task<IActionResult> CreateQuestion(int groupId, [FromBody] CreateQuestionRequest req)
@@ -156,9 +148,7 @@ namespace EasyEnglish_API.Controllers.AdminSide
             return Ok(new { message = "Question deleted" });
         }
 
-        // =====================================================
-        // OPTION CRUD
-        // =====================================================
+   
 
         [HttpPost("question/{questionId:int}/option")]
         public async Task<IActionResult> CreateOption(int questionId, [FromBody] CreateOptionRequest req)
@@ -194,9 +184,6 @@ namespace EasyEnglish_API.Controllers.AdminSide
             return Ok(new { message = "Option deleted" });
         }
 
-        // =====================================================
-        // ASSET CRUD
-        // =====================================================
 
         [HttpPost("group/{groupId:int}/asset")]
         public async Task<IActionResult> CreateAssetForGroup(int groupId, [FromBody] CreateAssetRequest req)

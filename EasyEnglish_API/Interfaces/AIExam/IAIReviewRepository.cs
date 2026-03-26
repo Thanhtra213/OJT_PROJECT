@@ -8,5 +8,6 @@ namespace EasyEnglish_API.Interfaces.AIExam
         Task<AnswerAIReview?> GetBySubmissionAsync(long submissionId);
         Task<List<AnswerAIReview>> GetPendingForTeacherAsync();
         Task<AnswerAIReview> GetByIdAsync(long id);
+        Task<object?> GetStudentReviewAsync(int userId, long submissionId);
     }
 }
