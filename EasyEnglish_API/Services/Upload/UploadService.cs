@@ -16,7 +16,7 @@ namespace EasyEnglish_API.Services.Upload
         {
             if (req.File == null || req.File.Length == 0)
                 throw new Exception("No file uploaded.");
-
+                
             var ext = Path.GetExtension(req.File.FileName).ToLower();
             string url;
 

@@ -2,10 +2,14 @@
 using EasyEnglish_API.DTOs.Flashcard;
 using EasyEnglish_API.Services.Courses;
 using EasyEnglish_API.Services.Flashcard;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EasyEnglish_API.Controllers.Teacher
 {
+    [ApiController]
+    [Route("api/teacher/flashcard")]
+    [Authorize(Roles = "TEACHER")]
     public class TeacherFlashcardController : ControllerBase
     {
         private readonly IFlashcardService _flashcardService;

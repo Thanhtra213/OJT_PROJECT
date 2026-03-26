@@ -46,6 +46,7 @@ using EasyEnglish_API.Services.Profile;
 using EasyEnglish_API.Services.Score;
 using EasyEnglish_API.Services.Subscriptionplan;
 using EasyEnglish_API.Services.Transaction;
+using EasyEnglish_API.Services.Upload;
 using EasyEnglish_API.Services.UserService;
 using EasyEnglish_API.Utils;
 using EMT_API.Services;
@@ -214,6 +215,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IUpLoadService, UploadService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));

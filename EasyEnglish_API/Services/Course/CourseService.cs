@@ -16,7 +16,6 @@ namespace EasyEnglish_API.Services.Courses
             _r2 = r2;
         }
 
-        
         private async Task<int> ResolveTeacherIdAsync(int accountId)
         {
             var teacherId = await _courseRepository.GetTeacherIdByAccountIdAsync(accountId);

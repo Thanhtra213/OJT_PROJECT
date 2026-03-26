@@ -17,9 +17,6 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    // ---------------------------
-    // GET ALL USERS
-    // ---------------------------
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
@@ -27,9 +24,6 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    // ---------------------------
-    // GET ALL TEACHERS
-    // ---------------------------
     [HttpGet("teachers")]
     public async Task<IActionResult> GetAllTeachers()
     {
@@ -37,9 +31,6 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    // ---------------------------
-    // GET ALL STUDENTS
-    // ---------------------------
     [HttpGet("students")]
     public async Task<IActionResult> GetAllStudents()
     {
@@ -47,9 +38,6 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    // ---------------------------
-    // LOCK ACCOUNT
-    // ---------------------------
     [HttpPut("{id}/lock")]
     public async Task<IActionResult> LockUser(int id)
     {
@@ -63,9 +51,6 @@ public class UserController : ControllerBase
         return Ok(acc);
     }
 
-    // ---------------------------
-    // UNLOCK ACCOUNT
-    // ---------------------------
     [HttpPut("{id}/unlock")]
     public async Task<IActionResult> UnlockUser(int id)
     {
@@ -79,9 +64,6 @@ public class UserController : ControllerBase
         return Ok(acc);
     }
 
-    // ---------------------------
-    // SEARCH USERS
-    // ---------------------------
     [HttpGet("search")]
     public async Task<IActionResult> SearchUser([FromQuery] string? q, [FromQuery] string? role, [FromQuery] string? status)
     {
@@ -94,9 +76,6 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
-    // ---------------------------
-    // ASSIGN USER ROLE
-    // ---------------------------
     [HttpPost("assign-role")]
     public async Task<IActionResult> AssignUserRole([FromBody] AssignRoleRequest req)
     {
