@@ -1,0 +1,456 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// --- Tokens/Mixins (Liquid Glass + OneUI) ---
+$ui-brand: #5aa0ff !default;
+$ui-accent: #8c64ff !default;
+$ui-bg: #f7f9fc !default;
+$ui-surface: #ffffff !default;
+$ui-text: #0b1324 !default;
+$ui-muted: #aeb7c2 !default;
+$ui-border: #e5edf4 !default;
+
+$ui-success: #22c55e !default;
+$ui-warn: #f59e0b !default;
+$ui-danger: #ef4444 !default;
+
+$ui-radius: 20px !default;
+$ui-radius-md: 16px !default;
+$ui-radius-sm: 12px !default;
+$ui-blur: 16px !default;
+$ui-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+  inset 0 1px 0 rgba(255, 255, 255, 0.12);
+$ui-transition: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+@mixin ui-focus($c: $ui-brand) {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(90, 160, 255, 0.35);
+}
+
+@mixin ui-glass(
+  $bg: rgba(255, 255, 255, 0.4),
+  $bd: rgba(255, 255, 255, 0.28),
+  $blur: $ui-blur
+) {
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.08)
+    ),
+    $bg;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid $bd;
+  box-shadow: $ui-shadow;
+
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    background: rgba(255, 255, 255, 0.8);
+  }
+}
+
+// --- Base Styles ---
+.grammar-container {
+  background: $ui-bg;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem;
+  position: relative;
+  max-width: 1200px; // Set a max-width for the container
+  margin: 0 auto; // Center the container
+
+  // Header
+  .grammar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-weight: 700;
+      color: $ui-text;
+      margin: 0;
+      font-size: 2.25rem;
+    }
+
+    .close-button {
+      @include ui-glass(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.5));
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      color: $ui-muted;
+      cursor: pointer;
+      transition: all $ui-transition ease;
+
+      &:hover {
+        background: $ui-surface;
+        color: $ui-text;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // Progress Sidebar
+  .progress-sidebar {
+    @include ui-glass(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+    border-radius: $ui-radius;
+    padding: 1.5rem;
+    align-self: start; // Keep sidebar from stretching
+    position: sticky; // Make it sticky
+    top: 2rem; // Stick to the top
+
+    h3 {
+      font-weight: 600;
+      color: $ui-text;
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .progress-overview {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: $ui-radius-md;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+
+      p {
+        font-weight: 500;
+        color: $ui-muted;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+      }
+
+      .progress-bar-background {
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+
+        .progress-bar-fill {
+          background: linear-gradient(90deg, $ui-brand 0%, $ui-accent 100%);
+          height: 100%;
+          border-radius: 10px;
+          transition: width 0.5s ease;
+        }
+      }
+
+      .completion-info {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 500;
+        color: $ui-muted;
+        font-size: 0.8rem;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        font-weight: 500;
+        color: $ui-muted;
+        transition: all $ui-transition;
+        position: relative;
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $ui-border;
+          margin-right: 1rem;
+          transition: all $ui-transition;
+        }
+
+        .question-count {
+          margin-left: auto;
+          font-size: 0.85rem;
+          background: rgba(0, 0, 0, 0.05);
+          padding: 0.2rem 0.5rem;
+          border-radius: 8px;
+        }
+
+        &.active-tense {
+          color: $ui-text;
+          font-weight: 600;
+
+          .dot {
+            background: $ui-brand;
+            transform: scale(1.5);
+          }
+        }
+      }
+    }
+  }
+
+  // Main Content
+  .grammar-content {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    align-items: flex-start; // Align items to the top
+  }
+
+  // Question Card
+  .question-card {
+    @include ui-glass(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+    border-radius: $ui-radius;
+    padding: 2rem;
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem; /* Reduced */
+      padding-bottom: 1rem; /* Reduced */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+      .icon {
+        @include ui-glass(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+        border-radius: 50%;
+        padding: 0.5rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $ui-brand;
+        font-size: 1.25rem;
+      }
+      .title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $ui-text;
+      }
+      .difficulty,
+      .tag {
+        padding: 0.3em 0.7em;
+        border-radius: $ui-radius-sm;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .difficulty {
+        background: rgba($ui-warn, 0.15);
+        color: darken($ui-warn, 15%);
+      }
+      .tag {
+        background: rgba($ui-accent, 0.15);
+        color: darken($ui-accent, 10%);
+      }
+    }
+
+    .description {
+      font-size: 1rem;
+      color: $ui-muted;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .question-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $ui-text;
+      margin-bottom: 2rem;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+
+      .option-item {
+        @include ui-glass(
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.25)
+        );
+        border-radius: $ui-radius-md;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        color: $ui-text;
+        cursor: pointer;
+        transition: all $ui-transition ease;
+        border: 2px solid transparent;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.4);
+          border-color: rgba($ui-brand, 0.3);
+        }
+        &.selected {
+          background: rgba($ui-brand, 0.15);
+          border-color: $ui-brand;
+          color: darken($ui-brand, 10%);
+          font-weight: 600;
+        }
+        &.correct {
+          background: rgba($ui-success, 0.15);
+          border-color: $ui-success;
+          color: darken($ui-success, 10%);
+        }
+        &.incorrect {
+          background: rgba($ui-danger, 0.15);
+          border-color: $ui-danger;
+          color: darken($ui-danger, 10%);
+        }
+      }
+    }
+
+    .check-button {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(180deg, $ui-brand 0%, #4178f0 85%);
+      color: $ui-surface;
+      border: none;
+      border-radius: $ui-radius-md;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all $ui-transition ease;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+      &:disabled {
+        background: $ui-muted;
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      &:focus-visible {
+        @include ui-focus;
+      }
+    }
+  }
+
+  // Chat Icon
+  .chat-icon {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(45deg, $ui-brand 0%, $ui-accent 100%);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all $ui-transition ease;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $ui-surface;
+
+    &:hover {
+      transform: scale(1.1) translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  // Navigation and Submit Buttons
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .nav-button,
+  .submit-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .nav-button {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .nav-button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+  }
+
+  .submit-button {
+    background-color: #28a745; /* Green for submit */
+    color: white;
+  }
+
+  .submit-button:hover:not(:disabled) {
+    background-color: #218838;
+  }
+
+  .nav-button:disabled,
+  .submit-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  // Responsive
+  @media (max-width: 992px) {
+    .grammar-content {
+      grid-template-columns: 1fr;
+    }
+    .progress-sidebar {
+      order: -1; // Move sidebar to top on smaller screens
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    .grammar-header h1 {
+      font-size: 1.75rem;
+    }
+    .question-card {
+      padding: 1.5rem;
+    }
+    .progress-sidebar {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 1rem;
+    .question-text {
+      font-size: 1.25rem;
+    }
+    .option-item {
+      padding: 0.75rem 1rem;
+    }
+  }
+}
+
+/* ==========================================================
+   DARK MODE - GRAMMAR
+   ========================================================== */
+body.global-dark-mode {
+  /* Ép nền trang ngữ pháp */
+  .grammar-page-container, .grammar-layout {
+    background-color: #0f172a !important;
+  }
+  
+  /* Các khối nội dung và thanh bên */
+  .grammar-sidebar, .grammar-content, .grammar-card, .lesson-card {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    
+    h1, h2, h3, h4, h5, strong { color: #f8fafc !important; }
+    p, span, li, .text-muted { color: #cbd5e1 !important; }
+  }
+  
+  /* Nút điều hướng chuyển bài */
+  .nav-button {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    &:hover:not(:disabled) { background-color: #475569 !important; }
+    &:disabled { opacity: 0.5; background-color: #1e293b !important; }
+  }
+}

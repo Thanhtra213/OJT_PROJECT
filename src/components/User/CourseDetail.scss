@@ -1,0 +1,562 @@
+// Tabs in course details: make text black
+.course-detail-tabs .nav-link,
+.course-detail-tabs .nav-item,
+.course-detail-tabs .tab,
+.course-detail-tabs .tab-item {
+  color: #111 !important;
+}
+// If using react-bootstrap Tabs
+.nav-tabs .nav-link {
+  color: #111 !important;
+}
+.course-feedback-page .btn-primary[type="submit"] {
+  background: #3b82f6;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+.course-feedback-page .btn-primary[type="submit"]:hover,
+.course-feedback-page .btn-primary[type="submit"]:focus {
+  background: #ff9800;
+  color: #fff;
+}
+// CourseDetail.scss - New design for the course learning page
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// --- Variables ---
+$font-family-base: 'Inter', sans-serif;
+$bg-main: #f0f2f5;
+$bg-card: #ffffff;
+$text-dark: #1e293b;
+$text-medium: #475569;
+$text-light: #94a3b8;
+$primary-color: #6366f1;
+$primary-hover: #4f46e5;
+$border-color: #e2e8f0;
+$border-radius: 0.75rem;
+$shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+$transition: 0.3s ease;
+
+// --- Global Page Styles ---
+.course-detail-page {
+  background-color: $bg-main;
+  min-height: 100vh;
+  font-family: $font-family-base;
+  padding: 2rem 0;
+}
+
+.page-loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  gap: 1rem;
+  color: $text-medium;
+}
+
+// --- Layout ---
+.main-content-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-col {
+  .course-playlist-card {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// --- Video Player ---
+.video-player-wrapper {
+  width: 100%;
+  padding-top: 56.25%; // 16:9 Aspect Ratio
+  position: relative;
+  background-color: #000;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+
+  .video-container, .player-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .player-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+
+    &.error {
+      background-color: #2d3748;
+    }
+  }
+}
+
+// --- Course Content Tabs ---
+.course-content-tabs {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+  padding: 0.5rem 1.5rem 1.5rem;
+
+  .nav-tabs {
+    border-bottom: 1px solid #e2e8f0;
+    .nav-link {
+      color: #38bdf8;
+      font-weight: 600;
+      border: none;
+      border-bottom: 2px solid transparent;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      &.active {
+        color: #38bdf8;
+        border-bottom-color: #38bdf8;
+        background: #e0f2fe;
+      }
+      &:hover {
+        color: #0ea5e9;
+      }
+    }
+  }
+  .tab-pane-content {
+    padding-top: 1.5rem;
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    .course-description {
+      color: #475569;
+      line-height: 1.6;
+    }
+  }
+}
+
+// --- Resource List (Quizzes/Flashcards) ---
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  .resource-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: 0.3s;
+    cursor: pointer;
+    background: #fff;
+    &:hover {
+      border-color: #38bdf8;
+      background-color: #e0f2fe;
+    }
+    .resource-icon {
+      font-size: 1.5rem;
+      color: #38bdf8;
+    }
+    .resource-info {
+      strong {
+        display: block;
+        color: #1e293b;
+        font-weight: 600;
+      }
+      span {
+        color: #475569;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// --- Sidebar Playlist ---
+.course-playlist-card {
+  background-color: $bg-card;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  overflow: hidden;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    h5 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    span {
+      font-size: 0.9rem;
+      color: $text-medium;
+    }
+  }
+
+  .accordion {
+    overflow-y: auto;
+    flex-grow: 1;
+
+    .accordion-item {
+      border: none;
+      border-bottom: 1px solid $border-color;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .accordion-header {
+      .accordion-button {
+        background-color: #f8fafc;
+        box-shadow: none;
+        color: $text-dark;
+        font-weight: 600;
+
+        &:not(.collapsed) {
+          background-color: lighten($primary-color, 35%);
+          color: $primary-hover;
+        }
+        &:focus {
+          box-shadow: none;
+        }
+        &::after {
+          filter: brightness(0.5);
+        }
+      }
+    }
+
+    .chapter-header {
+      span {
+        display: block;
+        font-size: 0.8rem;
+        color: $text-medium;
+        font-weight: 500;
+      }
+      strong {
+        font-size: 1rem;
+      }
+    }
+
+    .accordion-body {
+      padding: 0;
+    }
+  }
+}
+
+// --- Video List inside Accordion ---
+.video-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.5rem;
+    border-top: 1px solid $border-color;
+    font-size: 0.95rem;
+    color: $text-medium;
+    transition: $transition;
+
+    .video-icon {
+      color: $text-light;
+      font-size: 1.1rem;
+    }
+    .video-name {
+      flex-grow: 1;
+    }
+    .badge {
+      font-size: 0.7rem;
+    }
+
+    &.watchable {
+      cursor: pointer;
+      color: $text-dark;
+      .video-icon {
+        color: $primary-color;
+      }
+      &:hover {
+        background-color: #f8fafc;
+      }
+    }
+
+    &.locked {
+      opacity: 0.7;
+    }
+
+    &.playing {
+      background-color: lighten($primary-color, 38%);
+      color: $primary-hover;
+      font-weight: 600;
+      border-left: 4px solid $primary-color;
+      padding-left: calc(1.5rem - 4px);
+
+      .playing-icon {
+        animation: pulse 1.5s infinite;
+      }
+    }
+  }
+}
+
+// --- Feedback Cards ---
+// Feedback List Cards
+.feedback-list {
+  .card {
+    background: #e0f2fe !important;
+  }
+}
+
+// Feedback Form Card (at the top of feedback page)
+.course-feedback-page {
+  background: #3b82f6 !important;
+}
+.course-feedback-page .card {
+  background: #fff !important;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* ==========================================================
+   DARK MODE - COURSE DETAIL (TRANG HỌC TẬP)
+   ========================================================== */
+body.global-dark-mode {
+  .course-detail-page {
+    background-color: #0f172a !important; /* Đen nền */
+  }
+
+  /* Các khối Card, Tabs, Playlist */
+  .course-content-tabs, 
+  .course-playlist-card, 
+  .resource-item, 
+  .course-feedback-page .card {
+    background-color: #1e293b !important; /* Xám đen nổi */
+    border-color: #334155 !important;
+  }
+
+  /* Chữ trong Course */
+  .tab-pane-content h2, 
+  .resource-info strong, 
+  .card-header h5,
+  .course-detail-tabs .nav-link,
+  .nav-tabs .nav-link {
+    color: #f8fafc !important; /* Chữ trắng */
+  }
+
+  .course-description, 
+  .resource-info span, 
+  .card-header span {
+    color: #cbd5e1 !important; /* Chữ xám sáng */
+  }
+
+  /* Ghi đè thẻ Tabs đang bị !important màu đen (#111) */
+  .course-detail-tabs .nav-link, 
+  .course-detail-tabs .nav-item, 
+  .nav-tabs .nav-link {
+    color: #cbd5e1 !important;
+    &:hover { color: #38bdf8 !important; }
+  }
+  .nav-tabs .nav-link.active {
+    background-color: #0f172a !important;
+    color: #38bdf8 !important;
+    border-bottom-color: #38bdf8 !important;
+  }
+
+  /* Menu bài học bên phải (Accordion) */
+  .accordion-item, 
+  .accordion-button {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    background-color: #334155 !important;
+    color: #38bdf8 !important;
+  }
+
+  /* Nền danh sách Video */
+  .video-list li {
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+    &.watchable { color: #f8fafc !important; }
+    &.watchable:hover { background-color: #334155 !important; }
+    &.playing { background-color: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; }
+  }
+
+  /* Hover resource (Quizzes, Flashcards) */
+  .resource-item:hover {
+    background-color: #334155 !important;
+    border-color: #38bdf8 !important;
+  }
+
+  /* Fix khối thông tin "Đang xem: ..." dưới video */
+  .current-lesson-info {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    h5 { color: #f8fafc !important; }
+  }
+}
+/* ==========================================================
+   DARK MODE - COURSE DETAIL (TRANG HỌC TẬP) - BẢN PHẲNG (FLAT)
+   ========================================================== */
+body.global-dark-mode {
+  .course-detail-page {
+    background-color: #0f172a !important; /* Đen nền toàn trang */
+  }
+
+  /* Các khối Card bên trái (Tabs nội dung, Feedback) */
+  .course-content-tabs, 
+  .resource-item, 
+  .course-feedback-page .card {
+    background-color: #1e293b !important; /* Khối bên trái vẫn nổi xám đen */
+    border-color: #334155 !important;
+  }
+
+  /* ==========================================
+     TÀNG HÌNH TOÀN BỘ CỘT PLAYLIST BÊN PHẢI
+     ========================================== */
+  .course-playlist-card {
+    background-color: transparent !important; /* Xóa sạch nền */
+    border: none !important;                  /* Xóa sạch viền ngoài */
+    box-shadow: none !important;
+  }
+  
+  .course-playlist-card .card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* XÓA KHUNG BÀI HỌC (ACCORDION) */
+  .accordion-item, 
+  .accordion-header,
+  .accordion-button,
+  .accordion-body {
+    background-color: transparent !important; /* Tuyệt đối không hiện nền */
+    border: none !important;                  /* Tuyệt đối không có viền hộp */
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Đổi màu mũi tên gập/mở của Bootstrap thành trắng */
+  .accordion-button::after {
+    filter: invert(1) brightness(200%) !important;
+  }
+
+  /* Chữ Chapter (Chương) nổi bần bật lơ lửng */
+  .chapter-header strong {
+    color: #ffffff !important;
+    font-size: 1.15rem !important; /* Cỡ chữ to ra 1 chút */
+    letter-spacing: 0.5px;
+  }
+
+  /* Khi click mở Chapter: Màu chữ chuyển Xanh dương, không hiện nền */
+  .accordion-button:not(.collapsed) {
+    background-color: transparent !important;
+  }
+  .accordion-button:not(.collapsed) .chapter-header strong {
+    color: #38bdf8 !important;
+  }
+
+  /* Danh sách Video (Chỉ để lại đường chỉ ngăn cách cực mảnh) */
+  .video-list li {
+    background-color: transparent !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: #cbd5e1 !important;
+  }
+
+  .video-list li:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Rất mờ khi trỏ chuột */
+  }
+
+  .video-list li.watchable { 
+    color: #f8fafc !important; 
+  }
+
+  .video-list li.playing { 
+    background-color: rgba(56, 189, 248, 0.08) !important; 
+    color: #38bdf8 !important; 
+    border-left: 2px solid #38bdf8 !important;
+  }
+
+  /* LÀM SÁNG RỰC NHÃN "XEM TRƯỚC" */
+  .badge.bg-info {
+    background-color: rgba(56, 189, 248, 0.15) !important; /* Nền xanh lam mờ */
+    color: #38bdf8 !important; /* Chữ dạ quang */
+    border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    font-weight: 600 !important;
+    padding: 6px 10px !important;
+  }
+
+  /* ==========================================
+     Chữ trong Tabs bên trái
+     ========================================== */
+  .tab-pane-content h2, 
+  .resource-info strong, 
+  .card-header h5,
+  .course-detail-tabs .nav-link,
+  .nav-tabs .nav-link {
+    color: #f8fafc !important;
+  }
+
+  .course-description, 
+  .resource-info span, 
+  .card-header span {
+    color: #cbd5e1 !important;
+  }
+
+  .course-detail-tabs .nav-link, 
+  .course-detail-tabs .nav-item, 
+  .nav-tabs .nav-link {
+    color: #cbd5e1 !important;
+    &:hover { color: #38bdf8 !important; }
+  }
+  .nav-tabs .nav-link.active {
+    background-color: transparent !important;
+    color: #38bdf8 !important;
+    border-bottom-color: #38bdf8 !important;
+  }
+
+  /* Fix khối thông tin "Đang xem: ..." dưới video */
+  .current-lesson-info {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    h5 { color: #f8fafc !important; }
+    .text-muted { color: #cbd5e1 !important; }
+  }
+}

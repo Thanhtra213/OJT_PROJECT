@@ -1,0 +1,612 @@
+// Profile.scss - Redesigned with Design System
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// --- Design System Variables ---
+// Colors
+$bg-white: #ffffff;
+$bg-gradient-light: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0);
+$text-gray-900: #1a202c;
+$text-gray-600: #4a5568;
+$text-gray-500: #718096;
+$primary-gradient: linear-gradient(to right, #4f46e5, #8b5cf6); // Indigo-600 to Purple-600
+$accent-gradient: linear-gradient(to right, #f97316, #ef4444); // Orange-500 to Red-600
+$success-gradient: linear-gradient(to right, #10b981, #059669); // Green-500 to Emerald-600
+
+// Typography
+$font-family-base: 'Inter', sans-serif;
+$font-bold: 700;
+$font-medium: 500;
+
+// Effects
+$glass-morphism-bg: rgba(255, 255, 255, 0.3);
+$glass-morphism-border: rgba(255, 255, 255, 0.18);
+$backdrop-blur: 10px;
+$transition-duration: 0.3s;
+$border-radius-lg: 1rem; // rounded-2xl
+$border-radius-md: 0.75rem; // rounded-xl
+
+.profile-page {
+  background: $bg-gradient-light;
+  min-height: 100vh;
+  font-family: $font-family-base;
+  padding: 2rem 0;
+
+  .profile-container {
+    max-width: 1200px;
+  }
+
+  // Back Link
+  .back-link {
+    color: $text-gray-600;
+    text-decoration: none;
+    font-weight: $font-medium;
+    padding: 0.5rem 0;
+    margin-bottom: 2rem;
+    display: inline-flex;
+    align-items: center;
+    transition: all $transition-duration ease;
+
+    &:hover {
+      color: $text-gray-900;
+      transform: translateX(-3px);
+    }
+  }
+
+  // Profile Card
+  .profile-card {
+    background: $glass-morphism-bg;
+    backdrop-filter: blur($backdrop-blur);
+    border: 1px solid $glass-morphism-border;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transition: all $transition-duration ease;
+
+    &:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-body {
+      padding: 2rem;
+
+      .avatar-section {
+        .avatar-wrapper {
+          position: relative;
+          display: inline-block;
+          border-radius: 50%;
+          overflow: hidden;
+          background: none !important;
+
+          &:hover {
+            transform: scale(1.05);
+            
+            .avatar-overlay {
+              opacity: 1;
+            }
+          }
+
+          .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: none !important;
+          }
+
+          .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $bg-white;
+            font-size: 1.5rem;
+            opacity: 0;
+          }
+        }
+      }
+
+      .profile-name {
+        font-weight: $font-bold;
+        color: $text-gray-900;
+        margin: 1rem 0 0.5rem;
+        font-size: 1.5rem;
+      }
+
+      .profile-email {
+        font-weight: $font-medium;
+        color: $text-gray-600;
+      }
+    }
+  }
+
+  // Settings Card
+  .settings-card {
+    background: $glass-morphism-bg;
+    backdrop-filter: blur($backdrop-blur);
+    border: 1px solid $glass-morphism-border;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transition: all $transition-duration ease;
+
+    &:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-body {
+      padding: 2rem;
+
+      h4, h5 {
+        font-weight: $font-bold;
+        color: $text-gray-900;
+        margin-bottom: 1.5rem;
+
+        svg {
+          color: $primary-gradient;
+        }
+      }
+
+      .form-label {
+        font-weight: $font-bold;
+        color: $text-gray-900;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control, .form-select {
+        background: $bg-white;
+        border: 1px solid $glass-morphism-border;
+        border-radius: $border-radius-md;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all $transition-duration ease;
+
+        &:focus {
+          border-color: rgba(79, 70, 229, 0.5);
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        &:disabled {
+          background: rgba(255, 255, 255, 0.7);
+          color: $text-gray-500;
+        }
+      }
+
+      hr {
+        border-color: $glass-morphism-border;
+        margin: 2rem 0;
+      }
+
+      .btn-black {
+        background: $text-gray-900;
+        border: none;
+        border-radius: $border-radius-md;
+        font-weight: $font-bold;
+        padding: 0.75rem 2rem;
+        transition: all $transition-duration ease;
+
+        &:hover {
+          background: lighten($text-gray-900, 10%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  // Avatar Modal
+  .avatar-modal {
+    .modal-content {
+      background: $glass-morphism-bg;
+      backdrop-filter: blur($backdrop-blur);
+      border: 1px solid $glass-morphism-border;
+      border-radius: $border-radius-lg;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid $glass-morphism-border;
+      padding: 1.5rem;
+
+      .modal-title {
+        font-weight: $font-bold;
+        color: $text-gray-900;
+      }
+
+      .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        color: $text-gray-500;
+        transition: color $transition-duration ease;
+
+        &:hover {
+          color: $text-gray-900;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 2rem;
+
+      .current-avatar {
+        .modal-avatar {
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid $glass-morphism-border;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .text-muted {
+        font-weight: $font-medium;
+        line-height: 1.5;
+      }
+
+      .avatar-options {
+        .option-item {
+          margin-bottom: 1rem;
+
+          .upload-option, .remove-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border: 2px dashed $glass-morphism-border;
+            border-radius: $border-radius-md;
+            background: rgba(255, 255, 255, 0.5);
+            color: $text-gray-600;
+            font-weight: $font-medium;
+            transition: all $transition-duration ease;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.8);
+              border-color: rgba(79, 70, 229, 0.5);
+              transform: translateY(-2px);
+            }
+
+            .option-icon {
+              font-size: 1.2rem;
+              color: $primary-gradient;
+            }
+          }
+
+          .remove-option {
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+
+            &:hover {
+              background: rgba(239, 68, 68, 0.1);
+              border-color: rgba(239, 68, 68, 0.5);
+            }
+
+            .option-icon {
+              color: #ef4444;
+            }
+          }
+        }
+      }
+
+      .upload-info {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: $border-radius-md;
+        padding: 1rem;
+        border-left: 3px solid $primary-gradient;
+
+        small {
+          font-weight: $font-medium;
+          line-height: 1.4;
+        }
+      }
+    }
+
+    .modal-footer {
+      border-top: 1px solid $glass-morphism-border;
+      padding: 1.5rem;
+
+      .btn {
+        border-radius: $border-radius-md;
+        font-weight: $font-medium;
+        padding: 0.75rem 1.5rem;
+        transition: all $transition-duration ease;
+
+        &.btn-secondary {
+          background: $glass-morphism-bg;
+          border: 1px solid $glass-morphism-border;
+          color: $text-gray-600;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+          }
+        }
+
+        &.btn-black {
+          background: $text-gray-900;
+          border: none;
+
+          &:hover {
+            background: lighten($text-gray-900, 10%);
+            transform: translateY(-2px);
+          }
+
+          &:disabled {
+            background: $text-gray-500;
+            cursor: not-allowed;
+            transform: none;
+          }
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  // Toast Notification
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    
+    .toast {
+      background: $glass-morphism-bg;
+      backdrop-filter: blur($backdrop-blur);
+      border: 1px solid $glass-morphism-border;
+      border-radius: $border-radius-lg;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      animation: slideInRight 0.3s ease;
+
+      .toast-header {
+        background: transparent;
+        border-bottom: 1px solid $glass-morphism-border;
+        padding: 0.75rem 1rem;
+
+        .toast-title {
+          font-weight: $font-bold;
+          color: $text-gray-900;
+        }
+
+        .btn-close {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          color: $text-gray-500;
+          cursor: pointer;
+          transition: color $transition-duration ease;
+
+          &:hover {
+            color: $text-gray-900;
+          }
+        }
+      }
+
+      .toast-body {
+        padding: 1rem;
+        color: $text-gray-600;
+        font-weight: $font-medium;
+      }
+
+      &.success {
+        border-left: 4px solid $success-gradient;
+        
+        .toast-header .toast-title {
+          color: #059669;
+        }
+      }
+
+      &.error {
+        border-left: 4px solid $accent-gradient;
+        
+        .toast-header .toast-title {
+          color: #dc2626;
+        }
+      }
+
+      &.warning {
+        border-left: 4px solid #f59e0b;
+        
+        .toast-header .toast-title {
+          color: #b45309;
+        }
+      }
+
+      &.info {
+        border-left: 4px solid $primary-gradient;
+        
+        .toast-header .toast-title {
+          color: #4f46e5;
+        }
+      }
+    }
+  }
+
+  // Loading State
+  .loading-container {
+    padding: 4rem 0;
+    text-align: center;
+    
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      border-width: 0.3em;
+      color: $primary-gradient;
+    }
+    
+    p {
+      color: $text-gray-600;
+      font-weight: $font-medium;
+      margin-top: 1rem;
+    }
+  }
+
+  // Error State
+  .error-container {
+    .alert {
+      background: $glass-morphism-bg;
+      backdrop-filter: blur($backdrop-blur);
+      border: 1px solid $glass-morphism-border;
+      border-radius: $border-radius-lg;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+      .alert-heading {
+        font-weight: $font-bold;
+        color: $text-gray-900;
+      }
+
+      .btn {
+        border-radius: $border-radius-md;
+        font-weight: $font-medium;
+      }
+    }
+  }
+
+  // Animations
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+
+    .profile-card,
+    .settings-card {
+      .card-body {
+        padding: 1.5rem;
+      }
+    }
+
+    .avatar-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .toast-notification {
+      left: 1rem;
+      right: 1rem;
+      min-width: auto;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .profile-card,
+    .settings-card {
+      .card-body {
+        padding: 1.25rem;
+      }
+    }
+
+    .avatar-section .avatar-wrapper .profile-avatar {
+      width: 100px;
+      height: 100px;
+    }
+  }
+}
+
+/* ==========================================================
+   DARK MODE ĐỘC QUYỀN CHO TRANG PROFILE
+   ========================================================== */
+body.global-dark-mode {
+  .profile-page {
+    background: #0f172a !important; /* Đen nền toàn trang */
+
+    .back-link {
+      color: #cbd5e1 !important;
+      &:hover { color: #f8fafc !important; }
+    }
+
+    .profile-card, .settings-card {
+      background: #1e293b !important; /* Nền xám đen cho các khung */
+      border-color: #334155 !important;
+      
+      /* Đổi màu chữ */
+      .profile-name, h4, h5, .form-label, strong {
+        color: #f8fafc !important; 
+      }
+
+      .profile-email, .text-muted {
+        color: #94a3b8 !important; 
+      }
+
+      /* Fix các ô Input nhập liệu */
+      .form-control, .form-select {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+        
+        &:focus {
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+        }
+        &:disabled {
+          background: #1e293b !important;
+          color: #64748b !important;
+        }
+      }
+
+      hr { border-color: #334155 !important; }
+      
+      /* Fix khu vực Danh sách chứng chỉ đang bị nền trắng (bg-light) */
+      .bg-light {
+        background-color: #0f172a !important;
+        border-color: #334155 !important;
+      }
+    }
+  }
+
+  /* Fix Modal Cập nhật Avatar */
+  .avatar-modal .modal-content, .modal-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+
+    .modal-header {
+      border-bottom-color: #334155 !important;
+      .modal-title { color: #f8fafc !important; }
+      .btn-close { filter: invert(1); } /* Đổi màu nút X tắt modal thành trắng */
+    }
+    
+    .modal-body {
+      .text-muted { color: #94a3b8 !important; }
+      .upload-info {
+         background: #0f172a !important;
+         color: #cbd5e1 !important;
+         border-left-color: #3b82f6 !important;
+      }
+      .option-item .upload-option, .option-item .remove-option {
+         background: #0f172a !important;
+         border-color: #334155 !important;
+         color: #cbd5e1 !important;
+         &:hover { background: #334155 !important; }
+      }
+    }
+    
+    .modal-footer {
+      border-top-color: #334155 !important;
+      .btn-secondary {
+        background: #334155 !important;
+        color: #f8fafc !important;
+        border-color: #475569 !important;
+      }
+    }
+  }
+}

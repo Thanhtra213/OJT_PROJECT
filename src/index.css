@@ -1,0 +1,412 @@
+/* ==========================================================
+   GLOBAL DARK MODE FIX (ÁP DỤNG MẠNH MẼ CHO CẢ 3 ROLE)
+   ========================================================== */
+
+/* 1. Ép đen toàn bộ nền trang (Background) */
+html.global-dark-mode,
+body.global-dark-mode,
+body.global-dark-mode #root,
+body.global-dark-mode .App,
+body.global-dark-mode .main-content,
+body.global-dark-mode .admin-dashboard-layout {
+  background-color: #0f172a !important; /* Đen nhám sâu */
+  background-image: none !important; /* Xóa gradient sáng nếu có */
+  color: #f8fafc !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+}
+
+/* 2. Ép đen tất cả các khối nổi (Card, Bảng, Modal, Sidebar) */
+body.global-dark-mode .card,
+body.global-dark-mode .bg-white,
+body.global-dark-mode .bg-light,
+body.global-dark-mode .admin-stat-card,
+body.global-dark-mode .admin-chart-card,
+body.global-dark-mode .management-card,
+body.global-dark-mode .admin-sidebar,
+body.global-dark-mode .modal-content,
+body.global-dark-mode .offcanvas {
+  background-color: #1e293b !important; /* Nền card xám đen */
+  border: 1px solid #334155 !important; /* Viền phân tách */
+  color: #f8fafc !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+}
+
+/* 3. Ép màu chữ Form, Ô nhập liệu (Input), Nút bấm dropdown */
+body.global-dark-mode input,
+body.global-dark-mode textarea,
+body.global-dark-mode select,
+body.global-dark-mode .form-control,
+body.global-dark-mode .form-select {
+  background-color: #0f172a !important; /* Lõm xuống */
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.global-dark-mode input::placeholder,
+body.global-dark-mode textarea::placeholder {
+  color: #64748b !important;
+}
+
+body.global-dark-mode input:focus,
+body.global-dark-mode textarea:focus {
+  border-color: #5aa0ff !important;
+  box-shadow: 0 0 0 0.25rem rgba(90, 160, 255, 0.25) !important;
+}
+
+/* 4. Ép màu Bảng (Table) trên toàn hệ thống */
+body.global-dark-mode table,
+body.global-dark-mode .table,
+body.global-dark-mode .management-table {
+  background-color: transparent !important;
+}
+
+body.global-dark-mode table th,
+body.global-dark-mode table td,
+body.global-dark-mode .table th,
+body.global-dark-mode .table td,
+body.global-dark-mode .management-table th,
+body.global-dark-mode .management-table td {
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.global-dark-mode tbody tr:hover td {
+  background-color: #334155 !important;
+}
+
+/* ==========================================================
+   FIX LỖI MENU SIDEBAR ADMIN TRONG DARK MODE
+   ========================================================== */
+body.global-dark-mode .admin-sidebar-menu-item {
+  background-color: transparent !important; 
+  color: #cbd5e1 !important; 
+  border: none !important;
+}
+
+body.global-dark-mode .admin-sidebar-menu-item .admin-sidebar-menu-icon {
+  color: #94a3b8 !important; 
+}
+
+body.global-dark-mode .admin-sidebar-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important; 
+  color: #ffffff !important; 
+}
+body.global-dark-mode .admin-sidebar-menu-item:hover .admin-sidebar-menu-icon {
+  color: #ffffff !important;
+}
+
+body.global-dark-mode .admin-sidebar-menu-item.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; 
+  color: #ffffff !important; 
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important; 
+}
+body.global-dark-mode .admin-sidebar-menu-item.active .admin-sidebar-menu-icon {
+  color: #ffffff !important;
+}
+
+/* ==========================================================
+   FIX DARK MODE TRANG CHỦ (HOME) - BẢN DIỆT NỀN TRẮNG
+   ========================================================== */
+html.global-dark-mode section,
+html.global-dark-mode main,
+html.global-dark-mode header,
+html.global-dark-mode .container,
+html.global-dark-mode .container-fluid,
+html.global-dark-mode [class*="bg-white"],
+html.global-dark-mode [class*="bg-light"],
+html.global-dark-mode [class*="bg-gray-50"],
+html.global-dark-mode [class*="bg-gray-100"],
+html.global-dark-mode [class*="bg-slate-50"],
+html.global-dark-mode [class*="bg-slate-100"] {
+  background-color: transparent !important; 
+}
+
+html.global-dark-mode [class*="shadow-sm"],
+html.global-dark-mode [class*="shadow-md"],
+html.global-dark-mode [class*="shadow-lg"],
+html.global-dark-mode [class*="shadow-xl"],
+html.global-dark-mode .card {
+  background-color: #1e293b !important; 
+  border: 1px solid #334155 !important;
+}
+
+html.global-dark-mode [class*="shadow-"] svg {
+  color: #5aa0ff !important;
+}
+
+/* ==========================================================
+   VŨ KHÍ TỐI THƯỢNG - MÁY QUÉT LỖI TEXT CHÌM & MODAL
+   ========================================================== */
+
+/* 1. ÉP SÁNG MỌI ĐOẠN TEXT BỊ TÀNG HÌNH (Fix "Chapter 1..." và Phụ đề) */
+body.global-dark-mode p,
+body.global-dark-mode span:not(.badge):not(.logo-icon):not([class*="text-transparent"]),
+body.global-dark-mode label,
+body.global-dark-mode small,
+body.global-dark-mode li,
+body.global-dark-mode .card-text,
+body.global-dark-mode .text-muted,
+body.global-dark-mode .text-secondary,
+body.global-dark-mode .admin-stat-footer,
+body.global-dark-mode .admin-sidebar-subtitle,
+body.global-dark-mode .card-description,
+body.global-dark-mode [class*="text-gray-"],
+body.global-dark-mode [class*="text-dark"],
+body.global-dark-mode [class*="text-black"] {
+  color: #cbd5e1 !important; /* Đổi tất cả chữ phụ thành Xám sáng */
+}
+
+/* Ép sáng mọi Tiêu đề chưa chịu đổi màu */
+body.global-dark-mode h1:not(.text-transparent),
+body.global-dark-mode h2:not(.text-transparent),
+body.global-dark-mode h3:not(.text-transparent),
+body.global-dark-mode h4:not(.text-transparent),
+body.global-dark-mode h5:not(.text-transparent),
+body.global-dark-mode h6:not(.text-transparent),
+body.global-dark-mode strong,
+body.global-dark-mode b,
+body.global-dark-mode .card-title,
+body.global-dark-mode .admin-stat-title,
+body.global-dark-mode .admin-sidebar-title,
+body.global-dark-mode .admin-stat-value,
+body.global-dark-mode .set-card h1,
+body.global-dark-mode .set-card h2,
+body.global-dark-mode .set-card h3,
+body.global-dark-mode .set-card h4,
+body.global-dark-mode .set-card h5,
+body.global-dark-mode .set-card h6 {
+  color: #f8fafc !important; /* Đổi tất cả Tiêu đề thành Trắng tinh */
+}
+
+/* 2. Tự động nhận diện và tiêu diệt các Hộp bị code cứng "Nền Trắng" bằng inline-style */
+body.global-dark-mode [style*="background-color: white"],
+body.global-dark-mode [style*="background-color: #fff"],
+body.global-dark-mode [style*="background: white"],
+body.global-dark-mode [style*="background: #fff"] {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+/* 3. FIX MODAL ĐĂNG NHẬP / ĐĂNG KÝ VÀ CÁC MODAL THÔNG BÁO */
+body.global-dark-mode .modal-content {
+  background-color: #1e293b !important; /* Xám đen */
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
+}
+
+body.global-dark-mode .modal-header {
+  border-bottom: 1px solid #334155 !important;
+}
+body.global-dark-mode .modal-footer {
+  border-top: 1px solid #334155 !important;
+}
+
+/* Fix Dấu X tắt Modal (Bản gốc là màu đen nên bị chìm) */
+body.global-dark-mode .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+  opacity: 0.8 !important;
+}
+body.global-dark-mode .btn-close:hover {
+  opacity: 1 !important;
+}
+
+/* 4. FIX Ô NHẬP LIỆU VÀ TABS TRONG MODAL */
+body.global-dark-mode .modal-content input,
+body.global-dark-mode .modal-content .form-control {
+  background-color: #0f172a !important; /* Lõm xuống */
+  border: 1px solid #475569 !important;
+  color: #f8fafc !important;
+}
+
+body.global-dark-mode .modal-content input:focus,
+body.global-dark-mode .modal-content .form-control:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Fix 2 nút Tabs "Đăng nhập" / "Đăng ký" */
+body.global-dark-mode .auth-tabs-nav button,
+body.global-dark-mode .auth-tabs-nav .btn {
+  background-color: transparent !important;
+  border: 1px solid #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+body.global-dark-mode .auth-tabs-nav button.active,
+body.global-dark-mode .auth-tabs-nav button.btn-dark {
+  background-color: #3b82f6 !important; /* Đổi thành xanh dương cho sáng */
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* Fix Nút bấm Xác nhận (Login / Register) */
+body.global-dark-mode .modal-content .btn-dark,
+body.global-dark-mode .modal-content button[type="submit"] {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+}
+
+body.global-dark-mode .modal-content .btn-dark:hover,
+body.global-dark-mode .modal-content button[type="submit"]:hover {
+  background-color: #2563eb !important;
+}
+
+/* Fix dòng chữ "Quên mật khẩu" hoặc các link khác */
+body.global-dark-mode .modal-content .btn-link {
+  color: #38bdf8 !important;
+}
+
+/* 5. NGOẠI LỆ: Bảo vệ nút bấm và nhãn dán (Badge) để không bị mất màu đẹp */
+body.global-dark-mode .btn:not(.btn-dark):not([type="submit"]) *,
+body.global-dark-mode .badge,
+body.global-dark-mode .badge * {
+  color: inherit !important;
+}
+
+/* ==========================================================
+   FIX TẬN GỐC LỊCH SỬ XEM & THỐNG KÊ (BẢN HỦY DIỆT MẢNG TRẮNG 2.0)
+   ========================================================== */
+
+/* 1. Đánh bay mảng nền trắng/xám khổng lồ bọc bên ngoài các Tab */
+body.global-dark-mode .home-page .new-stats-section,
+body.global-dark-mode .home-page .lessons-section,
+body.global-dark-mode .home-page .practice-section {
+    background-color: transparent !important; 
+    box-shadow: none !important;
+}
+
+/* 2. Fix các dải trắng li ti TRONG thẻ Video (Thời lượng, Đã xem...) */
+body.global-dark-mode .home-page .lesson-card .list-group-item,
+body.global-dark-mode .home-page .lesson-card .bg-white,
+body.global-dark-mode .home-page .lesson-card .bg-light,
+body.global-dark-mode .home-page .lesson-card .border,
+body.global-dark-mode .home-page .lesson-card input,
+body.global-dark-mode .home-page .lesson-card .form-control {
+    background-color: #0f172a !important; /* Ép lõm xuống thành màu đen thẳm */
+    border: 1px solid #334155 !important; /* Viền xám mờ tinh tế */
+    color: #cbd5e1 !important;
+}
+
+/* 3. Làm sáng các Icon (Đồng hồ, Cuốn sách...) bên trong dải Thời lượng */
+body.global-dark-mode .home-page .lesson-card svg,
+body.global-dark-mode .home-page .lesson-card i {
+    color: #38bdf8 !important; /* Màu xanh ngọc phát sáng */
+}
+
+/* 4. Fix các ô trắng TRONG danh sách Lịch sử làm bài (Thống kê) */
+body.global-dark-mode .home-page .detail-card .list-group-item,
+body.global-dark-mode .home-page .detail-card .border,
+body.global-dark-mode .home-page .detail-card .bg-light,
+body.global-dark-mode .home-page .detail-card .bg-white {
+    background-color: #0f172a !important; 
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* 5. Khắc phục thẻ báo trạng thái (Ví dụ: Chữ đen trong Badge "SUBMITTED") */
+body.global-dark-mode .home-page .detail-card .badge.bg-light,
+body.global-dark-mode .home-page .detail-card .badge.text-dark {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+
+/* ==========================================================
+   VŨ KHÍ TỐI THƯỢNG: QUÉT SẠCH MỌI Ô TRẮNG LITI CÒN SÓT LẠI
+   ========================================================== */
+
+/* 1. Lột sạch mọi màu nền (kể cả inline style) của tất cả thẻ con bên trong, 
+      Ngoại trừ: Nút bấm, Thanh tiến trình, và Badge */
+body.global-dark-mode .home-page .lesson-card *:not(.btn):not(.progress):not(.progress-bar):not(.badge):not(img):not(svg):not(path),
+body.global-dark-mode .home-page .detail-card *:not(.btn):not(.progress):not(.progress-bar):not(.badge):not(img):not(svg):not(path) {
+    background-color: transparent !important;
+    background: none !important;
+    border-color: #334155 !important; /* Đổi luôn các viền xám sáng thành xám đen */
+}
+
+/* 2. Trường hợp đặc biệt: Nếu các ô đó là thẻ <input> (nhìn ảnh rất giống input disabled) */
+body.global-dark-mode .home-page .lesson-card input,
+body.global-dark-mode .home-page .detail-card input {
+    background-color: transparent !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* 3. Ép màu chữ bên trong các ô đó thành xám sáng để không bị chìm vào nền đen */
+body.global-dark-mode .home-page .lesson-card span,
+body.global-dark-mode .home-page .lesson-card div,
+body.global-dark-mode .home-page .lesson-card small,
+body.global-dark-mode .home-page .lesson-card p,
+body.global-dark-mode .home-page .detail-card span,
+body.global-dark-mode .home-page .detail-card div,
+body.global-dark-mode .home-page .detail-card small,
+body.global-dark-mode .home-page .detail-card p {
+    color: #cbd5e1 !important;
+}
+
+/* 4. Giữ lại độ sáng cho các Text/Tiêu đề quan trọng */
+body.global-dark-mode .home-page .lesson-card h6,
+body.global-dark-mode .home-page .lesson-card strong,
+body.global-dark-mode .home-page .detail-card h6,
+body.global-dark-mode .home-page .detail-card strong {
+    color: #f8fafc !important;
+}
+
+/* 5. Khắc phục Badge "SUBMITTED" (nếu có bị dính nền trắng) */
+body.global-dark-mode .home-page .detail-card .badge {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    border: none !important;
+}
+
+/* ==========================================================
+   FIX CUỐI CÙNG CHO KHUNG TRẮNG Ở TAB "LỊCH SỬ XEM"
+   ========================================================== */
+
+/* 1. Lột sạch nền trắng của MỌI phần tử nằm trong tab Lịch sử xem 
+   (Ngoại trừ Nút bấm, Thanh % và Badge) */
+body.global-dark-mode .home-page .lessons-section .card *:not(.btn):not(.progress):not(.progress-bar):not(.badge):not(img):not(svg):not(path) {
+    background-color: transparent !important;
+    background: none !important;
+    border-color: #334155 !important;
+}
+
+/* 2. Ép đen thẳm các ô Input, List-group (Các dải chứa ngày giờ, thời lượng bị lộ viền) */
+body.global-dark-mode .home-page .lessons-section .card .list-group-item,
+body.global-dark-mode .home-page .lessons-section .card input,
+body.global-dark-mode .home-page .lessons-section .card .form-control,
+body.global-dark-mode .home-page .lessons-section .card .bg-white,
+body.global-dark-mode .home-page .lessons-section .card .bg-light {
+    background-color: #0f172a !important; /* Lõm xuống thành đen sâu */
+    color: #f8fafc !important;
+}
+
+/* 3. Ép chữ phụ, ngày tháng, nội dung thành màu xám sáng */
+body.global-dark-mode .home-page .lessons-section .card p,
+body.global-dark-mode .home-page .lessons-section .card span,
+body.global-dark-mode .home-page .lessons-section .card small,
+body.global-dark-mode .home-page .lessons-section .card div {
+    color: #cbd5e1 !important;
+}
+
+/* 4. Giữ cho Tiêu đề Video luôn Trắng tinh và nổi bật */
+body.global-dark-mode .home-page .lessons-section .card h1,
+body.global-dark-mode .home-page .lessons-section .card h2,
+body.global-dark-mode .home-page .lessons-section .card h3,
+body.global-dark-mode .home-page .lessons-section .card h4,
+body.global-dark-mode .home-page .lessons-section .card h5,
+body.global-dark-mode .home-page .lessons-section .card h6,
+body.global-dark-mode .home-page .lessons-section .card strong {
+    color: #ffffff !important;
+}
+
+/* 5. Ép sáng các Icon nhỏ (Đồng hồ, Camera) thành xanh ngọc */
+body.global-dark-mode .home-page .lessons-section .card svg,
+body.global-dark-mode .home-page .lessons-section .card i {
+    color: #38bdf8 !important; 
+}
