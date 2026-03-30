@@ -129,10 +129,9 @@ namespace EasyEnglish_API.Services.Courses
 
         public async Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req)
         {
-            // ✅ Fix: dùng TeacherId thật, không phải AccountId
             var teacherId = await ResolveTeacherIdAsync(accountId);
 
-            var course = new Course
+            var course = new Models.Course
             {
                 TeacherId = teacherId,
                 CourseName = req.CourseName,

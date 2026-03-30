@@ -17,7 +17,8 @@ namespace EasyEnglish_API.Services
             _membership = membership;
         }
 
-//map
+        // ── MAPPERS ───────────────────────────────────────────────────────────
+
         private static QuizDto ToDto(QuizAlias q) => new()
         {
             QuizID = q.QuizId,
@@ -31,9 +32,26 @@ namespace EasyEnglish_API.Services
             QuizID = q.QuizId,
             Title = q.Title,
             Description = q.Description,
-            QuizType = q.QuizType
+            QuizType = q.QuizType,
+            Groups = q.QuestionGroups.Select(g => new QuestionGroupDto
+            {
+                GroupID = g.GroupId,
+                Instruction = g.Instruction,
+                Questions = g.Questions.Select(qs => new QuestionDto
+                {
+                    QuestionID = qs.QuestionId,
+                    Content = qs.Content,
+                    QuestionType = qs.QuestionType,
+                    Options = qs.Options.Select(o => new OptionDto
+                    {
+                        OptionID = o.OptionId,
+                        Content = o.Content
+                    }).ToList()
+                }).ToList()
+            }).ToList()
         };
 
+        // ── USER ─────────────────────────────────────────────────────────────
 
         public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId)
         {
@@ -149,6 +167,7 @@ namespace EasyEnglish_API.Services
             }).ToList();
         }
 
+        // ── TEACHER ──────────────────────────────────────────────────────────
 
         public async Task<List<QuizDto>> GetTeacherQuizzesByCourseAsync(int teacherId, int courseId)
         {

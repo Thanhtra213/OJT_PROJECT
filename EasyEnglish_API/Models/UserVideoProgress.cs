@@ -12,6 +12,7 @@ public partial class UserVideoProgress
     public DateTime WatchedAt { get; set; }
 
     public int? WatchDurationSec { get; set; }
+    public int? LastPositionSec { get; set; }
 
     public bool IsCompleted { get; set; }
 
