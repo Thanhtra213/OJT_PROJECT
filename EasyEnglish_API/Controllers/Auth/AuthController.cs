@@ -29,27 +29,34 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register(RegisterRequest req)
     {
-        var user = await _service.RegisterStudentAsync(req);
-
-        var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
-        var (rt, exp) = _tokens.CreateRefreshToken();
-
-        user.RefreshTokenHash = _tokens.HashRefreshToken(rt);
-        user.RefreshTokenExpiresAt = exp.UtcDateTime;
-
-        Response.Cookies.Append("emt_rt", rt, new CookieOptions
+        try
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = exp
-        });
+            var user = await _service.RegisterStudentAsync(req);
 
-        return Created("", new AuthResponse(
-            user.AccountId,
-            access,
-            int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60
-        ));
+            var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
+            var (rt, exp) = _tokens.CreateRefreshToken();
+
+            user.RefreshTokenHash = _tokens.HashRefreshToken(rt);
+            user.RefreshTokenExpiresAt = exp.UtcDateTime;
+
+            Response.Cookies.Append("emt_rt", rt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = exp
+            });
+
+            return Created("", new AuthResponse(
+                user.AccountId,
+                access,
+                int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60
+            ));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     //  REGISTER TEACHER 
@@ -83,38 +90,51 @@ public class AuthController : ControllerBase
     [HttpPost("send-otp")]
     public async Task<IActionResult> SendOtp(SendOtpRequest req)
     {
-        await _service.SendOtpAsync(req);
-        return Ok(new { message = "Đã gửi OTP tới email." });
+        try
+        {
+            await _service.SendOtpAsync(req);
+            return Ok(new { message = "Đã gửi OTP tới email." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     // LOGIN 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest req)
     {
-        var user = await _service.LoginAsync(req);
-
-        var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
-        var (rt, exp) = _tokens.CreateRefreshToken();
-
-        user.RefreshTokenHash = _tokens.HashRefreshToken(rt);
-        user.RefreshTokenExpiresAt = exp.UtcDateTime;
-
-        Response.Cookies.Append("emt_rt", rt, new CookieOptions
+        try
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = exp
-        });
+            var user = await _service.LoginAsync(req);
 
-        return Ok(new
+            var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
+            var (rt, exp) = _tokens.CreateRefreshToken();
+
+            user.RefreshTokenHash = _tokens.HashRefreshToken(rt);
+            user.RefreshTokenExpiresAt = exp.UtcDateTime;
+
+            Response.Cookies.Append("emt_rt", rt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = exp
+            });
+            return Ok(new
+            {
+                AccountID = user.AccountId,
+                AccessToken = access,
+                ExpiresIn = int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60,
+                Role = user.Role,
+                RedirectUrl = BuildRedirectUrl(user.Role)
+            });
+        }
+        catch (Exception ex)
         {
-            AccountID = user.AccountId,
-            AccessToken = access,
-            ExpiresIn = int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60,
-            Role = user.Role,
-            RedirectUrl = BuildRedirectUrl(user.Role)
-        });
+            return BadRequest(ex.Message);
+        }
     }
 
     //  LOGIN GOOGLE 
@@ -151,40 +171,46 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> Refresh()
     {
-        var rt = Request.Cookies["emt_rt"];
-        if (string.IsNullOrEmpty(rt))
-            return Unauthorized("Missing refresh token.");
-
-        var bearer = Request.Headers["Authorization"].ToString();
-        var accessOld = bearer.Replace("Bearer ", "");
-
-        var principal = _tokens.ValidateExpiredAccessToken(accessOld);
-        if (principal == null)
-            return Unauthorized("Invalid access token.");
-
-        var uid = int.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-        var user = await _service.RefreshAsync(uid, rt);
-
-        var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
-        var (newRt, exp) = _tokens.CreateRefreshToken();
-
-        user.RefreshTokenHash = _tokens.HashRefreshToken(newRt);
-        user.RefreshTokenExpiresAt = exp.UtcDateTime;
-
-        Response.Cookies.Append("emt_rt", newRt, new CookieOptions
+        try
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = exp
-        });
+            var rt = Request.Cookies["emt_rt"];
+            if (string.IsNullOrEmpty(rt))
+                return Unauthorized("Missing refresh token.");
 
-        return Ok(new AuthResponse(
-            user.AccountId,
-            access,
-            int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60
-        ));
+            var bearer = Request.Headers["Authorization"].ToString();
+            var accessOld = bearer.Replace("Bearer ", "");
+
+            var principal = _tokens.ValidateExpiredAccessToken(accessOld);
+            if (principal == null)
+                return Unauthorized("Invalid access token.");
+
+            var uid = int.Parse(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var user = await _service.RefreshAsync(uid, rt);
+
+            var access = _tokens.CreateAccessToken(user, user.RefreshTokenVersion);
+            var (newRt, exp) = _tokens.CreateRefreshToken();
+
+            user.RefreshTokenHash = _tokens.HashRefreshToken(newRt);
+            user.RefreshTokenExpiresAt = exp.UtcDateTime;
+
+            Response.Cookies.Append("emt_rt", newRt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = exp
+            });
+
+            return Ok(new AuthResponse(
+                user.AccountId,
+                access,
+                int.Parse(_cfg["Jwt:AccessTokenMinutes"]!) * 60
+            ));
+        }catch(Exception ex)
+        {
+            return BadRequest(ex.ToString());
+        }
     }
 
     //  LOGOUT 
@@ -212,8 +238,15 @@ public class AuthController : ControllerBase
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest req)
     {
-        await _service.ResetPasswordAsync(req);
-        return Ok(new { message = "Đổi mật khẩu thành công." });
+        try
+        {
+            await _service.ResetPasswordAsync(req);
+            return Ok(new { message = "Đổi mật khẩu thành công." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     //  HELPER 

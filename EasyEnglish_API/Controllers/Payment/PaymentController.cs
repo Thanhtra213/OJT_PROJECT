@@ -21,9 +21,7 @@ namespace EasyEnglish_API.Controllers.Payment
             _payOSService = payOSService;
         }
 
-        // ===============================
-        // 🔹 Student tạo đơn thanh toán
-        // ===============================
+        // Student tạo đơn thanh toán
         [HttpPost("create")]
         [Authorize(Roles = "STUDENT")]
         public async Task<IActionResult> CreatePayment(int planId)
@@ -41,9 +39,7 @@ namespace EasyEnglish_API.Controllers.Payment
             }
         }
 
-        // ===============================
-        // 🔹 PayOS Webhook Callback
-        // ===============================
+
         [HttpPost("webhook")]
         [AllowAnonymous]
         public async Task<IActionResult> WebhookCallback([FromBody] JsonElement body)

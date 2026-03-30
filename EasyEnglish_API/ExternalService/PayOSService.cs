@@ -25,7 +25,7 @@ namespace EMT_API.Services
             var plan = await _db.SubscriptionPlans.FindAsync(planId)
                 ?? throw new Exception("Không tìm thấy gói học.");
 
-            // 1️⃣ Tạo order trong DB
+          
             var order = new PaymentOrder
             {
                 BuyerId = buyerId,

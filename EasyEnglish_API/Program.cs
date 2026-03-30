@@ -294,7 +294,7 @@ namespace EasyEnglish_API {
                 app.UseSwaggerUI();
             }
 
-            // ===== Middlewares =====
+            // ===== Middlewares 
             app.UseHttpsRedirection();
 
 

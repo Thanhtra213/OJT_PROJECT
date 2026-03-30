@@ -19,7 +19,7 @@ namespace EasyEnglish_API.Services.AIExam
         public async Task<AIWritingPromptResponse> GeneratePrompt(int userID)
         {
             if (!await _membership.HasActiveMembershipAsync(userID))
-                throw new UnauthorizedAccessException("Mémhip required");
+                throw new UnauthorizedAccessException("Membership required");
 
             var (title, content) = await _ai.GenerateWritingPromptAsync();
 
@@ -42,7 +42,7 @@ namespace EasyEnglish_API.Services.AIExam
             if (req == null || string.IsNullOrEmpty(req.AnswerText))
                 throw new Exception("AnswerTexxt cannot be empty");
 
-            // normalize newline
+ 
             req.AnswerText = req.AnswerText
                 .Replace("\r\n", "\n")
                 .Replace("\r", "\n")

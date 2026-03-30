@@ -22,27 +22,48 @@ namespace EasyEnglish_API.ExternalService
         public async Task<string> GenerateQuizAsync(string teacherPrompt)
         {
             var prompt = $@"
-Generate an IELTS quiz.
+You are an IELTS exam generator.
 
 Teacher request: {teacherPrompt}
 
-Return ONLY JSON in this schema:
-Return ONLY valid JSON.
-Do not use markdown.
-Do not wrap JSON in ```json```.
+Generate a realistic IELTS-style quiz.
 
-{{
-  ""Title"": ""string"",
-  ""Description"": ""string"",
+Requirements:
+- Mix 3 types of questions:
+  1 = Multiple Choice (MCQ)
+  2 = Fill in the blank
+  3 = Essay
+- At least 5 questions
+- Content must be natural, not generic
+- Do NOT reuse template text
+
+Output MUST be valid JSON only. Do NOT wrap it in markdown code blocks or backticks.
+
+JSON structure:
+
+Title: string  
+Description: string  
+Questions: array of objects where each object has:
+- QuestionType (number: 1,2,3)
+- Content (string)
+- Options (array)
+
+Rules:
+- MCQ (type 1): must have 3–4 options, only ONE correct
+- Fill blank (type 2): only ONE option, correct answer (can have multiple answers separated by '/')
+- Essay (type 3): Options must be empty []
+
+Example of structure (DO NOT COPY CONTENT):
+
+{{""Title"": ""..."",
+  ""Description"": ""..."",
   ""Questions"": [
     {{
-      ""QuestionType"": number,
-      ""Content"": ""string"",
+      ""QuestionType"": 1,
+      ""Content"": ""..."",
       ""Options"": [
-        {{
-          ""Content"": ""string"",
-          ""IsCorrect"": true
-        }}
+        {{ ""Content"": ""..."", ""IsCorrect"": true }},
+        {{ ""Content"": ""..."", ""IsCorrect"": false }}
       ]
     }}
   ]
@@ -84,6 +105,23 @@ Do not wrap JSON in ```json```.
                 .GetProperty("parts")[0]
                 .GetProperty("text")
                 .GetString();
+
+            if (result != null)
+            {
+                result = result.Trim();
+                if (result.StartsWith("```"))
+                {
+                    var firstNewline = result.IndexOf('\n');
+                    if (firstNewline != -1)
+                        result = result.Substring(firstNewline + 1);
+
+                    var lastFence = result.LastIndexOf("```");
+                    if (lastFence != -1)
+                        result = result.Substring(0, lastFence);
+
+                    result = result.Trim();
+                }
+            }
 
             return result ?? "{}";
         }

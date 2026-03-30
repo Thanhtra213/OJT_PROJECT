@@ -21,9 +21,16 @@ namespace EasyEnglish_API.Controllers.Auth
         [HttpGet("check")]
         public async Task<ActionResult<MembershipResponseDto>> CheckMembership()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var check = await _membership.CheckMembershipAsync(userId);
-            return Ok(check);
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);  
+                var check = await _membership.CheckMembershipAsync(userId);
+                return Ok(check);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            } 
         }
 
         [HttpGet("history")]
