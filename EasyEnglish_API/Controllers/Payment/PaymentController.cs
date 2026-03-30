@@ -48,11 +48,14 @@ namespace EasyEnglish_API.Controllers.Payment
         [AllowAnonymous]
         public async Task<IActionResult> WebhookCallback([FromBody] JsonElement body)
         {
-            var result = await _paymentService.WebhookCallback(body);
-            
-            if (!result) 
-                return BadRequest();
-
+            try
+            {
+                await _paymentService.WebhookCallback(body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return Ok();
         }
     }
