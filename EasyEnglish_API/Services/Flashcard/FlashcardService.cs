@@ -26,6 +26,9 @@ namespace EasyEnglish_API.Services.Flashcard
             };
             var created = await _flashcardRepository.CreateItemAsync(item);
 
+            if (created == null)
+                throw new Exception("Can not create this Item!");
+
             return item;
         }
 
@@ -40,17 +43,30 @@ namespace EasyEnglish_API.Services.Flashcard
             };
             var created = await _flashcardRepository.CreateSetAsync(set);
 
+            if (created == null)
+                throw new Exception("Can not create this Set!");
+
             return created;
         }
 
         public async Task<bool> DeleteItemAsync(int itemId)
         {
-            return await _flashcardRepository.DeleteItemAsync(itemId);
+            var deleted = await _flashcardRepository.DeleteItemAsync(itemId);
+
+            if (!deleted)
+                throw new Exception("Not found!");
+
+            return deleted;
         }
 
         public async Task<bool> DeleteSetAsync(int setId)
         {
-            return await _flashcardRepository.DeleteSetAsync(setId);
+            var deleted = await _flashcardRepository.DeleteSetAsync(setId);
+
+            if (!deleted)
+                throw new Exception("Not found!");
+
+            return deleted;
         }
 
         public async Task<bool> EnsureTeacherOwnsCourse(int courseId, int userId)
@@ -66,6 +82,10 @@ namespace EasyEnglish_API.Services.Flashcard
         public async Task<List<FlashcardSetResponse>> GetAllPublicSetsAsync()
         {
             var sets = await _flashcardRepository.GetAllPublicSetsAsync();
+
+            if (sets == null)
+                throw new Exception("Kind of set is empty!");
+
             var result = sets.Select(s => new FlashcardSetResponse
             {
                 SetID = s.SetId,
@@ -79,8 +99,9 @@ namespace EasyEnglish_API.Services.Flashcard
         public async Task<FlashcardDetailResponse?> GetSetDetailAsync(int setId)
         {
             var set = await _flashcardRepository.GetSetDetailAsync(setId);
+
             if (set == null)
-                throw new Exception("Flashcard set not found");
+                throw new Exception("Flashcard set not found!");
 
             var result = new FlashcardDetailResponse
             {
@@ -103,6 +124,10 @@ namespace EasyEnglish_API.Services.Flashcard
         public async Task<List<FlashcardSetResponse>> GetSetsByCourseAsync(int courseId)
         {
             var sets = await _flashcardRepository.GetSetsByCourseAsync(courseId);
+
+            if (sets == null)
+                throw new Exception("Flashcard set not found!");
+
             var result = sets.Select(s => new FlashcardSetResponse
             {
                 SetID = s.SetId,
@@ -125,6 +150,9 @@ namespace EasyEnglish_API.Services.Flashcard
             };
             var updatedItem = await _flashcardRepository.UpdateItemAsync(item);
 
+            if (!updatedItem)
+                throw new Exception("Update current item fail!");
+
             return updatedItem;
         }
 
@@ -137,6 +165,9 @@ namespace EasyEnglish_API.Services.Flashcard
                 Description = req.Description
             };
             var updatedSet = await _flashcardRepository.UpdateSetAsync(set);
+
+            if (!updatedSet)
+                throw new Exception("Update current set fail!");
 
             return updatedSet;
         }

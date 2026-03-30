@@ -28,10 +28,17 @@ namespace EasyEnglish_API.Controllers.Payment
         [Authorize(Roles = "STUDENT")]
         public async Task<IActionResult> CreatePayment(int planId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var url = await _payOSService.CreatePaymentAsync(userId, planId);
-            return Ok(new { paymentUrl = url });
+                var url = await _payOSService.CreatePaymentAsync(userId, planId);
+                return Ok(new { paymentUrl = url });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // ===============================

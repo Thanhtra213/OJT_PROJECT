@@ -30,11 +30,16 @@ namespace EasyEnglish_API.Controllers.Admin
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetPlan(int id)
         {
-            var plan = await _subscriptionPlanService.GetPlanByIdAsync(id);
-            if (plan == null)
-                return NotFound();
+            try
+            {
+                var plan = await _subscriptionPlanService.GetPlanByIdAsync(id);
 
-            return Ok(plan);
+                return Ok(plan);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: api/admin/plans/create
@@ -74,7 +79,7 @@ namespace EasyEnglish_API.Controllers.Admin
                 return Ok(new { message = "Subscription plan updated successfully." });
             } catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 

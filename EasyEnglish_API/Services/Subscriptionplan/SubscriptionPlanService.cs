@@ -61,7 +61,12 @@ namespace EasyEnglish_API.Services.Subscriptionplan
 
         public async Task<SubscriptionPlan?> GetPlanByIdAsync(int id)
         {
-            return await _subscriptionRepository.GetPlanByIdAsync(id);
+            var plan = await _subscriptionRepository.GetPlanByIdAsync(id);
+
+            if (plan == null)
+                throw new Exception("Not found!");
+
+            return plan;
         }
 
         public async Task<bool> HardDeletePlanAsync(int id)

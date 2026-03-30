@@ -46,6 +46,7 @@ using EasyEnglish_API.Services.Profile;
 using EasyEnglish_API.Services.Score;
 using EasyEnglish_API.Services.Subscriptionplan;
 using EasyEnglish_API.Services.Transaction;
+using EasyEnglish_API.Services.Upload;
 using EasyEnglish_API.Services.UserService;
 using EasyEnglish_API.Utils;
 using EMT_API.Services;
@@ -258,13 +259,6 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIQuizService, AIQuizService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
-            builder.Services.AddScoped<ITeacherScoreService, TeacherScoreService>();
-            builder.Services.AddScoped<IAIReviewService, AIReviewService>();
-            builder.Services.AddScoped<IFlashcarProgressService, FlashcardProgressService>();
-            builder.Services.AddScoped<IVideoService, VideoService>();
-            builder.Services.AddScoped<IStreakService, StreakService>();
-            builder.Services.AddScoped<IVideoProgressService, VideoProgressService>();
-
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddSingleton<EmailSender>();

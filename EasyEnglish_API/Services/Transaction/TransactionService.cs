@@ -41,7 +41,8 @@ namespace EasyEnglish_API.Services.Transaction
         {
             var t = await _transactionRepository.GetTransactionDetailAsync(orderId);
 
-            if (t == null) return null;
+            if (t == null)
+                throw new Exception("Not found!");
 
             var result = new TransactionDetailResponse
             {
@@ -81,7 +82,10 @@ namespace EasyEnglish_API.Services.Transaction
 
         public async Task<List<TransactionListResponse>> SearchTransactionsAsync(string? keyword)
         {
-            var transactions = await _transactionRepository.GetAllTransactionsAsync();
+            var transactions = await _transactionRepository.SearchTransactionsAsync(keyword);
+
+            if (transactions == null)
+                throw new Exception("Not found!");
 
             var result = transactions.Select(t => new TransactionListResponse
             {
