@@ -478,7 +478,7 @@ const Header = () => {
       <Navbar expand="lg" className="main-header">
         <Container>
           <Navbar.Brand href="/" className="logo">
-            <span className="logo-icon"><BookLogoModern size={200} style={{verticalAlign: 'middle'}} /></span> <span style={{color: '#111', fontWeight: 700}}>EnglishMaster</span>
+            <span className="logo-icon"><BookLogoModern size={45} style={{verticalAlign: 'middle'}} /></span> <span>EnglishMaster</span>
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -557,7 +557,7 @@ const Header = () => {
         size="md"
       >
         <Modal.Header closeButton>
-          <Modal.Title style={{color: '#111', fontWeight: 700}}>English Master Hub</Modal.Title>
+          <Modal.Title>English Master Hub</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p className="text-center mb-3 small">
