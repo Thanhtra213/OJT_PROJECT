@@ -1043,6 +1043,7 @@ const Profile = () => {
         show={showAvatarModal}
         onHide={() => setShowAvatarModal(false)}
         centered
+        className="avatar-modal"
       >
         <Modal.Header closeButton>
           <Modal.Title>Thay đổi ảnh đại diện</Modal.Title>
