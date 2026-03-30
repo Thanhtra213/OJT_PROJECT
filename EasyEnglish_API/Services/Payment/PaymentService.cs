@@ -15,34 +15,47 @@ namespace EasyEnglish_API.Services.Payment
 
         public async Task<bool> WebhookCallback(JsonElement body)
         {
-            if (!body.TryGetProperty("data", out var dataElem))
+            try
             {
-                Console.WriteLine("Invalid payload: missing data");
-                return false;
-            }
+                if (!body.TryGetProperty("data", out var dataElem))
+                {
+                    Console.WriteLine("Invalid payload: missing data");
+                    return false;
+                }
 
-            var orderId = dataElem.GetProperty("orderCode").GetInt32();
-            var code = dataElem.TryGetProperty("code", out var codeElem)
-                ? codeElem.GetString() : "UNKNOWN";
+                long orderId = dataElem.GetProperty("orderCode").GetInt64();
 
-            string status = code == "00" ? "PAID" : "FAILED";
+                string code = "UNKNOWN";
+                if (dataElem.TryGetProperty("code", out var codeElem)
+                    && codeElem.ValueKind == JsonValueKind.String)
+                {
+                    code = codeElem.GetString()!;
+                }
 
-            await _paymentRepository.LogWebhookEventAsync(orderId, body.ToString() ?? "{}");
+                string status = code == "00" ? "PAID" : "FAILED";
 
-            var order = await _paymentRepository.GetOrderByIdAsync(orderId);
-            if (order == null)
-            {
-                Console.WriteLine("Order not found, ignored");
+                await _paymentRepository.LogWebhookEventAsync((int)orderId, body.ToString() ?? "{}");
+
+                var order = await _paymentRepository.GetOrderByIdAsync((int)orderId);
+                if (order == null)
+                {
+                    Console.WriteLine("Order not found, ignored");
+                    return true;
+                }
+
+                if (status == "PAID")
+                    await _paymentRepository.HandlePaymentSuccessAsync(order);
+                else
+                    await _paymentRepository.HandlePaymentFailedAsync(order);
+
+                Console.WriteLine($"✅ Webhook handled for order {orderId} - {status}");
                 return true;
             }
-
-            if (status == "PAID")
-                await _paymentRepository.HandlePaymentSuccessAsync(order);
-            else
-                await _paymentRepository.HandlePaymentFailedAsync(order);
-
-            Console.WriteLine($"✅ Webhook handled for order {orderId} - {status}");
-            return true;
+            catch (Exception ex)
+            {
+                Console.WriteLine("Webhook ERROR: " + ex.Message);
+                return false;
+            }
         }
     }
 }
