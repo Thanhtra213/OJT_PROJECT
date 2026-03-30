@@ -85,8 +85,6 @@ export const updateAvatar = async (file, token) => {
       },
     });
 
-    console.log("✅ Avatar uploaded:", res.data);
-    alert("✅ Ảnh đại diện đã được cập nhật!");
     return res.data;
   } catch (error) {
     handleApiError(error);

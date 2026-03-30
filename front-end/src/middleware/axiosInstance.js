@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://localhost:7010/api",
+  baseURL: `${process.env.REACT_APP_API_URL || "https://localhost:7131"}/api`,
 });
 
 // Thêm interceptor request
@@ -31,7 +31,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://localhost:7010/api/auth/refresh",
+          `${process.env.REACT_APP_API_URL || "https://localhost:7131"}/api/auth/refresh`,
           { refreshToken }
         );
 
