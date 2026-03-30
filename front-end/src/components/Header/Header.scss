@@ -63,24 +63,34 @@ $border-radius-pill: 99px;
     flex: 1;
     max-width: 450px;
     margin: 0 2rem;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transform: translateX(15%); // Dịch qua phải khoảng 15-20% so với vị trí cũ
 
     @media (max-width: 992px) {
       margin: 1rem 0;
       max-width: 100%;
       order: 3;
+      transform: translateX(0); // Trả lại vị trí cũ trên mobile
     }
 
     input {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       padding: 0.65rem 1.25rem;
-      border: 1.5px solid $border;
+      border: 1.5px solid $mint; // Mặc định xanh lá
       border-radius: $border-radius-pill;
-      background: $page-bg;
+      background: $bg-white;
       font-family: $font-family-base;
       font-size: 0.9rem;
       font-weight: 700;
       color: $text-dark;
       transition: all $transition-duration;
+      outline: none !important; // Xóa vòng viền xanh đậm của browser/bootstrap
+      box-shadow: none !important; // Xóa vòng viền màu xanh nhạt thừa thãi
 
       &::placeholder {
         color: $text-muted;
@@ -88,10 +98,8 @@ $border-radius-pill: 99px;
       }
 
       &:focus {
-        outline: none;
-        border-color: $mint;
-        background: $bg-white;
-        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.1);
+        border-color: $mint-dark;
+        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.1) !important; // Cực mỏng, tinh tế, không tạo thành 2 vòng tròn
       }
     }
   }
