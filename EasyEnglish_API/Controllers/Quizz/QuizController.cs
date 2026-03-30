@@ -30,17 +30,26 @@ namespace EasyEnglish_API.Controllers.Quizz
         [HttpGet("{quizId:int}")]
         public async Task<IActionResult> GetQuizDetail(int quizId)
         {
-            int userId = GetUserId();
-            var quiz = await _service.GetQuizDetailAsync(userId, quizId);
-            if (quiz == null)
-                return NotFound(new { message = "Quiz not found" });
+            try
+            {
+                int userId = GetUserId();
+                var quiz = await _service.GetQuizDetailAsync(userId, quizId);
+                if (quiz == null)
+                    return NotFound(new { message = "Quiz not found" });
 
-            return Ok(quiz);
+                return Ok(quiz);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("system-quiz")]
         public async Task<IActionResult> GetGlobalQuiz()
-        => Ok(await _service.GetGlobalQuizzesAsync(GetUserId()));
+        {
+            return Ok(await _service.GetGlobalQuizzesAsync(GetUserId()));
+        } 
 
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
@@ -49,11 +58,18 @@ namespace EasyEnglish_API.Controllers.Quizz
         [HttpPost("submit/{attemptId}")]
         public async Task<IActionResult> SubmitQuiz(int attemptId, SubmitQuizRequest req)
         {
-            int userId = GetUserId();
-            var score = await _service.SubmitQuizAsync(attemptId, userId, req);
-            if (score == null)
-                return NotFound(new { message = "Attempt not found" });
-            return Ok(await _service.SubmitQuizAsync(userId, attemptId, req));
+            try
+            {
+                int userId = GetUserId();
+                var score = await _service.SubmitQuizAsync(attemptId, userId, req);
+                if (score == null)
+                    return NotFound(new { message = "Attempt not found" });
+                return Ok(await _service.SubmitQuizAsync(userId, attemptId, req));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("attempts/history")]

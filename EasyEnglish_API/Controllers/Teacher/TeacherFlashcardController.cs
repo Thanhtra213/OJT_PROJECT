@@ -59,13 +59,17 @@ namespace EasyEnglish_API.Controllers.Teacher
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            try
+            {
+                if (req.CourseID.HasValue && !await _flashcardService.EnsureTeacherOwnsCourse(req.CourseID.Value, GetUserId()))
+                    return Forbid();
 
-            if (req.CourseID.HasValue && !await _flashcardService.EnsureTeacherOwnsCourse(req.CourseID.Value, GetUserId()))
-                return Forbid();
-
-            var createdSet = await _flashcardService.CreateSetAsync(req);
-
-            return CreatedAtAction(nameof(GetSetDetail), new { setId = createdSet.SetId }, createdSet);
+                var createdSet = await _flashcardService.CreateSetAsync(req);
+                return CreatedAtAction(nameof(GetSetDetail), new { setId = createdSet.SetId }, createdSet);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("item")]

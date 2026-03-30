@@ -11,7 +11,7 @@ namespace EasyEnglish_API.Services.Courses
         Task<object?> GetCourseDetailAsync(int courseId);
         Task<bool> DeleteCourseAsync(int courseId);
         Task<List<CourseResponse>> GetCoursesByTeacherAsync(int accountId);
-        Task<CourseResponse?> GetTeacherCourseDetailAsync(int accountId, int courseId);
+        Task<CourseDetailDto?> GetTeacherCourseDetailAsync(int accountId, int courseId);
         Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req);
         Task<bool> UpdateCourseAsync(int accountId, int courseId, UpdateCourseRequest req);
         Task<bool> DeleteCourseAsync(int accountId, int courseId);

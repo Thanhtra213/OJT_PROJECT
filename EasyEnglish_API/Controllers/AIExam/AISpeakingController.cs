@@ -25,8 +25,15 @@ namespace EasyEnglish_API.Controllers.AIExam
         [HttpPost("generate")]
         public async Task<IActionResult> GeneratePrompt()
         {
-            var result = await _service.GeneratePromptAsync(GetUserId());
-            return Ok(result);
+            try
+            {
+                var result = await _service.GeneratePromptAsync(GetUserId());
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // SUBMIT SPEAKING
@@ -35,8 +42,15 @@ namespace EasyEnglish_API.Controllers.AIExam
         [RequestSizeLimit(25_000_000)]
         public async Task<IActionResult> Submit([FromForm] AISpeakingSubmitAudioRequest req)
         {
-            var result = await _service.SubmitAsync(GetUserId(), req);
-            return Ok(result);
+            try
+            {
+                var result = await _service.SubmitAsync(GetUserId(), req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
