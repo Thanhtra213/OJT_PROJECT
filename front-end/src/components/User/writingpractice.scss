@@ -1,0 +1,142 @@
+// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+// writingpractice.scss
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       16px;
+$r-pill:       100px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
+// Placeholder states
+.info-box.placeholder, .writing-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; font-family: $font; font-size: 1rem; color: $text-muted; font-weight: 600;
+  min-height: 180px;
+}
+.writing-placeholder { min-height: 220px; height: 100%; }
+
+// Page
+.writing-page {
+  background: $bg;
+  min-height: 100vh;
+  padding: 2rem 3rem;
+  font-family: $font;
+  color: $text-body;
+}
+
+// Header
+.writing-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 1.5rem;
+  h1 { font-size: 1.875rem; font-weight: 900; color: $text-dark; letter-spacing: -.025em; margin-bottom: .25rem; }
+  p { color: $text-muted; font-size: .9rem; margin: 0; }
+  .header-right {
+    display: flex; align-items: center; gap: .75rem;
+    .btn-primary {
+      background: $mint; color: $white; border: none;
+      border-radius: $r-pill; font-family: $font; font-weight: 800;
+      padding: .6rem 1.4rem; font-size: .95rem;
+      box-shadow: $shadow-btn; transition: all $ease; cursor: pointer;
+      &:hover { background: $mint-dark; transform: translateY(-1px); }
+      &:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    }
+    .close-btn {
+      background: $white; color: $mint-dark; border: 1.5px solid $mint-mid;
+      border-radius: $r-pill; font-family: $font; font-weight: 700;
+      padding: .6rem 1.2rem; font-size: .95rem; cursor: pointer; transition: all $ease;
+      &:hover { background: $mint-light; }
+      &:disabled { opacity: .5; cursor: not-allowed; }
+    }
+  }
+}
+
+// Progress bar
+.progress-container {
+  background: $mint-light; border-radius: 99px; height: 6px;
+  width: 100%; position: relative; margin-bottom: 2rem;
+  .progress-bar { height: 100%; background: $mint; border-radius: 99px; transition: width .3s; }
+  span { position: absolute; right: 0; top: 10px; font-size: .85rem; color: $text-muted; font-weight: 600; }
+}
+
+// Layout
+.writing-main { display: grid; grid-template-columns: 1.2fr 2fr 1.2fr; gap: 1.5rem; }
+
+// Boxes (left & right panels)
+.info-box, .tips-box, .criteria-box, .progress-box {
+  background: $white; border-radius: $r-card; padding: 1.25rem;
+  box-shadow: $shadow-sm; margin-bottom: 1rem;
+  border: 1.5px solid $border;
+  h3 { display: flex; align-items: center; gap: .4rem; font-weight: 800; color: $text-dark; margin-bottom: .75rem; }
+}
+
+.tag {
+  display: inline-block; padding: .3rem .75rem; border-radius: 99px;
+  font-size: .78rem; font-weight: 700; margin-right: .4rem;
+}
+.easy  { background: #ecfdf5; color: #065f46; }
+.small { background: $bg; color: $text-muted; }
+
+.info-stats { margin: .8rem 0; color: $text-body; font-size: .9rem; }
+.task-box { background: $mint-light; border-radius: 10px; padding: .9rem; font-size: .9rem; color: $text-dark; }
+
+.tips-box ul {
+  list-style: none; padding: 0; margin: 0;
+  li { border-left: 3px solid $mint; padding-left: .75rem; margin-bottom: .5rem; font-size: .9rem; color: $text-body; }
+}
+
+// Writing area
+.writing-area {
+  background: $white; border-radius: $r-card;
+  box-shadow: $shadow-sm; border: 1.5px solid $border; padding: 1.5rem;
+  display: flex; flex-direction: column;
+}
+.writing-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+
+.writing-actions {
+  display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;
+  .btn-outline, .btn-primary {
+    border: none; border-radius: $r-pill; padding: .7rem 1.5rem;
+    font-family: $font; font-size: .95rem; font-weight: 700; cursor: pointer; transition: all $ease;
+  }
+  .btn-outline { background: $bg; color: $mint-dark; border: 1.5px solid $mint-mid; &:hover { background: $mint-light; } }
+  .btn-primary { background: $mint; color: $white; box-shadow: $shadow-btn; &:hover { background: $mint-dark; } &:disabled { opacity: .5; cursor: not-allowed; } }
+}
+
+textarea {
+  width: 100%; min-height: 250px;
+  border: 1.5px solid $border; border-radius: 12px; padding: 1rem;
+  resize: none; font-size: 1rem; font-family: $font; margin-bottom: 1rem;
+  transition: border-color $ease;
+  &:focus { outline: none; border-color: $mint; box-shadow: 0 0 0 3px rgba(0,200,150,.15); }
+}
+
+.submit-btn {
+  background: $mint; color: $white; border: none; border-radius: $r-pill;
+  padding: .7rem 1.75rem; font-family: $font; font-size: .95rem; font-weight: 800;
+  cursor: pointer; box-shadow: $shadow-btn; transition: all $ease;
+  &:hover { background: $mint-dark; transform: translateY(-1px); }
+}
+
+// Right panels
+.criteria-box li { margin-bottom: .8rem; p { font-size: .88rem; color: $text-muted; } }
+.progress-box li {
+  background: $bg; padding: .6rem 1rem; border-radius: 10px;
+  margin-bottom: .5rem; font-size: .88rem; color: $text-body;
+  &.active { border-left: 4px solid $mint; background: $mint-light; color: $mint-dark; padding-left: .75rem; }
+}
+
+@media (max-width: 1024px) { .writing-main { grid-template-columns: 1fr; } }
+@media (max-width: 576px)  { .writing-page { padding: 1rem; } }
