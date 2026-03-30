@@ -483,11 +483,11 @@ const Header = () => {
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <div className="search-bar ms-auto">
+            <div className="search-bar mx-auto">
               <input type="text" placeholder="Tìm kiếm giảng viên, khóa ..." />
             </div>
 
-            <Nav className="header-actions">
+            <Nav className="header-actions ms-auto">
               {!user ? (
                 <div className="auth-buttons">
                   <Button
