@@ -36,8 +36,22 @@ namespace EasyEnglish_API.Controllers.TeacherSide
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("{quizId:int}")]
+        public async Task<IActionResult> GetQuizDetail(int quizId)
+        {
+            try
+            {
+                var teacherId = GetUserId();
+                var q = await _service.GetTeacherQuizDetail(teacherId, quizId);
+                return Ok(q);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-        [HttpPost]
+            [HttpPost]
         public async Task<IActionResult> CreateQuiz([FromBody] TeacherCreateQuizRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.Title))

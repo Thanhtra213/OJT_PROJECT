@@ -16,6 +16,7 @@ namespace EasyEnglish_API.Interfaces.Quizs
 
         // ================= TEACHER =================
         Task<List<QuizDto>> GetTeacherQuizzesByCourseAsync(int teacherId, int courseId);
+        Task<QuizDetailDto> GetTeacherQuizDetail(int teacher, int quizId);
 
         Task<int> CreateQuizAsync(int teacherId, int courseId, string title, string? description, byte quizType);
         Task<bool> UpdateQuizAsync(int teacherId, int quizId, string? title, string? description, int quizType, bool? isActive);
