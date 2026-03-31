@@ -27,13 +27,9 @@ namespace EasyEnglish_API.Services
             QuizType = q.QuizType
         };
 
-        private static QuizDetailDto ToDetailDto(QuizAlias q) => new()
+        private static QuizDetailDto ToDetailDto(QuizAlias q)
         {
-            QuizID = q.QuizId,
-            Title = q.Title,
-            Description = q.Description,
-            QuizType = q.QuizType,
-            Groups = q.QuestionGroups.Select(g => new QuestionGroupDto
+            var groups = q.QuestionGroups.Select(g => new QuestionGroupDto
             {
                 GroupID = g.GroupId,
                 Instruction = g.Instruction,
@@ -43,13 +39,51 @@ namespace EasyEnglish_API.Services
                     Content = qs.Content,
                     QuestionType = qs.QuestionType,
                     Options = qs.QuestionType == 1
-                        ? qs.Options.Select(o => new OptionDto { OptionID = o.OptionId, Content = o.Content }).ToList()
+                        ? qs.Options.Select(o => new OptionDto
+                        {
+                            OptionID = o.OptionId,
+                            Content = o.Content
+                        }).ToList()
                         : new List<OptionDto>()
                 }).ToList()
-            }).ToList()
-        };
+            }).ToList();
 
-        // ── USER ─────────────────────────────────────────────────────────────
+            var noGroupQuestions = q.Questions
+                .Where(x => x.GroupId == null)
+                .ToList();
+
+            if (noGroupQuestions.Any())
+            {
+                groups.Add(new QuestionGroupDto
+                {
+                    GroupID = 0,
+                    Instruction = "(No group)",
+                    Questions = noGroupQuestions.Select(qs => new QuestionDto
+                    {
+                        QuestionID = qs.QuestionId,
+                        Content = qs.Content,
+                        QuestionType = qs.QuestionType,
+                        Options = qs.QuestionType == 1
+                            ? qs.Options.Select(o => new OptionDto
+                            {
+                                OptionID = o.OptionId,
+                                Content = o.Content
+                            }).ToList()
+                            : new List<OptionDto>()
+                    }).ToList()
+                });
+            }
+
+            return new QuizDetailDto
+            {
+                QuizID = q.QuizId,
+                Title = q.Title,
+                Description = q.Description,
+                QuizType = q.QuizType,
+                Groups = groups
+            };
+        }
+
 
         public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId)
         {
@@ -197,7 +231,7 @@ namespace EasyEnglish_API.Services
             };
         }
 
-        // ── Grade helpers ─────────────────────────────────────────────────────
+    
 
         private static bool GradeMultipleChoice(Question q, int? optionId)
             => optionId.HasValue && q.Options.Any(o => o.OptionId == optionId && o.IsCorrect);
@@ -233,7 +267,6 @@ namespace EasyEnglish_API.Services
             catch (JsonException) { throw new Exception("MetaJson không phải JSON hợp lệ."); }
         }
 
-        // ── Attempt history ───────────────────────────────────────────────────
 
         public async Task<List<object>> GetAttemptHistoryAsync(int userId)
         {
@@ -247,12 +280,22 @@ namespace EasyEnglish_API.Services
             return list.Select(a => (object)new { a.AttemptId, a.QuizId, QuizTitle = a.Quiz?.Title, a.SubmittedAt, a.AutoScore, a.Status, StudentID = a.UserId }).ToList();
         }
 
-        // ── TEACHER ──────────────────────────────────────────────────────────
 
         public async Task<List<QuizDto>> GetTeacherQuizzesByCourseAsync(int teacherId, int courseId)
         {
             if (!await _repo.TeacherOwnsCourseAsync(teacherId, courseId)) throw new Exception("Forbidden");
             return (await _repo.GetQuizzesByCourseAsync(courseId)).Select(ToDto).ToList();
+        }
+
+        public async Task<QuizDetailDto> GetTeacherQuizDetail(int teacherId, int quizId)
+        {
+            if (!await _repo.TeacherOwnsQuizAsync(teacherId, quizId))
+                throw new Exception("Forbidden");
+
+            var quiz = await _repo.GetQuizDetailAsync(quizId)
+                ?? throw new Exception("Quiz not found");
+
+            return ToDetailDto(quiz);
         }
 
         public async Task<int> CreateQuizAsync(int teacherId, int courseId, string title, string? description, byte quizType)
@@ -325,7 +368,6 @@ namespace EasyEnglish_API.Services
 
         public Task<bool> DeleteAssetAsync(int teacherId, int assetId) => _repo.DeleteAssetAsync(assetId);
 
-        // ── ADMIN ─────────────────────────────────────────────────────────────
 
         public async Task<List<QuizDto>> GetAllGlobalQuizzesAsync()
             => (await _repo.GetAllGlobalQuizzesAsync()).Select(ToDto).ToList();

@@ -15,6 +15,9 @@
         public string CourseName { get; set; } = null!;
         public string Description { get; set; } = "";
         public byte CourseLevel { get; set; }
+        public int TeacherId { get; set; }
+        public string TeacherName { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<ChapterDetailDto> Chapters { get; set; } = new();
     }
 

@@ -120,16 +120,34 @@ namespace EasyEnglish_API.Services.Courses
                 CourseID = course.CourseId,
                 CourseName = course.CourseName,
                 Description = course.Description,
-                CourseLevel=course.CourseLevel
+                TeacherId = course.TeacherId,
+                TeacherName = course.Teacher?.TeacherNavigation?.Username ?? "(Unknown)",
+                CreatedAt = course.CreateAt,
+                Chapters = new List<ChapterDetailDto>() 
             };
-            var orphanVideos = course.CourseVideos.Where(v => v.ChapterId == null).Select(v => new VideoDetailDto
+            dto.Chapters = course.CourseChapters.Select(ch => new ChapterDetailDto
             {
-                VideoID = v.VideoId,
-                VideoName = v.VideoName,
-                VideoURL = v.VideoUrl,
-                IsPreview = v.IsPreview
-            })
-            .ToList();
+                ChapterID = ch.ChapterId,
+                ChapterName = ch.ChapterName,
+                Videos = ch.CourseVideos.Select(v => new VideoDetailDto
+                {
+                    VideoID = v.VideoId,
+                    VideoName = v.VideoName,
+                    VideoURL = v.VideoUrl,
+                    IsPreview = v.IsPreview
+                }).ToList()
+            }).ToList();
+
+            var orphanVideos = course.CourseVideos
+                .Where(v => v.ChapterId == null)
+                .Select(v => new VideoDetailDto
+                {
+                    VideoID = v.VideoId,
+                    VideoName = v.VideoName,
+                    VideoURL = v.VideoUrl,
+                    IsPreview = v.IsPreview
+                })
+                .ToList();
 
             if (orphanVideos.Any())
             {
@@ -140,9 +158,9 @@ namespace EasyEnglish_API.Services.Courses
                     Videos = orphanVideos
                 });
             }
+
             return dto;
         }
-
         public async Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req)
         {
             var teacherId = await ResolveTeacherIdAsync(accountId);
