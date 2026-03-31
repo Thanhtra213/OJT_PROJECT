@@ -85,6 +85,12 @@ namespace EasyEnglish_API.Services.Score
         {
             var (courseScores, systemScores) = await _scoreRepository.GetUserScoresAsync(userId);
 
+            if (!courseScores.Any())
+                throw new Exception("No course scores found for system exams.");
+
+            if (!systemScores.Any())
+                throw new Exception("No system scores found for system exams.");
+
             var result1 = courseScores.Select(a => new ScoreViewRequest
             {
                 AttemptId = a.AttemptId,

@@ -44,7 +44,7 @@ public class AuthService : IAuthService
             throw new Exception("Mật khẩu xác nhận không khớp.");
 
         if (!_otp.Verify(req.Email, req.Otp))
-            throw new Exception("OTP không hợp lệ hoặc đã hết hạn.");
+            throw new UnauthorizedAccessException("OTP không hợp lệ hoặc đã hết hạn.");
 
         if (await _repo.IsEmailExistsAsync(req.Email))
             throw new Exception("Email đã tồn tại.");

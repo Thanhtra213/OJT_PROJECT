@@ -20,12 +20,18 @@ import {
   sendOtpApi,
   loginGoogle,
 } from "../../middleware/auth";
+<<<<<<< HEAD
 import "./Header.scss";
 
 // --- CHÈN THÊM: Import Icon và ThemeContext ---
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 // ----------------------------------------------
+=======
+
+import BookLogoModern from "../Footer/BookLogoModern";
+import "./Header.scss";
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
@@ -50,10 +56,13 @@ const Header = () => {
   const navigate = useNavigate();
   const googleButtonRef = useRef(null);
 
+<<<<<<< HEAD
   // --- CHÈN THÊM: Lấy trạng thái Dark Mode ---
   const { isDarkMode, toggleTheme } = useTheme();
   // -------------------------------------------
 
+=======
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("danger");
@@ -168,12 +177,20 @@ const Header = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+<<<<<<< HEAD
+=======
+  // ✅ FIX: Load Google Identity Services và render button
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
       console.warn("⚠️ GOOGLE_CLIENT_ID chưa được cấu hình");
       return;
     }
 
+<<<<<<< HEAD
+=======
+    // Load script nếu chưa có
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
     if (!window.google) {
       const script = document.createElement("script");
       script.src = "https://accounts.google.com/gsi/client";
@@ -186,6 +203,10 @@ const Header = () => {
     }
   }, [GOOGLE_CLIENT_ID]);
 
+<<<<<<< HEAD
+=======
+  // ✅ FIX: Initialize Google Sign-In
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   const initializeGoogleSignIn = () => {
     if (!window.google || !GOOGLE_CLIENT_ID) return;
 
@@ -197,6 +218,10 @@ const Header = () => {
         cancel_on_tap_outside: true,
       });
 
+<<<<<<< HEAD
+=======
+      // Render button nếu có ref
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
       if (googleButtonRef.current) {
         window.google.accounts.id.renderButton(googleButtonRef.current, {
           theme: "outline",
@@ -211,14 +236,22 @@ const Header = () => {
     }
   };
 
+<<<<<<< HEAD
   useEffect(() => {
     if (showAuthModal && activeTab === "login" && googleButtonRef.current) {
+=======
+  // ✅ FIX: Render lại button khi modal mở
+  useEffect(() => {
+    if (showAuthModal && activeTab === "login" && googleButtonRef.current) {
+      // Đợi modal render xong
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
       setTimeout(() => {
         initializeGoogleSignIn();
       }, 100);
     }
   }, [showAuthModal, activeTab]);
 
+<<<<<<< HEAD
   const onGoogleCredential = async (response) => {
     try {
       const idToken = response?.credential;
@@ -269,6 +302,64 @@ const Header = () => {
       showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
+=======
+  // ✅ Callback khi Google trả về credential
+  const onGoogleCredential = async (response) => {
+  try {
+    const idToken = response?.credential;
+ console.log(idToken);
+
+    if (!idToken) {
+      showToastNotification("Không nhận được Google ID token.", "danger");
+      return;
+    }
+ const res = await loginGoogle(idToken);
+    // FE vẫn decode để hiển thị email user nếu thích (optional)
+    const googlePayload = decodeJWT(idToken);
+
+    // ✔ Gửi đúng token lên BE
+   
+
+    const { accountID, accessToken, expiresIn, role, redirectUrl } = res.data;
+
+    const loggedUser = {
+      accountID,
+      accessToken,
+      expiresIn,
+      role,
+      username: googlePayload?.email?.split("@")[0] ?? "google-user",
+      email: googlePayload?.email
+    };
+
+    localStorage.setItem("user", JSON.stringify(loggedUser));
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("userName", loggedUser.username);
+
+    setUser(loggedUser);
+    setUsername(loggedUser.username);
+
+    await fetchUserProfile();
+
+    showToastNotification("🎉 Đăng nhập Google thành công!", "success");
+
+    setTimeout(() => {
+      setShowAuthModal(false);
+      const targetUrl = redirectUrl || "/home";
+      navigate(targetUrl);
+      window.location.href = targetUrl;
+    }, 800);
+
+  } catch (err) {
+    console.error("❌ Google login error:", err);
+    const errorMsg =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.message ||
+      "Đăng nhập Google thất bại!";
+    showToastNotification(`❌ ${errorMsg}`, "danger");
+  }
+};
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 
   const resetLoginForm = () => {
     setEmailOrUsername("");
@@ -473,11 +564,16 @@ const Header = () => {
       <Navbar expand="lg" className="main-header">
         <Container>
           <Navbar.Brand href="/" className="logo">
+<<<<<<< HEAD
             <span className="logo-icon">📖</span> EnglishMaster
+=======
+            <span className="logo-icon"><BookLogoModern size={45} style={{verticalAlign: 'middle'}} /></span> <span>EnglishMaster</span>
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
+<<<<<<< HEAD
             <div className="search-bar ms-auto">
               <input type="text" placeholder="Tìm kiếm giảng viên, khóa ..." />
             </div>
@@ -496,6 +592,13 @@ const Header = () => {
               </Button>
               {/* ----------------------------------------- */}
 
+=======
+            <div className="search-bar mx-auto">
+              <input type="text" placeholder="Tìm kiếm giảng viên, khóa ..." />
+            </div>
+
+            <Nav className="header-actions ms-auto">
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
               {!user ? (
                 <div className="auth-buttons">
                   <Button
@@ -543,6 +646,7 @@ const Header = () => {
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</Dropdown.Item>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Cài đặt</Dropdown.Item>
+<<<<<<< HEAD
                     
                     {/* --- CHÈN THÊM: Link điều hướng cho Admin / Teacher --- */}
                     {user.role === "ADMIN" && (
@@ -553,6 +657,8 @@ const Header = () => {
                     )}
                     {/* ------------------------------------------------------ */}
 
+=======
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
                     <Dropdown.Divider />
                     <Dropdown.Item className="text-danger" onClick={handleLogout}>Đăng xuất</Dropdown.Item>
                   </Dropdown.Menu>
@@ -632,6 +738,10 @@ const Header = () => {
                 Đăng nhập
               </Button>
 
+<<<<<<< HEAD
+=======
+              {/* ✅ FIX: Google Sign-In Button */}
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
               <div
                 ref={googleButtonRef}
                 className="w-100 mb-2"

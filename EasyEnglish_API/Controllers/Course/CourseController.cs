@@ -36,57 +36,78 @@ namespace EasyEnglish_API.Controllers.Course
             return int.Parse(idClaim);
         }
 
-        // =========================================
-        // 1️⃣ GET ALL COURSES (public)
-        // =========================================
         [HttpGet]
         public async Task<IActionResult> GetCourses()
         {
-            var courses = await _courseService.GetAllCoursesAsync();
-
-
-            return Ok(new { Courses = courses });
+            try
+            {
+                var courses = await _courseService.GetAllCoursesAsync();
+                return Ok(new { Courses = courses });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
 
-        // =========================================
-        // 2️⃣ GET COURSE DETAIL
-        // =========================================
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CourseRequest>> GetCourseDetail(int id)
         {
-            var course = await _courseService.GetCourseDetailAsync(id);
-            if (course == null)
-                return NotFound(new { Message = "Course not found" });
-            return Ok(course);
+            try
+            {
+                var course = await _courseService.GetCourseDetailAsync(id);
+                if (course == null)
+                    return NotFound(new { Message = "Course not found" });
+                return Ok(course);
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 3️. GET RATING
         [HttpGet("{courseId:int}/rating")]
         public async Task<IActionResult> GetCourseAverageRating(int courseId)
         {
-            var (avg, total) = await _feedbackService.GetCourseRatingAsync(courseId);
-
-            return Ok(new
+            try
             {
-                CourseID = courseId,
-                AverageRating = avg,
-                TotalFeedback = total
-            });
+                var (avg, total) = await _feedbackService.GetCourseRatingAsync(courseId);
+
+                return Ok(new
+                {
+                    CourseID = courseId,
+                    AverageRating = avg,
+                    TotalFeedback = total
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 4️ GET FEEDBACK LIST 
         [HttpGet("{courseId:int}/feedback")]
         public async Task<IActionResult> GetCourseFeedbacks(int courseId)
         {
-            var feedbacks = await _feedbackService.GetCourseFeedbacksAsync(courseId);
-
-            return Ok(new
+            try
             {
-                CourseID = courseId,
-                TotalFeedback = feedbacks.Count,
-                Feedbacks = feedbacks
-            });
+                var feedbacks = await _feedbackService.GetCourseFeedbacksAsync(courseId);
+
+                return Ok(new
+                {
+                    CourseID = courseId,
+                    TotalFeedback = feedbacks.Count,
+                    Feedbacks = feedbacks
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 5. USER SUBMIT FEEDBACK
@@ -94,15 +115,23 @@ namespace EasyEnglish_API.Controllers.Course
         [HttpPost("feedback")]
         public async Task<IActionResult> CreateFeedback([FromBody] FeedbackCreateRequest req)
         {
-            int userId = GetUserId();
-            var created = await _feedbackService.CreateFeedbackAsync(GetUserId(), req);
-            return Ok(new
+            try
             {
-                message = "Feedback submitted successfully.",
-                created.FeedbackId,
-                created.Rating,
-                created.Comment
-            });
+                int userId = GetUserId();
+                var created = await _feedbackService.CreateFeedbackAsync(GetUserId(), req);
+                return Ok(new
+                {
+                    message = "Feedback submitted successfully.",
+                    created.FeedbackId,
+                    created.Rating,
+                    created.Comment
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
+ 

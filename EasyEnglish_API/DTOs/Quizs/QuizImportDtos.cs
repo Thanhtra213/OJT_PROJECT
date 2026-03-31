@@ -9,7 +9,6 @@
         public byte QuizType { get; set; }           // 1=Listening, 2=Reading, 3=Writing, 4=Speaking
     }
 
-    // Import toàn bộ nội dung quiz
     public class ImportQuizRequest
     {
         public List<QuestionGroupImportDto> Groups { get; set; } = new();

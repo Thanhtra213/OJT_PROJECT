@@ -33,9 +33,7 @@ namespace EasyEnglish_API.ExternalService
             GradeSpeakingAsync(string transcript, string topic)
             => _grader.GradeSpeakingAsync(transcript, topic);
 
-        // =========================
-        // 1️⃣ DEEPGRAM TRANSCRIPTION
-        // =========================
+        // DEEPGRAM TRANSCRIPTION
         public class TranscriptionModule
         {
             private readonly IListenRESTClient _deepgramClient;
@@ -87,9 +85,7 @@ namespace EasyEnglish_API.ExternalService
             }
         }
 
-        // =========================
-        // 2️⃣ GEMINI PROMPT GENERATION
-        // =========================
+        // GEMINI PROMPT GENERATION
         public class PromptModule
         {
             private readonly HttpClient _http;
@@ -205,9 +201,6 @@ Return JSON ONLY:
             }
         }
 
-        // =========================
-        // 3️⃣ SPEAKING GRADING
-        // =========================
         public class GradingModule
         {
             private readonly HttpClient _http;

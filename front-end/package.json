@@ -51,7 +51,10 @@
       "react-app/jest"
     ]
   },
+<<<<<<< HEAD
   "proxy": "https://api.englishmaster.codes",
+=======
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   "browserslist": {
     "production": [
       ">0.2%",
@@ -63,10 +66,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+<<<<<<< HEAD
   },
   "devDependencies": {
     "autoprefixer": "^10.4.27",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1"
+=======
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   }
 }

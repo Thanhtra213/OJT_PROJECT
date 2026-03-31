@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 // --- Tokens/Mixins (Liquid Glass + OneUI) ---
@@ -315,12 +316,152 @@ $ui-transition: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
   padding: 1rem;
   border-radius: $ui-radius-sm;
   line-height: 1.6;
+=======
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-pill:       100px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+.speaking-page-outer-container {
+  background: $bg;
+  font-family: $font;
+  min-height: 100vh;
+  padding: 2rem;
+  color: $text-body;
+}
+
+.speaking-page-content-wrapper {
+  display: grid; grid-template-columns: 1fr;
+  gap: 2rem; max-width: 1200px; margin: 0 auto;
+  @media (min-width: 992px) { grid-template-columns: 2fr 1fr; }
+}
+
+// ── Main content & sidebar panels ────────────────────────────────────────────
+.speaking-main-content,
+.speaking-sidebar {
+  background: $white; border: 1.5px solid $border;
+  border-radius: $r-card; padding: 2rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+  box-shadow: $shadow-card;
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────────
+.speaking-header-section {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1.5px solid $border; padding-bottom: 1.5rem;
+  .speaking-title-group { display: flex; align-items: center; gap: 1rem; }
+  .speaking-icon-wrapper {
+    background: $mint-light; color: $mint-dark; border-radius: 50%;
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  }
+  .speaking-title { margin: 0; font-size: 1.6rem; color: $text-dark; font-weight: 900; letter-spacing: -.025em; }
+  .speaking-subtitle { margin: 0; font-size: .95rem; color: $text-muted; font-weight: 600; }
+  .speaking-close-btn {
+    background: none; border: none; font-size: 1.5rem; color: $text-muted; cursor: pointer; transition: all $ease;
+    &:hover { color: $text-dark; }
+  }
+}
+
+// ── Section cards (prompt, record, result) ────────────────────────────────────
+.prompt-section, .record-section, .result-section {
+  background: $bg; border: 1.5px solid $border;
+  border-radius: 14px; padding: 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+.prompt-title-icon, .record-section-title, .result-section-title {
+  margin: 0; color: $text-dark; font-weight: 800; font-size: 1.1rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+
+// Prompt section
+.prompt-header { display: flex; justify-content: space-between; align-items: center; }
+
+.generate-prompt-btn {
+  background: $mint; color: $white; border: none; border-radius: $r-pill;
+  padding: .75rem 1.5rem; font-family: $font; font-size: .95rem; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; gap: .5rem;
+  box-shadow: $shadow-btn; transition: all $ease;
+  &:hover:not(:disabled) { background: $mint-dark; transform: translateY(-2px); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+
+.prompt-card {
+  background: $white; border: 1.5px solid $border;
+  border-radius: 14px; padding: 1.25rem;
+}
+.prompt-tags { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.prompt-tag {
+  padding: .3em .75em; border-radius: 99px; font-size: .78rem; font-weight: 700;
+  &.tag-advanced { background: $mint-light; color: $mint-dark; }
+  &.tag-opinion  { background: #fef3c7; color: #b45309; }
+}
+.prompt-card-title { margin: 0 0 .5rem; color: $text-dark; font-weight: 800; }
+.prompt-card-content { margin: 0; color: $text-muted; line-height: 1.65; }
+.no-prompt-message { text-align: center; color: $text-muted; font-weight: 600; padding: 2rem; }
+
+// Record section buttons
+.record-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+.record-btn, .upload-btn, .submit-btn {
+  color: $white; border: none; border-radius: $r-pill;
+  padding: .75rem 1.5rem; font-family: $font; font-size: .95rem; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; gap: .5rem;
+  transition: all $ease;
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+.start-record-btn { background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,.3); }
+.stop-record-btn  { background: #8b5cf6; box-shadow: 0 4px 12px rgba(139,92,246,.3); }
+.upload-btn       { background: $mint; box-shadow: $shadow-btn; }
+.submit-btn       { background: $mint; box-shadow: $shadow-btn; margin-top: 1rem; }
+
+.audio-player { width: 100%; margin-top: 1rem; outline: none; }
+
+// Result section
+.result-section {
+  background: $mint-light; border-color: $mint-mid;
+  .result-section-title { color: $mint-dark; }
+}
+.result-transcript { margin: 0; color: $text-dark; font-size: 1.05em; strong { font-weight: 800; } }
+.result-scores {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem; background: $white; padding: 1rem; border-radius: 14px; border: 1.5px solid $mint-mid;
+  p { margin: 0; color: $text-body; }
+}
+.score-value { color: $mint-dark; font-weight: 800; }
+.total-score-line { font-size: 1.1em; font-weight: 900; }
+.total-score-value { color: $mint; }
+.result-feedback {
+  margin: .5rem 0 0; color: $text-muted; background: $white;
+  padding: 1rem; border-radius: 14px; line-height: 1.65;
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 }
 
 // Sidebar
 .speaking-sidebar {
   gap: 1.5rem;
   .sidebar-title {
+<<<<<<< HEAD
     margin: 0;
     color: $ui-text;
     font-weight: 600;
@@ -349,10 +490,20 @@ $ui-transition: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
     font-size: 1.2em;
     margin-top: 2px;
   }
+=======
+    margin: 0; color: $text-dark; font-weight: 800; font-size: 1.1rem;
+    display: flex; align-items: center; gap: .75rem;
+    border-bottom: 1.5px solid $border; padding-bottom: 1rem;
+  }
+  .tips-list { list-style: none; padding: 0; margin: 0; }
+  .tip-item { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: 1rem; color: $text-muted; font-size: .95rem; }
+  .tip-bullet { color: $mint; font-size: 1.2em; margin-top: 2px; }
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 }
 
 // Responsive
 @media (max-width: 768px) {
+<<<<<<< HEAD
   .speaking-page-outer-container {
     padding: 1.5rem;
   }
@@ -404,4 +555,13 @@ body.global-dark-mode {
     background-color: #0f172a !important; 
     border-color: #334155 !important; 
   }
+=======
+  .speaking-page-outer-container { padding: 1.25rem; }
+  .speaking-main-content, .speaking-sidebar { padding: 1.25rem; }
+  .record-controls { flex-direction: column; align-items: stretch; }
+}
+@media (max-width: 576px) {
+  .speaking-page-outer-container { padding: 1rem; }
+  .speaking-header-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 }

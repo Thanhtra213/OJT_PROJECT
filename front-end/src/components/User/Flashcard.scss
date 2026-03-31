@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Flashcard.scss - Styles for the new Flashcard Learning Page
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -25,11 +26,41 @@ $transition-flipper: 0.6s;
   font-family: $font-family-base;
   display: flex;
   flex-direction: column;
+=======
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-lg:    0 10px 28px rgba(0,0,0,.1);
+$r-xl:         24px;
+$r-pill:       100px;
+$ease:         0.3s ease;
+
+// ── Page containers ───────────────────────────────────────────────────────────
+.flashcard-learn-page {
+  background-color: $bg;
+  min-height: 100vh;
+  font-family: $font;
+  display: flex; flex-direction: column;
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   color: $text-dark;
 }
 
 .flashcard-page-loading,
 .flashcard-page-error {
+<<<<<<< HEAD
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -120,10 +151,64 @@ $transition-flipper: 0.6s;
       height: 100%;
       border-radius: 10px;
       transition: width 0.5s ease-in-out;
+=======
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  min-height: 100vh; background: $bg; font-family: $font;
+  .spinner { width: 44px; height: 44px; border: 3px solid $mint-mid; border-top-color: $mint; border-radius: 50%; animation: spin .75s linear infinite; margin-bottom: 1rem; }
+  p { font-size: 1rem; color: $text-muted; font-weight: 600; }
+}
+
+@keyframes spin  { to { transform: rotate(360deg); } }
+@keyframes flipY { to { transform: rotateY(180deg); } }
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.flashcard-learn-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.5rem 2rem; width: 100%;
+  background: $white; border-bottom: 1px solid $border;
+
+  .set-title {
+    font-size: 1.5rem; font-weight: 900; color: $text-dark;
+    margin: 0; flex: 1; text-align: center; padding: 0 2.5rem;
+    letter-spacing: -.02em;
+  }
+
+  .close-button {
+    background: $bg; border: 1.5px solid $border; border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: $text-muted; cursor: pointer;
+    transition: all $ease;
+    &:hover { background: $mint-light; border-color: $mint-mid; color: $mint-dark; transform: scale(1.05); }
+  }
+}
+
+// ── Main container ────────────────────────────────────────────────────────────
+.flashcard-learn-container {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 2rem 2rem;
+  width: 100%; max-width: 800px; margin: 0 auto;
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+.progress-section {
+  width: 100%; margin-bottom: 2rem;
+  .progress-text {
+    text-align: center; font-size: .88rem; font-weight: 600;
+    color: $text-muted; margin-bottom: .75rem;
+  }
+  .progress-bar-background {
+    background: $mint-light; border-radius: 99px; height: 8px; overflow: hidden;
+    .progress-bar-fill {
+      background: $mint; height: 100%; border-radius: 99px;
+      transition: width .5s ease-in-out;
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
     }
   }
 }
 
+<<<<<<< HEAD
 // --- Flashcard 3D Scene ---
 .flashcard-scene {
   width: 100%;
@@ -206,11 +291,49 @@ $transition-flipper: 0.6s;
         background: #e2e8f0;
         transform: translateX(-50%) scale(1.1);
       }
+=======
+// ── 3D Flashcard ──────────────────────────────────────────────────────────────
+.flashcard-scene {
+  width: 100%; height: 400px; perspective: 1000px; margin-bottom: 2rem;
+}
+
+.flashcard-item {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .6s;
+  cursor: pointer;
+  &.is-flipped { transform: rotateY(180deg); }
+}
+
+.flashcard-face {
+  position: absolute; width: 100%; height: 100%;
+  backface-visibility: hidden; border-radius: $r-xl;
+  box-shadow: $shadow-lg;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+}
+
+.flashcard-front {
+  background: $white; border: 1.5px solid $border;
+  .flashcard-content {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    height: 100%; width: 100%; position: relative;
+    .word { font-size: 3rem; font-weight: 900; color: $text-dark; margin-bottom: .5rem; letter-spacing: -.03em; }
+    .phonetic { font-size: 1.25rem; color: $text-muted; font-weight: 600; margin-bottom: 3rem; }
+    .speak-button {
+      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: $mint-light; border: none; border-radius: 50%;
+      width: 48px; height: 48px; font-size: 1.2rem; color: $mint-dark;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all $ease;
+      &:hover { background: $mint-mid; transform: translateX(-50%) scale(1.1); }
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
     }
   }
 }
 
 .flashcard-back {
+<<<<<<< HEAD
   background: $primary-gradient;
   color: $white;
   transform: rotateY(180deg);
@@ -357,5 +480,52 @@ body.global-dark-mode {
       color: #f8fafc !important;
       &:hover:not(:disabled) { background-color: #475569 !important; }
     }
+=======
+  background: linear-gradient(135deg, $mint, $mint-dark);
+  color: $white; transform: rotateY(180deg);
+  .flashcard-content {
+    .meaning { font-size: 2.5rem; font-weight: 900; letter-spacing: -.025em; }
+  }
+}
+
+// ── Main card area with arrows ────────────────────────────────────────────────
+.main-card-area {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; width: 100%; margin-bottom: 2rem;
+}
+
+.nav-arrow-button {
+  background: $white; border: 1.5px solid $border; border-radius: 50%;
+  width: 50px; height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: $text-muted; cursor: pointer;
+  transition: all $ease; flex-shrink: 0; box-shadow: $shadow-card;
+  &:hover { background: $mint-light; border-color: $mint-mid; color: $mint-dark; transform: scale(1.05); }
+  &:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex; justify-content: center; align-items: center;
+  height: 400px; width: 100%;
+  background: $mint-light; border-radius: $r-xl;
+  color: $text-muted; font-size: 1.1rem; font-weight: 600;
+}
+
+// ── Navigation controls ───────────────────────────────────────────────────────
+.navigation-controls {
+  display: flex; justify-content: space-between;
+  width: 100%; max-width: 500px; margin-top: auto;
+
+  .btn {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .75rem 1.5rem; font-family: $font;
+    font-size: 1rem; font-weight: 700; border-radius: $r-xl;
+    border: 1.5px solid $border; background: $white; color: $text-body;
+    box-shadow: $shadow-card; transition: all $ease; cursor: pointer;
+    &:hover { transform: translateY(-2px); box-shadow: $shadow-hover; }
+    &:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+    &:last-child { background: $mint; border-color: $mint; color: $white; border-width: 0; box-shadow: 0 4px 16px rgba(0,200,150,.3); &:hover { background: $mint-dark; } }
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
   }
 }

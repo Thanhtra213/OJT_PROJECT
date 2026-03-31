@@ -23,15 +23,29 @@ namespace EasyEnglish_API.Controllers.AIExam
         [HttpPost("generate")]
         public async Task<IActionResult> GeneratePrompt()
         {
-            var gen = await _service.GeneratePrompt(GetUserID());
-            return Ok(gen);
+            try
+            {
+                var gen = await _service.GeneratePrompt(GetUserID());
+                return Ok(gen);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("submit")]
         public async Task<IActionResult> Submit([FromBody] AIWritingSubmitRequest req)
         {
-            var sub = await _service.SubmitAsync(GetUserID(), req);
-            return Ok(sub);
+            try
+            {
+                var sub = await _service.SubmitAsync(GetUserID(), req);
+                return Ok(sub);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -1,7 +1,12 @@
 import axios from "axios";
 
+<<<<<<< HEAD
 const API_URL = `${process.env.REACT_APP_API_URL}`;
 ///api/teacher/flashcard
+=======
+const API_URL = `${process.env.REACT_APP_API_URL}/api/teacher/flashcard`;
+
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },

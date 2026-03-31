@@ -21,31 +21,37 @@ namespace EasyEnglish_API.Controllers.Payment
             _payOSService = payOSService;
         }
 
-        // ===============================
-        // 🔹 Student tạo đơn thanh toán
-        // ===============================
+        // Student tạo đơn thanh toán
         [HttpPost("create")]
         [Authorize(Roles = "STUDENT")]
         public async Task<IActionResult> CreatePayment(int planId)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var url = await _payOSService.CreatePaymentAsync(userId, planId);
-            return Ok(new { paymentUrl = url });
+                var url = await _payOSService.CreatePaymentAsync(userId, planId);
+                return Ok(new { paymentUrl = url });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // ===============================
-        // 🔹 PayOS Webhook Callback
-        // ===============================
+
         [HttpPost("webhook")]
         [AllowAnonymous]
         public async Task<IActionResult> WebhookCallback([FromBody] JsonElement body)
         {
-            var result = await _paymentService.WebhookCallback(body);
-            
-            if (!result) 
-                return BadRequest();
-
+            try
+            {
+                await _paymentService.WebhookCallback(body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return Ok();
         }
     }

@@ -16,16 +16,14 @@ namespace EasyEnglish_API.Services.Courses
             _r2 = r2;
         }
 
-        
         private async Task<int> ResolveTeacherIdAsync(int accountId)
         {
             var teacherId = await _courseRepository.GetTeacherIdByAccountIdAsync(accountId);
             if (teacherId == null)
-                throw new KeyNotFoundException("Teacher profile not found for this account.");
+                throw new KeyNotFoundException("Teacher profile not found.");
             return teacherId.Value;
         }
 
-        // ── COURSE ───────────────────────────────────────────────────────────
 
         public async Task<bool> CourseExistsAsync(int courseId)
         {
@@ -159,6 +157,29 @@ namespace EasyEnglish_API.Services.Courses
             return dto;
         }
 
+            var orphanVideos = course.CourseVideos
+                .Where(v => v.ChapterId == null)
+                .Select(v => new VideoDetailDto
+                {
+                    VideoID = v.VideoId,
+                    VideoName = v.VideoName,
+                    VideoURL = v.VideoUrl,
+                    IsPreview = v.IsPreview
+                })
+                .ToList();
+
+            if (orphanVideos.Any())
+            {
+                dto.Chapters.Add(new ChapterDetailDto
+                {
+                    ChapterID = 0,
+                    ChapterName = "(Uncategorized Videos)",
+                    Videos = orphanVideos
+                });
+            }
+
+            return dto;
+        }
         public async Task<int> CreateCourseAsync(int accountId, CreateCourseRequest req)
         {
             var teacherId = await ResolveTeacherIdAsync(accountId);
@@ -204,8 +225,6 @@ namespace EasyEnglish_API.Services.Courses
 
             return await _courseRepository.DeleteCourseAsync(courseId);
         }
-
-        // ── CHAPTER ──────────────────────────────────────────────────────────
 
         public async Task<int> AddChapterAsync(int accountId, int courseId, CreateChapterRequest req)
         {
@@ -255,7 +274,6 @@ namespace EasyEnglish_API.Services.Courses
             return await _courseRepository.DeleteChapterAsync(chapterId);
         }
 
-        // ── VIDEO ────────────────────────────────────────────────────────────
 
         public async Task<int> AddVideoAsync(int accountId, int chapterId, CreateVideoRequest req)
         {
@@ -311,4 +329,3 @@ namespace EasyEnglish_API.Services.Courses
             return await _courseRepository.DeleteCourseAsync(courseId);
         }
     }
-}

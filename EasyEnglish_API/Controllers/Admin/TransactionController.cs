@@ -32,12 +32,16 @@ namespace EasyEnglish_API.Controllers.Admin
         [HttpGet("search")]
         public async Task<IActionResult> SearchTransactions([FromQuery] string? keyword)
         {
-            var result = await _transactionService.SearchTransactionsAsync(keyword);
+            try
+            {
+                var result = await _transactionService.SearchTransactionsAsync(keyword);
 
-            if (result == null)
-                return NotFound();
-
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // -----------------------------------------------------
@@ -46,12 +50,15 @@ namespace EasyEnglish_API.Controllers.Admin
         [HttpGet("detail/{orderId:int}")]
         public async Task<IActionResult> GetTransactionDetail(int orderId)
         {
-            var result = await _transactionService.GetTransactionDetailAsync(orderId);
+            try
+            {
+                var result = await _transactionService.GetTransactionDetailAsync(orderId);
 
-            if (result == null)
-                return NotFound();
-
-            return Ok(result);
+                return Ok(result);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

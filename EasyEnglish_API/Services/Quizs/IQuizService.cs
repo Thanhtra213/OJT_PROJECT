@@ -10,12 +10,17 @@ namespace EasyEnglish_API.Interfaces.Quizs
         Task<QuizDetailDto?> GetQuizDetailAsync(int userId, int quizId);
 
         Task<int> StartQuizAsync(int userId, int quizId);
+<<<<<<< HEAD
         Task<SubmitQuizResponse> SubmitQuizAsync(int userId, int attemptId, SubmitQuizRequest req);
+=======
+        Task<SubmitQuizResponse?> SubmitQuizAsync(int userId, int attemptId, SubmitQuizRequest request);
+>>>>>>> da80f97b997fff2c4d042a6e29340cafbba88a96
 
         Task<List<object>> GetAttemptHistoryAsync(int userId);
 
         // ================= TEACHER =================
         Task<List<QuizDto>> GetTeacherQuizzesByCourseAsync(int teacherId, int courseId);
+        Task<QuizDetailDto> GetTeacherQuizDetail(int teacher, int quizId);
 
         Task<int> CreateQuizAsync(int teacherId, int courseId, string title, string? description, byte quizType);
         Task<bool> UpdateQuizAsync(int teacherId, int quizId, string? title, string? description, int quizType, bool? isActive);

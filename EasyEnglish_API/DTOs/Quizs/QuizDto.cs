@@ -56,4 +56,36 @@
 
         public string Type { get; set; } = null!;
     }
+
+    public class SubmitQuizResponse
+    {
+        public decimal AutoScore { get; set; }
+        public int TotalQuestions { get; set; }
+        public int CorrectCount { get; set; }
+        public int WrongCount { get; set; }
+        public int EssayCount { get; set; }  // chờ chấm tay
+        public string Status { get; set; } = string.Empty;
+        public List<QuestionResultDto> Results { get; set; } = new();
+    }
+
+    public class QuestionResultDto
+    {
+        public int QuestionId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public byte QuestionType { get; set; }
+        public bool? IsCorrect { get; set; }   // null = essay chờ chấm
+
+        public int? SubmittedOptionId { get; set; }
+        public string? SubmittedAnswerText { get; set; }
+
+        // Đáp án đúng — chỉ có khi sai
+        public List<CorrectOptionDto> CorrectOptions { get; set; } = new();
+        public string? CorrectAnswerText { get; set; }
+    }
+
+    public class CorrectOptionDto
+    {
+        public int OptionId { get; set; }
+        public string Content { get; set; } = string.Empty;
+    }
 }

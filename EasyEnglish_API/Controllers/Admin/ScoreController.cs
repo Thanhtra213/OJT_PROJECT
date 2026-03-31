@@ -19,36 +19,64 @@ namespace EasyEnglish_API.Controllers.Admin
         [HttpGet("system-exams")]
         public async Task<IActionResult> GetSystemExamScores()
         {
-            var result = await _scoreService.GetSystemExamScoresAsync();
+            try
+            {
+                var result = await _scoreService.GetSystemExamScoresAsync();
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 3️⃣ Xem điểm user (phân loại)
         [HttpGet("user/{userId:int}")]
         public async Task<IActionResult> GetUserScores(int userId)
         {
-            var result = await _scoreService.GetUserScoresAsync(userId);
+            try
+            {
+                var result = await _scoreService.GetUserScoresAsync(userId);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 4️⃣ Điểm theo khóa học
         [HttpGet("by-course/{courseId:int}")]
         public async Task<IActionResult> GetScoresByCourse(int courseId)
         {
-            var result = await _scoreService.GetScoresByCourseAsync(courseId);
+            try
+            {
+                var result = await _scoreService.GetScoresByCourseAsync(courseId);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // 5️⃣ Tất cả điểm system exam (group by quiz)
         [HttpGet("system-exams/all")]
         public async Task<IActionResult> GetAllSystemExamScores()
         {
-            var result = await _scoreService.GetAllSystemExamScoresAsync();
+            try
+            {
+                var result = await _scoreService.GetAllSystemExamScoresAsync();
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

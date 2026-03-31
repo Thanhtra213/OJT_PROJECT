@@ -21,7 +21,7 @@ namespace EasyEnglish_API.Controllers.TeacherSide
         private int GetUserId()
             => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // ================= QUIZ =================
+      
 
         [HttpGet("course/{courseId:int}")]
         public async Task<IActionResult> GetCourseQuiz(int courseId)
@@ -33,11 +33,25 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("{quizId:int}")]
+        public async Task<IActionResult> GetQuizDetail(int quizId)
+        {
+            try
+            {
+                var teacherId = GetUserId();
+                var q = await _service.GetTeacherQuizDetail(teacherId, quizId);
+                return Ok(q);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
-        [HttpPost]
+            [HttpPost]
         public async Task<IActionResult> CreateQuiz([FromBody] TeacherCreateQuizRequest req)
         {
             if (string.IsNullOrWhiteSpace(req.Title))
@@ -108,7 +122,6 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             }
         }
 
-        // ================= GROUP =================
 
         [HttpPost("{quizId:int}/group")]
         public async Task<IActionResult> CreateGroup(int quizId, CreateGroupRequest req)
@@ -151,7 +164,7 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             return Ok(new { message = "Group deleted" });
         }
 
-        // ================= QUESTION =================
+
 
         [HttpPost("group/{groupId:int}/question")]
         public async Task<IActionResult> CreateQuestion(int groupId, CreateQuestionRequest req)
@@ -187,7 +200,6 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             return Ok(new { message = "Question deleted" });
         }
 
-        // ================= OPTION =================
 
         [HttpPost("question/{questionId:int}/option")]
         public async Task<IActionResult> CreateOption(int questionId, CreateOptionRequest req)
@@ -223,7 +235,7 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             return Ok(new { message = "Option deleted" });
         }
 
-        // ================= ASSET =================
+      
 
         [HttpPost("group/{groupId:int}/asset")]
         public async Task<IActionResult> CreateAssetForGroup(int groupId, CreateAssetRequest req)

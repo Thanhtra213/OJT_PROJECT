@@ -21,13 +21,18 @@ namespace EasyEnglish_API.Controllers.TeacherSide
         private int GetUserId() =>
             int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // ── COURSE ───────────────────────────────────────────────────────────
-
         [HttpGet]
         public async Task<IActionResult> GetMyCourses()
         {
-            var courses = await _courseService.GetCoursesByTeacherAsync(GetUserId());
-            return Ok(new { Courses = courses });
+            try
+            {
+                var courses = await _courseService.GetCoursesByTeacherAsync(GetUserId());
+                return Ok(new { Courses = courses });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{courseId:int}")]
@@ -82,7 +87,6 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // ── CHAPTER ──────────────────────────────────────────────────────────
 
         [HttpPost("{courseId:int}/chapter")]
         public async Task<IActionResult> AddChapter(int courseId, [FromBody] CreateChapterRequest req)
@@ -125,7 +129,6 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // ── VIDEO ────────────────────────────────────────────────────────────
 
         [HttpPost("{chapterId:int}/video")]
         public async Task<IActionResult> AddVideo(int chapterId, [FromForm] CreateVideoRequest req)

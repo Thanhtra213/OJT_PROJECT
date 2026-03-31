@@ -30,17 +30,26 @@ namespace EasyEnglish_API.Controllers.Quizz
         [HttpGet("{quizId:int}")]
         public async Task<IActionResult> GetQuizDetail(int quizId)
         {
-            int userId = GetUserId();
-            var quiz = await _service.GetQuizDetailAsync(userId, quizId);
-            if (quiz == null)
-                return NotFound(new { message = "Quiz not found" });
+            try
+            {
+                int userId = GetUserId();
+                var quiz = await _service.GetQuizDetailAsync(userId, quizId);
+                if (quiz == null)
+                    return NotFound(new { message = "Quiz not found" });
 
-            return Ok(quiz);
+                return Ok(quiz);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("system-quiz")]
         public async Task<IActionResult> GetGlobalQuiz()
-        => Ok(await _service.GetGlobalQuizzesAsync(GetUserId()));
+        {
+            return Ok(await _service.GetGlobalQuizzesAsync(GetUserId()));
+        } 
 
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
