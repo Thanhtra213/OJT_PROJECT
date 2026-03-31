@@ -1,0 +1,656 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+// --- Design Tokens ---
+:root {
+  --font-primary: 'Manrope', sans-serif;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --text-white: #ffffff;
+  --text-accent: #7c3aed;
+
+  --bg-main: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-accent: #7c3aed;
+  --bg-accent-light: #ede9fe;
+
+  --border-primary: #e5e7eb;
+  --border-secondary: #f3f4f6;
+
+  --radius-small: 8px;
+  --radius-medium: 16px;
+  --radius-large: 24px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0px 10px 15px -3px rgba(0, 0, 0, 0.03), 0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-button: 0px 4px 12px rgba(124, 58, 237, 0.3);
+  
+  --gradient-purple: linear-gradient(135deg, #8b5cf6, #6366f1);
+  --gradient-blue: linear-gradient(135deg, #38bdf8, #3b82f6);
+  --gradient-green: linear-gradient(135deg, #4ade80, #22c55e);
+  --gradient-orange: linear-gradient(135deg, #fb923c, #f97316);
+  --gradient-pink: linear-gradient(135deg, #f472b6, #ec4899);
+}
+
+// --- Mixins ---
+@mixin flex-center($direction: row) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: $direction;
+}
+
+@mixin card-base {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-primary);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.05), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+}
+
+// --- Base Styles ---
+.new-homepage {
+  font-family: var(--font-primary);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  
+  .main-content-new {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+}
+
+// --- Section Base ---
+.content-section, .hero-section, .general-features, .membership-features, .final-cta {
+  padding: 4rem 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .section-tag {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+
+    &.free {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    &.premium {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+  }
+
+  .view-all-button {
+    background: none;
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: var(--radius-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--bg-accent);
+      color: var(--text-white);
+      border-color: var(--bg-accent);
+    }
+  }
+}
+
+// --- Hero Section ---
+.hero-section {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+  text-align: left;
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-left {
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--bg-accent-light);
+      color: var(--text-accent);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      
+      span {
+        background: var(--gradient-purple);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        display: block;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-bottom: 2.5rem;
+    }
+
+    .cta-button-main {
+      background: var(--bg-accent);
+      color: var(--text-white);
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      box-shadow: var(--shadow-button);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0px 8px 20px rgba(124, 58, 237, 0.4);
+      }
+    }
+  }
+
+  .hero-stats-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+
+    .stat-card {
+      @include card-base;
+      padding: 1.5rem;
+      text-align: center;
+      flex: 1;
+
+      .icon-container {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-medium);
+        @include flex-center;
+        margin: 0 auto 1rem;
+        color: var(--text-white);
+
+        &.orange { background: var(--gradient-orange); }
+        &.purple { background: var(--gradient-purple); }
+        &.green { background: var(--gradient-green); }
+      }
+
+      p {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin: 0;
+      }
+      span {
+        font-size: 0.875rem;
+        color: var(--text-tertiary);
+      }
+    }
+  }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .feature-card-large {
+      @include card-base;
+      padding: 2rem;
+      
+      .icon-container {
+        width: 56px;
+        height: 56px;
+        border-radius: var(--radius-medium);
+        @include flex-center;
+        margin-bottom: 1rem;
+        color: var(--text-white);
+
+        &.purple-gradient { background: var(--gradient-purple); }
+        &.blue-gradient { background: var(--gradient-blue); }
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+    }
+  }
+}
+
+// --- General Features Section ---
+.general-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  background-color: var(--bg-card);
+  padding: 2.5rem;
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border-primary);
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .icon-container {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      border-radius: var(--radius-medium);
+      @include flex-center;
+      color: var(--text-white);
+
+      &.green-gradient { background: var(--gradient-green); }
+      &.orange-gradient { background: var(--gradient-orange); }
+      &.pink-gradient { background: var(--gradient-pink); }
+    }
+
+    h4 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem;
+    }
+    p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+}
+
+// --- Card Grids (Video & Course) ---
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.level-tag {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  
+  &.beginner { background-color: #22c55e; }
+  &.pre-intermediate { background-color: #3b82f6; }
+  &.intermediate { background-color: #f97316; }
+  &.advanced { background-color: #ef4444; }
+}
+
+.video-card-new {
+  @include card-base;
+  overflow: hidden;
+  cursor: pointer;
+
+  .video-thumbnail {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      @include flex-center;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+
+  &:hover .play-overlay {
+    opacity: 1;
+  }
+
+  .card-content {
+    padding: 1.5rem;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+  p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0 0 1rem;
+    min-height: 48px; // Ensure consistent height
+  }
+}
+
+.card-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  align-items: center;
+  border-top: 1px solid var(--border-secondary);
+  padding-top: 1rem;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.course-card-new {
+  @include card-base;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  cursor: pointer;
+
+  .course-card-header {
+    background-color: #38bdf8 !important; // Solid Blue
+    color: #fff !important;
+    padding: 1.5rem !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    h4 {
+      font-size: 1.5rem !important;
+      font-weight: 700 !important;
+      margin: 0 !important;
+      color: #fff !important;
+    }
+
+    .level-tag {
+      background-color: rgba(255,255,255,0.2) !important;
+      color: #fff !important;
+      border: 1px solid rgba(255,255,255,0.5) !important;
+    }
+  }
+
+  .card-content {
+    background: #fff !important;
+    padding: 1.5rem !important;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    p {
+      font-size: 1rem !important;
+      color: var(--text-secondary) !important;
+      margin: 0 0 1rem !important;
+      flex-grow: 1;
+    }
+  }
+
+  .card-footer {
+    background: #fff !important;
+    padding: 0 1.5rem 1.5rem !important;
+  }
+
+  .unlock-button {
+    width: 100%;
+    background-color: #f97316 !important; // Orange
+    color: #fff !important;
+    border: 1px solid #f97316 !important;
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-medium) !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #fff !important;
+      color: #f97316 !important;
+    }
+  }
+}
+
+// --- Membership Features Section ---
+.membership-features {
+  text-align: center;
+  
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .feature-card-small {
+    @include card-base;
+    padding: 2rem 1.5rem;
+    text-align: center;
+
+    .feature-icon-small {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-large);
+      @include flex-center;
+      margin: 0 auto 1.5rem;
+      color: var(--text-white);
+
+      &.blue { background: var(--gradient-blue); }
+      &.purple { background: var(--gradient-purple); }
+      &.green { background: var(--gradient-green); }
+      &.yellow { background: var(--gradient-orange); }
+    }
+
+    h4 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+}
+
+// --- Final CTA ---
+.final-cta {
+  text-align: center;
+  padding-bottom: 6rem;
+
+  .cta-button-large {
+    background: var(--gradient-purple);
+    color: var(--text-white);
+    border: none;
+    padding: 1.25rem 3rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    border-radius: var(--radius-medium);
+    cursor: pointer;
+    box-shadow: var(--shadow-button);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0px 10px 25px rgba(124, 58, 237, 0.4);
+    }
+  }
+}
+
+// --- Responsive Adjustments ---
+@media (max-width: 1024px) {
+  .hero-section .hero-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero-section .hero-left {
+    align-items: center;
+    .hero-subtitle { margin: 1.5rem auto 2.5rem; }
+  }
+  .hero-section .hero-right {
+    flex-direction: row;
+  }
+  .general-features, .membership-features .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-new {
+    padding: 0 1rem;
+  }
+  .hero-section h1 {
+    font-size: 3rem;
+  }
+  .hero-section .hero-right {
+    flex-direction: column;
+  }
+  .hero-stats-cards {
+    flex-direction: column;
+  }
+  .general-features {
+    grid-template-columns: 1fr;
+  }
+  .membership-features .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    h2 { font-size: 1.75rem; }
+  }
+}
+
+/* ==========================================================
+   DARK MODE ĐỘC QUYỀN CHO TRANG CHỦ (HOME PAGE)
+   Không gây xung đột với Admin hay Teacher
+   ========================================================== */
+
+body.global-dark-mode {
+  /* 1. Đảo ngược các biến CSS thành màu tối (Slate) */
+  --text-primary: #f8fafc;       /* Chữ chính: Trắng sáng */
+  --text-secondary: #cbd5e1;     /* Chữ phụ: Xám nhạt */
+  --text-tertiary: #94a3b8;      /* Chữ chú thích: Xám mờ */
+  
+  --bg-main: #0f172a !important; /* Nền toàn trang: Đen thẳm */
+  --bg-card: #1e293b !important; /* Nền thẻ Card: Xám đen nổi bật */
+  
+  --border-primary: #334155;     /* Viền tối màu */
+  --border-secondary: #475569;
+
+  /* 2. Áp dụng màu nền cho container chính của trang chủ */
+  .new-homepage {
+    background-color: var(--bg-main) !important;
+  }
+
+  /* 3. TIÊU DIỆT LỖI MẢNG TRẮNG DO #fff !important TẠO RA TRONG CARD */
+  .course-card-new {
+    .card-content {
+      background: var(--bg-card) !important;
+      p {
+        color: var(--text-secondary) !important;
+      }
+    }
+    
+    .card-footer {
+      background: var(--bg-card) !important;
+    }
+
+    /* Đổi màu hover của nút cho hợp với nền đen */
+    .unlock-button:hover {
+      background-color: var(--bg-card) !important;
+      color: #f97316 !important;
+      border-color: #f97316 !important;
+    }
+  }
+
+  /* 4. Tinh chỉnh các Tag "Miễn phí", "Membership" không bị chói */
+  .section-tag {
+    &.free {
+      background-color: rgba(34, 197, 94, 0.15) !important;
+      color: #4ade80 !important;
+    }
+    &.premium {
+      background-color: rgba(245, 158, 11, 0.15) !important;
+      color: #fbbf24 !important;
+    }
+  }
+
+  /* 5. Ghi đè thẻ View All */
+  .view-all-button {
+    color: var(--text-primary);
+    &:hover {
+      background-color: var(--bg-accent);
+      color: #ffffff !important;
+    }
+  }
+  .hero-tag {
+    background-color: rgba(124, 58, 237, 0.15) !important; /* Nền tím trong suốt cực sang */
+    color: #a78bfa !important; /* Chữ tím sáng */
+    border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  }
+}

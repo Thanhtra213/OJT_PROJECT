@@ -1,0 +1,361 @@
+// Flashcard.scss - Styles for the new Flashcard Learning Page
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// --- Base Variables ---
+$font-family-base: 'Inter', sans-serif;
+$bg-light-gray: #f8fafc;
+$text-dark: #1a202c;
+$text-medium: #4a5568;
+$text-light: #718096;
+$primary-color: #4f46e5;
+$primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+$white: #ffffff;
+$border-color: #e2e8f0; // Variable that was missing
+$border-radius-lg: 1rem;
+$border-radius-xl: 1.5rem;
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); // Variable that was missing
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$transition-fast: 0.3s ease;
+$transition-flipper: 0.6s;
+
+// --- Page Containers ---
+.flashcard-learn-page {
+  background-color: $bg-light-gray;
+  min-height: 100vh;
+  font-family: $font-family-base;
+  display: flex;
+  flex-direction: column;
+  color: $text-dark;
+}
+
+.flashcard-page-loading,
+.flashcard-page-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $bg-light-gray;
+  font-family: $font-family-base;
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    color: $text-medium;
+  }
+}
+
+// --- Header ---
+.flashcard-learn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  box-sizing: border-box;
+
+  .set-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+    padding: 0 2.5rem; // Make space for the close button
+  }
+
+  .close-button {
+    background: $white;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: $text-medium;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: $text-dark;
+      transform: scale(1.1);
+    }
+  }
+}
+
+// --- Main Content Container ---
+.flashcard-learn-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2rem 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+// --- Progress Section ---
+.progress-section {
+  width: 100%;
+  margin-bottom: 2rem;
+
+  .progress-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: $text-light;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-bar-background {
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+
+    .progress-bar-fill {
+      background: $primary-gradient;
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.5s ease-in-out;
+    }
+  }
+}
+
+// --- Flashcard 3D Scene ---
+.flashcard-scene {
+  width: 100%;
+  height: 400px;
+  perspective: 1000px;
+  margin-bottom: 2rem;
+}
+
+.flashcard-item {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform $transition-flipper;
+  cursor: pointer;
+
+  &.is-flipped {
+    transform: rotateY(180deg);
+  }
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.flashcard-front {
+  background: $white;
+
+  .flashcard-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // Center vertically
+    align-items: center; // Center horizontally
+    height: 100%;
+    width: 100%;
+    position: relative; // Needed for absolute positioning of the button
+
+    .word {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .phonetic {
+      font-size: 1.25rem;
+      color: $text-medium;
+      margin-bottom: 3rem; // Add space for the button
+    }
+
+    .speak-button {
+      position: absolute;
+      bottom: 1.5rem; // Position at the bottom
+      left: 50%;
+      transform: translateX(-50%); // Center horizontally
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.2rem;
+      color: $primary-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: #e2e8f0;
+        transform: translateX(-50%) scale(1.1);
+      }
+    }
+  }
+}
+
+.flashcard-back {
+  background: $primary-gradient;
+  color: $white;
+  transform: rotateY(180deg);
+
+  .flashcard-content {
+    .meaning {
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// --- Main Card Area with Arrows ---
+.main-card-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.nav-arrow-button {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: $text-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+  box-shadow: $shadow-md;
+
+  &:hover {
+    background-color: #f1f5f9;
+    color: $text-dark;
+    transform: scale(1.05);
+    box-shadow: $shadow-lg;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+// --- Empty State ---
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  width: 100%;
+  background: #f1f5f9;
+  border-radius: $border-radius-xl;
+  color: $text-light;
+  font-size: 1.2rem;
+}
+
+// --- Navigation Controls ---
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  margin-top: auto; // Pushes controls to the bottom if content is short
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: $border-radius-lg;
+    border: none;
+    background: $white;
+    color: $text-dark;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all $transition-fast;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    &:last-child {
+      background: $primary-color;
+      color: $white;
+
+      &:hover {
+        background: darken($primary-color, 5%);
+      }
+    }
+  }
+}
+
+/* ==========================================================
+   DARK MODE - FLASHCARD LEARNING
+   ========================================================== */
+body.global-dark-mode {
+  .flashcard-learning-page {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  .header-section h1 { color: #f8fafc !important; }
+  .progress-text { color: #cbd5e1 !important; }
+
+  /* Thẻ Flashcard 2 mặt */
+  .flashcard-container .flashcard-inner {
+    .flashcard-front, .flashcard-back {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+      color: #f8fafc !important;
+    }
+  }
+
+  .empty-state {
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+  }
+
+  .navigation-controls .btn {
+    &.btn-light, &.btn-outline-secondary {
+      background-color: #334155 !important;
+      border-color: #475569 !important;
+      color: #f8fafc !important;
+      &:hover:not(:disabled) { background-color: #475569 !important; }
+    }
+  }
+}

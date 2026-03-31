@@ -1,0 +1,205 @@
+// FlashcardList.scss - Redesigned with a more modern and engaging UI
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// --- Design System Variables ---
+$font-family-base: 'Inter', sans-serif;
+$bg-light: #f8fafc;
+$text-dark: #1e293b;
+$text-medium: #64748b;
+$primary-color: #6366f1;
+$primary-gradient: linear-gradient(135deg, $primary-color, #8b5cf6);
+$white: #ffffff;
+$border-color: #e2e8f0;
+$border-radius-lg: 1rem;
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$transition-fast: 0.3s ease;
+
+// --- Main Page Container ---
+.flashcard-list-page {
+  background-color: $bg-light;
+  min-height: 100vh;
+  font-family: $font-family-base;
+  padding: 2rem 0;
+  color: $text-dark;
+
+  .container {
+    max-width: 1200px;
+  }
+}
+
+// --- Back Button ---
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: $text-medium;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-dark;
+    transform: translateX(-3px);
+  }
+}
+
+// --- Page Header ---
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    color: $text-medium;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+// --- Loading & Empty States ---
+.loading-container,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: $white;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-color;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: $primary-color;
+  }
+
+  .empty-icon {
+    font-size: 3.5rem;
+    color: #cbd5e1;
+    margin-bottom: 1.5rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: $text-medium;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+// --- Grid for Flashcard Sets ---
+.sets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+// --- Individual Flashcard Set Card ---
+.set-card {
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  background-color: $white;
+  box-shadow: $shadow-md;
+  transition: all $transition-fast;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-lg;
+    border-color: $primary-color;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary-gradient;
+    color: $white;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: $text-dark;
+  }
+
+  .card-text {
+    color: $text-medium;
+    font-size: 0.95rem;
+    flex-grow: 1;
+    margin-bottom: 1rem;
+  }
+
+  .card-footer-info {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid $border-color;
+    font-size: 0.9rem;
+    color: $text-medium;
+    font-weight: 500;
+  }
+}
+
+/* ==========================================================
+   DARK MODE - FLASHCARD LIST (DANH SÁCH FLASHCARD)
+   ========================================================== */
+body.global-dark-mode {
+  .flashcard-list-page {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  /* Tiêu đề trang */
+  .page-header h1 { color: #f8fafc !important; }
+  .page-subtitle { color: #cbd5e1 !important; }
+
+  /* Thẻ Flashcard */
+  .set-card, 
+  .loading-container, 
+  .empty-state {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .set-card:hover {
+    border-color: #6366f1 !important;
+    background-color: #334155 !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+  }
+
+  /* Chữ trong thẻ */
+  .card-title, .empty-state p { color: #f8fafc !important; }
+  .card-text { color: #cbd5e1 !important; }
+  
+  .card-footer-info {
+    color: #94a3b8 !important;
+    border-top-color: #334155 !important;
+  }
+}

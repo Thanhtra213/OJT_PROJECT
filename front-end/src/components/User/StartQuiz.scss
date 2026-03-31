@@ -1,0 +1,425 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+// ========== Design Variables ==========
+$font-family: 'Inter', sans-serif;
+$primary: #4f46e5;
+$primary-light: #6366f1;
+$success: #10b981;
+$danger: #ef4444;
+$text-dark: #1f2937;
+$text-muted: #6b7280;
+$border-color: #e5e7eb;
+$bg-light: #f9fafb;
+$card-bg: #ffffff;
+$radius: 12px;
+$shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+$transition: 0.25s ease;
+
+// ========== Page Wrapper ==========
+.start-quiz-page {
+  background: $bg-light;
+  min-height: 100vh;
+  font-family: $font-family;
+  padding: 2rem 0;
+
+  // ---------- Back Button ----------
+  .back-button {
+    color: $text-muted;
+    font-weight: 500;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    transition: $transition;
+
+    &:hover {
+      color: $primary;
+      transform: translateX(-4px);
+    }
+  }
+
+  // ---------- Header ----------
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    .quiz-title {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: $primary;
+      margin-bottom: 0.5rem;
+    }
+
+    .quiz-description {
+      color: $text-muted;
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  // ---------- Questions Container ----------
+  .questions-container {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-bottom: 2rem;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary-light;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: $primary;
+    }
+  }
+
+  .question-instruction{
+    overflow-y: auto;
+    max-height: 75vh;
+  }
+
+  // ---------- Fixed Group Header ----------
+  .quiz-fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: $radius;
+    padding: 1rem 1.25rem;
+    box-shadow: $shadow;
+    margin-bottom: 1rem;
+
+    audio, video {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 8px;
+    }
+
+    .instruction-text {
+      font-size: 0.95rem;
+      color: $text-dark;
+      margin-top: 0.75rem;
+
+      strong {
+        color: $primary;
+      }
+    }
+  }
+
+  // ---------- Question Card ----------
+  .question-card {
+    border: 1px solid $border-color;
+    border-radius: $radius;
+    background: $card-bg;
+    box-shadow: $shadow;
+    transition: $transition;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+
+      .question-title {
+        font-weight: 600;
+        color: $text-dark;
+        margin-bottom: 1rem;
+      }
+
+      .form-check {
+        margin-bottom: 0.5rem;
+
+        .form-check-input {
+          margin-right: 0.6rem;
+          width: 1.1rem;
+          height: 1.1rem;
+          border: 2px solid #cbd5e1;
+          transition: $transition;
+
+          &:checked {
+            background-color: $primary;
+            border-color: $primary;
+          }
+
+          &:focus {
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+          }
+        }
+
+        .form-check-label {
+          color: $text-dark;
+          font-weight: 500;
+          cursor: pointer;
+          transition: $transition;
+
+          &:hover {
+            color: $primary;
+          }
+        }
+      }
+
+      .no-options-message {
+        font-size: 0.9rem;
+        color: $text-muted;
+        text-align: center;
+        background: #f3f4f6;
+        border-radius: $radius;
+        padding: 0.75rem;
+      }
+    }
+  }
+
+  
+.start-quiz-page {
+  .instruction-section {
+    position: static;
+    top: 80px;
+    z-index: 100;
+    border: 1px solid #e0e0e0;
+    background-color: #fff !important;
+    overflow: auto;
+  }
+
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .question-card {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .back-button {
+    margin-bottom: 1rem;
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .toast-notification {
+    width: 400px;
+  }
+}
+.question-block {
+  background: #f8f9fa;
+  border-left: 4px solid #007bff;
+  padding: 20px;
+}
+
+.question-title {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.question-image {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.option-item {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .row .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+  // ---------- Buttons ----------
+  .action-buttons {
+    text-align: center;
+    margin-top: 2rem;
+
+    .submit-button {
+      background: $primary;
+      border: none;
+      border-radius: $radius;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      transition: $transition;
+
+      &:hover:not(:disabled) {
+        background: $primary-light;
+        transform: translateY(-3px);
+      }
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // ---------- Results ----------
+  .results-section {
+    text-align: center;
+    margin-top: 2rem;
+
+    .score-alert {
+      background: $card-bg;
+      border-radius: $radius;
+      box-shadow: $shadow;
+      padding: 2rem 1rem;
+
+      h3 {
+        color: $text-dark;
+        font-weight: 700;
+      }
+
+      .score-text {
+        font-size: 1.5rem;
+        color: $success;
+        margin: 0.5rem 0;
+        font-weight: 700;
+      }
+
+      .total-questions {
+        color: $text-muted;
+      }
+    }
+
+    .btn {
+      margin: 0.5rem;
+      border-radius: $radius;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+    }
+  }
+
+  // ---------- Alerts ----------
+  .error-alert,
+  .no-questions-alert {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: $radius;
+    padding: 1rem;
+    box-shadow: $shadow;
+    margin-top: 1rem;
+
+    .alert {
+      border: none;
+      background: transparent;
+      color: $danger;
+      font-weight: 500;
+    }
+  }
+
+  // ---------- Toast ----------
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    min-width: 300px;
+
+    .alert {
+      border-radius: $radius;
+      box-shadow: $shadow;
+      font-weight: 500;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+  }
+
+  // ---------- Loading ----------
+  .loading-container {
+    text-align: center;
+    padding: 3rem 0;
+
+    p {
+      color: $text-muted;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+  }
+
+  // ---------- Responsive ----------
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .quiz-header {
+      .quiz-title {
+        font-size: 1.4rem;
+      }
+    }
+
+    .question-card .card-body {
+      padding: 1.25rem;
+    }
+
+    .submit-button {
+      width: 100%;
+    }
+  }
+}
+/* ==========================================================
+   DARK MODE - START QUIZ (TRANG LÀM KIỂM TRA)
+   ========================================================== */
+body.global-dark-mode {
+  /* Nền trang và khối câu hỏi */
+  .start-quiz-page, 
+  .question-block {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+  }
+
+  /* Các thẻ Card, Alert, Instruction */
+  .quiz-fixed-header, 
+  .question-card, 
+  .score-alert, 
+  .error-alert, 
+  .no-questions-alert, 
+  .instruction-section {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  /* Màu chữ câu hỏi & tiêu đề */
+  .quiz-header .quiz-title, 
+  .question-title, 
+  .score-alert h3, 
+  .instruction-text,
+  .question-title {
+    color: #f8fafc !important;
+  }
+
+  /* Chữ phụ */
+  .quiz-description, 
+  .total-questions, 
+  .instruction-text, 
+  .form-check-label {
+    color: #cbd5e1 !important;
+  }
+
+  /* Fix Nút Radio (Chọn đáp án) */
+  .question-card .card-body .form-check .form-check-input {
+    border-color: #64748b !important;
+    background-color: #0f172a !important;
+    &:checked {
+      background-color: #4f46e5 !important;
+      border-color: #4f46e5 !important;
+    }
+  }
+
+  .no-options-message {
+    background: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+}
