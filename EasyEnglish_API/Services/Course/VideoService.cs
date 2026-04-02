@@ -25,7 +25,7 @@ namespace EasyEnglish_API.Services.Course
 
             var dto = new VideoDto
             {
-                VideoID = video.VideoId,
+                VideoId = video.VideoId,
                 VideoName = video.VideoName,
                 VideoURL = video.VideoUrl,
                 IsPreview = video.IsPreview
@@ -35,6 +35,7 @@ namespace EasyEnglish_API.Services.Course
             if (dto.IsPreview)
             {
                 dto.IsPreview = true;
+                dto.CanWatch = true;
                 dto.RequiresMembership = false;
                 return (dto, 200, null);
             }
