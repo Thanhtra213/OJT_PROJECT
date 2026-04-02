@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BookLogoModern from "./BookLogoModern";
 import { Container, Row, Col, Modal, Button } from "react-bootstrap";
 import "./Footer.scss";
@@ -23,6 +23,7 @@ const Footer = () => {
         return "popup-header-info";
     }
   };
+
   return (
     <>
       <footer className="main-footer">
@@ -31,7 +32,10 @@ const Footer = () => {
             <Col lg={4} md={6} className="footer-logo-col">
               <div className="footer-logo d-flex align-items-center">
                 <BookLogoModern size={64} style={{ marginRight: 20 }} />
-                <span className="logo-text" style={{ fontWeight: 700, fontSize: 20, color: '#111', letterSpacing: 1 }}>EnglishMaster</span>
+                {/* Đã bỏ thuộc tính color: '#111' fix cứng để Dark Mode có thể tự đổi màu chữ */}
+                <span className="logo-text" style={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '-0.5px' }}>
+                  EnglishMaster
+                </span>
               </div>
               <p>
                 Nền tảng học tiếng Anh với AI tiên tiến, giúp bạn chinh phục mọi
