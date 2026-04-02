@@ -22,13 +22,16 @@ $border-radius-lg: 20px;
 $border-radius-md: 12px;
 $border-radius-pill: 99px;
 
-// --- Header Container ---
+/* ==========================================================
+   FIX LỖI BỐ CỤC HEADER (Tránh đè nội dung)
+   ========================================================== */
 .main-header {
-  position: sticky;
+  position: fixed !important;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000;
+  height: 80px !important;
+  z-index: 1050;
   padding: 0.25rem 0;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
@@ -45,13 +48,16 @@ $border-radius-pill: 99px;
   .navbar-brand {
     display: flex;
     align-items: center;
+    gap: 0.35rem;
     font-size: 1.35rem;
     font-weight: 900;
     text-decoration: none;
     color: $text-dark !important;
+    padding: 0;
+    margin: 0;
 
     .logo-icon {
-      margin-right: -10px; // the svg takes up space, adjust according to BookLogoModern
+      // margin-right: -10px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -67,13 +73,13 @@ $border-radius-pill: 99px;
     background: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
-    transform: translateX(15%); // Dịch qua phải khoảng 15-20% so với vị trí cũ
+    transform: translateX(15%);
 
     @media (max-width: 992px) {
       margin: 1rem 0;
       max-width: 100%;
       order: 3;
-      transform: translateX(0); // Trả lại vị trí cũ trên mobile
+      transform: translateX(0);
     }
 
     input {
@@ -81,7 +87,7 @@ $border-radius-pill: 99px;
       appearance: none;
       width: 100%;
       padding: 0.65rem 1.25rem;
-      border: 1.5px solid $mint; // Mặc định xanh lá
+      border: 1.5px solid $mint;
       border-radius: $border-radius-pill;
       background: $bg-white;
       font-family: $font-family-base;
@@ -89,8 +95,8 @@ $border-radius-pill: 99px;
       font-weight: 700;
       color: $text-dark;
       transition: all $transition-duration;
-      outline: none !important; // Xóa vòng viền xanh đậm của browser/bootstrap
-      box-shadow: none !important; // Xóa vòng viền màu xanh nhạt thừa thãi
+      outline: none !important;
+      box-shadow: none !important;
 
       &::placeholder {
         color: $text-muted;
@@ -99,7 +105,7 @@ $border-radius-pill: 99px;
 
       &:focus {
         border-color: $mint-dark;
-        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.1) !important; // Cực mỏng, tinh tế, không tạo thành 2 vòng tròn
+        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.1) !important;
       }
     }
   }
@@ -174,9 +180,7 @@ $border-radius-pill: 99px;
     text-decoration: none;
     border: 1.5px solid transparent !important;
 
-    &::after {
-      display: none;
-    }
+    &::after { display: none; }
 
     &:hover, &:focus {
       background: $mint-light !important;
@@ -185,6 +189,10 @@ $border-radius-pill: 99px;
     }
 
     .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
       border: 2px solid $bg-white;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: all $transition-duration;
@@ -194,11 +202,15 @@ $border-radius-pill: 99px;
       color: $text-dark;
       font-weight: 900;
       font-size: 0.9rem;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      @media (max-width: 576px) { max-width: 100px; }
     }
 
-    &:hover .user-avatar {
-      border-color: $mint;
-    }
+    &:hover .user-avatar { border-color: $mint; }
   }
 
   // Dropdown Menu
@@ -218,6 +230,9 @@ $border-radius-pill: 99px;
       font-weight: 800;
       font-size: 0.9rem;
       transition: all $transition-duration;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
 
       &:hover, &:focus {
         background: $mint-light;
@@ -240,6 +255,7 @@ $border-radius-pill: 99px;
     }
   }
 
+  // --- Navbar Toggle (Mobile) ---
   .navbar-toggler {
     border: 1.5px solid $border;
     border-radius: $border-radius-md;
@@ -249,7 +265,29 @@ $border-radius-pill: 99px;
       box-shadow: 0 0 0 3px $mint-light;
     }
   }
+
+  // --- Mobile Responsive Adjustments ---
+  @media (max-width: 576px) {
+    .navbar-brand {
+      font-size: 1.3rem;
+      .logo-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.8rem;
+        margin-right: 0.5rem;
+      }
+    }
+    .auth-buttons {
+      .login-btn, .register-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
 }
+
+// Đẩy nội dung xuống bằng đúng Header
+body { padding-top: 80px !important; }
 
 // --- Auth Modal Styling ---
 .auth-modal {
@@ -272,21 +310,13 @@ $border-radius-pill: 99px;
       font-size: 1.4rem;
     }
 
-    .btn-close {
-      &:focus {
-        box-shadow: none;
-      }
-    }
+    .btn-close:focus { box-shadow: none; }
   }
 
   .modal-body {
     padding: 1.5rem 2rem 2rem;
     color: $text-body;
-
-    .small {
-      color: $text-muted;
-      font-weight: 700;
-    }
+    .small { color: $text-muted; font-weight: 700; }
   }
 
   // Auth Tabs Navigation
@@ -322,6 +352,7 @@ $border-radius-pill: 99px;
     }
   }
 
+  // Form Styling
   .form-label {
     font-weight: 900;
     color: $text-dark;
@@ -362,7 +393,6 @@ $border-radius-pill: 99px;
       background: $mint;
       color: $bg-white;
       border: none;
-
       &:hover {
         background: $mint-dark;
         transform: translateY(-2px);
@@ -374,7 +404,6 @@ $border-radius-pill: 99px;
       border: 2px solid $mint;
       color: $mint-dark;
       background: transparent;
-
       &:hover {
         background: $mint-light;
         transform: translateY(-1px);
@@ -385,9 +414,7 @@ $border-radius-pill: 99px;
     &.btn-link {
       color: $text-muted;
       text-decoration: none;
-      &:hover {
-        color: $mint-dark;
-      }
+      &:hover { color: $mint-dark; }
     }
   }
 
@@ -397,15 +424,8 @@ $border-radius-pill: 99px;
     font-size: 0.85rem;
     font-weight: 800;
 
-    &.alert-success {
-      background: $mint-light;
-      color: $mint-dark;
-    }
-
-    &.alert-danger {
-      background: #fef2f2;
-      color: #dc2626;
-    }
+    &.alert-success { background: $mint-light; color: $mint-dark; }
+    &.alert-danger { background: #fef2f2; color: #dc2626; }
   }
 }
 
@@ -423,11 +443,7 @@ $border-radius-pill: 99px;
       background: transparent;
       border-bottom: 1.5px solid $border;
       padding: 0.75rem 1rem;
-
-      .me-auto {
-        font-weight: 900;
-        color: $text-dark;
-      }
+      .me-auto { font-weight: 900; color: $text-dark; }
     }
 
     .toast-body {
@@ -437,8 +453,7 @@ $border-radius-pill: 99px;
     }
 
     &.bg-success {
-      background: $mint !important;
-      border-color: $mint-dark;
+      background: $mint !important; border-color: $mint-dark;
       .toast-header {
         border-bottom-color: rgba(255,255,255,0.2);
         .me-auto, .btn-close { color: $bg-white; filter: invert(1); }
@@ -447,8 +462,7 @@ $border-radius-pill: 99px;
     }
 
     &.bg-danger {
-      background: #ef4444 !important;
-      border-color: #dc2626;
+      background: #ef4444 !important; border-color: #dc2626;
       .toast-header {
         border-bottom-color: rgba(255,255,255,0.2);
         .me-auto, .btn-close { color: $bg-white; filter: invert(1); }
@@ -457,8 +471,7 @@ $border-radius-pill: 99px;
     }
     
     &.bg-warning {
-      background: #f9c74f !important;
-      border-color: #f59e0b;
+      background: #f9c74f !important; border-color: #f59e0b;
       .toast-header {
         border-bottom-color: rgba(0,0,0,0.1);
         .me-auto, .btn-close { color: $text-dark; filter: none; }
@@ -468,10 +481,164 @@ $border-radius-pill: 99px;
   }
 }
 
+// Scroll behavior for header
 @media (min-width: 993px) {
   .main-header .navbar-collapse {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
+  }
+}
+
+
+/* ==========================================================
+   CHẾ ĐỘ TỐI TOÀN TRANG (DARK MODE - Đã tích hợp Theme Mint)
+   ========================================================== */
+body.global-dark-mode {
+  background-color: #0f172a !important; /* Màu nền đen sâu */
+
+  /* --- HEADER TỐI --- */
+  .main-header, .custom-navbar {
+    background-color: #1e293b !important; /* Nền Header nổi */
+    border-bottom: 1px solid #334155 !important;
+    
+    .logo-text, .nav-link, .navbar-brand, .user-name {
+      color: #f8fafc !important;
+    }
+
+    /* Bảng User Dropdown */
+    .dropdown-menu {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      .dropdown-item { color: #f8fafc !important; }
+      .dropdown-item:hover { background-color: #334155 !important; color: $mint !important; }
+    }
+
+    /* Thanh tìm kiếm */
+    .search-bar {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+
+      input, .form-control {
+        background-color: #0f172a !important; 
+        border: 1px solid #334155 !important;
+        border-radius: 50px !important;
+        color: #f8fafc !important;
+        width: 100% !important;
+
+        &::placeholder { color: #94a3b8 !important; }
+
+        &:focus {
+          border-color: $mint !important; /* Đổi màu xanh Mint */
+          background-color: #0f172a !important;
+          box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.2) !important;
+        }
+      }
+    }
+
+    /* Nút Đăng Ký (Dark Mode) */
+    .auth-buttons .register-btn {
+      background: transparent !important;
+      border: 2px solid #94a3b8 !important;
+      color: #f8fafc !important;
+
+      &:hover {
+        background: $mint !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  /* --- FOOTER TỐI --- */
+  footer, .footer, .py-5 {
+    background-color: #1e293b !important;
+    border-top: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+    
+    p, span, div, a { color: #cbd5e1 !important; }
+    h1, h2, h3, h4, h5, h6, strong, b { color: #f8fafc !important; }
+    a:hover { color: $mint !important; }
+  }
+
+  /* --- MODAL ĐĂNG NHẬP/ĐĂNG KÝ (DARK MODE) --- */
+  .auth-modal {
+    .modal-content {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+    }
+    
+    .modal-header {
+      border-bottom-color: #334155 !important;
+      background-color: #1e293b !important;
+      
+      .modal-title { color: #f8fafc !important; }
+      .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%) !important;
+        opacity: 0.8 !important;
+      }
+    }
+
+    .modal-body {
+      background-color: #1e293b !important;
+      
+      /* Chữ phụ đề */
+      p, .small, span {
+        background-color: transparent !important;
+        color: #cbd5e1 !important;
+      }
+
+      /* Khung 2 Tab */
+      .auth-tabs-nav {
+        background-color: #0f172a !important;
+        border: 1px solid #334155 !important;
+        
+        .tab-nav-btn {
+          background-color: transparent !important;
+          color: #94a3b8 !important;
+          border: none !important;
+          
+          &.active {
+            background-color: $mint !important; 
+            color: #ffffff !important;
+          }
+          
+          &:not(.active):hover {
+            background-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+        }
+      }
+
+      /* Ô nhập liệu (Inputs) */
+      .form-label { color: #cbd5e1 !important; }
+
+      .form-control {
+        background-color: #0f172a !important;
+        border: 1px solid #475569 !important;
+        color: #f8fafc !important;
+        
+        &::placeholder { color: #64748b !important; }
+        
+        &:focus {
+          border-color: $mint !important;
+          box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.3) !important;
+        }
+      }
+
+      /* Nút Xác Nhận */
+      .btn-dark {
+        background-color: $mint !important;
+        border-color: $mint !important;
+        color: #ffffff !important;
+        &:hover { background-color: $mint-dark !important; }
+      }
+
+      .btn-link { color: $mint !important; }
+
+      div[style*="justify-content: center"] { background: transparent !important; }
+    }
   }
 }
