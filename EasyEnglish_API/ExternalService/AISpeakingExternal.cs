@@ -217,28 +217,55 @@ Return JSON ONLY:
                 _logger = logger;
             }
 
-            public async Task<(decimal overall, decimal fluency, decimal lexical, decimal grammar, decimal pronunciation, string feedback)>
-                GradeSpeakingAsync(string transcript, string topic)
+            public async Task<(decimal overall, decimal fluency, decimal lexical, decimal grammar, decimal pronunciation, string feedback)> GradeSpeakingAsync(string transcript, string topic)
             {
                 var prompt = $@"
-Evaluate IELTS speaking answer.
+You are a strict IELTS Speaking examiner with 20 years of experience.
+Evaluate the transcript below based on all 4 IELTS Speaking criteria.
+Respond ONLY with a single valid JSON object, no markdown, no extra text.
 
-Return JSON ONLY:
-
+Format exactly:
 {{
-""score"":0-9,
-""Fluency"":0-9,
-""LexicalResource"":0-9,
-""Grammar"":0-9,
-""Pronunciation"":0-9,
-""feedback"":""short feedback""
+  ""score"": <overall band 0–9, can be .5>,
+  ""Fluency"": <0–9>,
+  ""LexicalResource"": <0–9>,
+  ""Grammar"": <0–9>,
+  ""Pronunciation"": <0–9>,
+  ""feedback"": {{
+    ""fluency"": {{
+      ""comment"": ""<Was the speech smooth? Any long pauses or self-corrections?>"",
+      ""issues"": [""<specific issue>""],
+      ""suggestions"": [""<how to improve>""]
+    }},
+    ""lexical"": {{
+      ""comment"": ""<Was vocabulary range wide and accurate?>"",
+      ""weakPhrases"": [
+        {{ ""original"": ""<weak or repeated word/phrase from transcript>"", ""suggestion"": ""<better alternative>"" }}
+      ]
+    }},
+    ""grammar"": {{
+      ""comment"": ""<Range and accuracy of grammatical structures>"",
+      ""errors"": [
+        {{
+          ""original"": ""<incorrect phrase from transcript>"",
+          ""correction"": ""<corrected version>"",
+          ""explanation"": ""<why it is wrong>""
+        }}
+      ]
+    }},
+    ""pronunciation"": {{
+      ""comment"": ""<Was pronunciation clear and natural?>"",
+      ""issues"": [""<specific pronunciation issue if any>""],
+      ""suggestions"": [""<improvement tip>""]
+    }},
+    ""overall"": ""<2–3 sentences summarising main strengths and the single most important thing to improve>""
+  }}
 }}
+
+Topic: {topic}
 
 Transcript:
 {transcript}
-
-Topic:
-{topic}
 ";
 
                 var response = await CallGeminiAsync(prompt);
@@ -255,7 +282,7 @@ Topic:
                         root.GetProperty("LexicalResource").GetDecimal(),
                         root.GetProperty("Grammar").GetDecimal(),
                         root.GetProperty("Pronunciation").GetDecimal(),
-                        root.GetProperty("feedback").GetString() ?? ""
+                        root.GetProperty("feedback").ToString()
                     );
                 }
                 catch (Exception ex)

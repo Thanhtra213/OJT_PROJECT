@@ -54,40 +54,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
-using EasyEnglish_API.Services.UserService;
-using EasyEnglish_API.Interfaces;
-using EasyEnglish_API.Repositories.Courses;
-using EasyEnglish_API.Services.Courses;
-using EasyEnglish_API.Interfaces.Dashboard;
-using EasyEnglish_API.Repositories.Dashboard;
-using EasyEnglish_API.Services.Dashboard;
-using EasyEnglish_API.Interfaces.Quizs;
-using EasyEnglish_API.Repositories.Quizs;
-using EasyEnglish_API.Services;
-using EasyEnglish_API.ExternalService;
-using EasyEnglish_API.Interfaces.Subscriptionplan;
-using EasyEnglish_API.Repositories.Subscriptionplan;
-using EasyEnglish_API.Services.Subscriptionplan;
-using EasyEnglish_API.Interfaces.Flashcard;
-using EasyEnglish_API.Repositories.Flashcard;
-using EasyEnglish_API.Services.Flashcard;
-
-using EasyEnglish_API.Services.AIExam;
-using EasyEnglish_API.Interfaces.AIExam;
-using EasyEnglish_API.Repositories.AIExam;
-using EasyEnglish_API.Interfaces.Profile;
-using EasyEnglish_API.Repositories.Profile;
-using EasyEnglish_API.Services.Profile;
-using EasyEnglish_API.Interfaces.Score;
-using EasyEnglish_API.Services.Score;
-using EasyEnglish_API.Repositories.Score;
-using EasyEnglish_API.Interfaces.Transaction;
-using EasyEnglish_API.Repositories.Transaction;
-using EasyEnglish_API.Services.Transaction;
-using EasyEnglish_API.Services.Course;
 using EasyEnglish_API.Interfaces.Streak;
 using EasyEnglish_API.Repositories.Streak;
 using EasyEnglish_API.Services.Streak;
@@ -241,6 +207,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IFlashcardProgressRepository, FlashcardProgressRepository>();
             builder.Services.AddScoped<IStreakRepository, StreakRepository>();
             builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -259,6 +226,8 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIQuizService, AIQuizService>();
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddSingleton<EmailSender>();

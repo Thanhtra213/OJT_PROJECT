@@ -90,8 +90,10 @@ Rules:
             GradeWritingAsync(string essay)
         {
             var gradingPrompt = $@"
-You are an IELTS Writing examiner.
-Evaluate the following essay and respond **only** with a single valid JSON object (no extra text, no markdown).
+You are a strict IELTS Writing Task 2 examiner with 20 years of experience.
+Evaluate the essay below across all 4 IELTS criteria.
+Respond ONLY with a single valid JSON object, no markdown, no extra text.
+
 Format exactly:
 {{
   ""score"": <overall band 0–9, can be .5>,
@@ -99,8 +101,35 @@ Format exactly:
   ""Coherence"": <0–9>,
   ""LexicalResource"": <0–9>,
   ""Grammar"": <0–9>,
-  ""feedback"": ""<2–3 sentences of specific, constructive feedback>""
+  ""feedback"": {{
+    ""taskResponse"": {{
+      ""comment"": ""<Did they answer all parts? Is the position clear and consistent?>"",
+      ""issues"": [""<specific issue 1>"", ""<specific issue 2>""],
+      ""suggestions"": [""<rewrite suggestion or advice 1>"", ""<rewrite suggestion or advice 2>""]
+    }},
+    ""coherence"": {{
+      ""comment"": ""<Is the essay logically structured? Are linking devices used well?>"",
+      ""issues"": [""<specific issue>""],
+      ""suggestions"": [""<suggestion>""]
+    }},
+    ""lexical"": {{
+      ""comment"": ""<Is vocabulary range wide and accurate?>"",
+      ""weakPhrases"": [
+        {{ ""original"": ""<weak phrase from essay>"", ""suggestion"": ""<better alternative>"" }},
+        {{ ""original"": ""<weak phrase>"", ""suggestion"": ""<better alternative>"" }}
+      ]
+    }},
+    ""grammar"": {{
+      ""comment"": ""<Range and accuracy of grammar structures>"",
+      ""errors"": [
+        {{ ""original"": ""<incorrect sentence or phrase from essay>"", ""correction"": ""<corrected version>"", ""explanation"": ""<why it's wrong>"" }},
+        {{ ""original"": ""<incorrect>"", ""correction"": ""<corrected>"", ""explanation"": ""<explanation>"" }}
+      ]
+    }},
+    ""overall"": ""<2–3 sentences summarising the essay's main strengths and the single most important thing to improve>""
+  }}
 }}
+
 Essay:
 {essay}
 ";
@@ -116,7 +145,9 @@ Essay:
                 decimal coherence = doc.RootElement.GetProperty("Coherence").GetDecimal();
                 decimal lexical = doc.RootElement.GetProperty("LexicalResource").GetDecimal();
                 decimal grammar = doc.RootElement.GetProperty("Grammar").GetDecimal();
-                string feedback = doc.RootElement.GetProperty("feedback").GetString() ?? "";
+
+                string feedback = doc.RootElement.GetProperty("feedback").ToString();
+
                 return (overall, task, coherence, lexical, grammar, feedback);
             }
             catch (Exception ex)
