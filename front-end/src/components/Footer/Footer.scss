@@ -71,12 +71,39 @@ $border-radius-pill: 99px;
       display: flex;
       align-items: center;
       margin-bottom: 1.25rem;
+      margin-left: 20px; // Dịch khối logo sang phải để cân đối với viền text bên dưới
 
-      .logo-text {
-        font-weight: 900 !important;
-        font-size: 1.5rem !important;
-        color: $text-dark !important;
-        letter-spacing: -0.5px !important;
+      .logo-text-stacked {
+        display: flex;
+        flex-direction: column;
+        line-height: 0.95;
+        position: relative;
+        padding-bottom: 6px;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: #d0daf5; // Light blue underline matching the image
+          border-radius: 4px;
+        }
+
+        .text-easy {
+          font-weight: 900;
+          font-size: 2.2rem;
+          color: #4285F4; // Bright blue
+          letter-spacing: -0.5px;
+        }
+
+        .text-english {
+          font-weight: 900;
+          font-size: 2.2rem;
+          color: #1e293b; // Deep navy/black
+          letter-spacing: -0.5px;
+        }
       }
     }
 

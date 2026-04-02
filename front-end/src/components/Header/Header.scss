@@ -51,7 +51,7 @@ $border-radius-pill: 99px;
     color: $text-dark !important;
 
     .logo-icon {
-      margin-right: -10px; // the svg takes up space, adjust according to BookLogoModern
+      margin-right: 10px; // adjusted to prevent overlapping with text
       display: flex;
       align-items: center;
       justify-content: center;
