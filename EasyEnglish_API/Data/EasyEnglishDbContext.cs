@@ -498,6 +498,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.HasIndex(e => new { e.BuyerId, e.Status, e.CreatedAt }, "IX_PO_Buyer_Status").IsDescending(false, false, true);
 
             entity.Property(e => e.OrderId).HasColumnName("OrderID");
+            entity.Property(e => e.OrderCode).HasColumnName("OrderCode");
             entity.Property(e => e.Amount).HasColumnType("decimal(12, 2)");
             entity.Property(e => e.BuyerId).HasColumnName("BuyerID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");

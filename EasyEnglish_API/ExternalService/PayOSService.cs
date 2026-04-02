@@ -25,14 +25,16 @@ namespace EMT_API.Services
             var plan = await _db.SubscriptionPlans.FindAsync(planId)
                 ?? throw new Exception("Không tìm thấy gói học.");
 
-          
+            var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var order = new PaymentOrder
             {
                 BuyerId = buyerId,
                 PlanId = planId,
                 Amount = plan.Price,
-                Status = "PENDING"
+                Status = "PENDING",
+                OrderCode = orderCode 
             };
+
             _db.PaymentOrders.Add(order);
             await _db.SaveChangesAsync();
 
@@ -44,7 +46,7 @@ namespace EMT_API.Services
      ? $"Gói {plan.Name}".Substring(0, 25)
      : $"Gói {plan.Name}";
 
-            var orderCode = order.OrderId;
+
 
             var dataToSign =
                 $"amount={amount}&cancelUrl={cancelUrl}&description={description}&orderCode={orderCode}&returnUrl={returnUrl}";
