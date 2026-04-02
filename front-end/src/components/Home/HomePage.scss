@@ -600,3 +600,89 @@
   .hp-hero h1 { font-size: 1.9rem; }
   .hp-hero .hero-actions { flex-direction: column; .btn-primary,.btn-ghost{width:100%;justify-content:center;} }
 }
+body.global-dark-mode {
+  // Ghi đè các Token màu sắc chính
+  --bg:        #0f172a; // Nền đen sâu
+  --white:     #1e293b; // Nền card xám xanh nổi
+  --gray-900:  #f8fafc; // Chữ trắng tiêu đề
+  --gray-600:  #cbd5e1; // Chữ nội dung xám sáng
+  --gray-400:  #94a3b8; // Chữ mô tả mờ
+  --gray-200:  #334155; // Viền tối
+  --gray-100:  #1e293b;
+  --gray-50:   #0f172a;
+
+  .new-homepage {
+    background: var(--bg);
+    color: var(--gray-900);
+
+    // 1. Dải tính năng (Feature Strip) - Bản phẳng không bóng đổ
+    .hp-features__grid {
+      background: var(--white);
+      border-color: var(--gray-200);
+      box-shadow: none !important;
+    }
+
+    .hp-features__item {
+      background: var(--white);
+      border-right-color: var(--gray-200);
+      border-bottom-color: var(--gray-200);
+      
+      &:hover {
+        background: rgba(0, 200, 150, 0.05); // Màu Mint cực mờ khi hover
+      }
+    }
+
+    // 2. Video Card & Course Card
+    .vcard, .ccard, .mem-card {
+      background: var(--white);
+      border-color: var(--gray-200);
+      box-shadow: none !important; // Loại bỏ bóng đổ để ra chất Flat
+
+      &:hover {
+        border-color: var(--mint);
+        background: #1e293b;
+      }
+      
+      .body h4 { color: var(--gray-900); }
+      .meta { border-top-color: var(--gray-200); }
+    }
+
+    // 3. Section Heading
+    .sec-link {
+      border-color: var(--gray-200);
+      color: var(--gray-600);
+      &:hover {
+        border-color: var(--mint);
+        background: var(--mint);
+        color: #fff;
+      }
+    }
+
+    // 4. Level Tags (Tối ưu độ tương phản trong tối)
+    .lvl {
+      &.beginner         { background: rgba(249, 115, 22, 0.15) !important; }
+      &.pre-intermediate { background: rgba(236, 72, 153, 0.15) !important; }
+      &.intermediate     { background: rgba(16, 185, 129, 0.15) !important; }
+      &.advanced         { background: rgba(139, 92, 246, 0.15) !important; }
+      &.expert           { background: rgba(59, 130, 246, 0.15) !important; }
+    }
+
+    // 5. Membership Section
+    .mem-card {
+      .mem-icon {
+        &.mint   { background: rgba(0, 200, 150, 0.1) !important; }
+        &.blue   { background: rgba(59, 130, 246, 0.1) !important; }
+        &.orange { background: rgba(249, 115, 22, 0.1) !important; }
+        &.gold   { background: rgba(245, 158, 11, 0.1) !important; }
+      }
+    }
+
+    // 6. Utility
+    .table-custom {
+      thead tr { background: #1e293b; }
+      tbody tr:hover { background: rgba(255, 255, 255, 0.05); }
+    }
+    
+    .loading-state p { color: var(--mint); }
+  }
+}
