@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
-using EasyEnglish_API.Models;
 using EasyEnglish_API.Services.Payment;
 using EMT_API.Services;
 using Microsoft.AspNetCore.Authorization;

@@ -21,6 +21,7 @@ namespace EasyEnglish_API.Services.Flashcard
                 SetId = req.SetID,
                 FrontText = req.FrontText,
                 BackText = req.BackText,
+                IPA = req.IPA,
                 Example = req.Example,
                 CreatedAt = DateTime.UtcNow
             };
@@ -114,6 +115,7 @@ namespace EasyEnglish_API.Services.Flashcard
                     ItemID = i.ItemId,
                     FrontText = i.FrontText,
                     BackText = i.BackText,
+                    IPA = i.IPA,
                     Example = i.Example
                 }).ToList()
             };
@@ -143,9 +145,11 @@ namespace EasyEnglish_API.Services.Flashcard
         {
             var item = new FlashcardItem
             {
+                SetId = req.SetID,
                 ItemId = itemId,
                 FrontText = req.FrontText,
                 BackText = req.BackText,
+                IPA = req.IPA,
                 Example = req.Example
             };
             var updatedItem = await _flashcardRepository.UpdateItemAsync(item);

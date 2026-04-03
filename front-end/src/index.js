@@ -9,7 +9,6 @@ import ForgotPass from "./components/Password/Forgotpass";
 import ResetPassword from "./components/Password/ResetPassword";
 import Profile from "./components/Profile/Profile";
 import WritingPractice from "./components/User/WritingPractice";
-import ListeningPractice from "./components/User/ListeningPractice";
 import Membership from "./components/User/Membership";
 import CourseDetail from './components/User/CourseDetail';
 import Flashcard from "./components/User/Flashcard";
@@ -47,10 +46,6 @@ root.render(
         } />
         
         <Route path="writingpractice" element={<WritingPractice />} />
-        <Route path="listeningpractice" element={<ListeningPractice />} />
-        <Route path="forgotpassword" element={<ForgotPass />} />
-        <Route path="reset-password" element={<ResetPassword />} />
-        {/* <Route path="editlesson" element={<EditLesson />} /> */}
         <Route path="membership" element={<Membership />} />
         <Route path="/payment/:id" element={<PaymentForm />} />
         <Route path="/course/:id" element={<CourseDetail />} />
