@@ -11,8 +11,8 @@ export const getPlans = async () => {
       }
     });
     // ✅ Kiểm tra đúng cấu trúc dữ liệu trả về từ API
-    if (res.data && Array.isArray(res.data.plan)) {
-      return res.data.plan;
+    if (res.data && Array.isArray(res.data)) {
+      return res.data;
     } else {
       console.error("API /plan không trả về mảng hợp lệ:", res.data);
       return [];

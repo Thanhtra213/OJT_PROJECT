@@ -6,7 +6,7 @@ namespace EasyEnglish_API.Models;
 public partial class PaymentOrder
 {
     public int OrderId { get; set; }
-    public long OrderCode { get; set; }
+    public long? OrderCode { get; set; }
 
     public int BuyerId { get; set; }
 
