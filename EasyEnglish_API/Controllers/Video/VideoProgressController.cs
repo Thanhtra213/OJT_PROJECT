@@ -11,9 +11,9 @@ namespace EasyEnglish_API.Controllers.Video
     [Authorize]
     public class VideoProgressController : ControllerBase
     {
-        private readonly VideoProgressService _service;
+        private readonly IVideoProgressService _service;
 
-        public VideoProgressController(VideoProgressService service)
+        public VideoProgressController(IVideoProgressService service)
         {
             _service = service;
         }
@@ -47,18 +47,20 @@ namespace EasyEnglish_API.Controllers.Video
             if (progress == null)
                 return Ok(new
                 {
-                    videoId,
-                    lastPosition = progress.LastPositionSec?? 0,
-                    isCompleted = false
+                    videoId = videoId,
+                    watchDurationSec = 0,
+                    lastPositionSec = (int?)null,
+                    isCompleted = false,
+                    watchedAt = (DateTime?)null
                 });
 
             return Ok(new
             {
-                progress.VideoId,
-                progress.WatchDurationSec,
-                progress.LastPositionSec,
-                progress.IsCompleted,
-                progress.WatchedAt
+                videoId = progress.VideoId,
+                watchDurationSec = progress.WatchDurationSec,
+                lastPositionSec = progress.LastPositionSec,
+                isCompleted = progress.IsCompleted,
+                watchedAt = progress.WatchedAt
             });
         }
     }

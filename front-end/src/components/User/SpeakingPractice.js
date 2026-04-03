@@ -1,20 +1,20 @@
 import React, { useState, useRef } from "react";
 import { generateSpeakingPrompt, submitSpeakingAnswer } from "../../middleware/speakingAPI";
-import "./speakingpractice.scss"; // This is where your styles will be
+import "./speakingpractice.scss";
 import { useNavigate } from "react-router-dom";
 
 const SpeakingPractice = () => {
   const [prompt, setPrompt] = useState(null);
   const [recording, setRecording] = useState(false);
-const [audioURL, setAudioURL] = useState(null);
-const [audioBlob, setAudioBlob] = useState(null);
+  const [audioURL, setAudioURL] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const navigate = useNavigate();
 
-  // 🧠 Lấy đề từ AI
   const handleGeneratePrompt = async () => {
     try {
       const data = await generateSpeakingPrompt();
@@ -22,12 +22,12 @@ const [audioBlob, setAudioBlob] = useState(null);
       setResult(null);
       setAudioURL(null);
       setAudioBlob(null);
+       console.log("PROMPT DATA:", data);
     } catch {
       alert("Lỗi khi tạo đề. Vui lòng thử lại.");
     }
   };
 
-  // 🎙️ Bắt đầu ghi âm
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -52,7 +52,6 @@ const [audioBlob, setAudioBlob] = useState(null);
     }
   };
 
-  // ⏹️ Dừng ghi âm
   const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
@@ -60,29 +59,28 @@ const [audioBlob, setAudioBlob] = useState(null);
     }
   };
 
-  // 📁 Upload file ghi âm (nếu người học đã có sẵn)
   const handleUploadFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Kiểm tra định dạng
     if (!file.type.startsWith("audio/")) {
       alert("Vui lòng chọn file âm thanh hợp lệ (.mp3, .wav, ...)");
       return;
     }
-
     const url = URL.createObjectURL(file);
     setAudioURL(url);
     setAudioBlob(file);
   };
 
-  // 📤 Gửi file để chấm điểm
-  const handleSubmit = async () => {
+  const handleSubmitClick = () => {
     if (!audioBlob || !prompt) return alert("Vui lòng ghi âm hoặc tải file trước khi nộp!");
+    setShowConfirm(true);
+  };
 
+  const handleConfirmSubmit = async (sendToTeacher) => {
+    setShowConfirm(false);
     setLoading(true);
     try {
-      const data = await submitSpeakingAnswer(audioBlob, prompt.content);
+      const data = await submitSpeakingAnswer(audioBlob, prompt.promptId, sendToTeacher);
       setResult(data);
     } catch {
       alert("Lỗi khi nộp bài. Vui lòng thử lại.");
@@ -90,14 +88,12 @@ const [audioBlob, setAudioBlob] = useState(null);
       setLoading(false);
     }
   };
-const handleClose = () => {
-    navigate("/home");
-  };
+
+  const handleClose = () => navigate("/home");
+
   return (
     <div className="speaking-page-outer-container">
-
       <div className="speaking-page-content-wrapper">
-        {/* Main Content Area */}
         <div className="speaking-main-content">
           <div className="speaking-header-section">
             <div className="speaking-title-group">
@@ -109,7 +105,6 @@ const handleClose = () => {
             <button className="speaking-close-btn" onClick={handleClose}>✕</button>
           </div>
 
-          {/* Đề bài */}
           <div className="prompt-section">
             <div className="prompt-header">
               <h3 className="prompt-title-icon">Đề bài luyện tập</h3>
@@ -117,19 +112,16 @@ const handleClose = () => {
                 Tạo đề mới
               </button>
             </div>
-
             {prompt ? (
               <div className="prompt-card">
-                {/* tags removed */}
                 <h3 className="prompt-card-title">{prompt.title}</h3>
                 <p className="prompt-card-content">{prompt.content}</p>
               </div>
             ) : (
-              <p className="no-prompt-message">Nhấn “Tạo đề mới” để bắt đầu luyện nói</p>
+              <p className="no-prompt-message">Nhấn "Tạo đề mới" để bắt đầu luyện nói</p>
             )}
           </div>
 
-          {/* Ghi âm + Upload */}
           {prompt && (
             <div className="record-section">
               <h3 className="record-section-title">Ghi âm hoặc tải file</h3>
@@ -143,53 +135,34 @@ const handleClose = () => {
                     Dừng ghi âm
                   </button>
                 )}
-
-                {/* 📁 Nút tải file lên */}
                 <label className="upload-btn">
                   Tải file lên
-                  <input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleUploadFile}
-                    style={{ display: "none" }}
-                  />
+                  <input type="file" accept="audio/*" onChange={handleUploadFile} style={{ display: "none" }} />
                 </label>
-
-                {audioURL && (
-                  <audio controls src={audioURL} className="audio-player"></audio>
-                )}
+                {audioURL && <audio controls src={audioURL} className="audio-player" />}
               </div>
-
-              <button onClick={handleSubmit} disabled={!audioBlob || loading} className="submit-btn">
+              <button onClick={handleSubmitClick} disabled={!audioBlob || loading} className="submit-btn">
                 {loading ? "Đang chấm..." : "Nộp bài"}
               </button>
             </div>
           )}
 
-          {/* Kết quả - Appears only after submission */}
           {result && (
             <div className="result-section">
               <h3 className="result-section-title">Kết quả chấm điểm</h3>
-              <p className="result-transcript">
-                <strong>Transcript:</strong> {result.transcript}
-              </p>
+              <p className="result-transcript"><strong>Transcript:</strong> {result.transcript}</p>
               <div className="result-scores">
                 <p>Fluency: <strong className="score-value">{result.fluency}</strong></p>
                 <p>Grammar: <strong className="score-value">{result.grammar}</strong></p>
                 <p>Pronunciation: <strong className="score-value">{result.pronunciation}</strong></p>
                 <p>Vocabulary: <strong className="score-value">{result.lexicalResource}</strong></p>
-                <p className="total-score-line">
-                    Tổng điểm: <span className="total-score-value">{result.score}</span>
-                </p>
+                <p className="total-score-line">Tổng điểm: <span className="total-score-value">{result.score}</span></p>
               </div>
-              <p className="result-feedback">
-                Feedback: {result.feedback}
-              </p>
+              <p className="result-feedback">Feedback: {result.feedback}</p>
             </div>
           )}
         </div>
 
-        {/* Right Sidebar - Tips */}
         <div className="speaking-sidebar">
           <h3 className="sidebar-title">Tips hữu ích</h3>
           <ul className="tips-list">
@@ -201,13 +174,28 @@ const handleClose = () => {
               "Sử dụng từ vựng đa dạng",
               "Luyện tập phát âm mỗi ngày"
             ].map((tip, index) => (
-              <li key={index} className="tip-item">
-                <span className="tip-bullet">•</span> {tip}
-              </li>
+              <li key={index} className="tip-item"><span className="tip-bullet">•</span> {tip}</li>
             ))}
           </ul>
         </div>
       </div>
+
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-modal">
+            <h3>Send To Teacher?</h3>
+            <p>Bạn có muốn gửi bài nộp này cho giáo viên để nhận thêm nhận xét không?</p>
+            <div className="confirm-actions">
+              <button className="confirm-btn confirm-yes" onClick={() => handleConfirmSubmit(true)}>
+                Yes
+              </button>
+              <button className="confirm-btn confirm-no" onClick={() => handleConfirmSubmit(false)}>
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
