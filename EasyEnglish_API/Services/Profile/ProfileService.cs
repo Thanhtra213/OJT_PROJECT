@@ -41,8 +41,11 @@ namespace EasyEnglish_API.Services.Profile
                 var detail = await _repo.GetUserDetailAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
             if (string.IsNullOrEmpty(detail.AvatarUrl))
                 return null;
 

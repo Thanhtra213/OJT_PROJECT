@@ -78,6 +78,7 @@ namespace EasyEnglish_API.Repositories.Flashcard
 
             existing.FrontText = item.FrontText;
             existing.BackText = item.BackText;
+            existing.IPA = item.IPA;
             existing.Example = item.Example;
 
             await _db.SaveChangesAsync();

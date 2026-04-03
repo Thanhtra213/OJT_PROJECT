@@ -415,6 +415,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Example).HasMaxLength(500);
             entity.Property(e => e.FrontText).HasMaxLength(500);
+            entity.Property(e => e.IPA).HasMaxLength(500);
             entity.Property(e => e.SetId).HasColumnName("SetID");
 
             entity.HasOne(d => d.Set).WithMany(p => p.FlashcardItems)

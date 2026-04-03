@@ -12,6 +12,7 @@ public partial class FlashcardItem
     public string FrontText { get; set; } = null!;
 
     public string BackText { get; set; } = null!;
+    public string? IPA { get; set; }
 
     public string? Example { get; set; }
 

@@ -12,7 +12,7 @@ const getAuthHeaders = () => {
 };
 
 // ============= COURSE APIs =============
-
+console.log("ENV:", process.env.REACT_APP_API_URL);
 /**
  * Get all courses with teacher info
  */
@@ -28,6 +28,7 @@ export const getCourses = async () => {
 
     const data = await response.json();
     console.log("📚 Raw courses data:", data);
+    
 
     // Process courses to include teacher info
     const coursesWithTeachers = await Promise.all(
@@ -73,7 +74,7 @@ export const getCourses = async () => {
       totalCount: coursesWithTeachers.length,
     };
   } catch (error) {
-    console.error("❌ Error fetching courses:", error);
+    console.error("❌ Error fetching courses:", error.message);
     throw error;
   }
 };

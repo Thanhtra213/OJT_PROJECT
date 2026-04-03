@@ -14,8 +14,8 @@ export async function createPayment(planID) {
     if (!token) throw new Error("Chưa đăng nhập");
 
     const res = await axios.post(
-      `${API_BASE}/create`,
-      { planId: planID }, // 🔹 Gửi object { planId: number } theo Swagger
+      `${API_BASE}/create?planId=${planID}`, 
+      null,
       {
         headers: {
           "Content-Type": "application/json",
