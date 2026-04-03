@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './index.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
 import HomePage from './components/Home/HomePage';
@@ -22,11 +23,13 @@ import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
 
+// CẤP QUYỀN SỬ DỤNG DARK MODE CHO TOÀN ỨNG DỤNG
+import { ThemeProvider } from './context/ThemeContext';
+
 const ProtectedRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   return user ? children : <Navigate to="/" replace />; 
 };
-
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

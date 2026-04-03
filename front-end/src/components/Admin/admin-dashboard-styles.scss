@@ -1,0 +1,827 @@
+// admin-dashboard-styles.scss
+
+// --- UI Design Tokens (Liquid Glass + OneUI) ---
+$ui-brand: #5aa0ff !default;
+$ui-accent: #8c64ff !default;
+$ui-bg: #f0f4fa !default; // Slightly cooler than the requested #F7F9FC for a more modern feel
+$ui-surface: #ffffff !default;
+$ui-text: #0b1324 !default;
+$ui-muted: #8a94a6 !default; // Adjusted for better contrast on the new bg
+$ui-border: rgba(0, 0, 0, 0.08) !default; // Hairline border for glass components
+$ui-border-solid: #e5edf4 !default;
+
+$ui-success: #22c55e !default;
+$ui-warn: #f59e0b !default;
+$ui-danger: #ef4444 !default;
+
+$ui-radius-large: 24px !default; // For main panels, cards
+$ui-radius-medium: 16px !default; // For buttons, inputs
+$ui-radius-small: 12px !default; // For chips, smaller elements
+$ui-radius-round: 999px !default; // For circular elements
+
+$ui-blur: 12px !default;
+$ui-shadow-deep: 0 16px 48px rgba(0, 0, 0, 0.18);
+$ui-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+$ui-transition: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+// --- Mixins ---
+@mixin ui-focus($c: $ui-brand) {
+  outline: none;
+  box-shadow: 0 0 0 3.5px rgba($c, 0.3);
+}
+
+@mixin ui-glass(
+  $bg: rgba(255, 255, 255, 0.5),
+  $bd: rgba(255, 255, 255, 0.7),
+  $blur: $ui-blur
+) {
+  background: $bg;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid $bd;
+  box-shadow: $ui-shadow-soft, inset 0 1px 1px rgba(255, 255, 255, 0.2);
+
+  // Fallback for older browsers
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// Colors
+$ui-brand: #007aff; // A vibrant blue, common in Samsung's OneUI
+$ui-bg: #f0f2f5; // A light, neutral background
+$ui-surface-1: rgba(255, 255, 255, 0.6); // Base for glass components
+$ui-surface-2: rgba(245, 245, 247, 0.7); // Slightly more opaque for interactions
+$ui-surface-3: rgba(235, 235, 240, 0.8); // Hover/active states
+$ui-text-primary: #1c1c1e;
+$ui-text-secondary: #8e8e93;
+$ui-border-color: rgba(0, 0, 0, 0.1);
+
+// Variables (có thể thêm nhiều biến màu sắc, font, v.v.)
+$sidebar-width: 256px; // 64 * 4px = 256px (tương đương w-64 trong Tailwind)
+$primary-color: $ui-brand;
+$primary-color-dark: #4178f0;
+$primary-color-light: #eff6ff; // Blue-50
+$text-color: $ui-text;
+$text-light-color: $ui-muted;
+$border-color: $ui-border-solid;
+$bg-light-gray: $ui-bg;
+
+$ui-red: #ff4d4f;
+$ui-green: #52c41a;
+$ui-yellow: #faad14;
+
+// Shadows - DEFINING THEM HERE
+$ui-shadow-small: 0 2px 8px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.05);
+$ui-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.08);
+$ui-shadow-large: 0 10px 30px rgba(0, 0, 0, 0.12), 0 5px 15px rgba(0, 0, 0, 0.1);
+$ui-shadow-inset: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+
+
+/* ============================================= */
+/* ==              Core Mixins                == */
+/* ============================================= */
+
+// ...existing mixins...
+
+.admin-dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $bg-light-gray;
+  background-image: radial-gradient(circle at 1% 1%, #dbeafe, transparent),
+    radial-gradient(circle at 99% 99%, #e0e7ff, transparent);
+}
+
+.admin-sidebar {
+  width: $sidebar-width;
+  background-color: rgba(248, 250, 252, 0.6); // slate-50 with alpha
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: $ui-shadow-soft;
+  position: sticky;
+  left: 0;
+  top: 1rem; // Give some space from the top
+  height: calc(100vh - 2rem); // Adjust height to fit the new top/bottom margin
+  margin: 1rem 0 1rem 1rem; // Add margin to detach from edges
+  border-radius: $ui-radius-large;
+  overflow: hidden; // Important for border-radius
+  display: flex;
+  flex-direction: column;
+  transition: $ui-transition;
+
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    background-color: #f8fafc;
+    margin: 0;
+    border-radius: 0;
+    height: 100vh;
+    top: 0;
+    border-right: 1px solid $border-color;
+  }
+}
+
+.admin-sidebar-header {
+  padding: 1.5rem; // p-6
+  border-bottom: 1px solid $ui-border;
+}
+
+.admin-sidebar-title {
+  font-size: 1.25rem; // text-xl
+  font-weight: 700;
+  color: $ui-text;
+}
+
+.admin-sidebar-subtitle {
+  color: $ui-muted;
+  font-size: 0.875rem; // text-sm
+  margin-top: 0.25rem; // mt-1
+}
+
+.admin-sidebar-nav {
+  padding: 0.75rem; // p-3
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.admin-sidebar-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; // space-y-2
+}
+
+.admin-sidebar-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem; // gap-3.5
+  padding: 0.875rem 1.25rem; // px-5 py-3.5
+  border-radius: $ui-radius-medium;
+  transition: all 180ms ease-in-out;
+  text-align: left;
+  border: 1px solid transparent;
+  font-weight: 500;
+
+  span {
+    line-height: 1.2;
+  }
+
+  // Default state
+  color: #334155; // slate-700
+  &:hover {
+    background-color: rgba($ui-brand, 0.1);
+    color: $ui-brand;
+  }
+
+  // Active state
+  &.active {
+    background: linear-gradient(120deg, $ui-brand 0%, $primary-color-dark 100%);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba($ui-brand, 0.3);
+
+    .admin-sidebar-menu-icon {
+      color: white;
+    }
+  }
+
+  .admin-sidebar-menu-icon {
+    transition: color 180ms ease-in-out;
+    flex-shrink: 0;
+  }
+}
+
+.admin-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // Fix for flexbox overflow
+}
+
+.admin-close-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; // gap-2
+  // Tailwind's `variant="outline"` styles would be applied here by your Button component
+  border-radius: $ui-radius-medium !important;
+  padding: 0.625rem 1rem !important;
+  font-weight: 500 !important;
+  border: 1px solid $ui-border-solid !important;
+  &:hover {
+    background-color: $ui-bg !important;
+  }
+  &:focus-visible {
+    @include ui-focus;
+  }
+}
+
+.admin-content-area {
+  background-color: transparent; // The layout provides the background
+  min-height: auto;
+  padding: 1rem;
+  flex-grow: 1;
+}
+
+// Analytics Specific Styles
+.admin-analytics-content {
+  padding: 0; // Removed padding, handled by content-area
+}
+
+.teacher-feedback-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem; // gap-6
+  margin-bottom: 1.5rem; // mb-6
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 1024px) { // lg
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-stat-card {
+  @include ui-glass(
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6)
+  );
+  border-radius: $ui-radius-large;
+  padding: 1.25rem; // p-5
+  position: relative;
+  overflow: hidden;
+  transition: $ui-transition;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $ui-shadow-deep;
+  }
+}
+
+.admin-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; // Align to top
+  margin-bottom: 0.75rem; // mb-3
+}
+
+.admin-stat-title {
+  font-size: 0.9rem; // ~text-sm
+  font-weight: 600;
+  color: $text-light-color;
+}
+
+.admin-stat-icon-wrapper {
+  padding: 0.75rem; // p-3
+  border-radius: $ui-radius-medium;
+  display: grid;
+  place-items: center;
+  color: white;
+
+  // Assign colors based on an attribute or nth-child
+  // Example using nth-child for demonstration
+  .admin-stats-grid > .admin-stat-card:nth-child(1) & { background: linear-gradient(135deg, #2563eb, #5aa0ff); }
+  .admin-stats-grid > .admin-stat-card:nth-child(2) & { background: linear-gradient(135deg, #db2777, #f472b6); }
+  .admin-stats-grid > .admin-stat-card:nth-child(3) & { background: linear-gradient(135deg, #16a34a, #4ade80); }
+  .admin-stats-grid > .admin-stat-card:nth-child(4) & { background: linear-gradient(135deg, #f97316, #fb923c); }
+}
+
+.admin-stat-value {
+  font-size: 2rem; // ~text-3xl
+  font-weight: 700;
+  color: $text-color;
+  letter-spacing: -0.8px;
+}
+
+.admin-stat-footer {
+  font-size: 0.875rem; // text-sm
+  color: $text-light-color;
+  margin-top: 0.5rem; // mt-2
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  // Example for positive/negative colors
+  &.positive { color: $ui-success; }
+  &.negative { color: $ui-danger; }
+}
+
+.admin-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem; // gap-6
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.admin-chart-card {
+  @include ui-glass(
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6)
+  );
+  border-radius: $ui-radius-large;
+  padding: 1.5rem;
+  transition: $ui-transition;
+  display: flex;
+  flex-direction: column;
+
+  .flex-grow {
+    flex-grow: 1;
+    min-height: 250px; // Set a minimum height for chart containers
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $ui-shadow-deep;
+  }
+}
+
+// Loading Spinner Styles
+.admin-loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 73px); // Chiều cao phù hợp sau header
+  flex-direction: column;
+  p {
+    margin-top: 1rem;
+    color: $ui-muted;
+    font-weight: 500;
+  }
+}
+
+.admin-spinner {
+  border: 4px solid rgba($ui-brand, 0.2);
+  border-top-color: $ui-brand;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Recharts Tooltip Customization
+.recharts-tooltip-wrapper {
+  .recharts-default-tooltip {
+    @include ui-glass(rgba(20, 20, 30, 0.8), rgba(255, 255, 255, 0.2), 8px);
+    border-radius: $ui-radius-medium !important;
+    box-shadow: $ui-shadow-deep !important;
+    padding: 0.5rem 1rem !important;
+    .recharts-tooltip-label {
+      color: white !important;
+      font-weight: 600 !important;
+    }
+  }
+}
+
+/* ============================================= */
+/* ==         UI Component Overrides          == */
+/* ============================================= */
+
+// Buttons
+.primary-button, .secondary-button, .action-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: $ui-radius-medium;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none !important; // Override link styles
+  box-shadow: $ui-shadow-small;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $ui-shadow-large;
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: $ui-shadow-small;
+  }
+}
+
+.primary-button {
+  background: $ui-brand;
+  color: white;
+
+  &:hover {
+    background: lighten($ui-brand, 5%);
+  }
+}
+
+.secondary-button {
+  background: $ui-surface-2;
+  color: $ui-text-primary;
+  border: 1px solid $ui-border-color;
+
+  &:hover {
+    background: $ui-surface-3;
+    border-color: darken($ui-border-color, 5%);
+  }
+}
+
+.action-button {
+  background: transparent;
+  color: $ui-text-secondary;
+  padding: 0.4rem;
+  border-radius: $ui-radius-round;
+  box-shadow: none;
+
+  &:hover {
+    background: $ui-surface-3;
+    color: $ui-text-primary;
+    transform: translateY(-1px);
+    box-shadow: none;
+  }
+
+  &.delete-button:hover {
+    background: rgba($ui-red, 0.1);
+    color: $ui-red;
+  }
+}
+
+// Form Inputs & Modals
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: $ui-radius-medium;
+  background-color: $ui-surface; // Changed from $ui-surface-2
+  border: 1px solid $ui-border-solid; // Changed from $ui-border-color
+  color: $ui-text-primary;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  // margin-bottom: 1rem; // Removed margin from here, will be handled by .form-group
+
+  &:focus {
+    outline: none;
+    border-color: $ui-brand;
+    box-shadow: 0 0 0 3px rgba($ui-brand, 0.2);
+  }
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.management-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.management-modal-content {
+  @include ui-glass;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem;
+  border-radius: $ui-radius-large;
+  box-shadow: $ui-shadow-large;
+}
+
+.management-card {
+  @include ui-glass(
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6)
+  );
+  border-radius: $ui-radius-large;
+  padding: 1.5rem;
+  transition: $ui-transition;
+  width: 100%;
+}
+
+.management-card-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $ui-border;
+  margin-bottom: 1.5rem;
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $ui-text;
+  }
+  .card-description {
+    font-size: 0.9rem;
+    color: $ui-muted;
+    margin-top: 0.25rem;
+  }
+}
+
+.management-table-wrapper {
+  overflow-x: auto;
+}
+
+.management-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid $ui-border;
+    vertical-align: middle;
+  }
+
+  th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: $ui-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    font-size: 0.9rem;
+    color: $ui-text;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease-in-out;
+    &:hover {
+      background-color: rgba($ui-brand, 0.04);
+    }
+  }
+}
+
+.management-table-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $ui-surface;
+  border: 1px solid $ui-border-solid;
+  border-radius: $ui-radius-medium;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+  width: 100%;
+  max-width: 320px;
+  transition: $ui-transition;
+
+  &:focus-within {
+    @include ui-focus;
+    border-color: transparent;
+  }
+
+  .search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    color: $ui-text;
+  }
+
+  .search-button {
+    padding: 0.5rem;
+    border-radius: $ui-radius-small;
+    background-color: $ui-brand;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: $primary-color-dark;
+    }
+  }
+}
+
+.status-badge {
+  border-radius: $ui-radius-round;
+  padding: 0.25rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &.active {
+    background-color: rgba($ui-success, 0.1);
+    color: darken($ui-success, 10%);
+  }
+
+  &.inactive {
+    background-color: rgba($ui-muted, 0.1);
+    color: $ui-muted;
+  }
+}
+
+// Flashcard Grid Layout
+.flashcard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+
+  .management-card {
+    width: auto; // Override the default 100% width to fit the grid
+  }
+
+  // Responsive adjustments
+  @media (max-width: 1280px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Rating Distribution Chart Styles */
+.rating-distribution-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+}
+
+.rating-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* 12px */
+  font-size: 0.875rem; /* 14px */
+}
+
+.rating-label {
+  color: #6b7280; /* gray-500 */
+  width: 3rem; /* 48px */
+  flex-shrink: 0;
+}
+
+.rating-bar-container {
+  flex-grow: 1;
+  background-color: #e5e7eb; /* gray-200 */
+  border-radius: 9999px;
+  height: 0.625rem; /* 10px */
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  background-color: #facc15; /* yellow-400 */
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.rating-count {
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+  width: 2rem; /* 32px */
+  text-align: right;
+  flex-shrink: 0;
+}
+
+body.global-dark-mode {
+  /* 1. Xóa nền sáng, đổi màu nền tổng thể */
+  .admin-dashboard-layout {
+    background-color: #0f172a !important; /* Đen sâu */
+    background-image: none !important;    /* Xóa sạch dải màu gradient sáng */
+  }
+
+  /* 2. Cột menu bên trái (Sidebar) */
+  .admin-sidebar {
+    background-color: rgba(30, 41, 59, 0.85) !important;
+    border-right-color: #334155 !important;
+  }
+  .admin-sidebar-header {
+    border-bottom-color: #334155 !important;
+  }
+  .admin-sidebar-title {
+    color: #f8fafc !important;
+  }
+  .admin-sidebar-subtitle {
+    color: #94a3b8 !important;
+  }
+  .admin-sidebar-menu-item {
+    color: #cbd5e1 !important;
+    &:hover {
+      background-color: rgba(56, 189, 248, 0.1) !important;
+      color: #38bdf8 !important;
+    }
+    &.active {
+      background: linear-gradient(120deg, #38bdf8 0%, #0284c7 100%) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4) !important;
+    }
+  }
+
+  /* 3. Các khối thẻ nổi (Cards, Modal, Charts) */
+  .admin-stat-card,
+  .admin-chart-card,
+  .management-card,
+  .management-modal-content {
+    background: #1e293b !important; /* Xám đen sang trọng */
+    border: 1px solid #334155 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Chữ trong thẻ */
+  .admin-stat-title,
+  .card-description,
+  .admin-stat-footer {
+    color: #94a3b8 !important;
+  }
+  .admin-stat-value,
+  .card-title {
+    color: #f8fafc !important;
+  }
+
+  /* 4. Bảng dữ liệu (Tables) */
+  .management-table {
+    th {
+      color: #94a3b8 !important;
+      border-bottom-color: #334155 !important;
+    }
+    td {
+      color: #cbd5e1 !important;
+      border-bottom-color: #334155 !important;
+    }
+    tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+  }
+
+  /* 5. Thanh Tìm kiếm & Ô nhập liệu (Form Inputs) */
+  .search-bar,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    background-color: #0f172a !important; /* Ép lõm xuống nền */
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+    
+    .search-input {
+      color: #f8fafc !important;
+      &::placeholder { color: #64748b !important; }
+    }
+
+    &:focus, &:focus-within {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    }
+  }
+
+  /* 6. Nút phụ và Nút đóng (Secondary & Close Buttons) */
+  .secondary-button,
+  .admin-close-button {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+    &:hover {
+      background-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+  }
+
+  /* 7. Đánh giá / Thanh Progress (Rating Distribution) */
+  .rating-label { color: #cbd5e1 !important; }
+  .rating-count { color: #f8fafc !important; }
+  .rating-bar-container { background-color: #334155 !important; }
+  
+  /* Text loading */
+  .admin-loading-spinner p {
+    color: #cbd5e1 !important;
+  }
+}

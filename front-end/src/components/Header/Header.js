@@ -1,4 +1,4 @@
-// src/components/Header/Header.jsx
+// src/components/Header/Header.js
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -24,6 +24,10 @@ import {
 import BookLogoModern from "../Footer/BookLogoModern";
 import "./Header.scss";
 
+// Import Icon và ThemeContext cho Dark Mode
+import { Sun, Moon } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
+
 const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
 const decodeJWT = (token) => {
@@ -46,6 +50,9 @@ const decodeJWT = (token) => {
 const Header = () => {
   const navigate = useNavigate();
   const googleButtonRef = useRef(null);
+
+  // Lấy trạng thái Dark Mode từ ThemeContext
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -108,7 +115,6 @@ const Header = () => {
         avatarRes.data?.url;
 
       if (avatar) {
-        console.log("✅ Avatar loaded:", avatar);
         setAvatarUrl(avatar);
         localStorage.setItem("avatarUrl", avatar);
       }
@@ -161,14 +167,13 @@ const Header = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // ✅ FIX: Load Google Identity Services và render button
+  // Load Google Identity Services
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
       console.warn("⚠️ GOOGLE_CLIENT_ID chưa được cấu hình");
       return;
     }
 
-    // Load script nếu chưa có
     if (!window.google) {
       const script = document.createElement("script");
       script.src = "https://accounts.google.com/gsi/client";
@@ -181,7 +186,7 @@ const Header = () => {
     }
   }, [GOOGLE_CLIENT_ID]);
 
-  // ✅ FIX: Initialize Google Sign-In
+  // Initialize Google Sign-In
   const initializeGoogleSignIn = () => {
     if (!window.google || !GOOGLE_CLIENT_ID) return;
 
@@ -193,7 +198,6 @@ const Header = () => {
         cancel_on_tap_outside: true,
       });
 
-      // Render button nếu có ref
       if (googleButtonRef.current) {
         window.google.accounts.id.renderButton(googleButtonRef.current, {
           theme: "outline",
@@ -208,72 +212,63 @@ const Header = () => {
     }
   };
 
-  // ✅ FIX: Render lại button khi modal mở
+  // Render lại button khi modal mở
   useEffect(() => {
     if (showAuthModal && activeTab === "login" && googleButtonRef.current) {
-      // Đợi modal render xong
       setTimeout(() => {
         initializeGoogleSignIn();
       }, 100);
     }
   }, [showAuthModal, activeTab]);
 
-  // ✅ Callback khi Google trả về credential
   const onGoogleCredential = async (response) => {
-  try {
-    const idToken = response?.credential;
- console.log(idToken);
+    try {
+      const idToken = response?.credential;
+      if (!idToken) {
+        showToastNotification("Không nhận được Google ID token.", "danger");
+        return;
+      }
+      const res = await loginGoogle(idToken);
+      const googlePayload = decodeJWT(idToken);
+      const { accountID, accessToken, expiresIn, role, redirectUrl } = res.data;
 
-    if (!idToken) {
-      showToastNotification("Không nhận được Google ID token.", "danger");
-      return;
+      const loggedUser = {
+        accountID,
+        accessToken,
+        expiresIn,
+        role,
+        username: googlePayload?.email?.split("@")[0] ?? "google-user",
+        email: googlePayload?.email
+      };
+
+      localStorage.setItem("user", JSON.stringify(loggedUser));
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("userName", loggedUser.username);
+
+      setUser(loggedUser);
+      setUsername(loggedUser.username);
+
+      await fetchUserProfile();
+
+      showToastNotification("🎉 Đăng nhập Google thành công!", "success");
+
+      setTimeout(() => {
+        setShowAuthModal(false);
+        const targetUrl = redirectUrl || "/home";
+        navigate(targetUrl);
+        window.location.href = targetUrl;
+      }, 800);
+
+    } catch (err) {
+      console.error("❌ Google login error:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Đăng nhập Google thất bại!";
+      showToastNotification(`❌ ${errorMsg}`, "danger");
     }
- const res = await loginGoogle(idToken);
-    // FE vẫn decode để hiển thị email user nếu thích (optional)
-    const googlePayload = decodeJWT(idToken);
-
-    // ✔ Gửi đúng token lên BE
-   
-
-    const { accountID, accessToken, expiresIn, role, redirectUrl } = res.data;
-
-    const loggedUser = {
-      accountID,
-      accessToken,
-      expiresIn,
-      role,
-      username: googlePayload?.email?.split("@")[0] ?? "google-user",
-      email: googlePayload?.email
-    };
-
-    localStorage.setItem("user", JSON.stringify(loggedUser));
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("userName", loggedUser.username);
-
-    setUser(loggedUser);
-    setUsername(loggedUser.username);
-
-    await fetchUserProfile();
-
-    showToastNotification("🎉 Đăng nhập Google thành công!", "success");
-
-    setTimeout(() => {
-      setShowAuthModal(false);
-      const targetUrl = redirectUrl || "/home";
-      navigate(targetUrl);
-      window.location.href = targetUrl;
-    }, 800);
-
-  } catch (err) {
-    console.error("❌ Google login error:", err);
-    const errorMsg =
-      err.response?.data?.message ||
-      err.response?.data?.error ||
-      err.message ||
-      "Đăng nhập Google thất bại!";
-    showToastNotification(`❌ ${errorMsg}`, "danger");
-  }
-};
+  };
 
   const resetLoginForm = () => {
     setEmailOrUsername("");
@@ -477,8 +472,36 @@ const Header = () => {
 
       <Navbar expand="lg" className="main-header">
         <Container>
-          <Navbar.Brand href="/" className="logo">
-            <span className="logo-icon"><BookLogoModern size={45} style={{verticalAlign: 'middle'}} /></span> <span>EnglishMaster</span>
+          <Navbar.Brand href="/" className="logo" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '0', left: '-6px', zIndex: 1, transform: 'rotate(-10deg)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+              </svg>
+            </div>
+
+            <div style={{ position: 'absolute', top: '-10px', left: '26px', zIndex: 2 }}>
+              <svg width="24" height="20" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="34" height="20" rx="6" fill="#52C478"/>
+                <path d="M10 20L12 26L16 20H10Z" fill="#52C478"/>
+                <text x="17" y="14" fill="white" fontSize="12" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">Hi!</text>
+              </svg>
+            </div>
+
+            <span className="logo-icon" style={{ position: 'relative', zIndex: 0, marginRight: '10px' }}>
+              <BookLogoModern size={48} style={{verticalAlign: 'middle'}} />
+            </span> 
+            
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.9, position: 'relative', paddingBottom: '4px', marginTop: '2px' }}>
+              <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#4285F4', letterSpacing: '-0.5px' }}>Easy</span>
+              <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#1e293b', letterSpacing: '-0.5px' }}>English</span>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2.5px', background: '#d0daf5', borderRadius: '4px' }}></div>
+            </div>
+
+            <div style={{ position: 'absolute', top: '5px', right: '-25px', display: 'flex', flexWrap: 'wrap', width: '20px', height: '20px' }}>
+               <div style={{ position: 'absolute', top: '0', left: '6px', width: '5px', height: '5px', backgroundColor: '#dbeafe', borderRadius: '50%' }}></div>
+               <div style={{ position: 'absolute', top: '10px', left: '0', width: '3px', height: '3px', backgroundColor: '#fef08a', borderRadius: '50%' }}></div>
+               <div style={{ position: 'absolute', top: '8px', left: '10px', width: '8px', height: '8px', backgroundColor: '#d1fae5', borderRadius: '50%' }}></div>
+            </div>
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -487,7 +510,19 @@ const Header = () => {
               <input type="text" placeholder="Tìm kiếm giảng viên, khóa ..." />
             </div>
 
-            <Nav className="header-actions ms-auto">
+            <Nav className="header-actions ms-auto align-items-center">
+              
+              {/* Nút Bật/Tắt Dark Mode */}
+              <Button 
+                variant="link" 
+                onClick={toggleDarkMode} 
+                className="theme-toggle-btn me-3 p-1 d-flex align-items-center justify-content-center"
+                style={{ border: 'none', background: 'transparent' }}
+                title={isDarkMode ? "Chuyển sang nền sáng" : "Chuyển sang nền tối"}
+              >
+                {isDarkMode ? <Sun size={24} color="#facc15" /> : <Moon size={24} color="#475569" />}
+              </Button>
+
               {!user ? (
                 <div className="auth-buttons">
                   <Button
@@ -535,6 +570,15 @@ const Header = () => {
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</Dropdown.Item>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Cài đặt</Dropdown.Item>
+                    
+                    {/* Link điều hướng cho Admin / Teacher */}
+                    {user.role === "ADMIN" && (
+                      <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>Trang quản trị</Dropdown.Item>
+                    )}
+                    {user.role === "TEACHER" && (
+                      <Dropdown.Item onClick={() => navigate("/teacher/dashboard")}>Trang giảng viên</Dropdown.Item>
+                    )}
+
                     <Dropdown.Divider />
                     <Dropdown.Item className="text-danger" onClick={handleLogout}>Đăng xuất</Dropdown.Item>
                   </Dropdown.Menu>
@@ -614,7 +658,7 @@ const Header = () => {
                 Đăng nhập
               </Button>
 
-              {/* ✅ FIX: Google Sign-In Button */}
+              {/* Google Sign-In Button */}
               <div
                 ref={googleButtonRef}
                 className="w-100 mb-2"

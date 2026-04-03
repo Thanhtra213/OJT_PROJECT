@@ -1,23 +1,45 @@
 // BookLogoModern.js
-// SVG logo: open book, modern, minimal, with color accent
 import React from "react";
 
 const BookLogoModern = ({ size = 40, style = {} }) => (
   <svg
     width={size}
     height={size}
-    viewBox="0 0 64 64"
+    viewBox="295 15 90 90"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     style={style}
   >
-    <rect width="64" height="64" rx="14" fill="#fff"/>
-    <path d="M16 48V20C16 17.7909 17.7909 16 20 16H32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round"/>
-    <path d="M48 48V20C48 17.7909 46.2091 16 44 16H32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round"/>
-    <path d="M32 16V48" stroke="#2196F3" strokeWidth="3" strokeLinecap="round"/>
-    <path d="M32 48C32 48 28 44 20 44C17.7909 44 16 45.7909 16 48" fill="#90CAF9"/>
-    <path d="M32 48C32 48 36 44 44 44C46.2091 44 48 45.7909 48 48" fill="#2196F3"/>
-    <ellipse cx="32" cy="24" rx="4" ry="2" fill="#2196F3" fillOpacity="0.15"/>
+    {/* 2 trang sách hình chữ nhật bo góc */}
+    <rect x="295" y="40" width="38" height="52" rx="6" fill="#10B981" />
+    <rect x="340" y="40" width="38" height="52" rx="6" fill="#059669" />
+
+    {/* Gáy sách ở giữa */}
+    <rect x="330" y="36" width="14" height="60" rx="4" fill="#065F46" />
+
+    {/* Dòng kẻ trang trái */}
+    <line x1="302" y1="54" x2="326" y2="54" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="302" y1="63" x2="326" y2="63" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="302" y1="72" x2="326" y2="72" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="302" y1="81" x2="322" y2="81" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+
+    {/* Dòng kẻ trang phải */}
+    <line x1="347" y1="54" x2="371" y2="54" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="347" y1="63" x2="371" y2="63" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="347" y1="72" x2="371" y2="72" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+    <line x1="347" y1="81" x2="367" y2="81" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+
+    {/* Mũ tốt nghiệp phía trên */}
+    {/* Mặt mũ hình thoi */}
+    <polygon points="337,18 362,28 337,38 312,28" fill="#1E293B" />
+    {/* Thân mũ hình trụ nhỏ */}
+    <rect x="330" y="28" width="14" height="10" rx="2" fill="#334155" />
+    {/* Dây mũ */}
+    <line x1="362" y1="28" x2="362" y2="44" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" />
+    <circle cx="362" cy="47" r="4" fill="#FBBF24" />
+
+    {/* Đường cong dưới sách (bóng nhẹ) */}
+    <ellipse cx="337" cy="98" rx="38" ry="5" fill="#10B981" opacity="0.15" />
   </svg>
 );
 
