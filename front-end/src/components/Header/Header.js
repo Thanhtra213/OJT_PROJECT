@@ -472,8 +472,36 @@ const Header = () => {
 
       <Navbar expand="lg" className="main-header">
         <Container>
-          <Navbar.Brand href="/" className="logo">
-            <span className="logo-icon"><BookLogoModern size={45} style={{verticalAlign: 'middle'}} /></span> <span>EnglishMaster</span>
+          <Navbar.Brand href="/" className="logo" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '0', left: '-6px', zIndex: 1, transform: 'rotate(-10deg)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+              </svg>
+            </div>
+
+            <div style={{ position: 'absolute', top: '-10px', left: '26px', zIndex: 2 }}>
+              <svg width="24" height="20" viewBox="0 0 34 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="34" height="20" rx="6" fill="#52C478"/>
+                <path d="M10 20L12 26L16 20H10Z" fill="#52C478"/>
+                <text x="17" y="14" fill="white" fontSize="12" fontWeight="bold" fontFamily="system-ui, sans-serif" textAnchor="middle">Hi!</text>
+              </svg>
+            </div>
+
+            <span className="logo-icon" style={{ position: 'relative', zIndex: 0, marginRight: '10px' }}>
+              <BookLogoModern size={48} style={{verticalAlign: 'middle'}} />
+            </span> 
+            
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.9, position: 'relative', paddingBottom: '4px', marginTop: '2px' }}>
+              <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#4285F4', letterSpacing: '-0.5px' }}>Easy</span>
+              <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#1e293b', letterSpacing: '-0.5px' }}>English</span>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2.5px', background: '#d0daf5', borderRadius: '4px' }}></div>
+            </div>
+
+            <div style={{ position: 'absolute', top: '5px', right: '-25px', display: 'flex', flexWrap: 'wrap', width: '20px', height: '20px' }}>
+               <div style={{ position: 'absolute', top: '0', left: '6px', width: '5px', height: '5px', backgroundColor: '#dbeafe', borderRadius: '50%' }}></div>
+               <div style={{ position: 'absolute', top: '10px', left: '0', width: '3px', height: '3px', backgroundColor: '#fef08a', borderRadius: '50%' }}></div>
+               <div style={{ position: 'absolute', top: '8px', left: '10px', width: '8px', height: '8px', backgroundColor: '#d1fae5', borderRadius: '50%' }}></div>
+            </div>
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
