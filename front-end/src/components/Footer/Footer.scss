@@ -64,11 +64,39 @@ $border-radius-pill: 99px;
       align-items: center;
       margin-bottom: 1.25rem;
 
-      .logo-text {
-        font-weight: 900 !important;
-        font-size: 1.5rem !important;
-        color: $text-dark; 
-        letter-spacing: -0.5px !important;
+      margin-left: 20px;
+
+      .logo-text-stacked {
+        display: flex;
+        flex-direction: column;
+        line-height: 0.95;
+        position: relative;
+        padding-bottom: 6px;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: #d0daf5;
+          border-radius: 4px;
+        }
+
+        .text-easy {
+          font-weight: 900;
+          font-size: 2.2rem;
+          color: #4285F4;
+          letter-spacing: -0.5px;
+        }
+
+        .text-english {
+          font-weight: 900;
+          font-size: 2.2rem;
+          color: #1e293b;
+          letter-spacing: -0.5px;
+        }
       }
     }
 

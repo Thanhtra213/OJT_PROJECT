@@ -16,12 +16,13 @@ const getAuthHeaders = () => {
   };
 };
 
-// 🟢 Lấy tất cả người dùng
+// 🟢 Lấy tất cả người dùng (ĐÃ SỬA LỖI MẤT DỮ LIỆU Ở ĐÂY 👇)
 export const getAllUsers = async () => {
   try {
     const res = await api.get("/users", { headers: getAuthHeaders() });
     console.log("📘 getAllUsers response:", res.data);
-    return res.data?.data || [];
+    // Nếu res.data là mảng thì trả về luôn, nếu không thì tìm trong res.data.data
+    return Array.isArray(res.data) ? res.data : (res.data?.data || []);
   } catch (err) {
     console.error("❌ getAllUsers error:", err.response?.data || err.message);
     throw err;

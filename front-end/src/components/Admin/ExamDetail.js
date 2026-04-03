@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container, Card, Button, Spinner, Alert, Form, ListGroup,
-  Modal, Badge, Row, Col, Accordion,
-} from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getQuizById,
@@ -14,7 +10,8 @@ import {
   parseAIQuizResponse, 
   convertAIQuestionsToImportFormat 
 } from "../../middleware/teacher/aiQuizAPI";
-import { Trash2, Plus, Check, Edit2, FolderPlus, Sparkles } from "lucide-react";
+import { Trash2, Plus, Check, Edit2, FolderPlus, Sparkles, X, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import "./admin-dashboard-styles.scss";
 
 const ExamDetail = () => {
   const { quizId } = useParams();
@@ -25,6 +22,8 @@ const ExamDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [correctAnswersMap, setCorrectAnswersMap] = useState({});
+
+  const [openGroups, setOpenGroups] = useState({}); // Trạng thái đóng/mở Accordion
 
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [editingGroupIndex, setEditingGroupIndex] = useState(null);
@@ -54,25 +53,29 @@ const ExamDetail = () => {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [editingQuestionGroupIndex, setEditingQuestionGroupIndex] = useState(null);
   const [editingQuestionIndex, setEditingQuestionIndex] = useState(null);
+  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Toast
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const showPopup = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+  };
+
   const fetchQuiz = async () => {
     try {
       setLoading(true);
       setError("");
       const data = await getQuizById(quizId);
-      console.log("📘 Admin getQuizById response:", data);
       setQuiz(data);
 
       let parsedGroups = [];
-      
-      // ✅ FIX: Chỉ parse từ 1 nguồn duy nhất, ưu tiên groups
       if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
-        // Nguồn 1: data.groups (ưu tiên cao nhất)
         parsedGroups = data.groups.map(g => ({
           groupOrder: g.groupOrder || 1,
           groupType: g.groupType || 1,
@@ -80,9 +83,7 @@ const ExamDetail = () => {
           assets: g.assets || [],
           questions: g.questions || []
         }));
-        console.log("✅ Parsed from data.groups");
       } else if (data.questionGroups && Array.isArray(data.questionGroups) && data.questionGroups.length > 0) {
-        // Nguồn 2: data.questionGroups (fallback)
         parsedGroups = data.questionGroups.map(g => ({
           groupOrder: g.groupOrder || 1,
           groupType: g.groupType || 1,
@@ -90,10 +91,7 @@ const ExamDetail = () => {
           assets: g.assets || [],
           questions: g.questions || []
         }));
-        console.log("✅ Parsed from data.questionGroups");
       } else if (data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
-        // Nguồn 3: data.questions (chỉ dùng khi HOÀN TOÀN không có groups)
-        // Chỉ tạo group ảo khi thực sự cần
         parsedGroups = [{
           groupOrder: 1,
           groupType: 1,
@@ -101,12 +99,15 @@ const ExamDetail = () => {
           assets: [],
           questions: data.questions
         }];
-        console.log("✅ Created virtual group from data.questions");
       }
-      // Nếu không có gì cả thì parsedGroups = [] (không tạo group ảo)
 
-      console.log("✅ Final parsed groups (admin):", parsedGroups);
       setGroups(parsedGroups);
+      
+      // Mặc định mở tất cả các group
+      const initialOpenState = {};
+      parsedGroups.forEach((_, idx) => initialOpenState[idx] = true);
+      setOpenGroups(initialOpenState);
+
     } catch (err) {
       console.error("❌ Admin fetchQuiz error:", err);
       setError(err.response?.data?.message || err.message || "Không thể tải quiz");
@@ -127,9 +128,13 @@ const ExamDetail = () => {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizId]);
 
-  // ============= FORMAT GROUPS FOR API =============
+  const toggleGroup = (idx) => {
+    setOpenGroups(prev => ({ ...prev, [idx]: !prev[idx] }));
+  };
+
   const formatGroupsForAPI = (groupsData) => ({
     groups: groupsData.map(g => ({
       groupOrder: g.groupOrder || 1,
@@ -163,40 +168,28 @@ const ExamDetail = () => {
     }))
   });
 
-  // ============= AI QUIZ GENERATOR =============
   const handleGenerateAIQuiz = async () => {
     if (!aiPrompt.trim()) {
-      setErrorMessage("❌ Vui lòng nhập prompt cho AI!");
+      setErrorMessage("Vui lòng nhập prompt cho AI!");
       setShowErrorModal(true);
       return;
     }
 
     try {
       setAiLoading(true);
-      console.log("🤖 Gọi AI generate với prompt:", aiPrompt);
       const aiResponse = await generateAIQuiz(aiPrompt);
 
-      console.log("✅ AI quiz generated (admin):", aiResponse);
-      if (aiResponse.error) {
-        throw new Error(aiResponse.error);
-      }
+      if (aiResponse.error) throw new Error(aiResponse.error);
 
       const parsedQuiz = parseAIQuizResponse(aiResponse);
-      console.log("📦 Parsed AI quiz:", parsedQuiz);
-
       if (!parsedQuiz.questions || !parsedQuiz.questions.length) {
         throw new Error("AI không tạo được câu hỏi. Vui lòng thử prompt khác.");
       }
 
       const convertedQuestions = convertAIQuestionsToImportFormat(parsedQuiz.questions);
-      console.log("🧩 Converted AI questions:", convertedQuestions);
-
       let updatedGroups = [...groups];
 
-      // TRƯỜNG HỢP 1: Quiz CHƯA CÓ GROUP NÀO → TẠO GROUP MỚI
       if (!updatedGroups.length) {
-        console.log("⚙️ Không có group nào, tạo group mới cho AI...");
-
         const newQuestions = convertedQuestions.map((q, i) => ({
           questionOrder: i + 1,
           questionType: q.questionType || 1,
@@ -219,13 +212,9 @@ const ExamDetail = () => {
         };
 
         updatedGroups = [newGroup];
-
-        // import lên backend
         const importPayload = formatGroupsForAPI(updatedGroups);
-        console.log("📤 AI Import payload (new group):", importPayload);
         await importQuizGroups(quizId, importPayload);
 
-        // lưu đáp án đúng
         const newAnswersMap = { ...correctAnswersMap };
         newQuestions.forEach((_, i) => {
           newAnswersMap[`0-${i}`] = convertedQuestions[i].correctIndex;
@@ -237,11 +226,10 @@ const ExamDetail = () => {
         setShowAIModal(false);
         setAiPrompt("");
         setAiSelectedGroupIndex(null);
-        alert(`✅ AI đã tạo ${convertedQuestions.length} câu hỏi trong Group 1!`);
+        showPopup(`AI đã tạo ${convertedQuestions.length} câu hỏi!`, "success");
         return;
       }
 
-      // TRƯỜNG HỢP 2: ĐÃ CÓ GROUP → THÊM CÂU HỎI VÀO GROUP ĐƯỢC CHỌN
       if (aiSelectedGroupIndex === null || aiSelectedGroupIndex < 0 || aiSelectedGroupIndex >= updatedGroups.length) {
         throw new Error("Group được chọn không hợp lệ.");
       }
@@ -263,9 +251,7 @@ const ExamDetail = () => {
       }));
 
       targetGroup.questions = [...(targetGroup.questions || []), ...newQuestions];
-
       const importData = formatGroupsForAPI(updatedGroups);
-      console.log("📤 AI Import payload (existing group):", importData);
       await importQuizGroups(quizId, importData);
 
       const newAnswersMap = { ...correctAnswersMap };
@@ -279,10 +265,9 @@ const ExamDetail = () => {
       setShowAIModal(false);
       setAiPrompt("");
       setAiSelectedGroupIndex(null);
-      alert(`✅ AI đã tạo ${convertedQuestions.length} câu hỏi!`);
+      showPopup(`AI đã tạo ${convertedQuestions.length} câu hỏi!`, "success");
     } catch (err) {
-      console.error("❌ Admin AI generate error:", err);
-      setErrorMessage("❌ " + (err.message || "Lỗi tạo đề bằng AI"));
+      setErrorMessage(err.message || "Lỗi tạo đề bằng AI");
       setShowErrorModal(true);
     } finally {
       setAiLoading(false);
@@ -291,7 +276,7 @@ const ExamDetail = () => {
 
   const handleSaveGroup = async () => {
     if (!newGroupInstruction.trim()) {
-      alert("❌ Vui lòng nhập instruction!");
+      showPopup("Vui lòng nhập instruction cho Group!", "danger");
       return;
     }
     try {
@@ -310,38 +295,34 @@ const ExamDetail = () => {
       }
       
       const importPayload = formatGroupsForAPI(updatedGroups);
-      console.log("📤 Save group payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
       
       await fetchQuiz();
       setShowGroupModal(false);
       setNewGroupInstruction("");
       setEditingGroupIndex(null);
-      alert("✅ Đã lưu group!");
+      showPopup("Đã lưu group!", "success");
     } catch (err) {
-      alert("❌ " + (err.response?.data?.message || err.message));
+      showPopup(err.response?.data?.message || err.message, "danger");
     } finally {
       setUploading(false);
     }
   };
 
   const handleDeleteGroup = async (idx) => {
-    if (!window.confirm(`Xóa group ${idx + 1}?`)) return;
+    if (!window.confirm(`Bạn có chắc muốn xóa group ${idx + 1} cùng toàn bộ câu hỏi bên trong?`)) return;
     try {
       setUploading(true);
       const updated = groups.filter((_, i) => i !== idx);
-      updated.forEach((g, i) => {
-        g.groupOrder = i + 1;
-      });
+      updated.forEach((g, i) => { g.groupOrder = i + 1; });
       
       const importPayload = formatGroupsForAPI(updated);
-      console.log("📤 Delete group payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
       
       await fetchQuiz();
-      alert("✅ Đã xóa!");
+      showPopup("Đã xóa Group!", "success");
     } catch (err) {
-      alert("❌ " + (err.response?.data?.message || err.message));
+      showPopup(err.response?.data?.message || err.message, "danger");
     } finally {
       setUploading(false);
     }
@@ -351,14 +332,14 @@ const ExamDetail = () => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 50 * 1024 * 1024) {
-      alert("❌ File quá lớn!");
+      showPopup("File quá lớn! Tối đa 50MB.", "danger");
       return;
     }
 
     const typeMap = { 1: "audio", 2: "image", 5: "video" };
     const typeString = typeMap[assetType];
     if (!typeString) {
-      alert("❌ Loại không hỗ trợ!");
+      showPopup("Loại file không hỗ trợ!", "danger");
       return;
     }
 
@@ -375,13 +356,12 @@ const ExamDetail = () => {
       });
       
       const importPayload = formatGroupsForAPI(updatedGroups);
-      console.log("📤 Upload asset payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
       
       await fetchQuiz();
-      alert("✅ Upload thành công!");
+      showPopup("Upload thành công!", "success");
     } catch (err) {
-      alert("❌ " + err.message);
+      showPopup(err.message, "danger");
     } finally {
       setUploadingAsset(false);
       e.target.value = "";
@@ -390,7 +370,7 @@ const ExamDetail = () => {
 
   const handleAddTextAsset = async () => {
     if (!textAssetContent.trim()) {
-      alert("❌ Nhập nội dung!");
+      showPopup("Vui lòng nhập nội dung!", "danger");
       return;
     }
     try {
@@ -401,14 +381,10 @@ const ExamDetail = () => {
         target.assets[editingAssetIndex].contentText = textAssetContent.trim();
       } else {
         if (!target.assets) target.assets = [];
-        target.assets.push({
-          assetType: 3,
-          contentText: textAssetContent.trim(),
-        });
+        target.assets.push({ assetType: 3, contentText: textAssetContent.trim() });
       }
       
       const importPayload = formatGroupsForAPI(updatedGroups);
-      console.log("📤 Text asset payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
       
       await fetchQuiz();
@@ -417,9 +393,9 @@ const ExamDetail = () => {
       setTextAssetGroupIndex(null);
       setIsEditingAsset(false);
       setEditingAssetIndex(null);
-      alert("✅ Đã lưu!");
+      showPopup("Lưu Text Asset thành công!", "success");
     } catch (err) {
-      alert("❌ " + err.message);
+      showPopup(err.message, "danger");
     } finally {
       setUploading(false);
     }
@@ -433,25 +409,24 @@ const ExamDetail = () => {
       setIsEditingAsset(true);
       setShowTextAssetModal(true);
     } else {
-      alert("⚠️ Để sửa file, vui lòng xóa và upload lại.");
+      showPopup("Để sửa file (ảnh/âm thanh), vui lòng xóa và upload lại.", "warning");
     }
   };
 
   const removeAsset = async (gIdx, aIdx) => {
-    if (!window.confirm("Xóa?")) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa asset này?")) return;
     try {
       setUploading(true);
       const updated = [...groups];
       updated[gIdx].assets.splice(aIdx, 1);
       
       const importPayload = formatGroupsForAPI(updated);
-      console.log("📤 Remove asset payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
       
       await fetchQuiz();
-      alert("✅ Đã xóa");
+      showPopup("Đã xóa Asset!", "success");
     } catch (err) {
-      alert("❌ " + err.message);
+      showPopup(err.message, "danger");
     } finally {
       setUploading(false);
     }
@@ -495,7 +470,7 @@ const ExamDetail = () => {
       }
       setImportQuestions(updated);
     } else {
-      alert("Phải có ít nhất 2 đáp án!");
+      showPopup("Câu hỏi phải có ít nhất 2 đáp án!", "warning");
     }
   };
 
@@ -542,7 +517,6 @@ const ExamDetail = () => {
       target.questions = [...(target.questions || []), ...newQs];
       
       const importPayload = formatGroupsForAPI(updated);
-      console.log("📤 Import questions payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
 
       const newAnsMap = { ...correctAnswersMap };
@@ -556,9 +530,9 @@ const ExamDetail = () => {
       setShowImportModal(false);
       setImportQuestions([{ content: "", options: ["", ""], correctIndex: 0, scoreWeight: 1.0 }]);
       setSelectedGroupIndex(null);
-      alert("✅ Đã thêm!");
+      showPopup("Thêm câu hỏi thành công!", "success");
     } catch (err) {
-      setErrorMessage("❌ " + (err.response?.data?.message || err.message));
+      setErrorMessage(err.response?.data?.message || err.message);
       setShowErrorModal(true);
     } finally {
       setUploading(false);
@@ -606,7 +580,6 @@ const ExamDetail = () => {
       };
       
       const importPayload = formatGroupsForAPI(updated);
-      console.log("📤 Edit question payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
 
       const newAnsMap = { ...correctAnswersMap };
@@ -619,9 +592,9 @@ const ExamDetail = () => {
       setEditingQuestion(null);
       setEditingQuestionGroupIndex(null);
       setEditingQuestionIndex(null);
-      alert("✅ Đã cập nhật!");
+      showPopup("Cập nhật câu hỏi thành công!", "success");
     } catch (err) {
-      setErrorMessage("❌ " + (err.response?.data?.message || err.message));
+      setErrorMessage(err.response?.data?.message || err.message);
       setShowErrorModal(true);
     } finally {
       setUploading(false);
@@ -639,7 +612,6 @@ const ExamDetail = () => {
       });
       
       const importPayload = formatGroupsForAPI(updated);
-      console.log("📤 Delete question payload:", importPayload);
       await importQuizGroups(quizId, importPayload);
 
       const newAnsMap = { ...correctAnswersMap };
@@ -650,9 +622,9 @@ const ExamDetail = () => {
       await fetchQuiz();
       setShowDeleteModal(false);
       setDeleteTarget(null);
-      alert("✅ Đã xóa!");
+      showPopup("Đã xóa câu hỏi!", "success");
     } catch (err) {
-      setErrorMessage("❌ " + (err.response?.data?.message || err.message));
+      setErrorMessage(err.response?.data?.message || err.message);
       setShowErrorModal(true);
     } finally {
       setUploading(false);
@@ -661,22 +633,18 @@ const ExamDetail = () => {
 
   const renderAsset = (asset, idx) => {
     if (!asset) return null;
-    const style = { maxWidth: "100%", marginBottom: "10px" };
+    const style = { maxWidth: "100%", marginBottom: "10px", borderRadius: '8px' };
     switch (asset.assetType) {
-      case 1:
-        return <audio key={idx} controls src={asset.url} style={style} className="w-100" />;
-      case 2:
-        return <img key={idx} src={asset.url} alt={asset.caption} style={style} className="img-fluid" />;
+      case 1: return <audio key={idx} controls src={asset.url} style={{...style, width: '100%'}} />;
+      case 2: return <img key={idx} src={asset.url} alt={asset.caption} style={style} />;
       case 3:
         return (
-          <div key={idx} className="p-3 bg-light rounded">
-            <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>{asset.contentText}</p>
+          <div key={idx} style={{ background: 'var(--bg-page)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            <p style={{ whiteSpace: "pre-wrap", margin: 0, color: 'var(--text-body)' }}>{asset.contentText}</p>
           </div>
         );
-      case 5:
-        return <video key={idx} controls src={asset.url} style={style} className="w-100" />;
-      default:
-        return null;
+      case 5: return <video key={idx} controls src={asset.url} style={{...style, width: '100%'}} />;
+      default: return null;
     }
   };
 
@@ -684,579 +652,486 @@ const ExamDetail = () => {
 
   if (loading) {
     return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" variant="primary" />
-        <p className="mt-3 text-muted">Đang tải...</p>
-      </Container>
+      <div className="admin-loading-spinner" style={{ minHeight: '60vh' }}>
+        <div className="admin-spinner"></div>
+        <p>Đang tải chi tiết bài kiểm tra...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Container className="py-4">
-        <Alert variant="danger">{error}</Alert>
-        <Button variant="link" onClick={() => navigate(-1)}>← Quay lại</Button>
-      </Container>
+      <div className="management-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+        <p style={{ color: '#ec4899', fontSize: '1.2rem', fontWeight: 800 }}>{error}</p>
+        <button className="secondary-button mt-4" onClick={() => navigate(-1)}>
+          <ArrowLeft size={18} /> Quay lại
+        </button>
+      </div>
     );
   }
 
   return (
-    <Container className="py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div className="management-card">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, background: toast.type === 'success' ? 'var(--mint)' : '#ec4899', color: '#fff', padding: '12px 24px', borderRadius: '99px', fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+          {toast.message}
+        </div>
+      )}
+
+      {/* HEADER CHI TIẾT */}
+      <div className="management-header" style={{ marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <Button variant="link" onClick={() => navigate(-1)} className="p-0 mb-2">← Quay lại</Button>
-          <h3 className="text-primary mb-0">{quiz?.title || "Quiz Detail"}</h3>
-          {quiz?.description && <p className="text-muted mt-2">{quiz.description}</p>}
-          <div className="mt-2">
-            <Badge bg="info" className="me-2">{groups.length} groups</Badge>
-            <Badge bg="secondary">{getTotalQuestions()} câu</Badge>
+          <button className="secondary-button mb-3" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> 
+            <span>Quay lại danh sách</span>
+          </button>
+          <h2 className="card-title" style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>
+            {quiz?.title || "Chi tiết bài kiểm tra"}
+          </h2>
+          {quiz?.description && <p className="card-description mt-2">{quiz.description}</p>}
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+            <span className="status-badge" style={{ backgroundColor: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>{groups.length} Groups</span>
+            <span className="status-badge" style={{ backgroundColor: 'rgba(0,200,150,0.12)', color: 'var(--primary)' }}>{getTotalQuestions()} Câu hỏi</span>
           </div>
         </div>
-        <div className="d-flex gap-2">
-          <Button
-            variant="success"
-            onClick={() => {
-              setEditingGroupIndex(null);
-              setNewGroupInstruction("");
-              setShowGroupModal(true);
-            }}
+
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="secondary-button" onClick={() => { setEditingGroupIndex(null); setNewGroupInstruction(""); setShowGroupModal(true); }}>
+            <FolderPlus size={18} /> Thêm Group
+          </button>
+          <button 
+            className="primary-button" 
+            style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", boxShadow: "0 4px 15px rgba(102, 126, 234, 0.3)" }}
+            onClick={() => { setAiSelectedGroupIndex(groups.length > 0 ? 0 : null); setAiPrompt(""); setShowAIModal(true); }}
           >
-            <FolderPlus size={18} className="me-2" />
-            Thêm Group
-          </Button>
-          <Button
-            variant="gradient"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              border: "none",
-              color: "white",
-            }}
-            onClick={() => {
-              if (groups.length === 0) {
-                setAiSelectedGroupIndex(null);
-              } else {
-                setAiSelectedGroupIndex(0);
-              }
-              setAiPrompt("");
-              setShowAIModal(true);
-            }}
-          >
-            <Sparkles size={18} className="me-2" />
-            Tạo đề bằng AI
-          </Button>
+            <Sparkles size={18} /> Tạo bằng AI
+          </button>
         </div>
       </div>
 
+      {/* DANH SÁCH GROUPS */}
       {groups.length > 0 ? (
-        <Accordion defaultActiveKey="0">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {groups.map((group, gIdx) => (
-            <Accordion.Item eventKey={gIdx.toString()} key={gIdx}>
-              <Accordion.Header>
-                <div className="d-flex justify-content-between align-items-center w-100 pe-3">
-                  <div>
-                    <strong>Group {gIdx + 1}:</strong> {group.instruction}
-                  </div>
-                  <div>
-                    <Badge bg="info" className="me-2">{group.assets?.length || 0} assets</Badge>
-                    <Badge bg="secondary">{group.questions?.length || 0} câu</Badge>
-                  </div>
+            <div key={gIdx} className="interactive-card" style={{ padding: '1.25rem' }}>
+              
+              {/* Group Header (Click để đóng mở) */}
+              <div 
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                onClick={() => toggleGroup(gIdx)}
+              >
+                <div>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0 }}>
+                    Group {gIdx + 1}: <span style={{ color: 'var(--text-body)', fontWeight: 600 }}>{group.instruction}</span>
+                  </h4>
                 </div>
-              </Accordion.Header>
-              <Accordion.Body>
-                <div className="d-flex gap-2 mb-3">
-                  <Button
-                    variant="outline-primary"
-                    size="sm"
-                    onClick={() => {
-                      setEditingGroupIndex(gIdx);
-                      setNewGroupInstruction(group.instruction);
-                      setShowGroupModal(true);
-                    }}
-                  >
-                    <Edit2 size={14} className="me-1" />
-                    Sửa
-                  </Button>
-                  <Button
-                    variant="outline-success"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedGroupIndex(gIdx);
-                      setImportQuestions([
-                        { content: "", options: ["", ""], correctIndex: 0, scoreWeight: 1.0 },
-                      ]);
-                      setShowImportModal(true);
-                    }}
-                  >
-                    <Plus size={14} className="me-1" />
-                    Thêm câu hỏi
-                  </Button>
-                  <Button
-                    variant="outline-info"
-                    size="sm"
-                    onClick={() => {
-                      setAiSelectedGroupIndex(gIdx);
-                      setAiPrompt("");
-                      setShowAIModal(true);
-                    }}
-                  >
-                    <Sparkles size={14} className="me-1" />
-                    AI
-                  </Button>
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => handleDeleteGroup(gIdx)}
-                  >
-                    <Trash2 size={14} className="me-1" />
-                    Xóa
-                  </Button>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span className="status-badge" style={{ backgroundColor: 'var(--bg-page)', color: 'var(--text-muted)' }}>{group.assets?.length || 0} Assets</span>
+                  <span className="status-badge" style={{ backgroundColor: 'var(--bg-page)', color: 'var(--text-muted)' }}>{group.questions?.length || 0} Câu</span>
+                  {openGroups[gIdx] ? <ChevronUp size={20} color="var(--text-muted)" /> : <ChevronDown size={20} color="var(--text-muted)" />}
                 </div>
+              </div>
 
-                <Card className="mb-3 border-primary">
-                  <Card.Header className="bg-light d-flex justify-content-between">
-                    <strong>📎 Assets</strong>
-                    <div className="d-flex gap-2">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        disabled={uploadingAsset}
-                        onClick={() => document.getElementById(`audio-${gIdx}`).click()}
-                      >
-                        Audio
-                      </Button>
-                      <input
-                        id={`audio-${gIdx}`}
-                        type="file"
-                        accept="audio/*"
-                        hidden
-                        onChange={(e) => handleAssetUpload(e, 1, gIdx)}
-                      />
-                      <Button
-                        variant="outline-success"
-                        size="sm"
-                        disabled={uploadingAsset}
-                        onClick={() => document.getElementById(`image-${gIdx}`).click()}
-                      >
-                        Image
-                      </Button>
-                      <input
-                        id={`image-${gIdx}`}
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        onChange={(e) => handleAssetUpload(e, 2, gIdx)}
-                      />
-                      <Button
-                        variant="outline-info"
-                        size="sm"
-                        disabled={uploadingAsset}
-                        onClick={() => document.getElementById(`video-${gIdx}`).click()}
-                      >
-                        Video
-                      </Button>
-                      <input
-                        id={`video-${gIdx}`}
-                        type="file"
-                        accept="video/*"
-                        hidden
-                        onChange={(e) => handleAssetUpload(e, 5, gIdx)}
-                      />
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => {
-                          setTextAssetGroupIndex(gIdx);
-                          setTextAssetContent("");
-                          setIsEditingAsset(false);
-                          setShowTextAssetModal(true);
-                        }}
-                      >
-                        Text
-                      </Button>
+              {/* Nội dung bên trong Group */}
+              {openGroups[gIdx] && (
+                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1.5px solid var(--border)' }}>
+                  {/* Thanh công cụ Group */}
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                    <button className="secondary-button" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => { setEditingGroupIndex(gIdx); setNewGroupInstruction(group.instruction); setShowGroupModal(true); }}>
+                      <Edit2 size={14} /> Sửa Group
+                    </button>
+                    <button className="secondary-button" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', color: 'var(--primary)', borderColor: 'var(--primary)' }} onClick={() => { setSelectedGroupIndex(gIdx); setImportQuestions([{ content: "", options: ["", ""], correctIndex: 0, scoreWeight: 1.0 }]); setShowImportModal(true); }}>
+                      <Plus size={14} /> Thêm câu hỏi
+                    </button>
+                    <button className="secondary-button" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', color: '#667eea', borderColor: '#667eea' }} onClick={() => { setAiSelectedGroupIndex(gIdx); setAiPrompt(""); setShowAIModal(true); }}>
+                      <Sparkles size={14} /> Dùng AI
+                    </button>
+                    <button className="action-button" style={{ color: '#ec4899', background: 'rgba(236,72,153,0.1)', marginLeft: 'auto' }} onClick={() => handleDeleteGroup(gIdx)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
+                  {/* Vùng Assets */}
+                  <div style={{ background: 'var(--bg-page)', padding: '1.25rem', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <strong style={{ color: 'var(--text-dark)' }}>📎 Phương tiện (Assets)</strong>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button className="action-button" title="Thêm Audio" disabled={uploadingAsset} onClick={() => document.getElementById(`audio-${gIdx}`).click()}><span role="img" aria-label="audio">🎧</span></button>
+                        <input id={`audio-${gIdx}`} type="file" accept="audio/*" hidden onChange={(e) => handleAssetUpload(e, 1, gIdx)} />
+                        
+                        <button className="action-button" title="Thêm Ảnh" disabled={uploadingAsset} onClick={() => document.getElementById(`image-${gIdx}`).click()}><span role="img" aria-label="image">🖼️</span></button>
+                        <input id={`image-${gIdx}`} type="file" accept="image/*" hidden onChange={(e) => handleAssetUpload(e, 2, gIdx)} />
+                        
+                        <button className="action-button" title="Thêm Video" disabled={uploadingAsset} onClick={() => document.getElementById(`video-${gIdx}`).click()}><span role="img" aria-label="video">🎬</span></button>
+                        <input id={`video-${gIdx}`} type="file" accept="video/*" hidden onChange={(e) => handleAssetUpload(e, 5, gIdx)} />
+                        
+                        <button className="action-button" title="Thêm Text" onClick={() => { setTextAssetGroupIndex(gIdx); setTextAssetContent(""); setIsEditingAsset(false); setShowTextAssetModal(true); }}><span role="img" aria-label="text">📝</span></button>
+                      </div>
                     </div>
-                  </Card.Header>
-                  <Card.Body>
+
                     {group.assets && group.assets.length > 0 ? (
-                      group.assets.map((a, aIdx) => (
-                        <Card key={aIdx} className="mb-3">
-                          <Card.Body>
-                            <div className="d-flex justify-content-between mb-2">
-                              <Badge bg="info">
-                                {a.assetType === 1 ? "audio" : a.assetType === 2 ? "image" : a.assetType === 3 ? "text" : "video"}
-                              </Badge>
-                              <div className="d-flex gap-2">
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  onClick={() => handleEditAsset(gIdx, aIdx, a)}
-                                >
-                                  <Edit2 size={14} />
-                                </Button>
-                                <Button
-                                  variant="outline-danger"
-                                  size="sm"
-                                  onClick={() => removeAsset(gIdx, aIdx)}
-                                >
-                                  <Trash2 size={14} />
-                                </Button>
+                      <div style={{ display: 'grid', gap: '1rem' }}>
+                        {group.assets.map((a, aIdx) => (
+                          <div key={aIdx} style={{ background: 'var(--bg-card)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                              <span className="status-badge" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-dark)' }}>
+                                {a.assetType === 1 ? "Audio" : a.assetType === 2 ? "Image" : a.assetType === 3 ? "Text" : "Video"}
+                              </span>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button className="action-button" onClick={() => handleEditAsset(gIdx, aIdx, a)}><Edit2 size={14} /></button>
+                                <button className="action-button" style={{ color: '#ec4899' }} onClick={() => removeAsset(gIdx, aIdx)}><Trash2 size={14} /></button>
                               </div>
                             </div>
                             {renderAsset(a, aIdx)}
-                          </Card.Body>
-                        </Card>
-                      ))
+                          </div>
+                        ))}
+                      </div>
                     ) : (
-                      <p className="text-muted text-center mb-0">Chưa có assets</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Group này chưa có hình ảnh, âm thanh hay đoạn văn nào.</p>
                     )}
-                  </Card.Body>
-                </Card>
+                  </div>
 
-                <h6 className="mb-3">Câu hỏi</h6>
-                {group.questions && group.questions.length > 0 ? (
-                  group.questions.map((q, qIdx) => {
-                    const opts = q.options || q.choices || [];
-                    return (
-                      <Card key={qIdx} className="mb-3 shadow-sm">
-                        <Card.Body>
-                          <div className="d-flex justify-content-end gap-2 mb-2">
-                            <Button
-                              variant="outline-primary"
-                              size="sm"
-                              onClick={() => handleEditQuestion(gIdx, qIdx, q)}
-                            >
-                              <Edit2 size={14} className="me-1" />
-                              Sửa
-                            </Button>
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              onClick={() => {
-                                setDeleteTarget({ groupIndex: gIdx, questionIndex: qIdx });
-                                setShowDeleteModal(true);
-                              }}
-                            >
-                              <Trash2 size={14} className="me-1" />
-                              Xóa
-                            </Button>
-                          </div>
-                          <div className="d-flex justify-content-between mb-3">
-                            <h6 className="mb-1">
-                              <Badge bg="primary" className="me-2">Câu {qIdx + 1}</Badge>
-                              {q.content}
-                            </h6>
-                            <Badge bg="info">Điểm: {q.scoreWeight || 1}</Badge>
-                          </div>
-                          {opts.length > 0 && (
-                            <div>
-                              <p className="text-muted mb-2"><small>Đáp án:</small></p>
-                              <ListGroup>
-                                {opts.map((opt, oIdx) => {
-                                  const isCorrectAPI = opt.isCorrect === true || opt.correct === true;
-                                  const isCorrectLocal = correctAnswersMap[`${gIdx}-${qIdx}`] === oIdx;
-                                  const isCorrect = isCorrectAPI || isCorrectLocal;
-                                  return (
-                                    <ListGroup.Item
-                                      key={oIdx}
-                                      variant={isCorrect ? "success" : ""}
-                                      className="d-flex align-items-center"
-                                      style={isCorrect ? { backgroundColor: "#d1e7dd", borderColor: "#badbcc" } : {}}
-                                    >
-                                      {isCorrect && <Check size={18} className="me-2 text-success fw-bold" />}
-                                      <span className="me-2 fw-bold">{String.fromCharCode(65 + oIdx)}.</span>
-                                      <span className={isCorrect ? "fw-bold text-success" : ""}>{opt.content || opt}</span>
-                                      {isCorrect && <Badge bg="success" className="ms-auto">✓ Đúng</Badge>}
-                                    </ListGroup.Item>
-                                  );
-                                })}
-                              </ListGroup>
+                  {/* Vùng Câu hỏi */}
+                  <div>
+                    <h5 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '1rem' }}>📝 Danh sách câu hỏi</h5>
+                    {group.questions && group.questions.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {group.questions.map((q, qIdx) => {
+                          const opts = q.options || q.choices || [];
+                          return (
+                            <div key={qIdx} style={{ background: 'var(--bg-page)', padding: '1.25rem', borderRadius: '16px', border: '1px solid var(--border)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <div style={{ fontWeight: 800, color: 'var(--text-dark)', fontSize: '1.05rem', lineHeight: 1.5 }}>
+                                  <span style={{ color: 'var(--primary)', marginRight: '8px' }}>Câu {qIdx + 1}.</span> 
+                                  {q.content}
+                                </div>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                                  <span className="status-badge" style={{ backgroundColor: 'rgba(245,158,11,0.12)', color: '#f59e0b' }}>{q.scoreWeight || 1} đ</span>
+                                  <button className="action-button" onClick={() => handleEditQuestion(gIdx, qIdx, q)}><Edit2 size={16} /></button>
+                                  <button className="action-button" style={{ color: '#ec4899' }} onClick={() => { setDeleteTarget({ groupIndex: gIdx, questionIndex: qIdx }); setShowDeleteModal(true); }}><Trash2 size={16} /></button>
+                                </div>
+                              </div>
+                              
+                              {/* RENDER CÁC LỰA CHỌN VÀ HIGHLIGHT ĐÁP ÁN ĐÚNG */}
+                              {opts.length > 0 && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                  {opts.map((opt, oIdx) => {
+                                    const isCorrectAPI = opt.isCorrect === true || opt.correct === true;
+                                    const isCorrectLocal = correctAnswersMap[`${gIdx}-${qIdx}`] === oIdx;
+                                    const isCorrect = isCorrectAPI || isCorrectLocal;
+                                    
+                                    return (
+                                      <div key={oIdx} style={{ 
+                                        padding: '0.85rem 1.25rem', 
+                                        borderRadius: '12px', 
+                                        border: isCorrect ? '2px solid var(--primary)' : '1.5px solid var(--border)',
+                                        background: isCorrect ? 'var(--primary-light)' : 'var(--bg-card)',
+                                        display: 'flex', 
+                                        alignItems: 'center',
+                                        boxShadow: isCorrect ? '0 4px 15px rgba(0, 200, 150, 0.15)' : 'none',
+                                        transition: 'all 0.2s ease'
+                                      }}>
+                                        <span style={{ fontWeight: 900, marginRight: '12px', color: isCorrect ? 'var(--primary)' : 'var(--text-muted)', fontSize: '1.1rem' }}>
+                                          {String.fromCharCode(65 + oIdx)}.
+                                        </span>
+                                        <span style={{ fontWeight: isCorrect ? 800 : 600, color: isCorrect ? 'var(--primary)' : 'var(--text-body)', fontSize: '1rem' }}>
+                                          {opt.content || opt}
+                                        </span>
+                                        
+                                        {/* Huy hiệu ĐÁP ÁN ĐÚNG Nổi bật */}
+                                        {isCorrect && (
+                                          <div style={{ 
+                                            marginLeft: 'auto', 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: '6px', 
+                                            color: 'var(--primary)', 
+                                            fontWeight: 800, 
+                                            fontSize: '0.85rem', 
+                                            backgroundColor: 'var(--bg-card)', 
+                                            padding: '4px 10px', 
+                                            borderRadius: '99px', 
+                                            border: '1px solid var(--primary)' 
+                                          }}>
+                                            <Check size={16} strokeWidth={3} /> ĐÁP ÁN ĐÚNG
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
                             </div>
-                          )}
-                        </Card.Body>
-                      </Card>
-                    );
-                  })
-                ) : (
-                  <Alert variant="info" className="text-center">
-                    <p className="mb-0">Chưa có câu hỏi</p>
-                  </Alert>
-                )}
-              </Accordion.Body>
-            </Accordion.Item>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0, fontStyle: 'italic' }}>Chưa có câu hỏi nào trong Group này.</p>
+                    )}
+                  </div>
+
+                </div>
+              )}
+            </div>
           ))}
-        </Accordion>
+        </div>
       ) : (
-        <Card className="text-center py-5">
-          <Card.Body>
-            <Alert variant="info" className="mb-3">
-              <strong>Quiz chưa có group</strong>
-              <p className="mb-0 mt-2">
-                Bạn có thể dùng nút <b>"Tạo đề bằng AI"</b> để tạo group và câu hỏi tự động, hoặc tạo group thủ công.
-              </p>
-            </Alert>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setEditingGroupIndex(null);
-                setNewGroupInstruction("");
-                setShowGroupModal(true);
-              }}
-            >
-              <FolderPlus size={18} className="me-2" />
-              Tạo Group
-            </Button>
-          </Card.Body>
-        </Card>
+        <div style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--bg-page)', borderRadius: '20px', border: '1.5px dashed var(--border)' }}>
+          <FolderPlus size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem' }} />
+          <h4 style={{ color: 'var(--text-dark)', fontWeight: 800 }}>Đề thi này chưa có nội dung</h4>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Tạo group thủ công hoặc dùng AI để sinh câu hỏi tự động.</p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button className="secondary-button" onClick={() => { setEditingGroupIndex(null); setNewGroupInstruction(""); setShowGroupModal(true); }}>
+              Tạo Group thủ công
+            </button>
+            <button className="primary-button" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" }} onClick={() => { setAiSelectedGroupIndex(null); setAiPrompt(""); setShowAIModal(true); }}>
+              <Sparkles size={18} /> Tạo bằng AI
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Modals */}
-      <Modal show={showGroupModal} onHide={() => setShowGroupModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>{editingGroupIndex !== null ? "Sửa Group" : "Thêm Group"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Group>
-            <Form.Label>Instruction</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="VD: Listen to the audio and answer"
-              value={newGroupInstruction}
-              onChange={(e) => setNewGroupInstruction(e.target.value)}
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowGroupModal(false)} disabled={uploading}>Hủy</Button>
-          <Button variant="primary" onClick={handleSaveGroup} disabled={uploading}>
-            {uploading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang lưu...</> : editingGroupIndex !== null ? "Lưu" : "Tạo"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* ================= MODALS ================= */}
 
-      <Modal show={showAIModal} onHide={() => setShowAIModal(false)} size="lg" centered>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <Sparkles size={24} className="me-2" style={{ color: "#667eea" }} />
-            Tạo đề bằng AI
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Alert variant="info" className="mb-3">
-            <strong>💡 Hướng dẫn:</strong>
-            <ul className="mb-0 mt-2">
-              <li>Mô tả chi tiết nội dung bạn muốn tạo đề (chủ đề, level, số lượng câu, dạng câu hỏi...)</li>
-              <li>Ví dụ: <em>"Create 10 questions about Present Continuous Tense for intermediate level"</em></li>
-            </ul>
-          </Alert>
-
-          {groups.length > 0 && (
-            <Form.Group className="mb-3">
-              <Form.Label>Chọn Group để thêm câu hỏi</Form.Label>
-              <Form.Select
-                value={aiSelectedGroupIndex !== null ? aiSelectedGroupIndex : 0}
-                onChange={(e) => setAiSelectedGroupIndex(parseInt(e.target.value))}
-              >
-                {groups.map((g, i) => (
-                  <option key={i} value={i}>Group {i + 1}: {g.instruction}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          )}
-
-          <Form.Group>
-            <Form.Label>Prompt cho AI</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={5}
-              placeholder="Ví dụ: Create 10 multiple choice questions about English grammar..."
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              disabled={aiLoading}
-            />
-          </Form.Group>
-
-          {aiLoading && (
-            <Alert variant="warning" className="mt-3 mb-0">
-              <div className="d-flex align-items-center">
-                <Spinner animation="border" size="sm" className="me-2" />
-                <span>AI đang tạo đề... Vui lòng đợi (có thể mất 30-60 giây)</span>
-              </div>
-            </Alert>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAIModal(false)} disabled={aiLoading}>Hủy</Button>
-          <Button
-            variant="primary"
-            onClick={handleGenerateAIQuiz}
-            disabled={!aiPrompt.trim() || aiLoading}
-            style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" }}
-          >
-            {aiLoading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang tạo...</> : <><Sparkles size={18} className="me-2" />Tạo bằng AI</>}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showImportModal} onHide={() => setShowImportModal(false)} size="xl" centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm câu hỏi vào Group {selectedGroupIndex !== null ? selectedGroupIndex + 1 : ""}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
-          {selectedGroupIndex !== null && groups[selectedGroupIndex] && (
-            <Alert variant="info" className="mb-4">
-              <strong>📁 Group:</strong> {groups[selectedGroupIndex].instruction}
-            </Alert>
-          )}
-          {importQuestions.map((q, qIdx) => (
-            <Card key={qIdx} className="mb-3">
-              <Card.Header className="d-flex justify-content-between">
-                <strong>Câu {qIdx + 1}</strong>
-                {importQuestions.length > 1 && (
-                  <Button variant="link" size="sm" className="text-danger p-0" onClick={() => removeQuestion(qIdx)}>
-                    <Trash2 size={16} />
-                  </Button>
-                )}
-              </Card.Header>
-              <Card.Body>
-                <Form.Group className="mb-3">
-                  <Form.Label>Nội dung</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    placeholder="Nhập câu hỏi..."
-                    value={q.content}
-                    onChange={(e) => updateQuestion(qIdx, "content", e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Điểm</Form.Label>
-                  <Form.Control
-                    type="number"
-                    min="1"
-                    step="0.01"
-                    value={q.scoreWeight}
-                    onChange={(e) => updateQuestion(qIdx, "scoreWeight", parseFloat(e.target.value) || 1)}
-                    style={{ width: "100px" }}
-                  />
-                </Form.Group>
-                <Form.Label>Đáp án</Form.Label>
-                {q.options.map((opt, oIdx) => (
-                  <Row key={oIdx} className="mb-2 align-items-center">
-                    <Col xs={1}>
-                      <Form.Check type="radio" name={`correct-${qIdx}`} checked={q.correctIndex === oIdx} onChange={() => setCorrectAnswer(qIdx, oIdx)} />
-                    </Col>
-                    <Col xs={1} className="text-center"><strong>{String.fromCharCode(65 + oIdx)}.</strong></Col>
-                    <Col xs={9}>
-                      <Form.Control type="text" placeholder={`Đáp án ${String.fromCharCode(65 + oIdx)}`} value={opt} onChange={(e) => updateOption(qIdx, oIdx, e.target.value)} />
-                    </Col>
-                    <Col xs={1}>
-                      {q.options.length > 2 && (
-                        <Button variant="link" size="sm" className="text-danger p-0" onClick={() => removeOption(qIdx, oIdx)}>
-                          <Trash2 size={16} />
-                        </Button>
-                      )}
-                    </Col>
-                  </Row>
-                ))}
-                <Button variant="outline-secondary" size="sm" onClick={() => addOption(qIdx)}>
-                  <Plus size={16} className="me-1" />Thêm đáp án
-                </Button>
-              </Card.Body>
-            </Card>
-          ))}
-          <Button variant="outline-primary" onClick={addQuestion} className="w-100">
-            <Plus size={18} className="me-2" />Thêm câu hỏi
-          </Button>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowImportModal(false)} disabled={uploading}>Hủy</Button>
-          <Button variant="primary" onClick={handleImport} disabled={uploading}>
-            {uploading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang lưu...</> : `Lưu ${importQuestions.length} câu`}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg" centered>
-        <Modal.Header closeButton><Modal.Title>Sửa câu hỏi</Modal.Title></Modal.Header>
-        <Modal.Body>
-          {editingQuestion && (
-            <div>
-              <Form.Group className="mb-3">
-                <Form.Label>Nội dung</Form.Label>
-                <Form.Control as="textarea" rows={2} value={editingQuestion.content} onChange={(e) => setEditingQuestion({ ...editingQuestion, content: e.target.value })} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Điểm</Form.Label>
-                <Form.Control type="number" min="1" step="0.01" value={editingQuestion.scoreWeight} onChange={(e) => setEditingQuestion({ ...editingQuestion, scoreWeight: parseFloat(e.target.value) || 1 })} style={{ width: "100px" }} />
-              </Form.Group>
-              <Form.Label>Đáp án</Form.Label>
-              {editingQuestion.options.map((opt, oIdx) => (
-                <Row key={oIdx} className="mb-2 align-items-center">
-                  <Col xs={1}>
-                    <Form.Check type="radio" name="correct-edit" checked={editingQuestion.correctIndex === oIdx} onChange={() => setEditingQuestion({ ...editingQuestion, correctIndex: oIdx })} />
-                  </Col>
-                  <Col xs={1} className="text-center"><strong>{String.fromCharCode(65 + oIdx)}.</strong></Col>
-                  <Col xs={9}>
-                    <Form.Control type="text" value={opt} onChange={(e) => { const newOpts = [...editingQuestion.options]; newOpts[oIdx] = e.target.value; setEditingQuestion({ ...editingQuestion, options: newOpts }); }} />
-                  </Col>
-                  <Col xs={1}>
-                    {editingQuestion.options.length > 2 && (
-                      <Button variant="link" size="sm" className="text-danger p-0" onClick={() => { if (editingQuestion.options.length > 2) { const newOpts = editingQuestion.options.filter((_, i) => i !== oIdx); const newCIdx = editingQuestion.correctIndex >= newOpts.length ? newOpts.length - 1 : editingQuestion.correctIndex; setEditingQuestion({ ...editingQuestion, options: newOpts, correctIndex: newCIdx }); } }}>
-                        <Trash2 size={16} />
-                      </Button>
-                    )}
-                  </Col>
-                </Row>
-              ))}
-              <Button variant="outline-secondary" size="sm" onClick={() => setEditingQuestion({ ...editingQuestion, options: [...editingQuestion.options, ""] })}>
-                <Plus size={16} className="me-1" />Thêm đáp án
-              </Button>
+      {/* Modal Group */}
+      {showGroupModal && (
+        <div className="management-modal-overlay" onClick={() => setShowGroupModal(false)}>
+          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">{editingGroupIndex !== null ? "Sửa Group" : "Thêm Group"}</h3>
+              <button className="action-button" onClick={() => setShowGroupModal(false)}><X size={20} /></button>
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)} disabled={uploading}>Hủy</Button>
-          <Button variant="primary" onClick={handleSaveEdit} disabled={uploading}>
-            {uploading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang lưu...</> : "Lưu"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            <div className="modal-body-custom">
+              <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Yêu cầu (Instruction)</label>
+              <textarea className="form-textarea" rows={3} placeholder="VD: Đọc đoạn văn và chọn đáp án đúng..." value={newGroupInstruction} onChange={(e) => setNewGroupInstruction(e.target.value)} />
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowGroupModal(false)} disabled={uploading}>Hủy</button>
+              <button className="primary-button" onClick={handleSaveGroup} disabled={uploading}>
+                {uploading ? "Đang lưu..." : editingGroupIndex !== null ? "Lưu thay đổi" : "Tạo Group"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>⚠️ Xác nhận xóa</Modal.Title></Modal.Header>
-        <Modal.Body>
-          <Alert variant="warning">Bạn chắc chắn muốn xóa câu hỏi này?<br /><strong>Không thể hoàn tác!</strong></Alert>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={uploading}>Hủy</Button>
-          <Button variant="danger" onClick={handleDeleteQuestion} disabled={uploading}>
-            {uploading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang xóa...</> : "Xóa"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modal Text Asset */}
+      {showTextAssetModal && (
+        <div className="management-modal-overlay" onClick={() => { setShowTextAssetModal(false); setTextAssetContent(""); setTextAssetGroupIndex(null); setIsEditingAsset(false); setEditingAssetIndex(null); }}>
+          <div className="management-modal-content" style={{ maxWidth: '800px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">{isEditingAsset ? "Sửa đoạn văn" : "Thêm đoạn văn (Text)"}</h3>
+              <button className="action-button" onClick={() => setShowTextAssetModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom">
+              <textarea className="form-textarea" rows={12} placeholder="Dán nội dung đoạn văn bài đọc vào đây..." value={textAssetContent} onChange={(e) => setTextAssetContent(e.target.value)} style={{ fontSize: '1rem', lineHeight: 1.6 }} />
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowTextAssetModal(false)} disabled={uploading}>Hủy</button>
+              <button className="primary-button" onClick={handleAddTextAsset} disabled={!textAssetContent.trim() || uploading}>
+                {uploading ? "Đang lưu..." : "Lưu đoạn văn"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Modal show={showTextAssetModal} onHide={() => { setShowTextAssetModal(false); setTextAssetContent(""); setTextAssetGroupIndex(null); setIsEditingAsset(false); setEditingAssetIndex(null); }} size="lg" centered>
-        <Modal.Header closeButton><Modal.Title>{isEditingAsset ? "Sửa Text" : "Thêm Text"}</Modal.Title></Modal.Header>
-        <Modal.Body>
-          <Form.Group>
-            <Form.Label>Nội dung Text</Form.Label>
-            <Form.Control as="textarea" rows={12} placeholder="Nhập nội dung..." value={textAssetContent} onChange={(e) => setTextAssetContent(e.target.value)} style={{ fontSize: "14px" }} />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => { setShowTextAssetModal(false); setTextAssetContent(""); setTextAssetGroupIndex(null); setIsEditingAsset(false); setEditingAssetIndex(null); }} disabled={uploading}>Hủy</Button>
-          <Button variant="primary" onClick={handleAddTextAsset} disabled={!textAssetContent.trim() || uploading}>
-            {uploading ? <><Spinner as="span" animation="border" size="sm" className="me-2" />Đang lưu...</> : isEditingAsset ? "Cập nhật" : "Thêm"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Modal Import Câu Hỏi (Thủ công) */}
+      {showImportModal && (
+        <div className="management-modal-overlay" onClick={() => setShowImportModal(false)}>
+          <div className="management-modal-content" style={{ maxWidth: '900px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">Thêm câu hỏi vào Group {selectedGroupIndex !== null ? selectedGroupIndex + 1 : ""}</h3>
+              <button className="action-button" onClick={() => setShowImportModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom" style={{ maxHeight: '65vh', overflowY: 'auto', paddingRight: '10px' }}>
+              {importQuestions.map((q, qIdx) => (
+                <div key={qIdx} style={{ background: 'var(--bg-page)', padding: '1.5rem', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h5 style={{ margin: 0, fontWeight: 900, color: 'var(--primary-dark)' }}>Câu hỏi {qIdx + 1}</h5>
+                    {importQuestions.length > 1 && (
+                      <button className="action-button" style={{ color: '#ec4899' }} onClick={() => removeQuestion(qIdx)}><Trash2 size={16} /></button>
+                    )}
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ flexGrow: 1 }}>
+                      <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Nội dung câu hỏi</label>
+                      <textarea className="form-textarea" rows={2} placeholder="Nhập câu hỏi..." value={q.content} onChange={(e) => updateQuestion(qIdx, "content", e.target.value)} />
+                    </div>
+                    <div style={{ width: '100px' }}>
+                      <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Điểm</label>
+                      <input type="number" className="form-input" min="1" step="0.5" value={q.scoreWeight} onChange={(e) => updateQuestion(qIdx, "scoreWeight", parseFloat(e.target.value) || 1)} />
+                    </div>
+                  </div>
 
-      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>❌ Lỗi</Modal.Title></Modal.Header>
-        <Modal.Body><Alert variant="danger" className="mb-0">{errorMessage}</Alert></Modal.Body>
-        <Modal.Footer><Button variant="secondary" onClick={() => setShowErrorModal(false)}>Đóng</Button></Modal.Footer>
-      </Modal>
-    </Container>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Các đáp án (Chọn 1 đáp án đúng)</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {q.options.map((opt, oIdx) => (
+                      <div key={oIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input type="radio" style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }} name={`correct-${qIdx}`} checked={q.correctIndex === oIdx} onChange={() => setCorrectAnswer(qIdx, oIdx)} />
+                        <span style={{ fontWeight: 800, color: 'var(--text-dark)', width: '25px', textAlign: 'center' }}>{String.fromCharCode(65 + oIdx)}.</span>
+                        <input type="text" className="form-input" style={{ flexGrow: 1 }} placeholder={`Nhập đáp án ${String.fromCharCode(65 + oIdx)}...`} value={opt} onChange={(e) => updateOption(qIdx, oIdx, e.target.value)} />
+                        {q.options.length > 2 && (
+                          <button className="action-button" style={{ color: '#ec4899' }} onClick={() => removeOption(qIdx, oIdx)}><Trash2 size={16} /></button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button className="secondary-button" style={{ marginTop: '1rem', padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => addOption(qIdx)}>
+                    <Plus size={14} /> Thêm lựa chọn
+                  </button>
+                </div>
+              ))}
+              <button className="secondary-button" style={{ width: '100%', borderStyle: 'dashed', color: 'var(--primary)' }} onClick={addQuestion}>
+                <Plus size={18} /> Thêm khối câu hỏi mới
+              </button>
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowImportModal(false)} disabled={uploading}>Hủy</button>
+              <button className="primary-button" onClick={handleImport} disabled={uploading}>
+                {uploading ? "Đang lưu..." : `Lưu ${importQuestions.length} câu`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Sửa Câu Hỏi */}
+      {showEditModal && editingQuestion && (
+        <div className="management-modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="management-modal-content" style={{ maxWidth: '800px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">Sửa câu hỏi</h3>
+              <button className="action-button" onClick={() => setShowEditModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom">
+              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ flexGrow: 1 }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Nội dung câu hỏi</label>
+                  <textarea className="form-textarea" rows={2} value={editingQuestion.content} onChange={(e) => setEditingQuestion({ ...editingQuestion, content: e.target.value })} />
+                </div>
+                <div style={{ width: '100px' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Điểm</label>
+                  <input type="number" className="form-input" min="1" step="0.5" value={editingQuestion.scoreWeight} onChange={(e) => setEditingQuestion({ ...editingQuestion, scoreWeight: parseFloat(e.target.value) || 1 })} />
+                </div>
+              </div>
+              <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase' }}>Các đáp án (Chọn 1 đáp án đúng)</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {editingQuestion.options.map((opt, oIdx) => (
+                  <div key={oIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input type="radio" style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }} name="correct-edit" checked={editingQuestion.correctIndex === oIdx} onChange={() => setEditingQuestion({ ...editingQuestion, correctIndex: oIdx })} />
+                    <span style={{ fontWeight: 800, color: 'var(--text-dark)', width: '25px', textAlign: 'center' }}>{String.fromCharCode(65 + oIdx)}.</span>
+                    <input type="text" className="form-input" style={{ flexGrow: 1 }} value={opt} onChange={(e) => { const newOpts = [...editingQuestion.options]; newOpts[oIdx] = e.target.value; setEditingQuestion({ ...editingQuestion, options: newOpts }); }} />
+                    {editingQuestion.options.length > 2 && (
+                      <button className="action-button" style={{ color: '#ec4899' }} onClick={() => { if (editingQuestion.options.length > 2) { const newOpts = editingQuestion.options.filter((_, i) => i !== oIdx); const newCIdx = editingQuestion.correctIndex >= newOpts.length ? newOpts.length - 1 : editingQuestion.correctIndex; setEditingQuestion({ ...editingQuestion, options: newOpts, correctIndex: newCIdx }); } }}><Trash2 size={16} /></button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button className="secondary-button" style={{ marginTop: '1rem', padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => setEditingQuestion({ ...editingQuestion, options: [...editingQuestion.options, ""] })}>
+                <Plus size={14} /> Thêm lựa chọn
+              </button>
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowEditModal(false)} disabled={uploading}>Hủy</button>
+              <button className="primary-button" onClick={handleSaveEdit} disabled={uploading}>
+                {uploading ? "Đang lưu..." : "Cập nhật câu hỏi"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Sinh Đề Bằng AI */}
+      {showAIModal && (
+        <div className="management-modal-overlay" onClick={() => setShowAIModal(false)}>
+          <div className="management-modal-content" style={{ maxWidth: '800px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#667eea' }}>
+                <Sparkles size={24} /> Tạo câu hỏi bằng AI
+              </h3>
+              <button className="action-button" onClick={() => setShowAIModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom">
+              <div style={{ background: 'rgba(102, 126, 234, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(102, 126, 234, 0.2)', marginBottom: '1.5rem', color: '#4c51bf', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                <strong>💡 Hướng dẫn:</strong> Mô tả chi tiết nội dung bạn muốn tạo (chủ đề, độ khó, số lượng câu).<br/>
+                <em>Ví dụ: "Create 5 multiple choice questions about Present Perfect for beginners."</em>
+              </div>
+
+              {groups.length > 0 && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Thêm vào Group</label>
+                  <select className="form-select" value={aiSelectedGroupIndex !== null ? aiSelectedGroupIndex : 0} onChange={(e) => setAiSelectedGroupIndex(parseInt(e.target.value))}>
+                    {groups.map((g, i) => (
+                      <option key={i} value={i}>Group {i + 1}: {g.instruction}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Yêu cầu (Prompt)</label>
+              <textarea className="form-textarea" rows={5} placeholder="Nhập yêu cầu tạo đề tiếng Anh bằng AI..." value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} disabled={aiLoading} />
+
+              {aiLoading && (
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#fffbeb', borderRadius: '12px', color: '#d97706', display: 'flex', gap: '0.75rem', fontWeight: 700 }}>
+                  <div className="admin-spinner" style={{ width: '20px', height: '20px', borderTopColor: '#d97706' }}></div>
+                  AI đang xử lý... Việc này có thể mất từ 30-60 giây.
+                </div>
+              )}
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowAIModal(false)} disabled={aiLoading}>Đóng</button>
+              <button className="primary-button" onClick={handleGenerateAIQuiz} disabled={!aiPrompt.trim() || aiLoading} style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" }}>
+                {aiLoading ? "Đang xử lý..." : "Tạo bằng AI"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Lỗi */}
+      {showErrorModal && (
+        <div className="management-modal-overlay" onClick={() => setShowErrorModal(false)}>
+          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title" style={{ color: '#ec4899' }}>❌ Thông báo Lỗi</h3>
+              <button className="action-button" onClick={() => setShowErrorModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom">
+              <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-dark)' }}>{errorMessage}</p>
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" onClick={() => setShowErrorModal(false)}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Xóa */}
+      {showDeleteModal && (
+        <div className="management-modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title" style={{ color: '#ec4899' }}>⚠️ Xác nhận xóa</h3>
+              <button className="action-button" onClick={() => setShowDeleteModal(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body-custom">
+              <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-dark)' }}>Bạn có chắc chắn muốn xóa câu hỏi này không? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowDeleteModal(false)} disabled={uploading}>Hủy</button>
+              <button className="primary-button" style={{ background: '#ec4899' }} onClick={handleDeleteQuestion} disabled={uploading}>
+                {uploading ? "Đang xóa..." : "Xóa vĩnh viễn"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 };
 

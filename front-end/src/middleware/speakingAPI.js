@@ -24,21 +24,20 @@ export const generateSpeakingPrompt = async () => {
 };
 
 // ✅ API gửi file audio + prompt để chấm điểm
-export const submitSpeakingAnswer = async (audioFile, promptContent) => {
+export const submitSpeakingAnswer = async (audioFile, promptId, sendToTeacher = false) => {
   const formData = new FormData();
   formData.append("File", audioFile);
-  formData.append("PromptContent", promptContent);
-
+  formData.append("PromptId", promptId);
+  formData.append("SendToTeacher", sendToTeacher);
   try {
     const res = await axios.post(`${API_URL}/submit`, formData, {
       headers: {
         ...getAuthHeaders(),
-        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;
   } catch (err) {
-    console.error("Error submitting speaking answer:", err);
+    console.error("Error submitting speaking answer:", err.response?.data);
     throw err;
   }
 };
