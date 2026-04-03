@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.DTOs.Quizs;
+using EasyEnglish_API.DTOs.Quizs;
 using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Interfaces.Membership;
 using EasyEnglish_API.Models;
@@ -24,7 +24,8 @@ namespace EasyEnglish_API.Services
             QuizID = q.QuizId,
             Title = q.Title,
             Description = q.Description,
-            QuizType = q.QuizType
+            QuizType = q.QuizType,
+            IsActive = q.IsActive
         };
 
         private static QuizDetailDto ToDetailDto(QuizAlias q)
@@ -42,7 +43,8 @@ namespace EasyEnglish_API.Services
                         ? qs.Options.Select(o => new OptionDto
                         {
                             OptionID = o.OptionId,
-                            Content = o.Content
+                            Content = o.Content,
+                            IsCorrect = o.IsCorrect
                         }).ToList()
                         : new List<OptionDto>()
                 }).ToList()
@@ -67,7 +69,8 @@ namespace EasyEnglish_API.Services
                             ? qs.Options.Select(o => new OptionDto
                             {
                                 OptionID = o.OptionId,
-                                Content = o.Content
+                                Content = o.Content,
+                                IsCorrect = o.IsCorrect
                             }).ToList()
                             : new List<OptionDto>()
                     }).ToList()
@@ -80,6 +83,7 @@ namespace EasyEnglish_API.Services
                 Title = q.Title,
                 Description = q.Description,
                 QuizType = q.QuizType,
+                IsActive = q.IsActive,
                 Groups = groups
             };
         }
@@ -284,7 +288,7 @@ namespace EasyEnglish_API.Services
         public async Task<List<QuizDto>> GetTeacherQuizzesByCourseAsync(int teacherId, int courseId)
         {
             if (!await _repo.TeacherOwnsCourseAsync(teacherId, courseId)) throw new Exception("Forbidden");
-            return (await _repo.GetQuizzesByCourseAsync(courseId)).Select(ToDto).ToList();
+            return (await _repo.GetAllQuizzesByCourseAsync(courseId)).Select(ToDto).ToList();
         }
 
         public async Task<QuizDetailDto> GetTeacherQuizDetail(int teacherId, int quizId)

@@ -28,7 +28,7 @@ const getAuthHeader = () => {
 export const getTeacherCourses = async () => {
   try {
     const res = await axios.get(API_BASE, getAuthHeader());
-    return res.data?.courses || res.data || [];
+    return res.data?.EasyEnglish_API || res.data?.courses || res.data?.Courses || res.data || [];
   } catch (err) {
     console.error("❌ Lỗi lấy danh sách khóa học:", err.response || err);
     throw new Error(err.response?.data?.message || "Không thể tải danh sách khóa học");

@@ -25,7 +25,7 @@
     box-shadow: 0 2px 8px rgba(108, 71, 255, 0.07);
     border: none;
     margin-bottom: 1.5rem;
-    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
 
     &:hover {
       transform: translateY(-5px);
@@ -41,15 +41,15 @@
 
     .method-card {
       border: 1px solid #dee2e6;
-
+      
       &.url-method {
         border-left: 4px solid #dc3545;
       }
-
+      
       &.upload-method {
         border-left: 4px solid #198754;
       }
-
+      
       .method-title {
         color: #000;
         font-size: 0.95rem;
@@ -58,15 +58,15 @@
 
     .best-practice-card {
       border: 1px solid #dee2e6;
-
+      
       &.do-card {
         border-left: 4px solid #198754;
       }
-
+      
       &.dont-card {
         border-left: 4px solid #dc3545;
       }
-
+      
       .practice-title {
         color: #000;
         font-size: 0.95rem;
@@ -76,7 +76,7 @@
     .tech-specs-card {
       background-color: #f8f9fa !important;
       border: 1px solid #dee2e6;
-
+      
       .specs-title {
         font-size: 0.9rem;
         font-weight: bold;
@@ -88,7 +88,7 @@
       .faq-item {
         border: none;
         margin-bottom: 0.5rem;
-
+        
         .faq-header {
           background: white;
           border: 1px solid #dee2e6;
@@ -96,28 +96,28 @@
           padding: 1rem;
           border-radius: 8px;
           transition: background-color 0.2s;
-
+          
           &:hover {
             background-color: #f8f9fa;
           }
-
+          
           .faq-question {
             color: #000;
             margin: 0;
             font-weight: 600;
           }
-
+          
           .faq-icon {
             color: #000;
             font-size: 0.8rem;
             transition: transform 0.2s;
-
+            
             &.open {
               transform: rotate(90deg);
             }
           }
         }
-
+        
         .faq-answer {
           background-color: #f8f9fa;
           border: 1px solid #dee2e6;
@@ -133,7 +133,7 @@
       background: white !important;
       border: 1px solid #dee2e6;
       color: #000;
-
+      
       .support-title {
         color: #000;
       }
@@ -148,8 +148,7 @@
     }
   }
 
-  .method-list,
-  .practice-list {
+  .method-list, .practice-list {
     li {
       margin-bottom: 0.25rem;
       line-height: 1.4;
@@ -175,7 +174,7 @@
   .guide-page {
     .guide-header {
       flex-direction: column;
-
+      
       .close-button {
         margin-left: 0;
         margin-top: 1rem;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace EasyEnglish_API.Models;
@@ -11,7 +11,7 @@ public partial class CourseChapter
 
     public string ChapterName { get; set; } = null!;
 
-    public virtual Course Course { get; set; } = null!;
+    public virtual Course? Course { get; set; }
 
     public virtual ICollection<CourseVideo> CourseVideos { get; set; } = new List<CourseVideo>();
 

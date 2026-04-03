@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace EasyEnglish_API.Models;
@@ -29,5 +29,5 @@ public partial class Course
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 
-    public virtual Teacher Teacher { get; set; } = null!;
+    public virtual Teacher? Teacher { get; set; }
 }

@@ -51,7 +51,7 @@ const CreateLesson = () => {
       });
 
       alert("Lưu bài học thành công!");
-      navigate("/dashboard");
+      navigate("/teacher/dashboard");
     } catch (error) {
       console.error("Lỗi khi lưu bài học:", error);
       alert("Không thể lưu bài học!");
@@ -67,7 +67,7 @@ const CreateLesson = () => {
           <p>Tạo nội dung học tập cho học viên của bạn</p>
         </Col>
         <Col className="text-end header-buttons">
-          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/dashboard")}>
+          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/teacher/dashboard")}>
             <FontAwesomeIcon icon={faTimes} className="me-1" /> Hủy
           </Button>
           <Button variant="primary" onClick={handleSave}>
