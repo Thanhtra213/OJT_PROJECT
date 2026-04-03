@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash, Edit } from "lucide-react";
+import { Plus, Trash, Edit, X } from "lucide-react";
 import { getAllPlans, createPlan, updatePlan, deletePlan } from "../../middleware/admin/planAdminAPI";
-import "./management-styles.scss";
+import "./admin-dashboard-styles.scss";
 
 export function VoucherManagement() {
   const [plans, setPlans] = useState([]);
@@ -21,18 +21,19 @@ export function VoucherManagement() {
 
   const showPopup = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
   };
 
   useEffect(() => {
     loadPlans();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPlans = async () => {
     try {
       setIsLoading(true);
       const data = await getAllPlans();
-      setPlans(data);
+      setPlans(data || []);
     } catch (error) {
       showPopup("Không thể tải danh sách gói đăng ký", "error");
     } finally {
@@ -41,6 +42,10 @@ export function VoucherManagement() {
   };
 
   const handleCreatePlan = async () => {
+    if (!newPlan.planCode || !newPlan.name) {
+      showPopup("Vui lòng nhập mã và tên gói", "error");
+      return;
+    }
     try {
       await createPlan(newPlan);
       showPopup("Tạo gói đăng ký thành công!", "success");
@@ -65,6 +70,10 @@ export function VoucherManagement() {
   };
 
   const handleUpdatePlan = async () => {
+    if (!newPlan.planCode || !newPlan.name) {
+      showPopup("Vui lòng nhập mã và tên gói", "error");
+      return;
+    }
     try {
       await updatePlan(editingPlan.planID, newPlan);
       showPopup("Cập nhật gói đăng ký thành công!", "success");
@@ -73,7 +82,7 @@ export function VoucherManagement() {
       setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
       loadPlans();
     } catch (error) {
-      showPopup(error.response?.data?.message || error.message || "Lỗi khi cập nhật gói đăng ký", "error");
+      showPopup(error.response?.data?.message || error.message || "Lỗi khi cập nhật gói", "error");
     }
   };
 
@@ -105,181 +114,194 @@ export function VoucherManagement() {
   }
 
   return (
-    <div className="management-page-container">
+    <div className="management-card">
+      {/* Toast Notification */}
       {toast.show && (
-        <div className={`toast-notification ${toast.type}`}>
+        <div style={{
+          position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+          background: toast.type === 'success' ? 'var(--primary)' : '#ec4899',
+          color: '#fff', padding: '12px 24px', borderRadius: '99px',
+          fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+        }}>
           {toast.message}
         </div>
       )}
 
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div className="management-modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
-            <h3 className="card-title mb-6">Tạo gói đăng ký mới</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input 
-                type="text" 
-                placeholder="Mã gói (ví dụ: MONTHLY)" 
-                value={newPlan.planCode} 
-                onChange={e => setNewPlan({ ...newPlan, planCode: e.target.value.toUpperCase() })} 
-                className="form-input"
-              />
-              <input 
-                type="text" 
-                placeholder="Tên gói" 
-                value={newPlan.name} 
-                onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} 
-                className="form-input"
-              />
-              <input 
-                type="number" 
-                placeholder="Giá (VNĐ)" 
-                value={newPlan.price} 
-                onChange={e => setNewPlan({ ...newPlan, price: Number(e.target.value) })} 
-                className="form-input"
-              />
-              <input 
-                type="number" 
-                placeholder="Thời hạn (ngày)" 
-                value={newPlan.durationDays} 
-                onChange={e => setNewPlan({ ...newPlan, durationDays: Number(e.target.value) })} 
-                className="form-input"
-              />
-              <div className="flex items-center gap-2 md:col-span-2">
-                <input 
-                  type="checkbox" 
-                  id="isActive" 
-                  checked={newPlan.isActive} 
-                  onChange={e => setNewPlan({ ...newPlan, isActive: e.target.checked })} 
-                  className="form-checkbox"
-                />
-                <label htmlFor="isActive">Kích hoạt gói</label>
-              </div>
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <button onClick={() => setShowCreateModal(false)} className="secondary-button">Hủy</button>
-              <button onClick={handleCreatePlan} className="primary-button">Tạo gói</button>
-            </div>
-          </div>
+      {/* HEADER */}
+      <div className="management-card-header">
+        <div>
+          <h2 className="card-title">Quản lý Gói Hội Viên</h2>
+          <p className="card-description">Tổng số: {plans.length} gói đăng ký trên hệ thống</p>
         </div>
-      )}
+      </div>
 
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="management-modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
-            <h3 className="card-title mb-6">Chỉnh sửa gói đăng ký</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input 
-                type="text" 
-                placeholder="Mã gói" 
-                value={newPlan.planCode} 
-                onChange={e => setNewPlan({ ...newPlan, planCode: e.target.value.toUpperCase() })} 
-                className="form-input"
-              />
-              <input 
-                type="text" 
-                placeholder="Tên gói" 
-                value={newPlan.name} 
-                onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} 
-                className="form-input"
-              />
-              <input 
-                type="number" 
-                placeholder="Giá (VNĐ)" 
-                value={newPlan.price} 
-                onChange={e => setNewPlan({ ...newPlan, price: Number(e.target.value) })} 
-                className="form-input"
-              />
-              <input 
-                type="number" 
-                placeholder="Thời hạn (ngày)" 
-                value={newPlan.durationDays} 
-                onChange={e => setNewPlan({ ...newPlan, durationDays: Number(e.target.value) })} 
-                className="form-input"
-              />
-              <div className="flex items-center gap-2 md:col-span-2">
-                <input 
-                  type="checkbox" 
-                  id="isActiveEdit" 
-                  checked={newPlan.isActive} 
-                  onChange={e => setNewPlan({ ...newPlan, isActive: e.target.checked })} 
-                  className="form-checkbox"
-                />
-                <label htmlFor="isActiveEdit">Kích hoạt gói</label>
-              </div>
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <button onClick={() => setShowEditModal(false)} className="secondary-button">Hủy</button>
-              <button onClick={handleUpdatePlan} className="primary-button">Cập nhật</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* TOOLBAR */}
+      <div className="management-header">
+        <div style={{ flexGrow: 1 }}></div>
+        <button onClick={() => setShowCreateModal(true)} className="primary-button">
+          <Plus size={18} />
+          <span>Tạo gói mới</span>
+        </button>
+      </div>
 
-      <div className="management-card">
-        <div className="management-card-header flex justify-between items-center">
-          <div>
-            <h2 className="card-title">Quản lý Gói đăng ký</h2>
-            <p className="card-description">Tổng số: {plans.length} gói</p>
-          </div>
-          <button onClick={() => setShowCreateModal(true)} className="primary-button flex items-center gap-2">
-            <Plus size={18} />
-            Tạo gói mới
-          </button>
-        </div>
-
-        <div className="management-card-content">
-          <table className="management-table">
-            <thead>
-              <tr>
-                <th>Mã gói</th>
-                <th>Tên gói</th>
-                <th>Giá</th>
-                <th>Thời hạn</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plans.map((plan) => (
+      {/* BẢNG DỮ LIỆU */}
+      <div className="management-table-wrapper">
+        <table className="management-table">
+          <thead>
+            <tr>
+              <th>Mã gói</th>
+              <th>Tên gói</th>
+              <th>Giá</th>
+              <th>Thời hạn</th>
+              <th style={{ textAlign: 'center' }}>Trạng thái</th>
+              <th>Ngày tạo</th>
+              <th style={{ textAlign: 'right' }}>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plans.length > 0 ? (
+              plans.map((plan) => (
                 <tr key={plan.planID}>
-                  <td className="font-mono font-bold text-blue-600">{plan.planCode}</td>
-                  <td>{plan.name}</td>
-                  <td>{plan.price.toLocaleString()} VNĐ</td>
-                  <td>{formatDuration(plan.durationDays)}</td>
-                  <td>
-                    <span className={`status-badge ${plan.isActive ? 'active' : 'inactive'}`}>
+                  <td className="fw-800" style={{ color: 'var(--primary)', letterSpacing: '0.5px' }}>{plan.planCode}</td>
+                  <td className="fw-800 td-title">{plan.name}</td>
+                  <td className="fw-800" style={{ color: '#f59e0b' }}>{plan.price.toLocaleString()} VNĐ</td>
+                  <td className="td-sub fw-700">{formatDuration(plan.durationDays)}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span 
+                      className="status-badge" 
+                      style={{ 
+                        backgroundColor: plan.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(107,114,128,0.12)', 
+                        color: plan.isActive ? 'var(--primary)' : '#6b7280' 
+                      }}
+                    >
                       {plan.isActive ? 'Hoạt động' : 'Tạm dừng'}
                     </span>
                   </td>
-                  <td>{new Date(plan.createdAt).toLocaleDateString('vi-VN')}</td>
-                  <td>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => handleEditPlan(plan)} 
-                        className="action-button edit-button"
-                        title="Chỉnh sửa"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handleDeletePlan(plan.planID)} 
-                        className="action-button delete-button"
-                        title="Xóa"
-                      >
-                        <Trash size={16} />
-                      </button>
-                    </div>
+                  <td className="fw-600">{new Date(plan.createdAt).toLocaleDateString('vi-VN')}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button 
+                      onClick={() => handleEditPlan(plan)} 
+                      className="action-button"
+                      title="Chỉnh sửa"
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeletePlan(plan.planID)} 
+                      className="action-button"
+                      style={{ color: '#ec4899', marginLeft: '8px' }}
+                      title="Xóa"
+                    >
+                      <Trash size={18} />
+                    </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7">
+                  <div className="admin-empty-data" style={{ padding: '3rem 0' }}>
+                    Chưa có gói hội viên nào.
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {/* ════════════════════════════════════════════
+          MODAL: TẠO MỚI / SỬA GÓI HỘI VIÊN
+      ════════════════════════════════════════════ */}
+      {(showCreateModal || showEditModal) && (
+        <div className="management-modal-overlay" onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}>
+          <div className="management-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">{showEditModal ? "Chỉnh sửa gói" : "Tạo gói đăng ký mới"}</h3>
+              {/* <button className="action-button" onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}>
+                <X size={20} />
+              </button> */}
+            </div>
+            
+            <div className="modal-body-custom">
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mã gói (VD: MONTHLY)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Nhập mã gói..." 
+                    value={newPlan.planCode} 
+                    onChange={e => setNewPlan({ ...newPlan, planCode: e.target.value.toUpperCase() })} 
+                    className="form-input"
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên gói</label>
+                  <input 
+                    type="text" 
+                    placeholder="Nhập tên gói..." 
+                    value={newPlan.name} 
+                    onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} 
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Giá (VNĐ)</label>
+                  <input 
+                    type="number" 
+                    placeholder="Nhập giá tiền..." 
+                    value={newPlan.price} 
+                    onChange={e => setNewPlan({ ...newPlan, price: Number(e.target.value) })} 
+                    className="form-input"
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Thời hạn (Ngày)</label>
+                  <input 
+                    type="number" 
+                    placeholder="Số ngày..." 
+                    value={newPlan.durationDays} 
+                    onChange={e => setNewPlan({ ...newPlan, durationDays: Number(e.target.value) })} 
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="isActiveToggle" 
+                  checked={newPlan.isActive} 
+                  onChange={e => setNewPlan({ ...newPlan, isActive: e.target.checked })} 
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                />
+                <label htmlFor="isActiveToggle" style={{ fontWeight: 800, color: 'var(--text-dark)', cursor: 'pointer' }}>
+                  Cho phép hoạt động
+                </label>
+              </div>
+            </div>
+
+            <div className="modal-foot">
+              <button 
+                className="secondary-button" 
+                style={{ marginRight: '1rem' }} 
+                onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}
+              >
+                Hủy
+              </button>
+              <button 
+                className="primary-button" 
+                onClick={showEditModal ? handleUpdatePlan : handleCreatePlan}
+              >
+                {showEditModal ? "Cập nhật gói" : "Tạo gói"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
