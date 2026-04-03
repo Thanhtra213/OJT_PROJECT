@@ -171,33 +171,9 @@ const CreateEditCourse = () => {
         await updateCourse(id, payload);
         showSuccessToast("Cập nhật khóa học thành công!");
       } else {
-        const response = await createCourse(payload);
-        console.log("New course creation response body:", response);
-        
-        // Comprehensive ID extraction strategy
-        let courseId = null;
-        if (typeof response === 'number' || typeof response === 'string') {
-          courseId = response;
-        } else if (response && typeof response === 'object') {
-          // Check top-level
-          courseId = response.courseID || response.courseId || response.id || response.CourseID;
-          
-          // Check nested wrappers if not found
-          if (!courseId) {
-            const wrapper = response.EasyEnglish_API || response.course || response.data || response.newCourse || response.Course;
-            if (wrapper) {
-              courseId = wrapper.courseID || wrapper.courseId || wrapper.id || wrapper.CourseID;
-            }
-          }
-        }
-
-        if (courseId) {
-          showSuccessToast("Tạo khóa học mới thành công!");
-          // Use a more immediate navigation if possible, or confirm the delay is needed
-          navigate(`/teacher/edit-course/${courseId}`);
-        } else {
-          showErrorToast("Tạo khóa học thành công nhưng không thể xác định mã khóa học để chuyển tiếp. Vui lòng quay lại Dashboard.");
-        }
+        const newCourse = await createCourse(payload);
+        showSuccessToast("Tạo khóa học mới thành công!");
+        navigate(`/teacher/editcourse/${newCourse.courseID}`);
       }
     } catch (err) {
       console.error("❌ Lỗi khi lưu khóa học:", err);
