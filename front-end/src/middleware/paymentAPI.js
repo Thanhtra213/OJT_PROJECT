@@ -3,19 +3,14 @@ import axios from "axios";
 
 const API_BASE = `${process.env.REACT_APP_API_URL}/api/payment`;
 
-/**
- * Tạo thanh toán - Backend trả về paymentUrl để redirect
- * @param {number} planID - ID của gói học
- * @returns {Promise<string>} URL thanh toán
- */
 export async function createPayment(planID) {
   try {
     const token = localStorage.getItem("accessToken");
     if (!token) throw new Error("Chưa đăng nhập");
 
     const res = await axios.post(
-      `${API_BASE}/create`,
-      { planId: planID }, // 🔹 Gửi object { planId: number } theo Swagger
+      `${API_BASE}/create?planId=${planID}`, 
+      null,
       {
         headers: {
           "Content-Type": "application/json",

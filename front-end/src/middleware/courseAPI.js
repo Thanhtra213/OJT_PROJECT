@@ -190,11 +190,6 @@ export const getCourseFeedbacks = async (courseId) => {
   }
 };
 
-/**
- * Submit course feedback
- * POST /api/user/course/feedback
- * @param {Object} feedbackData - { courseID: number, rating: number, comment: string }
- */
 export const submitCourseFeedback = async (feedbackData) => {
   try {
     const response = await fetch(`${BASE_URL}/user/course/feedback`, {
@@ -223,6 +218,7 @@ export const submitCourseFeedback = async (feedbackData) => {
  * Get video by ID (with authentication and membership check)
  */
 export const getVideoById = async (videoId) => {
+  console.log("Fetching URL:", `${BASE_URL}/public/video/${videoId}`); // 👈
   try {
     const headers = getAuthHeaders();
     
@@ -249,6 +245,7 @@ export const getVideoById = async (videoId) => {
     
     const data = await res.json();
     console.log("Video Detail:", data);
+    
     
     return data;
   } catch (error) {
