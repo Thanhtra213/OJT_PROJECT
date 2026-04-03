@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AIChat from "../AIChat/AI";
+import { getVideoProgressFromDB } from "../../middleware/videoProgressAPI";
 import { Container, Row, Col, Card, ProgressBar, Button, Badge, Modal, Table } from "react-bootstrap";
 import "./Home.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -59,6 +60,7 @@ const Home = () => {
   const [loadingCourses,    setLoadingCourses]    = useState(true);
   const [courses,           setCourses]           = useState([]);
   const [attempts,          setAttempts]          = useState([]);
+  const [dbLessonHistory, setDbLessonHistory] = useState([]);
   const navigate = useNavigate();
 
   const emptyData = {
@@ -118,6 +120,31 @@ const Home = () => {
     } catch { setLessonHistory([]); }
   };
 
+  const loadDbHistory = async () => {
+  try {
+    const localHistory = JSON.parse(localStorage.getItem("videoWatchHistory") || "[]");
+    if (!localHistory.length) return;
+
+    const enriched = await Promise.all(
+      localHistory.map(async (item) => {
+        try {
+          const dbData = await getVideoProgressFromDB(item.lessonID);
+          if (dbData && (dbData.isCompleted || dbData.watchDurationSec > 0)) {
+            const dur = dbData.watchDurationSec || 0;
+            const pos = dbData.lastPositionSec || 0;
+            const progress = dbData.isCompleted
+              ? 100
+              : dur > 0 ? Math.min(99, Math.round((pos / dur) * 100)) : item.progress;
+            return { ...item, progress, isCompleted: dbData.isCompleted };
+          }
+          return item;
+        } catch { return item; }
+      })
+    );
+    setDbLessonHistory(enriched);
+  } catch { }
+};
+
   const loadStats = () => {
     try {
       const s=localStorage.getItem("videoWatchHistory");
@@ -160,7 +187,9 @@ const Home = () => {
         setUser({...emptyData.user,name});setStatsData(emptyData.stats);
         if(token){
           const md=await checkMembership();setHasMembership(md.hasMembership);setMembershipInfo(md);
-          loadHistory();loadStats();await loadAttempts();
+          loadHistory();loadStats();
+          await loadAttempts();
+          await loadDbHistory();
         } else {setHasMembership(false);setMembershipInfo(null);setLessonHistory([]);}
       } catch {setUser(emptyData.user);setStatsData(emptyData.stats);setLessonHistory([]);setHasMembership(false);setMembershipInfo(null);}
       finally{setIsLoading(false);}
@@ -197,10 +226,10 @@ const Home = () => {
     {id:"watching",label:"Đang xem"},
     {id:"completed",label:"Đã hoàn thành"},
   ];
-  const filtered = !lessonHistory.length ? [] :
-    selectedLevel==="watching"  ? lessonHistory.filter(l=>l.progress<100) :
-    selectedLevel==="completed" ? lessonHistory.filter(l=>l.progress>=100) : lessonHistory;
-
+  const filteredDB = !dbLessonHistory.length ? [] :
+  selectedLevel === "watching"  ? dbLessonHistory.filter(l => l.progress < 100) :
+  selectedLevel === "completed" ? dbLessonHistory.filter(l => l.progress >= 100) :
+  dbLessonHistory;
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="home-page">
@@ -290,9 +319,9 @@ const Home = () => {
                       ))}
                     </div>
 
-                    {filtered.length>0 ? (
+                    {filteredDB.length>0 ? (
                       <Row className="g-3">
-                        {filtered.map(lesson=>(
+                        {filteredDB.map(lesson=>(
                           <Col md={6} lg={4} key={lesson.id}>
                             <div style={{background:"#fff",borderRadius:"20px",overflow:"hidden",border:"1.5px solid #e5e7eb",boxShadow:"0 4px 24px rgba(0,0,0,.07)",height:"100%",display:"flex",flexDirection:"column",transition:"transform .22s,box-shadow .22s,border-color .22s"}}
                               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-7px)";e.currentTarget.style.boxShadow="0 12px 40px rgba(0,200,150,.18)";e.currentTarget.style.borderColor="#00c896";}}

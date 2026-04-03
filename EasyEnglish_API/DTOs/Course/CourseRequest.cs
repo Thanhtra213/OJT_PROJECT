@@ -21,7 +21,7 @@
 
     public class VideoDto
     {
-        public int VideoID { get; set; }
+        public int VideoId { get; set; }
         public string VideoName { get; set; } = string.Empty;
         public string VideoURL { get; set; } = string.Empty;
         public bool IsPreview { get; set; }

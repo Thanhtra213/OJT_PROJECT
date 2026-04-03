@@ -12,7 +12,7 @@ const getAuthHeaders = () => {
 };
 
 // ============= COURSE APIs =============
-
+console.log("ENV:", process.env.REACT_APP_API_URL);
 /**
  * Get all courses with teacher info
  */
@@ -28,6 +28,7 @@ export const getCourses = async () => {
 
     const data = await response.json();
     console.log("📚 Raw courses data:", data);
+    
 
     // Process courses to include teacher info
     const coursesWithTeachers = await Promise.all(
@@ -73,7 +74,7 @@ export const getCourses = async () => {
       totalCount: coursesWithTeachers.length,
     };
   } catch (error) {
-    console.error("❌ Error fetching courses:", error);
+    console.error("❌ Error fetching courses:", error.message);
     throw error;
   }
 };
@@ -190,11 +191,6 @@ export const getCourseFeedbacks = async (courseId) => {
   }
 };
 
-/**
- * Submit course feedback
- * POST /api/user/course/feedback
- * @param {Object} feedbackData - { courseID: number, rating: number, comment: string }
- */
 export const submitCourseFeedback = async (feedbackData) => {
   try {
     const response = await fetch(`${BASE_URL}/user/course/feedback`, {
@@ -223,6 +219,7 @@ export const submitCourseFeedback = async (feedbackData) => {
  * Get video by ID (with authentication and membership check)
  */
 export const getVideoById = async (videoId) => {
+  console.log("Fetching URL:", `${BASE_URL}/public/video/${videoId}`); // 👈
   try {
     const headers = getAuthHeaders();
     
@@ -249,6 +246,7 @@ export const getVideoById = async (videoId) => {
     
     const data = await res.json();
     console.log("Video Detail:", data);
+    
     
     return data;
   } catch (error) {

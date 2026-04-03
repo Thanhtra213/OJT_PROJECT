@@ -16,7 +16,6 @@ namespace EasyEnglish_API.Services.Video
         public async Task UpdateProgressAsync(int userId, VideoProgressRequest req)
         {
             var progress = await _repo.GetAsync(userId, req.VideoId);
-
             if (progress == null)
             {
                 progress = new UserVideoProgress
@@ -24,23 +23,21 @@ namespace EasyEnglish_API.Services.Video
                     UserId = userId,
                     VideoId = req.VideoId,
                     WatchDurationSec = req.WatchDurationSec,
+                    LastPositionSec = req.LastPositionSec,
                     WatchedAt = DateTime.UtcNow,
                     IsCompleted = req.IsCompleted
                 };
-
                 await _repo.AddAsync(progress);
             }
             else
             {
                 progress.WatchDurationSec = req.WatchDurationSec;
+                progress.LastPositionSec = req.LastPositionSec;
                 progress.WatchedAt = DateTime.UtcNow;
-
                 if (req.IsCompleted)
                     progress.IsCompleted = true;
-
                 await _repo.UpdateAsync(progress);
             }
-
             await _repo.SaveAsync();
         }
 

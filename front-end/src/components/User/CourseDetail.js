@@ -6,10 +6,10 @@ import { getQuizzesByCourse } from "../../middleware/QuizAPI";
 import { checkMembership } from "../../middleware/membershipAPI";
 import { getFlashcardSetsByCourseId } from "../../middleware/flashcardAPI";
 import { updateVideoHistory, getVideoProgress } from '../../redux/videoWatchHelper';
+import { saveVideoProgress as saveProgressToDB, getVideoProgressFromDB } from "../../middleware/videoProgressAPI";
 import { FaPlayCircle, FaBook, FaQuestionCircle, FaLock, FaArrowLeft, FaCheckCircle, FaStar, FaLayerGroup } from "react-icons/fa";
 import "./CourseDetail.scss";
 
-// ── Level badge config (mirrors Home.js) ─────────────────────────────────────
 const LEVELS = {
   1: { label:"Beginner",     color:"#f97316", bg:"#fff7ed", text:"#c2410c" },
   2: { label:"Intermediate", color:"#ec4899", bg:"#fdf2f8", text:"#be185d" },
@@ -60,6 +60,8 @@ const CourseDetail = () => {
         ]);
         setHasMembership(membershipData.hasMembership || false);
         setCourse(courseData);
+        // Trong loadData, sau setCourse(courseData):
+console.log("FIRST VIDEO:", courseData.chapters?.[0]?.videos?.[0]);
 
         try {
           const rating = await getCourseRating(id);
@@ -70,8 +72,10 @@ const CourseDetail = () => {
           for (const chapter of courseData.chapters) {
             if (chapter.videos?.length > 0) {
               const firstVideo = chapter.videos[0];
+              
+              const vid = firstVideo.videoId ?? firstVideo.videoID;
               if (firstVideo.isPreview || membershipData.hasMembership) {
-                handleVideoSelect(firstVideo.videoID, firstVideo.videoName, chapter.chapterName);
+                handleVideoSelect(vid, firstVideo.videoID, firstVideo.videoName, chapter.chapterName);
                 return;
               }
             }
@@ -113,34 +117,48 @@ const CourseDetail = () => {
     return { type:'video', url, platform:'direct' };
   };
 
-  // ── Video selection ────────────────────────────────────────────────────────
-  const handleVideoSelect = async (videoId, videoName, chapterName) => {
-    if (selectedVideo) {
-      saveVideoProgress();
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    }
-    setLoadingVideo(true);
-    setVideoError(null);
-    try {
-      const videoData = await getVideoById(videoId);
-      if (videoData.canWatch) {
-        const videoInfo = getDirectVideoUrl(videoData.videoURL);
-        const newVideo = { videoID:videoId, videoName, videoURL:videoInfo.url, videoType:videoInfo.type, platform:videoInfo.platform, canWatch:videoData.canWatch, chapterName };
-        setSelectedVideo(newVideo);
-        const saved = getVideoProgress(videoId);
-        if (saved) { setVideoProgress(saved.progress||0); setCurrentTime(saved.currentTime||0); setVideoDuration(saved.duration*60||600); }
-        else       { setVideoProgress(0); setCurrentTime(0); setVideoDuration(600); }
-        startProgressTracking();
+const handleVideoSelect = async (videoId, videoName, chapterName) => {
+  console.log("VIDEO ID:", videoId, typeof videoId);
+  if (selectedVideo) {
+    saveVideoProgressLocal();
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+  }
+  setLoadingVideo(true);
+  setVideoError(null);
+  try {
+    const videoData = await getVideoById(videoId);
+    const canWatch = videoData.canWatch || videoData.isPreview;
+    if (canWatch) {
+      const videoInfo = getDirectVideoUrl(videoData.videoURL);
+      const newVideo = {
+        videoID: videoId, videoName, videoURL: videoInfo.url,
+        videoType: videoInfo.type, platform: videoInfo.platform,
+        canWatch, chapterName
+      };
+      setSelectedVideo(newVideo);
+
+      const dbProgress = await getVideoProgressFromDB(videoId);
+      if (dbProgress) {
+        const dur = dbProgress.watchDurationSec || 600;
+        const pos = dbProgress.lastPositionSec || 0;
+        const prog = dbProgress.isCompleted ? 100 : (dur > 0 ? Math.min(100, Math.round((pos / dur) * 100)) : 0);
+        setVideoProgress(prog);
+        setCurrentTime(pos);
+        setVideoDuration(dur);
       } else {
-        setVideoError("Bạn cần đăng ký gói thành viên để xem video này.");
-        setSelectedVideo(null);
+        setVideoProgress(0); setCurrentTime(0); setVideoDuration(600);
       }
-    } catch (err) {
-      console.error(err);
-      setVideoError("Không thể tải video. Vui lòng thử lại.");
+      startProgressTracking();
+    } else {
+      setVideoError("Bạn cần đăng ký gói thành viên để xem video này.");
       setSelectedVideo(null);
-    } finally { setLoadingVideo(false); }
-  };
+    }
+  } catch (err) {
+    console.error(err);
+    setVideoError("Không thể tải video. Vui lòng thử lại.");
+    setSelectedVideo(null);
+  } finally { setLoadingVideo(false); }
+};
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -161,62 +179,89 @@ const CourseDetail = () => {
     }
   };
 
-  const handleVideoEnded = () => {
-    if (videoRef.current && selectedVideo) {
-      const dur = videoRef.current.duration;
-      updateVideoHistory({ courseID:parseInt(id), courseName:course?.courseName||"Khóa học", lessonID:selectedVideo.videoID, lessonTitle:selectedVideo.videoName }, dur, dur);
-      setVideoProgress(100);
-    }
-  };
+const handleVideoEnded = () => {
+  if (videoRef.current && selectedVideo) {
+    const dur = videoRef.current.duration;
+    updateVideoHistory({
+      courseID: parseInt(id), courseName: course?.courseName || "Khóa học",
+      lessonID: selectedVideo.videoID, lessonTitle: selectedVideo.videoName
+    }, dur, dur);
+    setVideoProgress(100);
+    saveProgressToDB(selectedVideo.videoID, Math.round(dur), true);
+  }
+};
 
-  const saveVideoProgress = () => {
-    if (!selectedVideo || !course) return;
-    let cur = 0, dur = 0;
-    if (selectedVideo.videoType==='video' && videoRef.current) { cur=videoRef.current.currentTime; dur=videoRef.current.duration; }
-    else { cur=currentTime; dur=videoDuration||600; }
-    if (dur > 0 && cur >= 0) {
-      updateVideoHistory({ courseID:parseInt(id), courseName:course.courseName, lessonID:selectedVideo.videoID, lessonTitle:selectedVideo.videoName }, cur, dur);
-      window.dispatchEvent(new Event('videoHistoryUpdated'));
-    }
-  };
+const saveVideoProgressLocal = () => {
+  if (!selectedVideo || !course) return;
+  let cur = 0, dur = 0;
 
-  const startProgressTracking = () => {
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    if (!selectedVideo) return;
-    progressIntervalRef.current = setInterval(() => {
-      if (selectedVideo.videoType==='iframe') {
-        setCurrentTime(prev => {
-          const nt = prev + 10;
-          setVideoProgress(videoDuration > 0 ? Math.min(100, Math.round((nt/videoDuration)*100)) : 0);
-          return nt;
-        });
-      }
-      saveVideoProgress();
-    }, 10000);
-  };
+  if (selectedVideo.videoType === "video" && videoRef.current) {
+    cur = videoRef.current.currentTime;
+    dur = videoRef.current.duration;
+  } else {
+    cur = currentTime;
+    dur = videoDuration || 600;
+  }
+
+  if (dur > 0 && cur >= 0) {
+    updateVideoHistory({
+      courseID: parseInt(id), courseName: course.courseName,
+      lessonID: selectedVideo.videoID, lessonTitle: selectedVideo.videoName
+    }, cur, dur);
+    window.dispatchEvent(new Event("videoHistoryUpdated"));
+
+    const isCompleted = dur > 0 && (cur / dur) >= 0.95;
+    saveProgressToDB(
+      selectedVideo.videoID,
+      Math.round(dur),
+      isCompleted,
+      Math.round(cur)  
+    );
+  }
+};
+
+const startProgressTracking = () => {
+  if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+  if (!selectedVideo) return;
+  progressIntervalRef.current = setInterval(() => {
+    if (selectedVideo.videoType === "iframe") {
+      setCurrentTime(prev => {
+        const nt = prev + 10;
+        setVideoProgress(videoDuration > 0 ? Math.min(100, Math.round((nt / videoDuration) * 100)) : 0);
+        return nt;
+      });
+    }
+    saveVideoProgressLocal();
+  }, 10000);
+};
 
   useEffect(() => {
-    const onUnload = () => saveVideoProgress();
-    window.addEventListener('beforeunload', onUnload);
-    return () => { if (progressIntervalRef.current) clearInterval(progressIntervalRef.current); saveVideoProgress(); window.removeEventListener('beforeunload', onUnload); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedVideo, course, currentTime, videoDuration]);
-
-  const markVideoAsCompleted = () => {
-    if (!selectedVideo || !course) return;
-    if (selectedVideo.videoType==='video' && videoRef.current) {
-      const dur = videoRef.current.duration;
-      updateVideoHistory({ courseID:parseInt(id), courseName:course.courseName, lessonID:selectedVideo.videoID, lessonTitle:selectedVideo.videoName }, dur, dur);
-      setVideoProgress(100);
-      videoRef.current.currentTime = dur;
-    } else {
-      const dur = videoDuration||600;
-      updateVideoHistory({ courseID:parseInt(id), courseName:course.courseName, lessonID:selectedVideo.videoID, lessonTitle:selectedVideo.videoName }, dur, dur);
-      setVideoProgress(100); setCurrentTime(dur);
-    }
-    window.dispatchEvent(new Event('videoHistoryUpdated'));
-    alert("✅ Đã đánh dấu hoàn thành!");
+  const onUnload = () => saveVideoProgressLocal();
+  window.addEventListener("beforeunload", onUnload);
+  return () => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    saveVideoProgressLocal();
+    window.removeEventListener("beforeunload", onUnload);
   };
+}, [selectedVideo, course, currentTime, videoDuration]);
+
+const markVideoAsCompleted = () => {
+  if (!selectedVideo || !course) return;
+  if (selectedVideo.videoType === "video" && videoRef.current) {
+    const dur = videoRef.current.duration;
+    updateVideoHistory({ courseID: parseInt(id), courseName: course.courseName, lessonID: selectedVideo.videoID, lessonTitle: selectedVideo.videoName }, dur, dur);
+    setVideoProgress(100);
+    videoRef.current.currentTime = dur;
+    saveProgressToDB(selectedVideo.videoID, Math.round(dur), true);
+  } else {
+    const dur = videoDuration || 600;
+    updateVideoHistory({ courseID: parseInt(id), courseName: course.courseName, lessonID: selectedVideo.videoID, lessonTitle: selectedVideo.videoName }, dur, dur);
+    setVideoProgress(100); setCurrentTime(dur);
+    saveProgressToDB(selectedVideo.videoID, Math.round(dur), true);
+  }
+  window.dispatchEvent(new Event("videoHistoryUpdated"));
+  alert("✅ Đã đánh dấu hoàn thành!");
+};
 
   // ── Lazy loaders ──────────────────────────────────────────────────────────
   const handleLoadQuizzes = async () => {
@@ -308,7 +353,7 @@ const CourseDetail = () => {
                   ) : (
                     <video ref={videoRef} src={selectedVideo.videoURL} controls controlsList="nodownload"
                       onLoadedMetadata={handleLoadedMetadata} onTimeUpdate={handleTimeUpdate}
-                      onEnded={handleVideoEnded} onPause={saveVideoProgress} />
+                      onEnded={handleVideoEnded} onPause={saveVideoProgressLocal} />
                   )}
                 </div>
               ) : (
@@ -494,10 +539,9 @@ const CourseDetail = () => {
                 <span>{totalVideos} bài giảng</span>
               </div>
 
-              <Accordion alwaysOpen defaultActiveKey={course.chapters?.[0]?.chapterID.toString()}>
-                {course.chapters?.map((chapter) => (
-                  <Accordion.Item eventKey={chapter.chapterID.toString()} key={chapter.chapterID}>
-                    <Accordion.Header>
+              <Accordion alwaysOpen defaultActiveKey={course.chapters?.[0]?.chapterID?.toString()}>
+  {course.chapters?.map((chapter) => (
+    <Accordion.Item eventKey={chapter.chapterID?.toString()} key={chapter.chapterID}> <Accordion.Header>
                       <div className="chapter-header">
                         <strong>{chapter.chapterName}</strong>
                       </div>
@@ -505,8 +549,9 @@ const CourseDetail = () => {
                     <Accordion.Body>
                       <ul className="video-list">
                         {chapter.videos?.map(video => {
+                          const vid = video.videoId;
                           const canWatch  = video.isPreview || hasMembership;
-                          const isPlaying = selectedVideo?.videoID === video.videoID;
+                          const isPlaying = selectedVideo?.videoId === video.videoID;
                           const saved     = getVideoProgress(video.videoID);
                           const hasWatched  = saved && saved.progress > 0;
                           const isCompleted = saved && saved.progress >= 100;
@@ -515,7 +560,7 @@ const CourseDetail = () => {
                             <li
                               key={video.videoID}
                               className={`${canWatch?'watchable':'locked'} ${isPlaying?'playing':''}`}
-                              onClick={()=>canWatch&&handleVideoSelect(video.videoID,video.videoName,chapter.chapterName)}
+                              onClick={()=>canWatch&&handleVideoSelect(vid,video.videoName,chapter.chapterName)}
                             >
                               <div className="video-icon">
                                 {isPlaying    ? <FaPlayCircle className="playing-icon"/>

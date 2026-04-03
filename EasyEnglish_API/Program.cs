@@ -56,10 +56,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using EasyEnglish_API.Interfaces.Streak;
 using EasyEnglish_API.Repositories.Streak;
-using EasyEnglish_API.Services.Streak;
 using EasyEnglish_API.Interfaces.Progress;
 using EasyEnglish_API.Repositories.Progress;
+<<<<<<< Updated upstream
 using EasyEnglish_API.Services.Video;
+using EasyEnglish_API.Services.Course;
+=======
+>>>>>>> Stashed changes
 
 
 
@@ -185,6 +188,8 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<AISpeakingExternal>();
             builder.Services.AddScoped<AIWritingExternal>();
             builder.Services.AddScoped<AIQuizExternal>();
+            builder.Services.AddScoped<AIListeningExternal>();
+            builder.Services.AddScoped<MurfTTSExternal>();
             // == Repositories ==
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -227,7 +232,13 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+<<<<<<< Updated upstream
+            builder.Services.AddScoped<IVideoService, VideoService>();
+            builder.Services.AddScoped<IVideoProgressService, VideoProgressService>();
+            builder.Services.AddScoped<IAIListeningService, AIListeningService>();
 
+=======
+>>>>>>> Stashed changes
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddSingleton<EmailSender>();
