@@ -21,6 +21,8 @@ import SpeakingPractice from './components/User/SpeakingPractice';
 import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
+import AdminDashboard from './components/Admin/AdminDashboard'; 
+import ExamDetail from './components/Admin/ExamDetail';
 import TeacherDashboard from "./components/Teacher/Dashboard";
 import TeacherCourseWorkspace from "./components/Teacher/CourseDetail";
 import TeacherCreateEditCourse from "./components/Teacher/CreateEditCourse";
