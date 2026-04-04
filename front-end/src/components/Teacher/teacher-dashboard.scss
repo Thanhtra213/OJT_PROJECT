@@ -1,36 +1,52 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 @import "../Admin/admin-dashboard-styles.scss";
 
-$primary: #6c47ff;
-$primary-dark: #5535e0;
-$primary-light: #ede9ff;
+// Main Theme Tokens (Mint)
+$primary: #00c896;      // --mint
+$primary-dark: #00a87c; // --mint-dk
+$primary-light: #e6faf4;// --mint-lt
+$mint-mid: #b3f0de;
 
-$bg: #f5f6fa;
+$bg: #f9fafb;
 $white: #ffffff;
 
-$text: #1a1a2e;
-$text-body: #5a6275;
-$text-muted: #9aa0ad;
-$border: #e8eaf0;
+$text: #111827;      // --gray-900
+$text-body: #4b5563; // --gray-600
+$text-muted: #9ca3af; // --gray-400
+$border: #e5e7eb;    // --gray-200
 
-$shadow-sm: 0 2px 8px rgba(108, 71, 255, 0.07);
-$shadow-lg: 0 12px 40px rgba(108, 71, 255, 0.16);
-$transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
+$shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); // --s1
+$shadow-lg: 0 4px 16px rgba(0,0,0,.08); // --s2
+$transition-main: .2s cubic-bezier(.4, 0, .2, 1); // --t
 
-$beginner: #6c47ff;
-$intermediate: #00b894;
-$advanced: #f9a825;
-$expert: #e84393;
-$upper-intermediate: #e17055;
+// Level Colors (Main project tokens)
+$beginner: #f97316;     // --lv0-d
+$intermediate: #10b981; // --lv2-d
+$advanced: #8b5cf6;     // --lv3-d
+$expert: #3b82f6;       // --lv4-d
+$pre-intermediate: #ec4899; // --lv1-d
+
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+}
+
+body {
+  background: $bg;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+}
 
 * {
   box-sizing: border-box;
 }
 
-/* Teacher shell: scroll inside main content; keeps global Header/Footer visible */
 .teacher-app-shell {
-  font-family: "Be Vietnam Pro", "Segoe UI", sans-serif;
-  min-height: calc(100vh - 120px);
+  min-height: 100vh;
+  height: 100vh;
   background: $bg;
   color: $text;
   overflow-y: auto;
@@ -45,7 +61,7 @@ $upper-intermediate: #e17055;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(108, 71, 255, 0.4);
+    background: rgba(0, 200, 150, 0.4);
     border-radius: 999px;
   }
 }
@@ -58,7 +74,7 @@ $upper-intermediate: #e17055;
 
 .teacher-dashboard-page {
   display: flex;
-  min-height: calc(100vh - 120px);
+  min-height: 100vh;
   background: $bg;
   color: $text;
   overflow: hidden;
@@ -75,8 +91,7 @@ $upper-intermediate: #e17055;
   gap: 14px;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 0;
-  align-self: stretch;
+  min-height: 100vh;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -102,7 +117,7 @@ $upper-intermediate: #e17055;
     width: 40px;
     height: 40px;
     border-radius: 14px;
-    background: linear-gradient(135deg, $primary 0%, #8a6dff 100%);
+    background: linear-gradient(135deg, $primary 0%, #0ea5c9 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -270,10 +285,10 @@ $upper-intermediate: #e17055;
 .teacher-main {
   flex: 1;
   min-width: 0;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 100vh;
 }
 
 .teacher-topbar {
@@ -334,8 +349,7 @@ $upper-intermediate: #e17055;
 .teacher-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden !important; // Force kill inner scrollbars
   padding: 2rem;
 
   &::-webkit-scrollbar {
@@ -389,54 +403,6 @@ $upper-intermediate: #e17055;
   background-size: cover;
   background-position: center;
   opacity: 1;
-}
-
-.theme-beginner .course-cover {
-  background: $beginner;
-}
-
-.theme-intermediate .course-cover {
-  background: $intermediate;
-}
-
-.theme-advanced .course-cover {
-  background: $advanced;
-}
-
-.theme-expert .course-cover {
-  background: $expert;
-}
-
-.course-card.theme-beginner .course-cover-overlay {
-  background:
-    linear-gradient(rgba(108, 71, 255, 0.65), rgba(108, 71, 255, 0.65)),
-    url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-intermediate .course-cover-overlay {
-  background:
-    linear-gradient(rgba(0, 184, 148, 0.65), rgba(0, 184, 148, 0.65)),
-    url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-advanced .course-cover-overlay {
-  background:
-    linear-gradient(rgba(249, 168, 37, 0.65), rgba(249, 168, 37, 0.65)),
-    url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-expert .course-cover-overlay {
-  background:
-    linear-gradient(rgba(232, 67, 147, 0.65), rgba(232, 67, 147, 0.65)),
-    url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
 }
 
 .course-level-badge {
@@ -611,23 +577,64 @@ $upper-intermediate: #e17055;
   }
 }
 
-.flashcard-card {
+.course-card {
+  --level-color: #88d8b0;
+  &.theme-beginner { --level-color: #88d8b0; }
+  &.theme-intermediate { --level-color: #a0c4ff; }
+  &.theme-advanced { --level-color: #ffd166; }
+  &.theme-expert { --level-color: #ff8b94; }
+
   .course-cover-overlay {
-    background:
-      linear-gradient(rgba(108, 71, 255, 0.65), rgba(108, 71, 255, 0.65)),
-      url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80");
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
+    opacity: 0.95;
+    transition: opacity 0.3s ease;
+    overflow: hidden !important;
+  }
+
+  &.origin-course-card .course-cover-overlay {
+    background: var(--level-color) 
+                url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80") 
+                center / cover no-repeat;
+  }
+
+  &.flashcard-card .course-cover-overlay {
+    background: var(--level-color) 
+                url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80") 
+                center / cover no-repeat;
+  }
+
+  &.quiz-card .course-cover-overlay {
+    background: var(--level-color) 
+                url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80") 
+                center / cover no-repeat;
+  }
+
+  &:hover .course-cover-overlay {
+    opacity: 1;
   }
 }
 
-.quiz-card {
-  .course-cover-overlay {
-    background:
-      linear-gradient(rgba(0, 184, 148, 0.65), rgba(0, 184, 148, 0.65)),
-      url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80");
-    background-size: cover;
-    background-position: center;
+// Force Mint Scrollbar for the whole dashboard components and children
+* {
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 200, 150, 0.5) !important;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03) !important;
   }
 }
 
@@ -714,6 +721,54 @@ $upper-intermediate: #e17055;
 
 .feedback-page-inner > * {
   width: 100%;
+}
+
+// --- Specific Feedback Components ---
+.teacher-feedback-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.rating-distribution-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .rating-label {
+    font-size: 13px;
+    font-weight: 700;
+    width: 45px;
+    color: $text-body;
+  }
+  
+  .rating-bar-container {
+    flex: 1;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  
+  .rating-bar-fill {
+    height: 100%;
+    background: #facc15; // Star yellow
+    border-radius: 999px;
+  }
+  
+  .rating-count {
+    font-size: 13px;
+    font-weight: 800;
+    width: 25px;
+    text-align: right;
+    color: $text;
+  }
 }
 
 .feedback-page-inner h1,

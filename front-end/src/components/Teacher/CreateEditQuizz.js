@@ -208,7 +208,7 @@ const CreateEditQuiz = () => {
           <p>{isEditMode ? "Cập nhật thông tin và câu hỏi cho Quiz" : "Thiết kế các bài kiểm tra ngắn cho học viên"}</p>
         </Col>
         <Col className="text-end header-buttons">
-          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/teacher/dashboard")}>
+          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/dashboard")}>
             <FontAwesomeIcon icon={faTimes} className="me-1" /> Hủy
           </Button>
           <Button variant="primary" onClick={handleSubmit} disabled={loading}>

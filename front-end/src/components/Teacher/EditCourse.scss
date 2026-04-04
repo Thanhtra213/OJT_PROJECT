@@ -553,6 +553,7 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
   }
 
   @media (max-width: 640px) {
+
     .chapter-header,
     .video-item {
       flex-direction: column;
