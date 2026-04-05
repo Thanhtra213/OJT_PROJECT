@@ -94,7 +94,7 @@ export function TeacherFeedbackView() {
   }
 
   return (
-    <div className="management-card">
+    <div className="feedback-page-card">
       <div className="management-card-header">
         <h2 className="card-title">Đánh giá từ học viên</h2>
       </div>

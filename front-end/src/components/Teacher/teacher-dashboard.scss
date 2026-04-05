@@ -424,36 +424,27 @@ body {
 
 .course-level-badge {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
-  padding: 8px 14px;
+  padding: 10px 22px;
   border-radius: 100px;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 13px;
-  font-weight: 700;
-  max-width: calc(100% - 28px);
+  background: rgba(255, 255, 255, 0.98);
+  font-size: 14px;
+  font-weight: 800;
+  max-width: calc(100% - 30px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.theme-beginner .course-level-badge {
-  color: $beginner;
-}
-
-.theme-intermediate .course-level-badge {
-  color: $intermediate;
-}
-
-.theme-advanced .course-level-badge {
-  color: $advanced;
-}
-
-.theme-expert .course-level-badge {
-  color: $expert;
-}
+.theme-beginner .course-level-badge { color: $beginner; }
+.theme-intermediate .course-level-badge { color: $intermediate; }
+.theme-pre-intermediate .course-level-badge { color: $pre-intermediate; }
+.theme-advanced .course-level-badge { color: $advanced; }
+.theme-expert .course-level-badge { color: $expert; }
 
 .course-card-body {
   padding: 1.4rem 1.5rem;
@@ -595,39 +586,33 @@ body {
 }
 
 .course-card {
-  --level-color: #88d8b0;
-  &.theme-beginner { --level-color: #88d8b0; }
-  &.theme-intermediate { --level-color: #a0c4ff; }
-  &.theme-advanced { --level-color: #ffd166; }
-  &.theme-expert { --level-color: #ff8b94; }
-
   .course-cover-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background-blend-mode: overlay;
     background-size: cover;
     background-position: center;
-    opacity: 0.95;
-    transition: opacity 0.3s ease;
+    opacity: 1;
+    transition: transform 0.5s ease;
     overflow: hidden !important;
   }
 
+  &:hover .course-cover-overlay {
+    transform: scale(1.05);
+  }
+
   &.origin-course-card .course-cover-overlay {
-    background: var(--level-color) 
-                url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80") 
+    background: url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=95") 
                 center / cover no-repeat;
   }
 
   &.flashcard-card .course-cover-overlay {
-    background: var(--level-color) 
-                url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80") 
+    background: url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=95") 
                 center / cover no-repeat;
   }
 
   &.quiz-card .course-cover-overlay {
-    background: var(--level-color) 
-                url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80") 
+    background: url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=95") 
                 center / cover no-repeat;
   }
 

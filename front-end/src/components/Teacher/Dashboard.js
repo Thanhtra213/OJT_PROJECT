@@ -13,6 +13,7 @@ import {
   MoreVertical,
   GraduationCap,
   BarChart3,
+  ClipboardCheck,
 } from "lucide-react";
 import "../Admin/admin-dashboard-styles.scss";
 import "./teacher-dashboard.scss";
@@ -29,6 +30,7 @@ import {
   deleteQuiz,
 } from "../../middleware/teacher/quizTeacherAPI";
 import { TeacherFeedbackView } from "./TeacherFeedbackView";
+import { TeacherReviewManagement } from "./TeacherReviewManagement";
 import { jwtDecode } from "jwt-decode";
 import AIChat from "../AIChat/AI";
 
@@ -221,19 +223,25 @@ const TeacherDashboard = () => {
 
   const getLevelLabel = (level, name) => {
     const s = (String(level || "") + String(name || "")).toLowerCase();
-    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "Beginner";
-    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "Intermediate";
-    if (s.includes("trung cấp") || s.includes("advanced") || s.includes("level 3")) return "Advanced";
-    if (s.includes("chuyên sâu") || s.includes("expert") || s.includes("level 4") || s.includes("level 5")) return "Expert";
-    return "General";
+    
+    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "Nền tảng";
+    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "Cơ bản";
+    if (s.includes("tiền trung cấp") || s.includes("advanced") || s.includes("level 3")) return "Tiền trung cấp";
+    if (s.includes("trung cấp") || s.includes("expert") || s.includes("level 4")) return "Trung cấp";
+    if (s.includes("cao cấp") || s.includes("level 5") || s.includes("level 6")) return "Cao cấp";
+    
+    return "Tổng quát";
   };
 
   const getLevelClass = (level, name) => {
     const s = (String(level || "") + String(name || "")).toLowerCase();
-    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "theme-beginner";
+    
+    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1")) return "theme-beginner";
     if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "theme-intermediate";
-    if (s.includes("trung cấp") || s.includes("advanced") || s.includes("level 3")) return "theme-advanced";
-    if (s.includes("chuyên sâu") || s.includes("expert") || s.includes("level 4") || s.includes("level 5")) return "theme-expert";
+    if (s.includes("tiền trung cấp") || s.includes("advanced") || s.includes("level 3")) return "theme-pre-intermediate";
+    if (s.includes("trung cấp") || s.includes("expert") || s.includes("level 4")) return "theme-advanced";
+    if (s.includes("cao cấp") || s.includes("level 5")) return "theme-expert";
+    
     return "theme-beginner";
   };
 
@@ -259,6 +267,13 @@ const TeacherDashboard = () => {
           subtitle: "Tạo và theo dõi các bài kiểm tra cho từng khóa học",
           buttonText: "Tạo quiz mới",
           onButtonClick: () => navigate("/teacher/create-quiz"),
+        };
+      case "review":
+        return {
+          title: "Chấm điểm bài làm",
+          subtitle: "Xem và đánh giá bài nộp từ học viên (hỗ trợ AI preview)",
+          buttonText: null,
+          onButtonClick: null,
         };
       case "danhgia":
         return {
@@ -355,6 +370,12 @@ const TeacherDashboard = () => {
       sub: "Thẻ từ vựng",
     },
     { key: "quiz", icon: Brain, label: "Quiz", sub: "Bài kiểm tra" },
+    {
+      key: "review",
+      icon: ClipboardCheck,
+      label: "Review",
+      sub: "Chấm điểm bài làm",
+    },
     {
       key: "danhgia",
       icon: Star,
@@ -561,37 +582,7 @@ const TeacherDashboard = () => {
 
     return (
       <div className="quiz-page-stack">
-        <div className="mini-stats-grid">
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <BarChart3 size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Tổng quiz</span>
-              <strong>{quizStats.totalQuiz}</strong>
-            </div>
-          </div>
 
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <Brain size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Quiz hoạt động</span>
-              <strong>{quizStats.activeQuiz}</strong>
-            </div>
-          </div>
-
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <Star size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Điểm trung bình</span>
-              <strong>{quizStats.avgQuizScore}/10</strong>
-            </div>
-          </div>
-        </div>
 
         {quizzes.length === 0 ? (
           <div className="empty-state-card">
@@ -700,14 +691,10 @@ const TeacherDashboard = () => {
         return renderFlashcards();
       case "quiz":
         return renderQuizzes();
+      case "review":
+        return <TeacherReviewManagement />;
       case "danhgia":
-        return (
-          <div className="feedback-page-card">
-            <div className="feedback-page-inner">
-              <TeacherFeedbackView />
-            </div>
-          </div>
-        );
+        return <TeacherFeedbackView />;
       default:
         return null;
     }
