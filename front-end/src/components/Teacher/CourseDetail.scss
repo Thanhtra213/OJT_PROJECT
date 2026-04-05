@@ -1,14 +1,15 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
-$course-primary: #00c896;      // --mint
-$course-primary-hover: #00a87c; // --mint-dk
-$course-primary-soft: #e6faf4; // --mint-lt
-$course-page-bg: #f9fafb;     // --bg
-$course-card-border: #e5e7eb; // --gray-200
-$course-text: #111827;      // --gray-900
-$course-body: #4b5563;      // --gray-600
-$course-muted: #9ca3af;     // --gray-400
-$course-surface: #ffffff;
+$course-primary: #00c896;
+$course-primary-hover: #00a87c;
+$course-primary-soft: #e6faf4;
+$course-primary-border: #b3f0de;
+$course-page-bg: var(--teacher-bg, #f9fafb);
+$course-card-border: var(--teacher-border, #e5e7eb);
+$course-text: var(--teacher-text, #111827);
+$course-body: var(--teacher-text-body, #4b5563);
+$course-muted: var(--teacher-text-muted, #9ca3af);
+$course-surface: var(--teacher-card-bg, #ffffff);
 $course-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); // --s1
 $course-shadow-hover: 0 4px 16px rgba(0,0,0,.08); // --s2
 $transition-main: .2s cubic-bezier(.4, 0, .2, 1); // --t
@@ -224,7 +225,7 @@ body {
     justify-content: center;
     padding: 0.18rem 0.45rem;
     border-radius: 999px;
-    background: #eefbf3;
+    background: $course-primary-soft;
     color: #16a34a;
     font-size: 0.68rem;
     font-weight: 700;
@@ -255,7 +256,7 @@ body {
     width: 100%;
     min-height: 42px;
     padding: 0.78rem 0.9rem;
-    background: #f9fafb;
+    background: $course-page-bg;
     border: 1px solid #e5e7eb;
     border-radius: 9px;
     color: $course-body;
@@ -295,7 +296,7 @@ body {
 
   .course-stats-group {
     .course-stats-box {
-      background: #f9fafb;
+      background: $course-page-bg;
       border: 1px solid #e5e7eb;
       border-radius: 9px;
       padding: 0.85rem 0.9rem;
@@ -380,7 +381,7 @@ body {
   }
 
   .course-chapter-item {
-    background: #ffffff;
+    background: $course-surface;
     border: 1px solid #eceef3;
     border-radius: 12px;
     overflow: hidden;
@@ -399,7 +400,7 @@ body {
     gap: 0.75rem;
     padding: 0.9rem 1rem;
     border: none;
-    background: #ffffff;
+    background: $course-surface;
     cursor: pointer;
     text-align: left;
 
@@ -486,7 +487,7 @@ body {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.9rem 1rem;
-    background: #ffffff;
+    background: $course-surface;
     border: 1px solid #eceef3;
     border-radius: 9px;
   }
@@ -503,7 +504,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 999px;
-    background: #e6faf4;
+    background: $course-primary-soft;
     color: $course-primary;
     display: inline-flex;
     align-items: center;

@@ -1,22 +1,22 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
 // ===== PALETTE =====
-$quiz-primary: #00c896;      // --mint
-$quiz-primary-hover: #00a87c; // --mint-dk
-$quiz-primary-soft: #e6faf4; // --mint-lt
-$quiz-primary-border: #b3f0de; // --mint-mid
+$quiz-primary: #00c896;      
+$quiz-primary-hover: #00a87c; 
+$quiz-primary-soft: #e6faf4; 
+$quiz-primary-border: #b3f0de; 
 
 $quiz-blue: #3b82f6;
 $quiz-green: #10b981;
 $quiz-red: #ef4444;
 $quiz-yellow: #f59e0b;
 
-$quiz-text: #111827;      // --gray-900
-$quiz-muted: #9ca3af;     // --gray-400
-$quiz-border: #e5e7eb;    // --gray-200
-$quiz-bg: #f9fafb;        // --bg
-$quiz-surface: #ffffff;
-$quiz-surface-soft: #fcfdfe;
+$quiz-text: var(--teacher-text, #111827);      
+$quiz-muted: var(--teacher-text-muted, #9ca3af);     
+$quiz-border: var(--teacher-border, #e5e7eb);    
+$quiz-bg: var(--teacher-bg, #f9fafb);        
+$quiz-surface: var(--teacher-card-bg, #ffffff);
+$quiz-surface-soft: var(--teacher-bg, #fcfdfe);
 
 $quiz-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); // --s2
 $quiz-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
@@ -77,7 +77,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding: 1.4rem 1.5rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: $quiz-surface;
     border: 1px solid $quiz-primary-border;
     border-radius: $quiz-radius-xl;
     box-shadow: $quiz-shadow;
@@ -195,7 +195,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
   .btn-outline-info {
     border-color: #bfdbfe;
     color: #2563eb;
-    background: #fff;
+    background: $quiz-surface;
 
     &:hover,
     &:focus,
@@ -210,7 +210,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
   .btn-outline-danger {
     border-color: #fecaca;
     color: #dc2626;
-    background: #fff;
+    background: $quiz-surface;
 
     &:hover,
     &:focus,
@@ -225,7 +225,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
   .btn-outline-secondary {
     border-color: #e5e7eb;
     color: #4b5563;
-    background: #fff;
+    background: $quiz-surface;
 
     &:hover,
     &:focus,
@@ -291,19 +291,19 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
     background: $quiz-surface;
 
     .card-header {
-      background: #fff;
+      background: $quiz-surface;
       border-bottom: 1px solid #f1f5f9;
       font-weight: 700;
     }
 
     .card-body {
-      background: #fff;
+      background: $quiz-surface;
     }
   }
 
   .quiz-empty-state {
     border: 1px dashed $quiz-primary-border;
-    background: rgba(255, 255, 255, 0.95);
+    background: $quiz-surface;
     border-radius: $quiz-radius-xl;
     box-shadow: $quiz-shadow;
   }
@@ -319,7 +319,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
       border: 1px solid $quiz-primary-border;
       border-radius: $quiz-radius-xl !important;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.97);
+      background: $quiz-surface;
       box-shadow: $quiz-shadow;
     }
 
@@ -347,7 +347,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
 
     .accordion-body {
       padding: 1.25rem;
-      background: #fff;
+      background: $quiz-surface;
     }
   }
 
@@ -381,7 +381,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
   // ===== ASSET SECTION =====
   .quiz-assets-card {
     border: 1px solid $quiz-primary-border !important;
-    background: #fff;
+    background: $quiz-surface;
 
     > .card-header {
       background: linear-gradient(180deg, #fcfdfe 0%, #e6faf4 100%);
@@ -444,7 +444,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
     object-fit: contain;
     border-radius: 14px;
     border: 1px solid $quiz-primary-soft;
-    background: #fff;
+    background: $quiz-surface;
     padding: 0.4rem;
   }
 
@@ -537,7 +537,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
     padding: 0.75rem 0.95rem;
     font-size: 0.95rem;
     color: $quiz-text;
-    background: #fff;
+    background: $quiz-surface;
     transition: $quiz-transition;
     box-shadow: none;
 
@@ -682,7 +682,7 @@ $quiz-transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
 
   .modal-body {
     padding: 1.15rem 1.2rem;
-    background: #fff;
+    background: $quiz-surface;
   }
 
   .modal-footer {

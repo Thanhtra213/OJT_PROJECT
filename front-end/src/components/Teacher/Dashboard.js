@@ -30,9 +30,11 @@ import {
 } from "../../middleware/teacher/quizTeacherAPI";
 import { TeacherFeedbackView } from "./TeacherFeedbackView";
 import { jwtDecode } from "jwt-decode";
+import AIChat from "../AIChat/AI";
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
+  const [showAIChat, setShowAIChat] = useState(false);
 
   const [courses, setCourses] = useState([]);
   const [flashcards, setFlashcards] = useState([]);
@@ -87,10 +89,20 @@ const TeacherDashboard = () => {
         if (filteredCourses.length > 0) {
           const [flashcardData, quizData] = await Promise.all([
             Promise.all(
-              filteredCourses.map((c) => getFlashcardSetsByCourse(c.courseID))
+              filteredCourses.map((c) =>
+                getFlashcardSetsByCourse(c.courseID).catch((err) => {
+                  console.warn(`Lỗi lấy flashcard cho course ${c.courseID}:`, err);
+                  return [];
+                })
+              )
             ),
             Promise.all(
-              filteredCourses.map((c) => getQuizzesByCourse(c.courseID))
+              filteredCourses.map((c) =>
+                getQuizzesByCourse(c.courseID).catch((err) => {
+                  console.warn(`Lỗi lấy quiz cho course ${c.courseID}:`, err);
+                  return [];
+                })
+              )
             ),
           ]);
 
@@ -145,10 +157,10 @@ const TeacherDashboard = () => {
         sum +
         Number(
           c.totalStudents ||
-            c.studentCount ||
-            c.enrolledStudents ||
-            c.totalEnrollments ||
-            0
+          c.studentCount ||
+          c.enrolledStudents ||
+          c.totalEnrollments ||
+          0
         )
       );
     }, 0);
@@ -158,10 +170,10 @@ const TeacherDashboard = () => {
         sum +
         Number(
           c.totalLessons ||
-            c.lessonCount ||
-            c.totalChapters ||
-            c.totalUnits ||
-            0
+          c.lessonCount ||
+          c.totalChapters ||
+          c.totalUnits ||
+          0
         )
       );
     }, 0);
@@ -169,13 +181,13 @@ const TeacherDashboard = () => {
     const avgScore =
       quizzes.length > 0
         ? (
-            quizzes.reduce(
-              (sum, q) =>
-                sum +
-                Number(q.averageScore || q.avgScore || q.averageResult || 0),
-              0
-            ) / quizzes.length
-          ).toFixed(1)
+          quizzes.reduce(
+            (sum, q) =>
+              sum +
+              Number(q.averageScore || q.avgScore || q.averageResult || 0),
+            0
+          ) / quizzes.length
+        ).toFixed(1)
         : "0.0";
 
     return {
@@ -191,13 +203,13 @@ const TeacherDashboard = () => {
     const avgQuizScore =
       quizzes.length > 0
         ? (
-            quizzes.reduce(
-              (sum, q) =>
-                sum +
-                Number(q.averageScore || q.avgScore || q.averageResult || 0),
-              0
-            ) / quizzes.length
-          ).toFixed(1)
+          quizzes.reduce(
+            (sum, q) =>
+              sum +
+              Number(q.averageScore || q.avgScore || q.averageResult || 0),
+            0
+          ) / quizzes.length
+        ).toFixed(1)
         : "0.0";
 
     return {
@@ -792,6 +804,37 @@ const TeacherDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* ── FAB ──────────────────────────────────────────────────────── */}
+      {!showAIChat&&(
+        <button className="ai-fab-btn" onClick={()=>setShowAIChat(true)} title="Chat với AI">
+          <span className="ai-fab-label">
+            AI
+            <svg width="14" height="14" viewBox="0 0 15 15" style={{marginLeft:"2px",verticalAlign:"middle",position:"relative",top:"-1px"}}>
+              <polygon points="7.5,1.5 9.3,5.6 14,5.8 10.5,8.6 11.7,12.8 7.5,10.4 3.3,12.8 4.5,8.6 1,5.8 5.7,5.6" fill="#f9c74f" stroke="#f9c74f" strokeWidth="0.5"/>
+            </svg>
+          </span>
+        </button>
+      )}
+
+      <style>{`
+        .ai-fab-btn {
+          position:fixed;bottom:30px;right:30px;z-index:1100;
+          background:#00c896;color:#fff;border:none;border-radius:50%;
+          width:56px;height:56px;
+          box-shadow:0 8px 32px rgba(0,200,150,0.4);
+          display:flex;align-items:center;justify-content:center;
+          cursor:pointer;padding:0;font-family:'Nunito',sans-serif;
+          transition:box-shadow .18s,transform .18s,background .18s;
+          animation:fab-pop 1.2s cubic-bezier(.68,-.55,.27,1.55);
+        }
+        .ai-fab-btn:hover{background:#00a87c;box-shadow:0 12px 40px rgba(0,200,150,.55);transform:translateY(-2px) scale(1.06);}
+        .ai-fab-label{font-weight:900;font-size:1.05rem;display:flex;align-items:center;}
+        @keyframes fab-pop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+        @media(max-width:600px){.ai-fab-btn{right:12px;bottom:12px;}}
+      `}</style>
+
+      {showAIChat&&<AIChat isVisible={showAIChat} onClose={()=>setShowAIChat(false)}/>}
     </div>
   );
 };

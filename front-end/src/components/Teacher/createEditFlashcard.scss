@@ -1,16 +1,16 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
-$flash-primary: #00c896;      // --mint
-$flash-primary-hover: #00a87c; // --mint-dk
-$flash-primary-soft: #e6faf4; // --mint-lt
-$flash-primary-border: #b3f0de; // --mint-mid
+$flash-primary: #00c896;      
+$flash-primary-hover: #00a87c; 
+$flash-primary-soft: #e6faf4;
+$flash-primary-border: #b3f0de; 
 
-$flash-page-bg: #f9fafb;     // --bg
-$flash-surface: #ffffff;
-$flash-surface-soft: #fcfdfe;
-$flash-border: #e5e7eb;    // --gray-200
-$flash-text: #111827;      // --gray-900
-$flash-muted: #9ca3af;     // --gray-400
+$flash-page-bg: var(--teacher-bg, #f9fafb);
+$flash-surface: var(--teacher-card-bg, #ffffff);
+$flash-surface-soft: var(--teacher-bg, #fcfdfe);
+$flash-border: var(--teacher-border, #e5e7eb);
+$flash-text: var(--teacher-text, #111827);
+$flash-muted: var(--teacher-text-muted, #9ca3af);
 $flash-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); // --s2
 $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 
@@ -55,8 +55,8 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
   gap: 1rem;
   margin-bottom: 1.35rem;
   padding: 1.4rem 1.5rem;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #b3f0de;
+  background: $flash-surface;
+  border: 1px solid $flash-primary-border;
   border-radius: 24px;
   box-shadow: $flash-shadow-soft;
   backdrop-filter: blur(10px);
@@ -115,14 +115,14 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 }
 
 .flashcard-side-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fcfdfe 100%);
+  background: $flash-surface;
 }
 
 .info-card {
   .info-row + .info-row {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px dashed #e5f6f1;
+    border-top: 1px dashed $flash-primary-border;
   }
 }
 
@@ -166,8 +166,8 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
   .form-select {
     min-height: 52px;
     border-radius: 16px;
-    border: 1px solid $flash-primary-soft;
-    background: #fff;
+    border: 1px solid $flash-border;
+    background: $flash-surface-soft;
     color: $flash-text;
     font-size: 0.95rem;
     padding: 0.8rem 1rem;
@@ -175,11 +175,11 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
     transition: all 0.2s ease;
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--teacher-text-muted);
     }
 
     &:hover {
-      border-color: #b3f0de;
+      border-color: $flash-primary-border;
     }
 
     &:focus {
@@ -189,8 +189,8 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 
     &:disabled,
     &[readonly] {
-      background: #f8fafc;
-      color: #6b7280;
+      background: $flash-page-bg;
+      color: var(--teacher-text-body);
       opacity: 1;
     }
   }
@@ -227,7 +227,7 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 
   .btn-save {
     background: $flash-primary;
-    color: #fff;
+    color: #ffffff;
     box-shadow: $flash-shadow-soft;
 
     &:hover {
@@ -244,13 +244,13 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
   }
 
   .btn-cancel {
-    background: #f8fafc;
-    color: #4b5563;
-    border: 1px solid #e5e7eb;
+    background: $flash-page-bg;
+    color: var(--teacher-text-body);
+    border: 1px solid $flash-border;
 
     &:hover {
-      background: #f1f5f9;
-      color: #111827;
+      background: $flash-border;
+      color: $flash-text;
     }
   }
 }

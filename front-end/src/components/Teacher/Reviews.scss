@@ -6,7 +6,7 @@
 
 .review-card button,
 .review-card .btn {
-  background: #6c47ff;
+  background: #00c896;
   color: #fff;
   border: none;
   border-radius: 14px;
@@ -17,10 +17,10 @@
 
 .review-card button:hover,
 .review-card .btn:hover {
-  background: #5535e0;
+  background: #00a87c;
   color: #fff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
 }
 
 .review-card button:disabled,

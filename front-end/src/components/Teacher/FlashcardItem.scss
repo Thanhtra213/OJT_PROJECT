@@ -1,6 +1,6 @@
 .flashcard-item-page {
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--teacher-bg);
   padding-top: 1rem;
   padding-bottom: 2rem;
   font-family: 'Nunito', sans-serif;
@@ -8,8 +8,8 @@
   .flashcard-header {
     margin-bottom: 1.25rem;
     padding: 1rem 1.25rem;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--teacher-card-bg);
+    border: 1px solid var(--teacher-border);
     border-radius: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,.06);
 
@@ -17,7 +17,7 @@
       margin: 0;
       font-size: 1.35rem;
       font-weight: 800; // Nunito bold
-      color: #111827; // --gray-900
+      color: var(--teacher-text); // --gray-900
     }
 
     .btn {
@@ -29,7 +29,7 @@
     .btn-outline-secondary {
       border-color: #b3f0de;
       color: #00a87c;
-      background: #fff;
+      background: var(--teacher-card-bg);
 
       &:hover,
       &:focus {
@@ -55,9 +55,9 @@
 
   .flashcard-card {
     min-height: 150px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--teacher-border);
     border-radius: 20px;
-    background: #ffffff;
+    background: var(--teacher-card-bg);
     box-shadow: 0 1px 3px rgba(0,0,0,.06);
     transition: all .2s cubic-bezier(.4, 0, .2, 1);
     overflow: hidden;
@@ -75,12 +75,12 @@
       margin-bottom: 0.55rem;
       font-size: 0.95rem;
       font-weight: 700;
-      color: #111827 !important;
+      color: var(--teacher-text) !important;
       line-height: 1.35;
     }
 
     .text-muted {
-      color: #4b5563 !important;
+      color: var(--teacher-text-muted) !important;
       font-size: 0.95rem;
       line-height: 1.45;
       margin-bottom: 0.35rem !important;
@@ -104,7 +104,7 @@
     gap: 0.45rem;
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid #e6faf4;
+    border-top: 1px solid var(--teacher-border);
 
     .btn {
       border-radius: 10px;
@@ -166,29 +166,29 @@
   }
 
   .modal-content {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--teacher-border);
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 20px 50px rgba(0, 200, 150, 0.1);
   }
 
   .modal-header {
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
+    background: var(--teacher-bg);
+    border-bottom: 1px solid var(--teacher-border);
 
     .modal-title {
       font-weight: 800;
-      color: #111827;
+      color: var(--teacher-text);
     }
   }
 
   .modal-body {
-    background: #fff;
+    background: var(--teacher-card-bg);
   }
 
   .modal-footer {
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
+    background: var(--teacher-bg);
+    border-top: 1px solid var(--teacher-border);
 
     .btn {
       border-radius: 12px;
@@ -198,27 +198,27 @@
     }
 
     .btn-secondary {
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      color: #4b5563;
+      border: 1px solid var(--teacher-border);
+      background: var(--teacher-bg);
+      color: var(--teacher-text-body);
 
       &:hover,
       &:focus {
-        background: #f3f4f6;
+        background: var(--teacher-border);
         border-color: #d1d5db;
-        color: #111827;
+        color: var(--teacher-text);
       }
     }
 
     .btn-primary {
       border: none;
-      background: #00c896;
-      box-shadow: 0 2px 8px rgba(0, 200, 150, 0.1);
+      background: #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
 
       &:hover,
       &:focus {
-        background: #00a87c;
-        box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+        background: #2563eb;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
         transform: translateY(-1px);
       }
     }
@@ -226,15 +226,17 @@
 
   .form-label {
     font-weight: 600;
-    color: #374151;
+    color: var(--teacher-text-body);
   }
 
   .form-control {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--teacher-border);
     border-radius: 12px;
     padding: 0.72rem 0.95rem;
     box-shadow: none;
     transition: all 0.2s ease;
+    background: var(--teacher-bg);
+    color: var(--teacher-text);
 
     &:focus {
       border-color: #00c896;
@@ -252,7 +254,7 @@
 
     p {
       margin-top: 1rem;
-      color: #6b7280;
+      color: var(--teacher-text-muted);
       font-weight: 500;
     }
   }
