@@ -11,7 +11,7 @@ import {
 } from "../../middleware/admin/adminFlashcardAPI";
 import { Plus, Edit, Trash, Eye, X, ArrowLeft } from "lucide-react";
 import Swal from "sweetalert2";
-import "./management-styles.scss";
+import "./admin-dashboard-styles.scss";
 
 export function FlashcardManagement() {
   const [sets, setSets] = useState([]);
@@ -24,6 +24,7 @@ export function FlashcardManagement() {
   const [setForm, setSetForm] = useState({ title: "", description: "" });
   const [itemForm, setItemForm] = useState({
     frontText: "",
+    ipa: "", 
     backText: "",
     example: "",
     setID: null,
@@ -43,6 +44,7 @@ export function FlashcardManagement() {
 
   useEffect(() => {
     loadSets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelectSet = async (setId) => {
@@ -86,6 +88,8 @@ export function FlashcardManagement() {
       showCancelButton: true,
       confirmButtonText: "Xóa",
       cancelButtonText: "Hủy",
+      confirmButtonColor: "#ec4899",
+      cancelButtonColor: "#9ca3af",
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
@@ -104,6 +108,7 @@ export function FlashcardManagement() {
     if (item)
       setItemForm({
         frontText: item.frontText ?? "",
+        ipa: item.ipa ?? "",
         backText: item.backText ?? "",
         example: item.example ?? "",
         itemID: item.itemID,
@@ -112,6 +117,7 @@ export function FlashcardManagement() {
     else
       setItemForm({
         frontText: "",
+        ipa: "",
         backText: "",
         example: "",
         setID,
@@ -130,8 +136,9 @@ export function FlashcardManagement() {
       const payload = {
         setID: itemForm.setID,
         frontText: itemForm.frontText,
+        ipa: itemForm.ipa || null,
         backText: itemForm.backText,
-        example: itemForm.example ?? null,
+        example: itemForm.example || null,
       };
 
       if (itemForm.itemID) {
@@ -152,15 +159,18 @@ export function FlashcardManagement() {
   const handleDeleteItem = (itemId, setID) => {
     Swal.fire({
       title: "Xác nhận xóa?",
-      text: "Bạn có chắc chắn muốn xóa Flashcard Item này?",
+      text: "Bạn có chắc chắn muốn xóa thẻ này?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+      confirmButtonColor: "#ec4899",
+      cancelButtonColor: "#9ca3af",
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
           await deleteFlashcardItem(itemId);
-          Swal.fire("Đã xóa!", "Flashcard Item đã bị xóa.", "success");
+          Swal.fire("Đã xóa!", "Thẻ (Item) đã bị xóa.", "success");
           const detail = await getFlashcardSet(setID);
           setSelectedSet(detail);
         } catch (err) {
@@ -177,11 +187,15 @@ export function FlashcardManagement() {
 
   const renderSetList = () => (
     <>
-      <div className="management-card-header flex justify-between items-center">
+      <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý Flashcard</h2>
-          <p className="card-description">Tạo và quản lý các bộ flashcard công khai.</p>
+          <p className="card-description">Tạo và quản lý các bộ flashcard công khai trên hệ thống.</p>
         </div>
+      </div>
+
+      <div className="management-header">
+        <div style={{ flex: 1 }}></div>
         <button onClick={() => handleOpenSetModal()} className="primary-button">
           <Plus size={18} />
           <span>Thêm bộ mới</span>
@@ -194,40 +208,43 @@ export function FlashcardManagement() {
           <p>Đang tải dữ liệu...</p>
         </div>
       ) : (
-        <div className="flashcard-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {sets.length > 0 ? (
             sets.map((set) => (
-              <div key={set.setID} className="management-card p-4 flex flex-col">
-                <h5 className="font-bold text-lg">{set.title}</h5>
-                <p className="text-gray-600 text-sm flex-grow">{set.description}</p>
-                <div className="flex gap-2 mt-4">
+              <div key={set.setID} className="interactive-card" style={{ display: 'flex', flexDirection: 'column', padding: '1.5rem' }}>
+                <h4 className="card-title" style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>{set.title}</h4>
+                <p className="card-description" style={{ flexGrow: 1, marginBottom: '1.5rem', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+                  {set.description || "Chưa có mô tả"}
+                </p>
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', borderTop: '1.5px dashed var(--border)', paddingTop: '1.25rem' }}>
                   <button
                     className="action-button"
-                    title="Xem chi tiết"
+                    title="Xem chi tiết thẻ"
                     onClick={() => handleSelectSet(set.setID)}
                   >
-                    <Eye size={16} />
+                    <Eye size={18} />
                   </button>
                   <button
                     className="action-button"
-                    title="Chỉnh sửa"
+                    title="Chỉnh sửa bộ thẻ"
                     onClick={() => handleOpenSetModal(set)}
                   >
-                    <Edit size={16} />
+                    <Edit size={18} />
                   </button>
                   <button
-                    className="action-button delete-button"
-                    title="Xóa"
+                    className="action-button"
+                    title="Xóa bộ thẻ"
                     onClick={() => handleDeleteSet(set.setID)}
+                    style={{ color: '#ec4899' }}
                   >
-                    <Trash size={16} />
+                    <Trash size={18} />
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center text-gray-500 py-12">
-              Không có Flashcard Set nào.
+            <div className="admin-empty-data" style={{ gridColumn: '1 / -1', padding: '4rem 0' }}>
+              Hệ thống chưa có bộ Flashcard nào.
             </div>
           )}
         </div>
@@ -237,9 +254,9 @@ export function FlashcardManagement() {
 
   const renderSetDetails = () => (
     <>
-      <div className="w-full flex justify-between items-center mb-4">
+      <div className="management-header" style={{ marginBottom: '1rem' }}>
         <button onClick={() => setSelectedSet(null)} className="secondary-button">
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
             <span>Quay lại</span>
         </button>
         <button onClick={() => handleOpenItemModal(null, selectedSet.setID)} className="primary-button">
@@ -247,47 +264,57 @@ export function FlashcardManagement() {
             <span>Thêm thẻ</span>
         </button>
       </div>
-      <div className="management-card-header">
+
+      <div className="management-card-header" style={{ marginBottom: '2rem' }}>
         <h3 className="card-title">Chi tiết bộ: {selectedSet.title}</h3>
-        <p className="card-description">{selectedSet.description}</p>
+        <p className="card-description">{selectedSet.description || "Không có mô tả"}</p>
       </div>
-      <div className="management-table-wrapper mt-4">
+
+      <div className="management-table-wrapper">
         <table className="management-table">
           <thead>
             <tr>
               <th>Thuật ngữ (Front)</th>
               <th>Định nghĩa (Back)</th>
               <th>Ví dụ</th>
-              <th className="text-right">Hành động</th>
+              <th style={{ textAlign: 'right' }}>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {selectedSet.items?.length > 0 ? (
               selectedSet.items.map((item) => (
                 <tr key={item.itemID}>
-                  <td className="font-semibold">{item.frontText}</td>
-                  <td>{item.backText}</td>
-                  <td className="text-gray-500 italic">{item.example || "N/A"}</td>
-                  <td className="management-table-actions">
+                  <td>
+                    <p className="fw-800 mb-0" style={{ color: 'var(--primary)' }}>{item.frontText}</p>
+                    {item.ipa && <p className="td-sub mb-0" style={{ fontStyle: 'italic', marginTop: '2px' }}>/{item.ipa}/</p>}
+                  </td>
+                  <td className="fw-700">{item.backText}</td>
+                  <td className="td-sub">{item.example || "N/A"}</td>
+                  <td style={{ textAlign: 'right' }}>
                     <button
                       className="action-button"
+                      title="Sửa thẻ"
                       onClick={() => handleOpenItemModal(item, selectedSet.setID)}
                     >
-                      <Edit size={16} />
+                      <Edit size={18} />
                     </button>
                     <button
-                      className="action-button delete-button"
+                      className="action-button"
+                      title="Xóa thẻ"
+                      style={{ color: '#ec4899', marginLeft: '8px' }}
                       onClick={() => handleDeleteItem(item.itemID, selectedSet.setID)}
                     >
-                      <Trash size={16} />
+                      <Trash size={18} />
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center text-gray-500 py-8">
-                  Chưa có thẻ nào trong bộ này.
+                <td colSpan="4">
+                  <div className="admin-empty-data" style={{ padding: '3rem 0' }}>
+                    Chưa có thẻ (Item) nào trong bộ này.
+                  </div>
                 </td>
               </tr>
             )}
@@ -301,87 +328,110 @@ export function FlashcardManagement() {
     <div className="management-card">
       {selectedSet ? renderSetDetails() : renderSetList()}
 
-      {/* Modal Set */}
       {showSetModal && (
         <div className="management-modal-overlay" onClick={() => setShowSetModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center pb-4 border-b">
-              <h3 className="text-xl font-bold">
+            <div className="modal-head">
+              <h3 className="modal-title">
                 {setForm.setID ? "Sửa Flashcard Set" : "Thêm Flashcard Set"}
               </h3>
-              <button className="action-button" onClick={() => setShowSetModal(false)}>
+              {/* <button className="action-button" onClick={() => setShowSetModal(false)}>
                 <X size={20} />
-              </button>
+              </button> */}
             </div>
-            <div className="my-6">
-              <label className="form-label">Tiêu đề</label>
-              <input
-                type="text"
-                className="form-input"
-                value={setForm.title}
-                onChange={(e) => setSetForm({ ...setForm, title: e.target.value })}
-              />
-              <label className="form-label mt-4">Mô tả</label>
-              <textarea
-                className="form-input"
-                rows="3"
-                value={setForm.description}
-                onChange={(e) => setSetForm({ ...setForm, description: e.target.value })}
-              ></textarea>
+            <div className="modal-body-custom">
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tiêu đề</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Nhập tiêu đề bộ thẻ..."
+                  value={setForm.title}
+                  onChange={(e) => setSetForm({ ...setForm, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mô tả</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Nhập mô tả bộ thẻ (không bắt buộc)..."
+                  rows="3"
+                  value={setForm.description}
+                  onChange={(e) => setSetForm({ ...setForm, description: e.target.value })}
+                ></textarea>
+              </div>
             </div>
-            <div className="flex justify-end gap-4 pt-4 border-t">
-              <button className="secondary-button" onClick={() => setShowSetModal(false)}>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowSetModal(false)}>
                 Hủy
               </button>
               <button className="primary-button" onClick={handleSaveSet}>
-                Lưu
+                Lưu thay đổi
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Item */}
       {showItemModal && (
         <div className="management-modal-overlay" onClick={() => setShowItemModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center pb-4 border-b">
-              <h3 className="text-xl font-bold">
+            <div className="modal-head">
+              <h3 className="modal-title">
                 {itemForm.itemID ? "Sửa Flashcard Item" : "Thêm Flashcard Item"}
               </h3>
-              <button className="action-button" onClick={() => setShowItemModal(false)}>
+              {/* <button className="action-button" onClick={() => setShowItemModal(false)}>
                 <X size={20} />
-              </button>
+              </button> */}
             </div>
-            <div className="my-6">
-              <label className="form-label">Thuật ngữ (Front Text)</label>
-              <input
-                type="text"
-                className="form-input"
-                value={itemForm.frontText}
-                onChange={(e) => setItemForm({ ...itemForm, frontText: e.target.value })}
-              />
-              <label className="form-label mt-4">Định nghĩa (Back Text)</label>
-              <input
-                type="text"
-                className="form-input"
-                value={itemForm.backText}
-                onChange={(e) => setItemForm({ ...itemForm, backText: e.target.value })}
-              />
-              <label className="form-label mt-4">Ví dụ (Tùy chọn)</label>
-              <textarea
-                className="form-input"
-                rows="2"
-                value={itemForm.example}
-                onChange={(e) => setItemForm({ ...itemForm, example: e.target.value })}
-              ></textarea>
+            <div className="modal-body-custom">
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Thuật ngữ (Mặt trước)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Vd: Serendipity..."
+                  value={itemForm.frontText}
+                  onChange={(e) => setItemForm({ ...itemForm, frontText: e.target.value })}
+                />
+              </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Phiên âm (IPA) - Tùy chọn</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Vd: /ˌserənˈdɪpəti/..."
+                  value={itemForm.ipa}
+                  onChange={(e) => setItemForm({ ...itemForm, ipa: e.target.value })}
+                />
+              </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Định nghĩa (Mặt sau)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Vd: Sự tình cờ may mắn..."
+                  value={itemForm.backText}
+                  onChange={(e) => setItemForm({ ...itemForm, backText: e.target.value })}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Ví dụ (Tùy chọn)</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Nhập câu ví dụ minh họa..."
+                  rows="2"
+                  value={itemForm.example}
+                  onChange={(e) => setItemForm({ ...itemForm, example: e.target.value })}
+                ></textarea>
+              </div>
             </div>
-            <div className="flex justify-end gap-4 pt-4 border-t">
-              <button className="secondary-button" onClick={() => setShowItemModal(false)}>
+            <div className="modal-foot">
+              <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowItemModal(false)}>
                 Hủy
               </button>
               <button className="primary-button" onClick={handleSaveItem}>
-                Lưu
+                Lưu thẻ
               </button>
             </div>
           </div>

@@ -1,17 +1,17 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
-$course-primary: #00c896;      // --mint
-$course-primary-hover: #00a87c; // --mint-dk
-$course-primary-soft: #e6faf4; // --mint-lt
-$course-page-bg: #f9fafb;     // --bg
-$course-card-border: #e5e7eb; // --gray-200
-$course-text: #111827;      // --gray-900
-$course-body: #4b5563;      // --gray-600
-$course-muted: #9ca3af;     // --gray-400
+$course-primary: #6c47ff;
+$course-primary-hover: #5535e0;
+$course-primary-soft: #ede9ff;
+$course-page-bg: #f5f6fa;
+$course-card-border: #e8eaf0;
+$course-text: #1a1a2e;
+$course-body: #5a6275;
+$course-muted: #9aa0ad;
 $course-surface: #ffffff;
-$course-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); // --s1
-$course-shadow-hover: 0 4px 16px rgba(0,0,0,.08); // --s2
-$transition-main: .2s cubic-bezier(.4, 0, .2, 1); // --t
+$course-shadow: 0 2px 8px rgba(108, 71, 255, 0.07);
+$course-shadow-hover: 0 12px 40px rgba(108, 71, 255, 0.16);
+$transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
 
 html,
 body,
@@ -128,7 +128,7 @@ body {
     &:hover {
       background: $course-primary-hover;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+      box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
     }
   }
 
@@ -358,7 +358,7 @@ body {
     &:hover {
       background: $course-primary-hover;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+      box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
     }
   }
 
@@ -419,7 +419,7 @@ body {
     width: 24px;
     height: 24px;
     border-radius: 6px;
-    background: #e6faf4;
+    background: #f4ebff;
     color: $course-primary;
     font-size: 0.78rem;
     font-weight: 700;
@@ -503,7 +503,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 999px;
-    background: #e6faf4;
+    background: #f4ebff;
     color: $course-primary;
     display: inline-flex;
     align-items: center;

@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Eye, Trash, UserPlus, Power, PowerOff, Search } from "lucide-react";
+import { Trash, UserPlus, Power, PowerOff, Search, X } from "lucide-react";
 import {
   getAllUsers,
   searchUsers,
   lockUser,
   unlockUser,
   createUser,
-  assignRole,
 } from "../../middleware/admin/userManagementAPI";
-import "./management-styles.scss"; // Ensure this is imported for base styles
+import "./admin-dashboard-styles.scss"; 
 
 export function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -34,23 +33,46 @@ export function UserManagement() {
 
   useEffect(() => {
     loadUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 📦 TẢI VÀ BÓC TÁCH DỮ LIỆU THÔNG MINH
   const loadUsers = async () => {
     try {
       setIsLoading(true);
-      const data = await getAllUsers();
-      const mapped = data.map((u) => ({
+      const response = await getAllUsers();
+      
+      // 1. Xử lý linh hoạt mọi cấu trúc Backend trả về (Array, {data: []}, {content: []}, {users: []})
+      let dataList = [];
+      if (Array.isArray(response)) {
+        dataList = response;
+      } else if (response && Array.isArray(response.data)) {
+        dataList = response.data;
+      } else if (response && Array.isArray(response.content)) {
+        dataList = response.content;
+      } else if (response && Array.isArray(response.users)) {
+        dataList = response.users;
+      }
+
+      console.log("Dữ liệu người dùng từ Backend:", dataList); // In ra F12 Console để kiểm tra
+
+      // 2. Map dữ liệu dự phòng (Fallback) để không bị undefined
+      const mapped = dataList.map((u) => ({
         ...u,
-        accountID: u.name,
-        username: u.username,
-        email: u.email,
-        role: u.role,
-        isActive: u.status === "ACTIVE",
-        joinedDate: u.joinedDate || new Date().toISOString(),
+        // Ưu tiên lấy các trường ID phổ biến
+        accountID: u.accountID || u.id || u.userId || u._id || u.name || Math.random().toString(),
+        username: u.username || u.name || u.fullName || "Chưa có tên",
+        email: u.email || "Không có email",
+        role: u.role || "STUDENT",
+        // Xử lý linh hoạt trạng thái
+        isActive: u.status === "ACTIVE" || u.isActive === true || u.status === 1 || u.active === true,
+        // Xử lý linh hoạt ngày tháng
+        joinedDate: u.joinedDate || u.createdAt || u.createAt || new Date().toISOString(),
       }));
+
       setUsers(mapped);
     } catch (error) {
+      console.error("Lỗi khi tải danh sách người dùng:", error);
       showPopup("Không thể tải danh sách người dùng", "error");
     } finally {
       setIsLoading(false);
@@ -80,15 +102,21 @@ export function UserManagement() {
     }
     try {
       setIsLoading(true);
-      const results = await searchUsers(searchQuery);
-      const mapped = results.map((u) => ({
+      const response = await searchUsers(searchQuery);
+      
+      let dataList = [];
+      if (Array.isArray(response)) dataList = response;
+      else if (response && Array.isArray(response.data)) dataList = response.data;
+      else if (response && Array.isArray(response.content)) dataList = response.content;
+
+      const mapped = dataList.map((u) => ({
         ...u,
-        accountID: u.name,
-        username: u.username,
-        email: u.email,
-        role: u.role,
-        isActive: u.status === "ACTIVE",
-        joinedDate: u.joinedDate || new Date().toISOString(),
+        accountID: u.accountID || u.id || u.userId || u._id || u.name,
+        username: u.username || u.name || u.fullName || "Chưa có tên",
+        email: u.email || "Không có email",
+        role: u.role || "STUDENT",
+        isActive: u.status === "ACTIVE" || u.isActive === true || u.status === 1,
+        joinedDate: u.joinedDate || u.createdAt || u.createAt || new Date().toISOString(),
       }));
       setUsers(mapped);
     } catch (error) {
@@ -114,13 +142,13 @@ export function UserManagement() {
     }
   };
 
+  // Lọc dữ liệu hiển thị (Bỏ phân biệt hoa thường)
   const filteredUsers = users.filter((user) => {
-    const roleMatch = filterRole === "all" || (user.role && user.role.toLowerCase() === filterRole);
+    const roleMatch = filterRole === "all" || (user.role && user.role.toLowerCase() === filterRole.toLowerCase());
     const statusMatch =
       filterStatus === "all" ||
       (user.isActive && filterStatus === "active") ||
       (!user.isActive && filterStatus === "inactive");
-    // Search is now handled by API, so we only filter by role and status on the client
     return roleMatch && statusMatch;
   });
 
@@ -135,70 +163,32 @@ export function UserManagement() {
 
   return (
     <div className="management-card">
-      {showCreateUser && (
-        <div className="management-modal-overlay" onClick={() => setShowCreateUser(false)}>
-          <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className="card-title mb-6">Tạo người dùng mới</h3>
-            <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Tên đăng nhập"
-                value={newUser.username}
-                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                className="form-input"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                className="form-input"
-              />
-              <input
-                type="password"
-                placeholder="Mật khẩu"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                className="form-input"
-              />
-              <select
-                value={newUser.role}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                className="form-input"
-              >
-                <option value="STUDENT">Student</option>
-                <option value="TEACHER">Teacher</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-              <div className="flex justify-end gap-4 mt-6">
-                <button onClick={() => setShowCreateUser(false)} className="secondary-button">
-                  Hủy
-                </button>
-                <button onClick={handleCreateUser} className="primary-button">
-                  Tạo
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Toast Notification */}
+      {toast.show && (
+        <div style={{
+          position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+          background: toast.type === 'success' ? 'var(--mint)' : '#ec4899',
+          color: '#fff', padding: '12px 24px', borderRadius: '99px',
+          fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+        }}>
+          {toast.message}
         </div>
       )}
 
-      <div className="management-card-header flex justify-between items-center">
+      {/* Header */}
+      <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý người dùng</h2>
           <p className="card-description">
-            Hiển thị {filteredUsers.length} trên tổng số {users.length} người dùng
+            Hiển thị {filteredUsers.length} trên tổng số {users.length} tài khoản
           </p>
         </div>
-        <button onClick={() => setShowCreateUser(true)} className="primary-button">
-          <UserPlus size={18} />
-          <span>Tạo mới</span>
-        </button>
       </div>
 
-      <div className="management-header" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-        <div className="search-bar" style={{ flexGrow: 1 }}>
-          <Search size={18} className="text-gray-400" />
+      {/* Toolbar: Search, Filters & Thêm mới */}
+      <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <div className="search-bar" style={{ flexGrow: 1, minWidth: '280px', maxWidth: '400px' }}>
+          <Search size={18} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             placeholder="Tìm theo tên, email..."
@@ -208,27 +198,38 @@ export function UserManagement() {
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
-        <select
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-          className="form-input"
-        >
-          <option value="all">Tất cả vai trò</option>
-          <option value="admin">Admin</option>
-          <option value="teacher">Teacher</option>
-          <option value="student">Student</option>
-        </select>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="form-input"
-        >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="active">Hoạt động</option>
-          <option value="inactive">Không hoạt động</option>
-        </select>
+        
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="form-input"
+            style={{ width: 'auto', borderRadius: '99px', padding: '0.6rem 1rem', border: '1.5px solid var(--border)' }}
+          >
+            <option value="all">Tất cả vai trò</option>
+            <option value="admin">Admin</option>
+            <option value="teacher">Giảng viên</option>
+            <option value="student">Học viên</option>
+          </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="form-input"
+            style={{ width: 'auto', borderRadius: '99px', padding: '0.6rem 1rem', border: '1.5px solid var(--border)' }}
+          >
+            <option value="all">Trạng thái (Tất cả)</option>
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Đã khóa</option>
+          </select>
+          
+          <button onClick={() => setShowCreateUser(true)} className="primary-button">
+            <UserPlus size={18} />
+            <span>Tạo mới</span>
+          </button>
+        </div>
       </div>
 
+      {/* Table Data */}
       <div className="management-table-wrapper">
         <table className="management-table">
           <thead>
@@ -237,40 +238,134 @@ export function UserManagement() {
               <th>Vai trò</th>
               <th>Trạng thái</th>
               <th>Ngày tham gia</th>
-              <th className="text-right">Hành động</th>
+              <th style={{ textAlign: 'right' }}>Hành động</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
-              <tr key={user.accountID}>
-                <td>
-                  <div className="font-semibold">{user.username}</div>
-                  <div className="text-sm text-gray-500">{user.email}</div>
-                </td>
-                <td>{user.role}</td>
-                <td>
-                  <span className={`status-badge ${user.isActive ? "active" : "inactive"}`}>
-                    {user.isActive ? "Hoạt động" : "Khóa"}
-                  </span>
-                </td>
-                <td>{new Date(user.joinedDate).toLocaleDateString()}</td>
-                <td className="management-table-actions">
-                  <button
-                    className="action-button"
-                    title={user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                    onClick={() => handleToggleStatus(user.accountID, user.isActive)}
-                  >
-                    {user.isActive ? <PowerOff size={16} /> : <Power size={16} />}
-                  </button>
-                  <button className="action-button delete-button" title="Xóa người dùng">
-                    <Trash size={16} />
-                  </button>
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <tr key={user.accountID}>
+                  <td>
+                    <p className="td-title fw-800 mb-0">{user.username}</p>
+                    <p className="td-sub mb-0">{user.email}</p>
+                  </td>
+                  <td className="fw-800" style={{ color: 'var(--primary)' }}>{user.role}</td>
+                  <td>
+                    <span 
+                      className="status-badge" 
+                      style={{ 
+                        backgroundColor: user.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(236,72,153,0.12)', 
+                        color: user.isActive ? 'var(--primary)' : '#ec4899' 
+                      }}
+                    >
+                      {user.isActive ? "Hoạt động" : "Khóa"}
+                    </span>
+                  </td>
+                  <td className="fw-600">{new Date(user.joinedDate).toLocaleDateString('vi-VN')}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button
+                      className="action-button"
+                      title={user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                      onClick={() => handleToggleStatus(user.accountID, user.isActive)}
+                      style={{ color: user.isActive ? '#ec4899' : 'var(--primary)' }}
+                    >
+                      {user.isActive ? <PowerOff size={18} /> : <Power size={18} />}
+                    </button>
+                    <button 
+                      className="action-button" 
+                      title="Xóa người dùng"
+                      style={{ color: '#ec4899', marginLeft: '8px' }}
+                    >
+                      <Trash size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">
+                  <div className="admin-empty-data" style={{ padding: '3rem 0' }}>
+                    Không tìm thấy người dùng nào.
+                  </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* ════════════════════════════════════════════
+          MODAL: TẠO NGƯỜI DÙNG MỚI
+      ════════════════════════════════════════════ */}
+      {showCreateUser && (
+        <div className="management-modal-overlay" onClick={() => setShowCreateUser(false)}>
+          <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title">Tạo người dùng mới</h3>
+              {/* <button className="action-button" onClick={() => setShowCreateUser(false)}>
+                <X size={20} />
+              </button> */}
+            </div>
+            
+            <div className="modal-body-custom">
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên đăng nhập</label>
+                <input
+                  type="text"
+                  placeholder="Nhập tên đăng nhập..."
+                  value={newUser.username}
+                  onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                  className="form-input"
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Địa chỉ Email</label>
+                <input
+                  type="email"
+                  placeholder="Nhập email..."
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  className="form-input"
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mật khẩu</label>
+                <input
+                  type="password"
+                  placeholder="Nhập mật khẩu..."
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  className="form-input"
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Phân quyền</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  className="form-input"
+                >
+                  <option value="STUDENT">Học viên (Student)</option>
+                  <option value="TEACHER">Giảng viên (Teacher)</option>
+                  <option value="ADMIN">Quản trị viên (Admin)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="modal-foot">
+              <button onClick={() => setShowCreateUser(false)} className="secondary-button" style={{ marginRight: '1rem' }}>
+                Hủy
+              </button>
+              <button onClick={handleCreateUser} className="primary-button">
+                Tạo tài khoản
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-﻿namespace EasyEnglish_API.DTOs.Quizs
+namespace EasyEnglish_API.DTOs.Quizs
 {
     public class QuizDto
     {
@@ -6,6 +6,7 @@
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public int QuizType { get; set; }  // 1=Listening, 2=Reading...
+        public bool IsActive { get; set; }
     }
 
     public class QuizDetailDto : QuizDto

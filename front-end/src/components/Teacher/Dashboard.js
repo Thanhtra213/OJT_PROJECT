@@ -99,7 +99,6 @@ const TeacherDashboard = () => {
               ...f,
               courseID: f.courseID || filteredCourses[idx].courseID,
               courseName: filteredCourses[idx].courseName,
-              courseLevel: f.courseLevel || f.level || filteredCourses[idx].courseLevel || 1,
             }))
           );
 
@@ -108,7 +107,6 @@ const TeacherDashboard = () => {
               ...q,
               courseID: q.courseID || filteredCourses[idx].courseID,
               courseName: filteredCourses[idx].courseName,
-              courseLevel: q.courseLevel || q.level || filteredCourses[idx].courseLevel || 1,
             }))
           );
 
@@ -207,22 +205,34 @@ const TeacherDashboard = () => {
     };
   }, [quizzes]);
 
-  const getLevelLabel = (level, name) => {
-    const s = (String(level || "") + String(name || "")).toLowerCase();
-    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "Beginner";
-    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "Intermediate";
-    if (s.includes("trung cấp") || s.includes("advanced") || s.includes("level 3")) return "Advanced";
-    if (s.includes("chuyên sâu") || s.includes("expert") || s.includes("level 4") || s.includes("level 5")) return "Expert";
-    return "General";
+  const getLevelLabel = (level) => {
+    switch (Number(level)) {
+      case 1:
+        return "Beginner";
+      case 2:
+        return "Intermediate";
+      case 3:
+        return "Advanced";
+      case 4:
+        return "Expert";
+      default:
+        return "General";
+    }
   };
 
-  const getLevelClass = (level, name) => {
-    const s = (String(level || "") + String(name || "")).toLowerCase();
-    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "theme-beginner";
-    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "theme-intermediate";
-    if (s.includes("trung cấp") || s.includes("advanced") || s.includes("level 3")) return "theme-advanced";
-    if (s.includes("chuyên sâu") || s.includes("expert") || s.includes("level 4") || s.includes("level 5")) return "theme-expert";
-    return "theme-beginner";
+  const getLevelClass = (level) => {
+    switch (Number(level)) {
+      case 1:
+        return "theme-beginner";
+      case 2:
+        return "theme-intermediate";
+      case 3:
+        return "theme-advanced";
+      case 4:
+        return "theme-expert";
+      default:
+        return "theme-beginner";
+    }
   };
 
   const getPageInfo = () => {
@@ -371,7 +381,7 @@ const TeacherDashboard = () => {
     return (
       <div className="course-grid">
         {courses.map((course) => {
-          const levelClass = getLevelClass(course.courseLevel, course.courseName);
+          const levelClass = getLevelClass(course.courseLevel);
           const studentCount =
             course.totalStudents ||
             course.studentCount ||
@@ -386,10 +396,10 @@ const TeacherDashboard = () => {
             0;
 
           return (
-            <div key={course.courseID} className={`course-card origin-course-card ${levelClass}`}>
+            <div key={course.courseID} className={`course-card ${levelClass}`}>
               <div className="course-cover">
                 <span className="course-level-badge">
-                  {getLevelLabel(course.courseLevel, course.courseName)}
+                  {getLevelLabel(course.courseLevel)}
                 </span>
                 <div className="course-cover-overlay" />
               </div>
@@ -475,8 +485,8 @@ const TeacherDashboard = () => {
 
     return (
       <div className="course-grid">
-        {flashcards.map((set) => {
-          const themeClass = getLevelClass(set.courseLevel, set.courseName || set.title);
+        {flashcards.map((set, index) => {
+          const themeClass = themeClasses[index % themeClasses.length];
 
           return (
             <div
@@ -595,8 +605,8 @@ const TeacherDashboard = () => {
           </div>
         ) : (
           <div className="course-grid">
-            {quizzes.map((quiz) => {
-              const themeClass = getLevelClass(quiz.courseLevel, quiz.courseName || quiz.title);
+            {quizzes.map((quiz, index) => {
+              const themeClass = themeClasses[index % themeClasses.length];
 
               return (
                 <div
@@ -605,7 +615,7 @@ const TeacherDashboard = () => {
                 >
                   <div className="course-cover">
                     <span className="course-level-badge">
-                      {getLevelLabel(quiz.courseLevel, quiz.courseName || quiz.title)}
+                      {quiz.courseName || "Quiz"}
                     </span>
                     <div className="course-cover-overlay" />
                   </div>

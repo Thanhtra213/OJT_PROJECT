@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.Data;
+using EasyEnglish_API.Data;
 using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +18,13 @@ namespace EasyEnglish_API.Repositories.Quizs
         {
             return await _db.Quizzes
                 .Where(q => q.CourseId == courseId && q.IsActive)
+                .ToListAsync();
+        }
+
+        public async Task<List<Quiz>> GetAllQuizzesByCourseAsync(int courseId)
+        {
+            return await _db.Quizzes
+                .Where(q => q.CourseId == courseId)
                 .ToListAsync();
         }
 
@@ -81,6 +88,27 @@ namespace EasyEnglish_API.Repositories.Quizs
         {
             var quiz = await _db.Quizzes.FindAsync(quizId);
             if (quiz == null) return false;
+
+            // Check if attempt exists
+            bool hasAttempts = await _db.Attempts.AnyAsync(a => a.QuizId == quizId);
+            if (hasAttempts)
+                throw new Exception("Không thể xóa Quiz vì đã có học viên làm bài.");
+
+            var groupIds = await _db.QuestionGroups.Where(g => g.QuizId == quizId).Select(g => g.GroupId).ToListAsync();
+            var questionIds = await _db.Questions.Where(q => q.QuizId == quizId).Select(q => q.QuestionId).ToListAsync();
+
+            if (questionIds.Any())
+            {
+                _db.Options.RemoveRange(_db.Options.Where(o => questionIds.Contains(o.QuestionId)));
+                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && questionIds.Contains(a.OwnerId)));
+                _db.Questions.RemoveRange(_db.Questions.Where(q => questionIds.Contains(q.QuestionId)));
+            }
+
+            if (groupIds.Any())
+            {
+                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 1 && groupIds.Contains(a.OwnerId)));
+                _db.QuestionGroups.RemoveRange(_db.QuestionGroups.Where(g => groupIds.Contains(g.GroupId)));
+            }
 
             _db.Quizzes.Remove(quiz);
             await _db.SaveChangesAsync();

@@ -1,23 +1,22 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
-$flash-primary: #00c896;      // --mint
-$flash-primary-hover: #00a87c; // --mint-dk
-$flash-primary-soft: #e6faf4; // --mint-lt
-$flash-primary-border: #b3f0de; // --mint-mid
+$flash-primary: #6c47ff;
+$flash-primary-hover: #5535e0;
+$flash-primary-soft: #ede9ff;
+$flash-primary-border: #d2c5ff;
 
-$flash-page-bg: #f9fafb;     // --bg
+$flash-page-bg: #f5f6fa;
 $flash-surface: #ffffff;
-$flash-surface-soft: #fcfdfe;
-$flash-border: #e5e7eb;    // --gray-200
-$flash-text: #111827;      // --gray-900
-$flash-muted: #9ca3af;     // --gray-400
-$flash-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); // --s2
-$flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
+$flash-surface-soft: #fcfbfe;
+$flash-border: #e8eaf0;
+$flash-text: #1a1a2e;
+$flash-muted: #9aa0ad;
+$flash-shadow: 0 12px 40px rgba(108, 71, 255, 0.16);
+$flash-shadow-soft: 0 2px 8px rgba(108, 71, 255, 0.07);
 
 .create-edit-flashcard-page {
   min-height: 100vh;
   background: $flash-page-bg;
-  font-family: 'Nunito', sans-serif;
 }
 
 .create-edit-flashcard-container {
@@ -56,7 +55,7 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
   margin-bottom: 1.35rem;
   padding: 1.4rem 1.5rem;
   background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #b3f0de;
+  border: 1px solid rgba(233, 213, 255, 0.9);
   border-radius: 24px;
   box-shadow: $flash-shadow-soft;
   backdrop-filter: blur(10px);
@@ -71,14 +70,14 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
     background: $flash-primary-soft;
     color: $flash-primary;
     flex-shrink: 0;
-    box-shadow: inset 0 0 0 1px rgba(0, 200, 150, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(108, 71, 255, 0.08);
   }
 
   .header-content {
     h1 {
       margin: 0 0 0.35rem;
       font-size: 2rem;
-      font-weight: 800; // Nunito bold
+      font-weight: 800;
       line-height: 1.2;
       color: $flash-text;
       letter-spacing: -0.02em;
@@ -115,14 +114,14 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 }
 
 .flashcard-side-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fcfdfe 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fcfbff 100%);
 }
 
 .info-card {
   .info-row + .info-row {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px dashed #e5f6f1;
+    border-top: 1px dashed #e9dff7;
   }
 }
 
@@ -166,7 +165,7 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
   .form-select {
     min-height: 52px;
     border-radius: 16px;
-    border: 1px solid $flash-primary-soft;
+    border: 1px solid #ddd6fe;
     background: #fff;
     color: $flash-text;
     font-size: 0.95rem;
@@ -179,12 +178,12 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
     }
 
     &:hover {
-      border-color: #b3f0de;
+      border-color: #c4b5fd;
     }
 
     &:focus {
       border-color: $flash-primary;
-      box-shadow: 0 0 0 0.22rem rgba(0, 200, 150, 0.14);
+      box-shadow: 0 0 0 0.22rem rgba(168, 85, 247, 0.14);
     }
 
     &:disabled,
@@ -232,7 +231,7 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+      box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
       background: $flash-primary-hover;
     }
 
@@ -245,7 +244,7 @@ $flash-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06); // --s1
 
   .btn-cancel {
     background: #f8fafc;
-    color: #4b5563;
+    color: #475569;
     border: 1px solid #e5e7eb;
 
     &:hover {

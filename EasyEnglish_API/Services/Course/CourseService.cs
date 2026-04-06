@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.DTOs.Course;
+using EasyEnglish_API.DTOs.Course;
 using EasyEnglish_API.ExternalService;
 using EasyEnglish_API.Interfaces;
 using EasyEnglish_API.Models;
@@ -119,7 +119,8 @@ namespace EasyEnglish_API.Services.Courses
             {
                 CourseID = course.CourseId,
                 CourseName = course.CourseName,
-                Description = course.Description,
+                Description = course.Description ?? "",
+                CourseLevel = course.CourseLevel,
                 TeacherId = course.TeacherId,
                 TeacherName = course.Teacher?.TeacherNavigation?.Username ?? "(Unknown)",
                 CreatedAt = course.CreateAt,
