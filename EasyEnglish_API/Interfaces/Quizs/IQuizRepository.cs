@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.Models;
+using EasyEnglish_API.Models;
 using EasyEnglish_API.DTOs.Quizs;
 
 namespace EasyEnglish_API.Interfaces.Quizs
@@ -6,6 +6,7 @@ namespace EasyEnglish_API.Interfaces.Quizs
     public interface IQuizRepository
     {
         Task<List<Quiz>> GetQuizzesByCourseAsync(int courseId);
+        Task<List<Quiz>> GetAllQuizzesByCourseAsync(int courseId);
         Task<List<Quiz>> GetGlobalQuizzesAsync();
         Task<List<Quiz>> GetAllGlobalQuizzesAsync();
         Task<Quiz?> GetQuizDetailAsync(int quizId);

@@ -6,7 +6,7 @@ namespace EasyEnglish_API.Models;
 public partial class PaymentOrder
 {
     public int OrderId { get; set; }
-    public long OrderCode { get; set; }
+    public long? OrderCode { get; set; }
 
     public int BuyerId { get; set; }
 
@@ -25,4 +25,9 @@ public partial class PaymentOrder
     public virtual SubscriptionPlan Plan { get; set; } = null!;
 
     public virtual ICollection<WebhookEvent> WebhookEvents { get; set; } = new List<WebhookEvent>();
+    public int? VoucherId { get; set; }
+    public decimal DiscountAmount { get; set; } = 0;
+    public decimal FinalAmount { get; set; }               // Số tiền thực tế thanh toán
+
+    public virtual Voucher? Voucher { get; set; }
 }

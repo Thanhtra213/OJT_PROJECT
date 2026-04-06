@@ -1,8 +1,7 @@
-﻿using EasyEnglish_API.DTOs.Profile;
+using EasyEnglish_API.DTOs.Profile;
 using EasyEnglish_API.ExternalService;
 using EasyEnglish_API.Interfaces.Profile;
 using EasyEnglish_API.Security;
-using EasyEnglish_API.ExternalService;
 
 namespace EasyEnglish_API.Services.Profile
 {
@@ -41,12 +40,10 @@ namespace EasyEnglish_API.Services.Profile
                 var detail = await _repo.GetUserDetailAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");
 
-
-
             if (string.IsNullOrEmpty(detail.AvatarUrl))
                 return null;
 
-            return detail.AvatarUrl;
+                return detail.AvatarUrl;
             }
 
             public async Task UpdateDetailAsync(int userId, UpdateUserDetailRequest req)

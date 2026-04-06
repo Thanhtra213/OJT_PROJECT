@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.DTOs.Course;
+using EasyEnglish_API.DTOs.Course;
 using EasyEnglish_API.Services.Courses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +59,7 @@ namespace EasyEnglish_API.Controllers.TeacherSide
                 return Ok(new { message = "Course created", courseId });
             }
             catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+            catch (Exception ex) { return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message }); }
         }
 
         [HttpPut("{courseId:int}")]

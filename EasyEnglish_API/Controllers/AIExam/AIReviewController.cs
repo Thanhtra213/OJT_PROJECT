@@ -16,15 +16,22 @@ namespace EasyEnglish_API.Controllers.AIExam
         {
             _ai = ai;
         }
-
+        
         private int GetUserId()
            => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        [HttpGet]
+        [HttpGet("{submissionId}")]
 
         public async Task<IActionResult> GetReview(long submissionId)
         {
             var result = await _ai.GetStudentReview(GetUserId(), submissionId);
+            return Ok(result);
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetSubmissionList()
+        {
+            var result = await _ai.GetSubmissionList(GetUserId());
             return Ok(result);
         }
     }

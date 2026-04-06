@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.DTOs.Quizs;
+using EasyEnglish_API.DTOs.Quizs;
 using EasyEnglish_API.Interfaces.Quizs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -118,7 +118,7 @@ namespace EasyEnglish_API.Controllers.TeacherSide
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 

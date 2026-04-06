@@ -100,7 +100,7 @@ Format exactly:
   ""TaskResponse"": <0–9>,
   ""Coherence"": <0–9>,
   ""LexicalResource"": <0–9>,
-  ""Grammar"": <0–9>,
+  ""Grammar"": <0–9>,  
   ""feedback"": {{
     ""taskResponse"": {{
       ""comment"": ""<Did they answer all parts? Is the position clear and consistent?>"",
@@ -112,7 +112,7 @@ Format exactly:
       ""issues"": [""<specific issue>""],
       ""suggestions"": [""<suggestion>""]
     }},
-    ""lexical"": {{
+    ""lexical"": {{ 
       ""comment"": ""<Is vocabulary range wide and accurate?>"",
       ""weakPhrases"": [
         {{ ""original"": ""<weak phrase from essay>"", ""suggestion"": ""<better alternative>"" }},

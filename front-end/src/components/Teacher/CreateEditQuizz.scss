@@ -1,23 +1,23 @@
 
 .create-edit-quiz-container {
   min-height: 100vh;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
   padding: 40px;
-  background-color: #f9fafb; // --bg
-  color: #111827; // --gray-900
+  background-color: #f5f6fa;
+  color: #1a1a2e;
 
   // --- Header Section ---
   .header-content {
     h3 {
-      font-size: 2.2rem;
-      font-weight: 800; // Extra bold for Nunito
-      color: #111827; // --gray-900
+      font-size: 2.2rem; // Consistent with dashboard title
+      font-weight: 700;
+      color: #2c3e50; // Consistent with dashboard title color
       margin-bottom: 8px;
     }
 
     p {
-      font-size: 1.1rem;
-      color: #4b5563; // --gray-600
+      font-size: 1.1rem; // Consistent with dashboard welcome message
+      color: #555;
       margin-bottom: 20px;
     }
   }
@@ -30,21 +30,21 @@
       transition: all 0.22s cubic-bezier(.4,0,.2,1);
 
       &.btn-outline-primary {
-        border-color: #00c896;
-        color: #00c896;
+        border-color: #6c47ff;
+        color: #6c47ff;
         &:hover {
-          background-color: #e6faf4;
+          background-color: #ede9ff;
           transform: translateY(-1px);
         }
       }
       &.btn-primary {
-        background-color: #00c896;
-        border-color: #00c896;
+        background-color: #6c47ff;
+        border-color: #6c47ff;
         color: white;
         &:hover {
-          background-color: #00a87c;
-          border-color: #00a87c;
-          box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+          background-color: #5535e0;
+          border-color: #5535e0;
+          box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
           transform: translateY(-1px);
         }
       }
@@ -53,17 +53,17 @@
 
   // --- Card Styling (Consistent with Dashboard cards) ---
   .card {
-    border: 1px solid #e5e7eb; // --gray-200
+    border: 1px solid #e8eaf0;
     border-radius: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06); // --s1
+    box-shadow: 0 2px 8px rgba(108,71,255,.07);
     background-color: white;
-    padding: 15px;
-    margin-bottom: 20px;
-    transition: all .2s cubic-bezier(.4, 0, .2, 1);
+    padding: 15px; // Adjust padding as needed for content
+    margin-bottom: 20px; // Spacing between cards
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 16px rgba(0,0,0,.08); // --s2
+      box-shadow: 0 12px 40px rgba(108,71,255,.16);
     }
 
     h5, h6 {
@@ -122,8 +122,8 @@
       transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
 
       &:focus {
-        border-color: #00c896;
-        box-shadow: 0 0 0 0.25rem rgba(0, 200, 150, 0.16);
+        border-color: #6c47ff;
+        box-shadow: 0 0 0 0.25rem rgba(108, 71, 255, 0.16);
       }
     }
 

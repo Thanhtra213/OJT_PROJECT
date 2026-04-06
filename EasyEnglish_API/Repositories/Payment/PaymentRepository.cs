@@ -60,9 +60,18 @@ namespace EasyEnglish_API.Repositories.Payment
                 Status = "ACTIVE"
             });
 
+            // Đánh dấu voucher đã dùng sau khi thanh toán thành công
+            if (order.VoucherId.HasValue)
+            {
+                _db.VoucherUsages.Add(new VoucherUsage
+                {
+                    UserId = order.BuyerId,
+                    VoucherId = order.VoucherId.Value
+                });
+            }
+
             order.Status = "PAID";
             order.PaidAt = DateTime.UtcNow;
-
             await _db.SaveChangesAsync();
         }
 

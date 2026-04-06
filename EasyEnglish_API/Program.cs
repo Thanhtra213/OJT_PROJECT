@@ -56,11 +56,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using EasyEnglish_API.Interfaces.Streak;
 using EasyEnglish_API.Repositories.Streak;
-using EasyEnglish_API.Services.Streak;
 using EasyEnglish_API.Interfaces.Progress;
 using EasyEnglish_API.Repositories.Progress;
 using EasyEnglish_API.Services.Video;
-
+using EasyEnglish_API.Services.Course;
+using EasyEnglish_API.Services.Vouchers;
+using EasyEnglish_API.Interfaces.Vouchers;
+using EasyEnglish_API.Repositories.Vouchers;
 
 
 namespace EasyEnglish_API {
@@ -185,6 +187,8 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<AISpeakingExternal>();
             builder.Services.AddScoped<AIWritingExternal>();
             builder.Services.AddScoped<AIQuizExternal>();
+            builder.Services.AddScoped<AIListeningExternal>();
+            builder.Services.AddScoped<MurfTTSExternal>();
             // == Repositories ==
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -208,6 +212,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IStreakRepository, StreakRepository>();
             builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -227,6 +232,13 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IProfileService, ProfileService>();
             builder.Services.AddScoped<ITeacherInforService, TeacherInforService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IVideoService, VideoService>();
+            builder.Services.AddScoped<IVideoProgressService, VideoProgressService>();
+            builder.Services.AddScoped<IAIListeningService, AIListeningService>();
+            builder.Services.AddScoped<IAIReviewService, AIReviewService>(); 
+            builder.Services.AddScoped<ITeacherScoreService, TeacherScoreService>();
+            builder.Services.AddScoped<IAIListeningService, AIListeningService>();
+            builder.Services.AddScoped<IVoucherService, VoucherService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
