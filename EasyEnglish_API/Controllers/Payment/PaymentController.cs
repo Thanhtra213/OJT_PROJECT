@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
+using EasyEnglish_API.DTOs.Vouchers;
 using EasyEnglish_API.Services.Payment;
+using EasyEnglish_API.Services.Vouchers;
 using EMT_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,24 +15,25 @@ namespace EasyEnglish_API.Controllers.Payment
     {
         private readonly IPaymentService _paymentService;
         private readonly PayOSService _payOSService;
+        private readonly IVoucherService _voucherService;
 
-        public PaymentController(IPaymentService paymentService, PayOSService payOSService)
+        public PaymentController(IPaymentService paymentService, PayOSService payOSService, IVoucherService voucherService)
         {
             _paymentService = paymentService;
             _payOSService = payOSService;
+            _voucherService = voucherService;
         }
 
-        // Student tạo đơn thanh toán
-        [HttpPost("create")]
+        [HttpPost("validate-voucher")]
         [Authorize(Roles = "STUDENT")]
-        public async Task<IActionResult> CreatePayment(int planId)
+        public async Task<IActionResult> ValidateVoucher([FromBody] ValidateVoucherRequest req)
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-                var url = await _payOSService.CreatePaymentAsync(userId, planId);
-                return Ok(new { paymentUrl = url });
+                var result = await _voucherService.ValidateVoucherAsync(userId, req);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -38,6 +41,18 @@ namespace EasyEnglish_API.Controllers.Payment
             }
         }
 
+        [HttpPost("create")]
+        [Authorize(Roles = "STUDENT")]
+        public async Task<IActionResult> CreatePayment(int planId, [FromQuery] string? voucherCode)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var url = await _payOSService.CreatePaymentAsync(userId, planId, voucherCode);
+                return Ok(new { paymentUrl = url });
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
 
         [HttpPost("webhook")]
         [AllowAnonymous]

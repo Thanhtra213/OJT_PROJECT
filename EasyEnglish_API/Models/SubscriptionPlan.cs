@@ -20,4 +20,5 @@ public partial class SubscriptionPlan
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<PaymentOrder> PaymentOrders { get; set; } = new List<PaymentOrder>();
+    public virtual ICollection<Voucher> Vouchers { get; set; } = new List<Voucher>();
 }

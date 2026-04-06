@@ -60,7 +60,9 @@ using EasyEnglish_API.Interfaces.Progress;
 using EasyEnglish_API.Repositories.Progress;
 using EasyEnglish_API.Services.Video;
 using EasyEnglish_API.Services.Course;
-
+using EasyEnglish_API.Services.Vouchers;
+using EasyEnglish_API.Interfaces.Vouchers;
+using EasyEnglish_API.Repositories.Vouchers;
 
 
 namespace EasyEnglish_API {
@@ -210,6 +212,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IStreakRepository, StreakRepository>();
             builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -235,6 +238,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIReviewService, AIReviewService>(); 
             builder.Services.AddScoped<ITeacherScoreService, TeacherScoreService>();
             builder.Services.AddScoped<IAIListeningService, AIListeningService>();
+            builder.Services.AddScoped<IVoucherService, VoucherService>();
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
