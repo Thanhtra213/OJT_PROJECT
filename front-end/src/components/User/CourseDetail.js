@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Accordion, Alert, Tabs, Tab, Spinner, Card, Badge } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getCourseById, getVideoById, getCourseRating, getCourseFeedbacks } from "../../middleware/courseAPI";
 import { getQuizzesByCourse } from "../../middleware/QuizAPI";
 import { checkMembership } from "../../middleware/membershipAPI";
@@ -68,6 +68,26 @@ console.log("FIRST VIDEO:", courseData.chapters?.[0]?.videos?.[0]);
           setCourseRating(rating);
         } catch (err) { console.log("Could not load rating:", err); }
 
+        const searchParams = new URLSearchParams(window.location.search);
+        const targetVideoId = searchParams.get('videoId');
+
+        if (targetVideoId && courseData.chapters?.length > 0) {
+          let found = false;
+          for (const chapter of courseData.chapters) {
+            for (const v of chapter.videos || []) {
+              const vidId = v.videoId ?? v.videoID;
+              if (String(vidId) === String(targetVideoId)) {
+                found = true;
+                if (v.isPreview || membershipData.hasMembership) {
+                  handleVideoSelect(vidId, v.videoName, chapter.chapterName);
+                  return;
+                }
+              }
+            }
+          }
+        }
+
+        // Fallback: Tự động chạy video ĐẦU TIÊN (nếu không có targetVideoId hoặc nó không được phép xem)
         if (courseData.chapters?.length > 0) {
           for (const chapter of courseData.chapters) {
             if (chapter.videos?.length > 0) {
@@ -75,7 +95,7 @@ console.log("FIRST VIDEO:", courseData.chapters?.[0]?.videos?.[0]);
               
               const vid = firstVideo.videoId ?? firstVideo.videoID;
               if (firstVideo.isPreview || membershipData.hasMembership) {
-                handleVideoSelect(vid, firstVideo.videoID, firstVideo.videoName, chapter.chapterName);
+                handleVideoSelect(vid, firstVideo.videoName, chapter.chapterName);
                 return;
               }
             }

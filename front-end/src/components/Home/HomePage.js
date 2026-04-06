@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AIChat from "../AIChat/AI";
 import "./HomePage.scss";
-import { getAllCoursesWithDetails } from '../../middleware/courseAPI';
+import { getAllCoursesWithDetails, getVideoById } from '../../middleware/courseAPI';
 import { useNavigate } from "react-router-dom";
 import {
   Play, Star, Users, BookOpen, Lock,
@@ -10,22 +10,21 @@ import {
 } from 'lucide-react';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
-const LEVEL_TEXT  = { 0:"Beginner", 1:"Pre-Intermediate", 2:"Intermediate", 3:"Advanced", 4:"Expert" };
-const LEVEL_CLASS = { 0:"beginner", 1:"pre-intermediate", 2:"intermediate", 3:"advanced", 4:"expert" };
+const LEVEL_TEXT = { 0: "Beginner", 1: "Pre-Intermediate", 2: "Intermediate", 3: "Advanced", 4: "Expert" };
+const LEVEL_CLASS = { 0: "beginner", 1: "pre-intermediate", 2: "intermediate", 3: "advanced", 4: "expert" };
 
-const lvText  = l => LEVEL_TEXT[l]  ?? "Beginner";
+const lvText = l => LEVEL_TEXT[l] ?? "Beginner";
 const lvClass = l => LEVEL_CLASS[l] ?? "beginner";
 
 // ─── component ────────────────────────────────────────────────────────────────
 const HomePage = ({ onShowAuthModal }) => {
   const [showAIChat, setShowAIChat] = useState(false);
-  const [freeVideos,     setFreeVideos]     = useState([]);
+  const [freeVideos, setFreeVideos] = useState([]);
   const [premiumCourses, setPremiumCourses] = useState([]);
   const navigate = useNavigate();
 
   const openAuth = (tab = "register") => {
-    if (onShowAuthModal) { onShowAuthModal(tab); }
-    else window.dispatchEvent(new CustomEvent("openAuthModal", { detail: { tab } }));
+    window.dispatchEvent(new CustomEvent("openAuthModal", { detail: { tab } }));
   };
 
   useEffect(() => {
@@ -33,30 +32,79 @@ const HomePage = ({ onShowAuthModal }) => {
       try {
         const courses = await getAllCoursesWithDetails();
 
-        // Free preview videos
+        // Free preview videos (1 random per course)
         const previews = [];
-        courses.forEach(course =>
-          course.chapters?.forEach(ch =>
+        courses.forEach(course => {
+          let freeVids = [];
+          course.chapters?.forEach(ch => {
             ch.videos?.forEach(vid => {
               if (vid.isPreview === 1 || vid.isPreview === true) {
-                let thumb = 'https://via.placeholder.com/300x170.png?text=Video';
-                try {
-                  const id = new URL(vid.videoURL).searchParams.get('v');
-                  if (id) thumb = `https://i3.ytimg.com/vi/${id}/hqdefault.jpg`;
-                } catch (_) {}
-                previews.push({
-                  id: vid.videoID, title: vid.videoName,
+                freeVids.push({
+                  id: vid.videoID || vid.videoId || vid.id, 
+                  courseId: course.courseID || course.courseId || course.id,
+                  title: vid.videoName || vid.title || "Video",
                   desc: "Bài học miễn phí — xem ngay, không cần đăng ký",
                   dur: "5:30", views: "1.2K", rating: 4.8,
                   level: lvText(course.courseLevel),
                   lvCls: lvClass(course.courseLevel),
-                  thumb,
+                  thumb: 'https://placehold.co/300x170/00c896/ffffff?text=' + encodeURIComponent("Video Demo"),
                 });
               }
-            })
-          )
-        );
-        setFreeVideos(previews.slice(0, 3));
+            });
+          });
+          if (freeVids.length > 0) {
+            // Lấy ngẫu nhiên 1 video từ mỗi khóa
+            const randomVid = freeVids[Math.floor(Math.random() * freeVids.length)];
+            previews.push(randomVid);
+          }
+        });
+
+        // Giới hạn hiển thị 3 video
+        const finalPreviews = previews.slice(0, 3);
+
+        // Fetch Thumbnail thông qua getVideoById vì getAllCourses không có videoURL
+        for (let p of finalPreviews) {
+          try {
+            const detail = await getVideoById(p.id);
+            let thumb = detail.thumbnailUrl || detail.thumbnailURL || detail.thumbnail || p.thumb;
+            const vUrl = detail.videoUrl || detail.videoURL || detail.videoLink || detail.url || "";
+            if (!detail.thumbnailUrl && !detail.thumbnailURL && !detail.thumbnail && vUrl) {
+              let ytId = null;
+              if (vUrl.includes("youtube.com/watch?v=")) ytId = vUrl.split("v=")[1].split("&")[0];
+              else if (vUrl.includes("youtu.be/")) ytId = vUrl.split("youtu.be/")[1].split("?")[0];
+              else if (vUrl.includes("youtube.com/embed/")) ytId = vUrl.split("embed/")[1].split("?")[0];
+              else if (vUrl.includes("youtube.com/shorts/")) ytId = vUrl.split("shorts/")[1].split("?")[0];
+              
+              if (ytId) {
+                thumb = `https://i3.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+              } else if (vUrl.includes("drive.google.com/file/d/")) {
+                let driveId = vUrl.split("/d/")[1];
+                if (driveId.includes("/")) driveId = driveId.split("/")[0];
+                if (driveId) thumb = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+              } else if (vUrl.includes("drive.google.com/open?id=")) {
+                let driveId = vUrl.split("id=")[1].split("&")[0];
+                if (driveId) thumb = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+              } else if (!vUrl.includes("/") && vUrl.length >= 25 && vUrl.length <= 40) {
+                // Nó là Google Drive ID trơ
+                thumb = `https://drive.google.com/thumbnail?id=${vUrl}&sz=w800`;
+              } else if (vUrl.startsWith("http")) {
+                // Bất kỳ link lạ nào không phải YT/Drive, thử ngàm vào thẻ video
+                thumb = vUrl;
+                p.isVideo = true; 
+              } else {
+                thumb = 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80';
+              }
+            } else if (!vUrl && !p.thumb.includes("unsplash")) {
+              // Nếu KHÔNG có link video luôn
+              p.thumb = 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80';
+            }
+            if (thumb) p.thumb = thumb;
+          } catch (e) {
+            console.error("Lỗi lấy video chi tiết cho thumbnail:", e);
+          }
+        }
+
+        setFreeVideos(finalPreviews);
 
         // Premium courses
         const premium = courses.map(c => {
@@ -165,9 +213,18 @@ const HomePage = ({ onShowAuthModal }) => {
           <div className="card-grid">
             {freeVideos.map(v => (
               <article key={v.id} className="vcard"
-                onClick={() => navigate(`/course/${v.id}`)}>
+                onClick={() => navigate(`/course/${v.courseId}?videoId=${v.id}`)}>
                 <div className="thumb">
-                  <img src={v.thumb} alt={v.title} loading="lazy" />
+                  {v.isVideo ? (
+                    <video src={`${v.thumb}#t=0.001`} preload="metadata" playsInline muted 
+                      style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block', backgroundColor: '#e5e7eb'}} 
+                      onError={(e) => { e.target.onerror = null; e.target.outerHTML = `<img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80" style="width:100%;height:100%;object-fit:cover;" />` }}
+                    />
+                  ) : (
+                    <img src={v.thumb} alt={v.title} loading="lazy" 
+                      onError={(e) => { e.target.onerror = null; e.target.src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80"}} 
+                    />
+                  )}
                   <span className={`lvl ${v.lvCls}`}>{v.level}</span>
                   <div className="play-ov"><Play size={40} /></div>
                 </div>
