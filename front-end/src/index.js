@@ -22,9 +22,11 @@ import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
 
+// ADMIN ROUTES
 import AdminDashboard from './components/Admin/AdminDashboard'; 
 import ExamDetail from './components/Admin/ExamDetail';
 
+// TEACHER ROUTES
 import TeacherDashboard from "./components/Teacher/Dashboard";
 import TeacherCourseWorkspace from "./components/Teacher/CourseDetail";
 import TeacherCreateEditCourse from "./components/Teacher/CreateEditCourse";
