@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Trash, Power, PowerOff } from "lucide-react";
+import { UserPlus, Trash, Power, PowerOff, X, Search } from "lucide-react";
 import { getTeachers, searchUsers, lockUser, unlockUser, createUser } from "../../middleware/admin/userManagementAPI";
-import "./management-styles.scss";
+import "./admin-dashboard-styles.scss"; // Đổi lại import CSS chuẩn
 
 export function TeacherManagement() {
     const [teachers, setTeachers] = useState([]);
@@ -20,11 +20,12 @@ export function TeacherManagement() {
 
     const showPopup = (message, type = "success") => {
         setToast({ show: true, message, type });
-        setTimeout(() => setToast({ show: false, message: "" }), 3000);
+        setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
     };
 
     useEffect(() => {
         loadTeachers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const loadTeachers = async () => {
@@ -56,7 +57,7 @@ export function TeacherManagement() {
     };
 
     const handleSearch = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         if (!searchQuery.trim()) {
             loadTeachers();
             return;
@@ -109,86 +110,172 @@ export function TeacherManagement() {
     }
 
     return (
-        <div className="management-page-container">
-            {showCreateModal && (
-                <div className="management-modal-overlay" onClick={() => setShowCreateModal(false)}>
-                    <div className="management-modal-content" onClick={e => e.stopPropagation()}>
-                        <h3 className="card-title mb-6">Tạo giảng viên mới</h3>
-                        <div className="flex flex-col gap-4">
-                            <input type="text" placeholder="Tên đăng nhập" name="username" value={newTeacher.username} onChange={handleInputChange} className="form-input" />
-                            <input type="email" placeholder="Email" name="email" value={newTeacher.email} onChange={handleInputChange} className="form-input" />
-                            <input type="password" placeholder="Mật khẩu" name="password" value={newTeacher.password} onChange={handleInputChange} className="form-input" />
-                            <textarea placeholder="Mô tả ngắn..." name="description" value={newTeacher.description} onChange={handleInputChange} className="form-input" rows="3"></textarea>
-                            <div className="flex justify-end gap-4 mt-6">
-                                <button onClick={() => setShowCreateModal(false)} className="secondary-button">Hủy</button>
-                                <button onClick={handleCreateTeacher} className="primary-button">Tạo</button>
-                            </div>
-                        </div>
-                    </div>
+        <div className="management-card">
+            {/* Hiển thị Toast Notification */}
+            {toast.show && (
+                <div style={{
+                    position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+                    background: toast.type === 'success' ? 'var(--primary)' : '#ec4899',
+                    color: '#fff', padding: '12px 24px', borderRadius: '99px',
+                    fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                }}>
+                    {toast.message}
                 </div>
             )}
 
-            <div className="management-card">
-                <div className="management-card-header flex justify-between items-center">
-                    <div>
-                        <h2 className="card-title">Quản lý giảng viên</h2>
-                        <p className="card-description">Tổng số: {filteredTeachers.length} giảng viên</p>
-                    </div>
-                    <button onClick={() => setShowCreateModal(true)} className="primary-button flex items-center gap-2">
-                        <UserPlus size={18} />
-                        Thêm giảng viên
-                    </button>
+            {/* HEADER */}
+            <div className="management-card-header">
+                <div>
+                    <h2 className="card-title">Quản lý giảng viên</h2>
+                    <p className="card-description">Tổng số: {filteredTeachers.length} giảng viên</p>
                 </div>
+            </div>
 
-                <div className="flex flex-wrap gap-4 items-center my-6">
+            {/* TOOLBAR */}
+            <div className="management-header">
+                <div className="search-bar">
+                    <Search size={18} style={{ color: 'var(--text-muted)' }} />
                     <input
                         type="text"
                         placeholder="Tìm kiếm theo tên, email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="form-input flex-grow"
+                        onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
+                        className="search-input"
                     />
                 </div>
-
-                <div className="management-card-content">
-                    <table className="management-table">
-                        <thead>
-                            <tr>
-                                <th>Giảng viên</th>
-                                <th>Mô tả</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredTeachers.map((teacher) => (
-                                <tr key={teacher.accountID}>
-                                    <td>
-                                        <div className="font-bold">{teacher.username}</div>
-                                        <div className="text-sm text-gray-500">{teacher.email}</div>
-                                    </td>
-                                    <td>{teacher.description}</td>
-                                    <td>
-                                        <span className={`status-badge ${teacher.isActive ? 'active' : 'inactive'}`}>
-                                            {teacher.isActive ? 'Hoạt động' : 'Khóa'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="flex gap-2">
-                                            <button className="action-button" onClick={() => handleToggleTeacher(teacher.accountID, teacher.isActive)}>
-                                                {teacher.isActive ? <PowerOff size={16} /> : <Power size={16} />}
-                                            </button>
-                                            <button className="action-button delete-button">
-                                                <Trash size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <button onClick={() => setShowCreateModal(true)} className="primary-button">
+                    <UserPlus size={18} />
+                    <span>Thêm giảng viên</span>
+                </button>
             </div>
+
+            {/* TABLE */}
+            <div className="management-table-wrapper">
+                <table className="management-table">
+                    <thead>
+                        <tr>
+                            <th>Giảng viên</th>
+                            <th>Mô tả</th>
+                            <th style={{ textAlign: 'center' }}>Trạng thái</th>
+                            <th style={{ textAlign: 'right' }}>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredTeachers.length > 0 ? filteredTeachers.map((teacher) => (
+                            <tr key={teacher.accountID}>
+                                <td>
+                                    <div className="fw-800 td-title">{teacher.username}</div>
+                                    <div className="td-sub">{teacher.email}</div>
+                                </td>
+                                <td>{teacher.description || "Chưa có mô tả"}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                    <span 
+                                        className="status-badge"
+                                        style={{ 
+                                            backgroundColor: teacher.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(236,72,153,0.12)', 
+                                            color: teacher.isActive ? 'var(--primary)' : '#ec4899' 
+                                        }}
+                                    >
+                                        {teacher.isActive ? 'Hoạt động' : 'Đã khóa'}
+                                    </span>
+                                </td>
+                                <td style={{ textAlign: 'right' }}>
+                                    <button 
+                                        className="action-button" 
+                                        title={teacher.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                                        style={{ color: teacher.isActive ? 'var(--text-dark)' : '#ec4899' }}
+                                        onClick={() => handleToggleTeacher(teacher.accountID, teacher.isActive)}
+                                    >
+                                        {teacher.isActive ? <PowerOff size={18} /> : <Power size={18} />}
+                                    </button>
+                                    <button 
+                                        className="action-button" 
+                                        style={{ color: '#ec4899', marginLeft: '8px' }}
+                                        title="Xóa"
+                                    >
+                                        <Trash size={18} />
+                                    </button>
+                                </td>
+                            </tr>
+                        )) : (
+                            <tr>
+                                <td colSpan="4">
+                                    <div className="admin-empty-data" style={{ padding: '3rem 0' }}>
+                                        Không tìm thấy giảng viên nào.
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* MODAL THÊM GIẢNG VIÊN */}
+            {showCreateModal && (
+                <div className="management-modal-overlay" onClick={() => setShowCreateModal(false)}>
+                    <div className="management-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-head">
+                            <h3 className="modal-title">Tạo giảng viên mới</h3>
+                        </div>
+                        
+                        <div className="modal-body-custom">
+                            <div style={{ marginBottom: '1.25rem' }}>
+                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên đăng nhập</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Nhập tên đăng nhập..." 
+                                    name="username" 
+                                    value={newTeacher.username} 
+                                    onChange={handleInputChange} 
+                                    className="form-input" 
+                                />
+                            </div>
+                            
+                            <div style={{ marginBottom: '1.25rem' }}>
+                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Email</label>
+                                <input 
+                                    type="email" 
+                                    placeholder="Nhập địa chỉ email..." 
+                                    name="email" 
+                                    value={newTeacher.email} 
+                                    onChange={handleInputChange} 
+                                    className="form-input" 
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '1.25rem' }}>
+                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mật khẩu</label>
+                                <input 
+                                    type="password" 
+                                    placeholder="Tạo mật khẩu..." 
+                                    name="password" 
+                                    value={newTeacher.password} 
+                                    onChange={handleInputChange} 
+                                    className="form-input" 
+                                />
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mô tả ngắn</label>
+                                <textarea 
+                                    placeholder="Giới thiệu nhanh về giảng viên..." 
+                                    name="description" 
+                                    value={newTeacher.description} 
+                                    onChange={handleInputChange} 
+                                    className="form-textarea" 
+                                    rows="3"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div className="modal-foot">
+                            <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowCreateModal(false)}>Hủy</button>
+                            <button className="primary-button" onClick={handleCreateTeacher}>Tạo giảng viên</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
