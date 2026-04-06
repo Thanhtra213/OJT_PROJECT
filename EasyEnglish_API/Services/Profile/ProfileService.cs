@@ -40,8 +40,8 @@ namespace EasyEnglish_API.Services.Profile
                 var detail = await _repo.GetUserDetailAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");
 
-                if (string.IsNullOrEmpty(detail.AvatarUrl))
-                    return null;
+            if (string.IsNullOrEmpty(detail.AvatarUrl))
+                return null;
 
                 return detail.AvatarUrl;
             }
