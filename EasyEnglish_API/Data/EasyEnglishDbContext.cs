@@ -73,6 +73,8 @@ public partial class EasyEnglishDbContext : DbContext
     public virtual DbSet<UserMembership> UserMemberships { get; set; }
 
     public virtual DbSet<UserVideoProgress> UserVideoProgresses { get; set; }
+    public virtual DbSet<Voucher> Vouchers { get; set; }
+    public virtual DbSet<VoucherUsage> VoucherUsages { get; set; }
 
     public virtual DbSet<VUserHasActiveMembership> VUserHasActiveMemberships { get; set; }
 
@@ -518,6 +520,19 @@ public partial class EasyEnglishDbContext : DbContext
                 .HasForeignKey(d => d.PlanId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PO_Plan");
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+            entity.Property(e => e.DiscountAmount)
+                .HasColumnType("decimal(12, 2)")
+                .HasDefaultValue(0m);
+            entity.Property(e => e.FinalAmount)
+                .HasColumnType("decimal(12, 2)")
+                .HasDefaultValue(0m);
+
+            entity.HasOne(d => d.Voucher)
+                .WithMany(p => p.PaymentOrders)
+                .HasForeignKey(d => d.VoucherId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_PO_Voucher");
         });
 
         modelBuilder.Entity<Question>(entity =>
@@ -764,6 +779,57 @@ public partial class EasyEnglishDbContext : DbContext
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_UVP_Video");
+        });
+
+        modelBuilder.Entity<Voucher>(entity =>
+        {
+            entity.HasKey(e => e.VoucherId).HasName("PK_Voucher");
+
+            entity.ToTable("Voucher");
+
+            entity.HasIndex(e => e.Code, "UQ_Voucher_Code").IsUnique();
+
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+            entity.Property(e => e.Code)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.DiscountAmount).HasColumnType("decimal(12, 2)");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.ApplicablePlanId).HasColumnName("ApplicablePlanID");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.ApplicablePlan)
+                .WithMany(p => p.Vouchers)
+                .HasForeignKey(d => d.ApplicablePlanId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_Voucher_Plan");
+        });
+
+        modelBuilder.Entity<VoucherUsage>(entity =>
+        {
+            entity.HasKey(e => e.UsageId).HasName("PK_VoucherUsage");
+
+            entity.ToTable("VoucherUsage");
+
+            // Ràng buộc unique: mỗi user chỉ dùng 1 voucher 1 lần
+            entity.HasIndex(e => new { e.VoucherId, e.UserId }, "UQ_VoucherUsage_User").IsUnique();
+
+            entity.Property(e => e.UsageId).HasColumnName("UsageID");
+            entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.UsedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Voucher)
+                .WithMany(p => p.Usages)
+                .HasForeignKey(d => d.VoucherId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_VoucherUsage_Voucher");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_VoucherUsage_User");
         });
 
         modelBuilder.Entity<VUserHasActiveMembership>(entity =>
