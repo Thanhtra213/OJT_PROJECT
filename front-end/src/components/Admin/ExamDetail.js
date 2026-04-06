@@ -682,8 +682,14 @@ const ExamDetail = () => {
       {/* HEADER CHI TIẾT */}
       <div className="management-header" style={{ marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
+<<<<<<< HEAD
+          <button className="secondary-button mb-3" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> 
+            <span>Quay lại danh sách</span>
+=======
           <button className="action-button mb-2" onClick={() => navigate(-1)} style={{ padding: '4px 8px', borderRadius: '8px' }}>
             <ArrowLeft size={18} style={{ marginRight: '4px' }} /> Quay lại danh sách
+>>>>>>> 9269f79502f554a9fe6739ad66a1ce8d93ee1900
           </button>
           <h2 className="card-title" style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>
             {quiz?.title || "Chi tiết bài kiểm tra"}

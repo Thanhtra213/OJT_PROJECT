@@ -95,7 +95,11 @@ console.log("FIRST VIDEO:", courseData.chapters?.[0]?.videos?.[0]);
               
               const vid = firstVideo.videoId ?? firstVideo.videoID;
               if (firstVideo.isPreview || membershipData.hasMembership) {
+<<<<<<< HEAD
+                handleVideoSelect(vid, firstVideo.videoID, firstVideo.videoName, chapter.chapterName);
+=======
                 handleVideoSelect(vid, firstVideo.videoName, chapter.chapterName);
+>>>>>>> 9269f79502f554a9fe6739ad66a1ce8d93ee1900
                 return;
               }
             }

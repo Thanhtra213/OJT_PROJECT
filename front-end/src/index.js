@@ -34,7 +34,20 @@ import TeacherGuide from "./components/Teacher/Guide";
 import TeacherCreateLesson from "./components/Teacher/CreateLesson";
 import TeacherEditLesson from "./components/Teacher/EditLesson";
 
-// CẤP QUYỀN SỬ DỤNG DARK MODE CHO TOÀN ỨNG DỤNG
+import AdminDashboard from './components/Admin/AdminDashboard'; 
+import ExamDetail from './components/Admin/ExamDetail';
+
+import TeacherDashboard from "./components/Teacher/Dashboard";
+import TeacherCourseWorkspace from "./components/Teacher/CourseDetail";
+import TeacherCreateEditCourse from "./components/Teacher/CreateEditCourse";
+import TeacherCreateEditFlashcardSet from "./components/Teacher/CreateEditFlashcardSet";
+import TeacherFlashcardWorkspace from "./components/Teacher/FlashcardItem";
+import TeacherCreateEditQuiz from "./components/Teacher/CreateEditQuizz";
+import TeacherQuizWorkspace from "./components/Teacher/QuizDetail";
+import TeacherGuide from "./components/Teacher/Guide";
+import TeacherCreateLesson from "./components/Teacher/CreateLesson";
+import TeacherEditLesson from "./components/Teacher/EditLesson";
+
 import { ThemeProvider } from './context/ThemeContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -42,6 +55,25 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/" replace />; 
 };
 
+<<<<<<< HEAD
+const AdminRoute = ({ children }) => {
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch {
+    user = null;
+  }
+  if (!user) return <Navigate to="/" replace />;
+  const role = String(user.role || "").toUpperCase();
+  if (role !== "ADMIN") return <Navigate to="/home" replace />;
+  return children;
+};
+
+=======
+>>>>>>> 9269f79502f554a9fe6739ad66a1ce8d93ee1900
 const TeacherRoute = ({ children }) => {
   const raw = localStorage.getItem("user");
   let user = null;
@@ -57,10 +89,146 @@ const TeacherRoute = ({ children }) => {
   if (role !== "TEACHER") return <Navigate to="/home" replace />;
   return children;
 };
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9269f79502f554a9fe6739ad66a1ce8d93ee1900
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <ThemeProvider>
+<<<<<<< HEAD
+      <Routes>
+        <Route path="/" element={<App />}>
+          <Route index element={
+            localStorage.getItem("user") ? <Navigate to="/home" replace /> : <HomePage />
+          } />
+          
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="writingpractice" element={<WritingPractice />} />
+          <Route path="membership" element={<Membership />} />
+          <Route path="/payment/:id" element={<PaymentForm />} />
+          <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/flashcards" element={<FlashcardList />} />
+          <Route path="/flashcard/:setId" element={<Flashcard />} />
+          <Route path="grammar" element={<Grammar />} />
+          <Route path="payment-success" element={<PaymentSuccessSubscription />} />
+          <Route path="/quiz/start/:quizId" element={<StartQuiz />} />
+          <Route path="speakingpractice" element={<SpeakingPractice />} />
+          <Route path="/quiz/publish" element={<QuizPublish />} />
+          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
+          <Route path="/teacherinfo/:teacherId" element={<TeacherInfo />} />
+          
+          <Route path="profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+
+          <Route path="forgotpassword" element={<ForgotPass />} />
+          <Route path="resetpassword" element={<ResetPassword />} />
+
+          {/* ADMIN ROUTES */}
+          <Route path="/admin/dashboard" element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } />
+          <Route path="/admin/examdetail/:quizId" element={
+            <AdminRoute>
+              <ExamDetail />
+            </AdminRoute>
+          } />
+
+          {/* TEACHER ROUTES */}
+          <Route path="/teacher/dashboard" element={
+            <TeacherRoute>
+              <TeacherDashboard />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/coursedetail/:courseId" element={
+            <TeacherRoute>
+              <TeacherCourseWorkspace />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/create-course" element={
+            <TeacherRoute>
+              <TeacherCreateEditCourse />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/createcourse" element={
+            <TeacherRoute>
+              <TeacherCreateEditCourse />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/editcourse/:id" element={
+            <TeacherRoute>
+              <TeacherCreateEditCourse />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/edit-course/:id" element={
+            <TeacherRoute>
+              <TeacherCreateEditCourse />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/create" element={
+            <TeacherRoute>
+              <TeacherCreateEditFlashcardSet />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/edit/:id" element={
+            <TeacherRoute>
+              <TeacherCreateEditFlashcardSet />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/flashcards/:setId" element={
+            <TeacherRoute>
+              <TeacherFlashcardWorkspace />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/create-quiz" element={
+            <TeacherRoute>
+              <TeacherCreateEditQuiz />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/edit-quiz/:id" element={
+            <TeacherRoute>
+              <TeacherCreateEditQuiz />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/quizdetail/:quizId" element={
+            <TeacherRoute>
+              <TeacherQuizWorkspace />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/quizdetail/:quizId/:groupType" element={
+            <TeacherRoute>
+              <TeacherQuizWorkspace />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/guide" element={
+            <TeacherRoute>
+              <TeacherGuide />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/create-lesson" element={
+            <TeacherRoute>
+              <TeacherCreateLesson />
+            </TeacherRoute>
+          } />
+          <Route path="/teacher/edit-lesson/:id" element={
+            <TeacherRoute>
+              <TeacherEditLesson />
+            </TeacherRoute>
+          } />
+        </Route>
+      </Routes>
+=======
     <Routes>
       <Route path="/" element={<App />}>
         <Route index element={
@@ -175,6 +343,7 @@ root.render(
       </Route>
 
     </Routes>
+>>>>>>> 9269f79502f554a9fe6739ad66a1ce8d93ee1900
     </ThemeProvider>
   </BrowserRouter>
 );
