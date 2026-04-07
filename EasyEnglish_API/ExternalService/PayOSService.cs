@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using EasyEnglish_API.Data;
 using EasyEnglish_API.Models;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace EMT_API.Services
@@ -20,26 +21,50 @@ namespace EMT_API.Services
             _db = db;
         }
 
-        public async Task<string> CreatePaymentAsync(int buyerId, int planId)
+        public async Task<string> CreatePaymentAsync(int buyerId, int planId, string? voucherCode = null)
         {
             var plan = await _db.SubscriptionPlans.FindAsync(planId)
                 ?? throw new Exception("Không tìm thấy gói học.");
 
-            var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            decimal discountAmount = 0;
+            int? voucherId = null;
+
+            if (!string.IsNullOrEmpty(voucherCode))
+            {
+                var voucher = await _db.Vouchers
+                    .Include(v => v.Usages)
+                    .FirstOrDefaultAsync(v => v.Code == voucherCode.ToUpper() && v.IsActive)
+                    ?? throw new Exception("Mã voucher không hợp lệ.");
+
+                if (voucher.ExpiresAt < DateOnly.FromDateTime(DateTime.UtcNow))
+                    throw new Exception("Mã voucher đã hết hạn.");
+
+                if (voucher.Usages.Any(u => u.UserId == buyerId))
+                    throw new Exception("Bạn đã sử dụng mã voucher này rồi.");
+
+                if (voucher.ApplicablePlanId.HasValue && voucher.ApplicablePlanId != planId)
+                    throw new Exception("Mã voucher không áp dụng cho gói học này.");
+
+                discountAmount = voucher.DiscountAmount;
+                voucherId = voucher.VoucherId;
+            }
+
+            var finalAmount = (int)Math.Max(0, plan.Price - discountAmount);
+
             var order = new PaymentOrder
             {
                 BuyerId = buyerId,
                 PlanId = planId,
                 Amount = plan.Price,
-                Status = "PENDING",
-                OrderCode = orderCode 
+                DiscountAmount = discountAmount,
+                FinalAmount = finalAmount,
+                VoucherId = voucherId,
+                Status = "PENDING"
             };
-
             _db.PaymentOrders.Add(order);
             await _db.SaveChangesAsync();
 
             // 2️⃣ Tạo chuỗi signature đúng format
-            var amount = (int)plan.Price;
             var cancelUrl = _cfg["PayOS:CancelUrl"];
             var returnUrl = _cfg["PayOS:ReturnUrl"];
             var description = $"Gói {plan.Name}".Length > 25
@@ -49,15 +74,15 @@ namespace EMT_API.Services
 
 
             var dataToSign =
-                $"amount={amount}&cancelUrl={cancelUrl}&description={description}&orderCode={orderCode}&returnUrl={returnUrl}";
+                $"amount={finalAmount}&cancelUrl={cancelUrl}&description={description}&orderCode={order.OrderId}&returnUrl={returnUrl}";
 
             var signature = ComputeHmacSHA256(dataToSign, _cfg["PayOS:ChecksumKey"]);
 
             // 3️⃣ Tạo payload đúng theo tài liệu PayOS
             var payload = new
             {
-                orderCode,
-                amount,
+                orderCode = order.OrderId,
+                amount = finalAmount,
                 description,
                 cancelUrl,
                 returnUrl,

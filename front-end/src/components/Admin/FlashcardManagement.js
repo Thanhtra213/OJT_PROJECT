@@ -57,13 +57,20 @@ export function FlashcardManagement() {
   };
 
   const handleOpenSetModal = (set = null) => {
-    if (set) setSetForm({ ...set });
-    else setSetForm({ title: "", description: "" });
+    if (set) {
+      setSetForm({
+        setID: set.setID,
+        title: set.title || "",
+        description: set.description || ""
+      });
+    } else {
+      setSetForm({ title: "", description: "" });
+    }
     setShowSetModal(true);
   };
 
   const handleSaveSet = async () => {
-    if (!setForm.title) {
+    if (!setForm.title?.trim()) {
       Swal.fire("Thiếu dữ liệu", "Vui lòng nhập tiêu đề Flashcard Set", "warning");
       return;
     }
@@ -105,16 +112,16 @@ export function FlashcardManagement() {
   };
 
   const handleOpenItemModal = (item = null, setID = null) => {
-    if (item)
+    if (item) {
       setItemForm({
-        frontText: item.frontText ?? "",
-        ipa: item.ipa ?? "",
-        backText: item.backText ?? "",
-        example: item.example ?? "",
+        frontText: item.frontText || "",
+        ipa: item.ipa || "",
+        backText: item.backText || "",
+        example: item.example || "",
         itemID: item.itemID,
         setID,
       });
-    else
+    } else {
       setItemForm({
         frontText: "",
         ipa: "",
@@ -122,23 +129,24 @@ export function FlashcardManagement() {
         example: "",
         setID,
       });
-
+    }
     setShowItemModal(true);
   };
 
   const handleSaveItem = async () => {
-    if (!itemForm.frontText || !itemForm.backText) {
+    if (!itemForm.frontText?.trim() || !itemForm.backText?.trim()) {
       Swal.fire("Thiếu dữ liệu", "Vui lòng nhập Thuật ngữ và Nghĩa của nó", "warning");
       return;
     }
 
     try {
+      // ÉP LƯU CHUỖI RỖNG ("") ĐỂ BÁO BACKEND XÓA DỮ LIỆU
       const payload = {
         setID: itemForm.setID,
-        frontText: itemForm.frontText,
-        ipa: itemForm.ipa || null,
-        backText: itemForm.backText,
-        example: itemForm.example || null,
+        frontText: itemForm.frontText.trim(),
+        ipa: itemForm.ipa.trim(), 
+        backText: itemForm.backText.trim(),
+        example: itemForm.example.trim(), 
       };
 
       if (itemForm.itemID) {
@@ -328,6 +336,7 @@ export function FlashcardManagement() {
     <div className="management-card">
       {selectedSet ? renderSetDetails() : renderSetList()}
 
+      {/* MODAL: BỘ FLASHCARD */}
       {showSetModal && (
         <div className="management-modal-overlay" onClick={() => setShowSetModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -335,9 +344,6 @@ export function FlashcardManagement() {
               <h3 className="modal-title">
                 {setForm.setID ? "Sửa Flashcard Set" : "Thêm Flashcard Set"}
               </h3>
-              {/* <button className="action-button" onClick={() => setShowSetModal(false)}>
-                <X size={20} />
-              </button> */}
             </div>
             <div className="modal-body-custom">
               <div style={{ marginBottom: '1.25rem' }}>
@@ -373,6 +379,7 @@ export function FlashcardManagement() {
         </div>
       )}
 
+      {/* MODAL: THẺ TỪ VỰNG (ITEM) */}
       {showItemModal && (
         <div className="management-modal-overlay" onClick={() => setShowItemModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -380,9 +387,6 @@ export function FlashcardManagement() {
               <h3 className="modal-title">
                 {itemForm.itemID ? "Sửa Flashcard Item" : "Thêm Flashcard Item"}
               </h3>
-              {/* <button className="action-button" onClick={() => setShowItemModal(false)}>
-                <X size={20} />
-              </button> */}
             </div>
             <div className="modal-body-custom">
               <div style={{ marginBottom: '1.25rem' }}>

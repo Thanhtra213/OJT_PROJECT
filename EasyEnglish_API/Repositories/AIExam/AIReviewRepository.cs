@@ -32,6 +32,7 @@ namespace EasyEnglish_API.Repositories.AIExam
         {
             return await _db.AnswerAIReviews
                 .Include(r => r.Submission)
+                .ThenInclude(s => s.Prompt)
                 .Where(r => r.IsSentToTeacher)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
@@ -92,6 +93,31 @@ namespace EasyEnglish_API.Repositories.AIExam
                 .FirstOrDefaultAsync();
 
             return result;
+        }
+
+        public async Task<List<object>> GetSubmissionListAsync(int userId)
+        {
+            return await _db.AnswerAIReviews
+                .Include(r => r.Submission)
+                    .ThenInclude(s => s.Prompt)
+                .Include(r => r.AnswerTeacherReviews)
+                .Where(r => r.Submission.UserId == userId)
+                .OrderByDescending(r => r.CreatedAt)
+                .Select(r => new
+                {
+                    r.Submission.SubmissionId,
+                    r.AireviewId,
+                    Prompt = new
+                    {
+                        r.Submission.Prompt.Title,
+                        r.Submission.Prompt.Content
+                    },
+                    r.ScoreOverall,
+                    r.CreatedAt,
+                    IsTeacherReviewed = r.AnswerTeacherReviews.Any()
+                })
+                .Cast<object>()
+                .ToListAsync();
         }
     }
 }

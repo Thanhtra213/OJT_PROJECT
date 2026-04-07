@@ -174,6 +174,15 @@ const Header = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  useEffect(() => {
+    const handleOpenAuthModal = (e) => {
+      setActiveTab(e.detail?.tab || "login");
+      setShowAuthModal(true);
+    };
+    window.addEventListener("openAuthModal", handleOpenAuthModal);
+    return () => window.removeEventListener("openAuthModal", handleOpenAuthModal);
+  }, []);
+
   // Load Google Identity Services
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID") {
@@ -272,8 +281,9 @@ const Header = () => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
-        "Đăng nhập Google thất bại!";
-      showToastNotification(`❌ ${errorMsg}`, "danger");
+      setLoginErrorMessage(errorMsg);
+      // Đã loại bỏ toast error theo yêu cầu
+      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -359,7 +369,8 @@ const Header = () => {
         err.message ||
         "Đăng nhập thất bại!";
       setLoginErrorMessage(errorMsg);
-      showToastNotification(`❌ ${errorMsg}`, "danger");
+      // Đã loại bỏ toast error theo yêu cầu
+      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -369,14 +380,14 @@ const Header = () => {
     if (!registerOtp) {
       const msg = "Vui lòng nhập mã OTP";
       setRegisterErrorMessage(msg);
-      showToastNotification(msg, "warning");
+      // showToastNotification(msg, "warning");
       return;
     }
 
     if (registerPassword !== registerConfirmPassword) {
       const msg = "Mật khẩu xác nhận không khớp!";
       setRegisterErrorMessage(msg);
-      showToastNotification(msg, "warning");
+      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -430,7 +441,8 @@ const Header = () => {
         err.message ||
         "Đăng ký thất bại!";
       setRegisterErrorMessage(errorMsg);
-      showToastNotification(`❌ ${errorMsg}`, "danger");
+      // Đã loại bỏ toast error theo yêu cầu
+      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -438,7 +450,7 @@ const Header = () => {
     if (!registerEmail) {
       const msg = "Vui lòng nhập email trước khi gửi OTP!";
       setOtpError(msg);
-      showToastNotification(msg, "warning");
+      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -456,7 +468,8 @@ const Header = () => {
         "Gửi OTP thất bại!";
       setOtpError(errorMsg);
       setOtpMessage("");
-      showToastNotification(`❌ ${errorMsg}`, "danger");
+      // Đã loại bỏ toast error theo yêu cầu
+      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 

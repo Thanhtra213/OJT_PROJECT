@@ -55,14 +55,27 @@ namespace EasyEnglish_API.Services.Score
             return pending.Select(x => new
             {
                 x.AireviewId,
-                x.ScoreOverall,
-                x.ScoreTask,
-                x.ScoreLexical,
-                x.ScoreGrammar,
-                x.ScorePronunciation,
-                x.ScoreFluency,
-                x.ScoreCoherence,
-                x.Feedback,
+                Prompt = new
+                {
+                    x.Submission.Prompt.Title,
+                    x.Submission.Prompt.Content
+                },
+                Answer = new
+                {
+                    x.Submission.Transcript,
+                    x.Submission.AnswerText
+                },
+                AIReview = new
+                {
+                    x.ScoreOverall,
+                    x.ScoreTask,
+                    x.ScoreLexical,
+                    x.ScoreGrammar,
+                    x.ScorePronunciation,
+                    x.ScoreFluency,
+                    x.ScoreCoherence,
+                    x.Feedback,
+                },
                 x.CreatedAt
             }).ToList<object>();
         }

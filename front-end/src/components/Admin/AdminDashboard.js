@@ -24,19 +24,17 @@ import {
   formatCurrency, formatDateTime, getStatusLabel
 } from "../../middleware/admin/transactionAPI";
 
-// IMPORT THEME CONTEXT
 import { useTheme } from "../../context/ThemeContext"; 
 import "./admin-dashboard-styles.scss";
 
-// --- BẢNG MÀU ĐỒNG BỘ: MINT (Giống User & Teacher) ---
 const SYS_COLORS = {
-  mint: "#00c896",       // Màu chủ đạo
+  mint: "#00c896",       
   mintLight: "#e6faf4",
-  blue: "#3b82f6",       // Màu phụ cho Chart
+  blue: "#3b82f6",       
   blueLight: "#eff6ff",
-  amber: "#f59e0b",      // Cảnh báo
+  amber: "#f59e0b",      
   amberLight: "#fef3c7",
-  pink: "#ec4899",       // Lỗi / Nguy hiểm
+  pink: "#ec4899",       
   pinkLight: "#fdf2f8",
   muted: "#9ca3af"
 };
@@ -102,8 +100,14 @@ export function AdminDashboard({ onClose }) {
   const loadTransactions = async () => {
     try {
       const data = await getAllTransactions();
-      setTransactions(data); calculateTransactionStats(data);
-    } catch (error) { console.error("Không thể tải giao dịch", error); }
+      const safeData = Array.isArray(data) ? data : [];
+      setTransactions(safeData); 
+      calculateTransactionStats(safeData);
+    } catch (error) { 
+      console.error("Không thể tải giao dịch (Lỗi Backend 500)", error); 
+      setTransactions([]);
+      calculateTransactionStats([]);
+    }
   };
 
   const calculateTransactionStats = (transactionsData) => {
@@ -113,17 +117,20 @@ export function AdminDashboard({ onClose }) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       monthlyRevenue[`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`] = 0;
     }
-    transactionsData.filter((t) => t.status === "PAID" && t.paidAt).forEach((t) => {
-      const paidDate = new Date(t.paidAt);
-      const monthKey = `${paidDate.getFullYear()}-${String(paidDate.getMonth() + 1).padStart(2, "0")}`;
-      if (monthlyRevenue.hasOwnProperty(monthKey)) monthlyRevenue[monthKey] += t.amount || 0;
-    });
+    
+    if (Array.isArray(transactionsData)) {
+      transactionsData.filter((t) => t.status === "PAID" && t.paidAt).forEach((t) => {
+        const paidDate = new Date(t.paidAt);
+        const monthKey = `${paidDate.getFullYear()}-${String(paidDate.getMonth() + 1).padStart(2, "0")}`;
+        if (monthlyRevenue.hasOwnProperty(monthKey)) monthlyRevenue[monthKey] += t.amount || 0;
+      });
+    }
 
     setTransactionStats({
-      total: transactionsData.length,
-      paid: transactionsData.filter((t) => t.status === "PAID").length,
-      pending: transactionsData.filter((t) => t.status === "PENDING").length,
-      totalRevenue: transactionsData.filter((t) => t.status === "PAID").reduce((sum, t) => sum + (t.amount || 0), 0),
+      total: transactionsData?.length || 0,
+      paid: transactionsData?.filter((t) => t.status === "PAID").length || 0,
+      pending: transactionsData?.filter((t) => t.status === "PENDING").length || 0,
+      totalRevenue: transactionsData?.filter((t) => t.status === "PAID").reduce((sum, t) => sum + (t.amount || 0), 0) || 0,
       monthlyRevenue,
     });
   };
@@ -132,7 +139,9 @@ export function AdminDashboard({ onClose }) {
     if (!searchKeyword.trim()) return loadTransactions();
     try {
       const data = await searchTransactions(searchKeyword);
-      setTransactions(data); calculateTransactionStats(data);
+      const safeData = Array.isArray(data) ? data : [];
+      setTransactions(safeData); 
+      calculateTransactionStats(safeData);
     } catch (error) { console.error("Lỗi tìm kiếm", error); }
   };
 
@@ -255,8 +264,8 @@ export function AdminDashboard({ onClose }) {
                 <h3 className="card-title">Doanh thu theo tháng</h3>
                 <p className="card-description">Thống kê biến động 6 tháng gần nhất</p>
               </div>
-              <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
+              <div style={{ width: '100%' }}>
+                <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={getRevenueChartData()} margin={{ top: 15, right: 10, left: -10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#334155' : '#e5e7eb'} />
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tickMargin={12} tick={{fill: isDarkMode ? '#9ca3af' : '#6b7280'}} />
@@ -280,8 +289,8 @@ export function AdminDashboard({ onClose }) {
                 <h3 className="card-title">Thống kê giao dịch</h3>
                 <p className="card-description">Phân bố trạng thái hóa đơn</p>
               </div>
-              <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
+              <div style={{ width: '100%' }}>
+                <ResponsiveContainer width="100%" height={300}>
                   <BarChart
                     data={[
                       { name: "Tổng GD", value: transactionStats.total, fill: SYS_COLORS.blue },
@@ -306,9 +315,9 @@ export function AdminDashboard({ onClose }) {
                 <h3 className="card-title">Phân bố vai trò</h3>
                 <p className="card-description">Hệ thống phân loại người dùng</p>
               </div>
-              <div style={{ width: '100%', height: 280 }}>
+              <div style={{ width: '100%' }}>
                 {userStats.totalStudents > 0 || userStats.totalTeachers > 0 ? (
-                  <ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
                       <Pie
                         data={[
@@ -326,7 +335,7 @@ export function AdminDashboard({ onClose }) {
                       <RechartsTooltip contentStyle={tooltipStyle} />
                     </PieChart>
                   </ResponsiveContainer>
-                ) : <div className="admin-empty-data">Chưa có dữ liệu</div>}
+                ) : <div className="admin-empty-data" style={{height: 280}}>Chưa có dữ liệu</div>}
               </div>
             </div>
             
@@ -336,9 +345,9 @@ export function AdminDashboard({ onClose }) {
                 <h3 className="card-title">Trạng thái tài khoản</h3>
                 <p className="card-description">Tỉ lệ hoạt động thực tế</p>
               </div>
-              <div style={{ width: '100%', height: 280 }}>
+              <div style={{ width: '100%' }}>
                 {userStats.activeUsers > 0 ? (
-                  <ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={280}>
                     <PieChart>
                       <Pie
                         data={[
@@ -354,7 +363,7 @@ export function AdminDashboard({ onClose }) {
                       <RechartsTooltip contentStyle={tooltipStyle} />
                     </PieChart>
                   </ResponsiveContainer>
-                ) : <div className="admin-empty-data">Chưa có dữ liệu</div>}
+                ) : <div className="admin-empty-data" style={{height: 280}}>Chưa có dữ liệu</div>}
               </div>
             </div>
           </div>
@@ -401,7 +410,7 @@ export function AdminDashboard({ onClose }) {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((t) => (
+                {transactions.length > 0 ? transactions.map((t) => (
                   <tr key={t.orderID}>
                     <td className="fw-800" style={{color: SYS_COLORS.mint}}>#{t.orderID}</td>
                     <td>
@@ -418,7 +427,15 @@ export function AdminDashboard({ onClose }) {
                       </button>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="7">
+                      <div className="admin-empty-data" style={{ padding: '3rem 0' }}>
+                        Chưa có giao dịch nào hoặc không thể kết nối tới máy chủ.
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -428,7 +445,6 @@ export function AdminDashboard({ onClose }) {
               <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-head">
                   <h3 className="modal-title">Chi tiết giao dịch #{selectedTransaction.orderID}</h3>
-                  {/* <button className="action-button" onClick={() => setShowDetailModal(false)}><X size={20} /></button> */}
                 </div>
                 <div className="modal-body-custom">
                   <div className="info-row">

@@ -20,5 +20,10 @@ namespace EasyEnglish_API.Services.AIExam
 
             return data;
         }
+
+        public async Task<List<object>> GetSubmissionList(int userId)
+        {
+            return await _repo.GetSubmissionListAsync(userId);
+        }
     }
 }
