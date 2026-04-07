@@ -61,8 +61,15 @@ const Header = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
 
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState(
+    () => localStorage.getItem("rememberedUser") || ""
+  );
+  const [password, setPassword] = useState(
+    () => localStorage.getItem("rememberedUser") ? (localStorage.getItem("rememberedPass") || "") : ""
+  );
+  const [rememberMe, setRememberMe] = useState(
+    () => !!localStorage.getItem("rememberedUser")
+  );
   const [loginMessage, setLoginMessage] = useState("");
   const [loginErrorMessage, setLoginErrorMessage] = useState("");
 
@@ -281,8 +288,12 @@ const Header = () => {
   };
 
   const resetLoginForm = () => {
-    setEmailOrUsername("");
-    setPassword("");
+    // Khôi phục lại thông tin đã nhớ nếu có (Remember Me)
+    const remembered = localStorage.getItem("rememberedUser") || "";
+    const rememberedPass = remembered ? (localStorage.getItem("rememberedPass") || "") : "";
+    setEmailOrUsername(remembered);
+    setPassword(rememberedPass);
+    setRememberMe(!!remembered);
     setLoginMessage("");
     setLoginErrorMessage("");
   };
@@ -326,6 +337,15 @@ const Header = () => {
       localStorage.setItem("user", JSON.stringify(loggedUser));
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userName", usernameFromToken || emailOrUsername);
+
+      // Remember Me
+      if (rememberMe) {
+        localStorage.setItem("rememberedUser", emailOrUsername);
+        localStorage.setItem("rememberedPass", password);
+      } else {
+        localStorage.removeItem("rememberedUser");
+        localStorage.removeItem("rememberedPass");
+      }
 
       setUser(loggedUser);
       setUsername(usernameFromToken || emailOrUsername);
@@ -655,7 +675,7 @@ const Header = () => {
                   size="sm"
                 />
               </Form.Group>
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-2">
                 <Form.Label>Mật khẩu</Form.Label>
                 <Form.Control
                   type="password"
@@ -664,6 +684,17 @@ const Header = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   size="sm"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3 d-flex align-items-center">
+                <Form.Check
+                  type="checkbox"
+                  id="remember-me-checkbox"
+                  label="Ghi nhớ tài khoản"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  style={{ cursor: "pointer" }}
                 />
               </Form.Group>
 

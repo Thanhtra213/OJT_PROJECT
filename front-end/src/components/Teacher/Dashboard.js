@@ -13,6 +13,7 @@ import {
   MoreVertical,
   GraduationCap,
   BarChart3,
+  ClipboardCheck,
 } from "lucide-react";
 import "../Admin/admin-dashboard-styles.scss";
 import "./teacher-dashboard.scss";
@@ -29,10 +30,13 @@ import {
   deleteQuiz,
 } from "../../middleware/teacher/quizTeacherAPI";
 import { TeacherFeedbackView } from "./TeacherFeedbackView";
+import { TeacherReviewManagement } from "./TeacherReviewManagement";
 import { jwtDecode } from "jwt-decode";
+import AIChat from "../AIChat/AI";
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
+  const [showAIChat, setShowAIChat] = useState(false);
 
   const [courses, setCourses] = useState([]);
   const [flashcards, setFlashcards] = useState([]);
@@ -87,10 +91,20 @@ const TeacherDashboard = () => {
         if (filteredCourses.length > 0) {
           const [flashcardData, quizData] = await Promise.all([
             Promise.all(
-              filteredCourses.map((c) => getFlashcardSetsByCourse(c.courseID))
+              filteredCourses.map((c) =>
+                getFlashcardSetsByCourse(c.courseID).catch((err) => {
+                  console.warn(`Lỗi lấy flashcard cho course ${c.courseID}:`, err);
+                  return [];
+                })
+              )
             ),
             Promise.all(
-              filteredCourses.map((c) => getQuizzesByCourse(c.courseID))
+              filteredCourses.map((c) =>
+                getQuizzesByCourse(c.courseID).catch((err) => {
+                  console.warn(`Lỗi lấy quiz cho course ${c.courseID}:`, err);
+                  return [];
+                })
+              )
             ),
           ]);
 
@@ -99,6 +113,7 @@ const TeacherDashboard = () => {
               ...f,
               courseID: f.courseID || filteredCourses[idx].courseID,
               courseName: filteredCourses[idx].courseName,
+              courseLevel: f.courseLevel || f.level || filteredCourses[idx].courseLevel || 1,
             }))
           );
 
@@ -107,6 +122,7 @@ const TeacherDashboard = () => {
               ...q,
               courseID: q.courseID || filteredCourses[idx].courseID,
               courseName: filteredCourses[idx].courseName,
+              courseLevel: q.courseLevel || q.level || filteredCourses[idx].courseLevel || 1,
             }))
           );
 
@@ -143,10 +159,10 @@ const TeacherDashboard = () => {
         sum +
         Number(
           c.totalStudents ||
-            c.studentCount ||
-            c.enrolledStudents ||
-            c.totalEnrollments ||
-            0
+          c.studentCount ||
+          c.enrolledStudents ||
+          c.totalEnrollments ||
+          0
         )
       );
     }, 0);
@@ -156,10 +172,10 @@ const TeacherDashboard = () => {
         sum +
         Number(
           c.totalLessons ||
-            c.lessonCount ||
-            c.totalChapters ||
-            c.totalUnits ||
-            0
+          c.lessonCount ||
+          c.totalChapters ||
+          c.totalUnits ||
+          0
         )
       );
     }, 0);
@@ -167,13 +183,13 @@ const TeacherDashboard = () => {
     const avgScore =
       quizzes.length > 0
         ? (
-            quizzes.reduce(
-              (sum, q) =>
-                sum +
-                Number(q.averageScore || q.avgScore || q.averageResult || 0),
-              0
-            ) / quizzes.length
-          ).toFixed(1)
+          quizzes.reduce(
+            (sum, q) =>
+              sum +
+              Number(q.averageScore || q.avgScore || q.averageResult || 0),
+            0
+          ) / quizzes.length
+        ).toFixed(1)
         : "0.0";
 
     return {
@@ -189,13 +205,13 @@ const TeacherDashboard = () => {
     const avgQuizScore =
       quizzes.length > 0
         ? (
-            quizzes.reduce(
-              (sum, q) =>
-                sum +
-                Number(q.averageScore || q.avgScore || q.averageResult || 0),
-              0
-            ) / quizzes.length
-          ).toFixed(1)
+          quizzes.reduce(
+            (sum, q) =>
+              sum +
+              Number(q.averageScore || q.avgScore || q.averageResult || 0),
+            0
+          ) / quizzes.length
+        ).toFixed(1)
         : "0.0";
 
     return {
@@ -205,34 +221,28 @@ const TeacherDashboard = () => {
     };
   }, [quizzes]);
 
-  const getLevelLabel = (level) => {
-    switch (Number(level)) {
-      case 1:
-        return "Beginner";
-      case 2:
-        return "Intermediate";
-      case 3:
-        return "Advanced";
-      case 4:
-        return "Expert";
-      default:
-        return "General";
-    }
+  const getLevelLabel = (level, name) => {
+    const s = (String(level || "") + String(name || "")).toLowerCase();
+    
+    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1") || s.includes("lớp 1")) return "Nền tảng";
+    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "Cơ bản";
+    if (s.includes("tiền trung cấp") || s.includes("advanced") || s.includes("level 3")) return "Tiền trung cấp";
+    if (s.includes("trung cấp") || s.includes("expert") || s.includes("level 4")) return "Trung cấp";
+    if (s.includes("cao cấp") || s.includes("level 5") || s.includes("level 6")) return "Cao cấp";
+    
+    return "Tổng quát";
   };
 
-  const getLevelClass = (level) => {
-    switch (Number(level)) {
-      case 1:
-        return "theme-beginner";
-      case 2:
-        return "theme-intermediate";
-      case 3:
-        return "theme-advanced";
-      case 4:
-        return "theme-expert";
-      default:
-        return "theme-beginner";
-    }
+  const getLevelClass = (level, name) => {
+    const s = (String(level || "") + String(name || "")).toLowerCase();
+    
+    if (s.includes("nền tảng") || s.includes("beginner") || s.includes("level 1")) return "theme-beginner";
+    if (s.includes("cơ bản") || s.includes("intermediate") || s.includes("level 2") || s.includes("elementary")) return "theme-intermediate";
+    if (s.includes("tiền trung cấp") || s.includes("advanced") || s.includes("level 3")) return "theme-pre-intermediate";
+    if (s.includes("trung cấp") || s.includes("expert") || s.includes("level 4")) return "theme-advanced";
+    if (s.includes("cao cấp") || s.includes("level 5")) return "theme-expert";
+    
+    return "theme-beginner";
   };
 
   const getPageInfo = () => {
@@ -257,6 +267,13 @@ const TeacherDashboard = () => {
           subtitle: "Tạo và theo dõi các bài kiểm tra cho từng khóa học",
           buttonText: "Tạo quiz mới",
           onButtonClick: () => navigate("/teacher/create-quiz"),
+        };
+      case "review":
+        return {
+          title: "Chấm điểm bài làm",
+          subtitle: "Xem và đánh giá bài nộp từ học viên (hỗ trợ AI preview)",
+          buttonText: null,
+          onButtonClick: null,
         };
       case "danhgia":
         return {
@@ -354,6 +371,12 @@ const TeacherDashboard = () => {
     },
     { key: "quiz", icon: Brain, label: "Quiz", sub: "Bài kiểm tra" },
     {
+      key: "review",
+      icon: ClipboardCheck,
+      label: "Review",
+      sub: "Chấm điểm bài làm",
+    },
+    {
       key: "danhgia",
       icon: Star,
       label: "Đánh giá",
@@ -381,7 +404,7 @@ const TeacherDashboard = () => {
     return (
       <div className="course-grid">
         {courses.map((course) => {
-          const levelClass = getLevelClass(course.courseLevel);
+          const levelClass = getLevelClass(course.courseLevel, course.courseName);
           const studentCount =
             course.totalStudents ||
             course.studentCount ||
@@ -396,10 +419,10 @@ const TeacherDashboard = () => {
             0;
 
           return (
-            <div key={course.courseID} className={`course-card ${levelClass}`}>
+            <div key={course.courseID} className={`course-card origin-course-card ${levelClass}`}>
               <div className="course-cover">
                 <span className="course-level-badge">
-                  {getLevelLabel(course.courseLevel)}
+                  {getLevelLabel(course.courseLevel, course.courseName)}
                 </span>
                 <div className="course-cover-overlay" />
               </div>
@@ -485,8 +508,8 @@ const TeacherDashboard = () => {
 
     return (
       <div className="course-grid">
-        {flashcards.map((set, index) => {
-          const themeClass = themeClasses[index % themeClasses.length];
+        {flashcards.map((set) => {
+          const themeClass = getLevelClass(set.courseLevel, set.courseName || set.title);
 
           return (
             <div
@@ -559,37 +582,7 @@ const TeacherDashboard = () => {
 
     return (
       <div className="quiz-page-stack">
-        <div className="mini-stats-grid">
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <BarChart3 size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Tổng quiz</span>
-              <strong>{quizStats.totalQuiz}</strong>
-            </div>
-          </div>
 
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <Brain size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Quiz hoạt động</span>
-              <strong>{quizStats.activeQuiz}</strong>
-            </div>
-          </div>
-
-          <div className="mini-stat-card">
-            <div className="mini-stat-icon">
-              <Star size={18} />
-            </div>
-            <div className="mini-stat-content">
-              <span>Điểm trung bình</span>
-              <strong>{quizStats.avgQuizScore}/10</strong>
-            </div>
-          </div>
-        </div>
 
         {quizzes.length === 0 ? (
           <div className="empty-state-card">
@@ -605,8 +598,8 @@ const TeacherDashboard = () => {
           </div>
         ) : (
           <div className="course-grid">
-            {quizzes.map((quiz, index) => {
-              const themeClass = themeClasses[index % themeClasses.length];
+            {quizzes.map((quiz) => {
+              const themeClass = getLevelClass(quiz.courseLevel, quiz.courseName || quiz.title);
 
               return (
                 <div
@@ -615,7 +608,7 @@ const TeacherDashboard = () => {
                 >
                   <div className="course-cover">
                     <span className="course-level-badge">
-                      {quiz.courseName || "Quiz"}
+                      {getLevelLabel(quiz.courseLevel, quiz.courseName || quiz.title)}
                     </span>
                     <div className="course-cover-overlay" />
                   </div>
@@ -698,14 +691,10 @@ const TeacherDashboard = () => {
         return renderFlashcards();
       case "quiz":
         return renderQuizzes();
+      case "review":
+        return <TeacherReviewManagement />;
       case "danhgia":
-        return (
-          <div className="feedback-page-card">
-            <div className="feedback-page-inner">
-              <TeacherFeedbackView />
-            </div>
-          </div>
-        );
+        return <TeacherFeedbackView />;
       default:
         return null;
     }
@@ -802,6 +791,37 @@ const TeacherDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* ── FAB ──────────────────────────────────────────────────────── */}
+      {!showAIChat&&(
+        <button className="ai-fab-btn" onClick={()=>setShowAIChat(true)} title="Chat với AI">
+          <span className="ai-fab-label">
+            AI
+            <svg width="14" height="14" viewBox="0 0 15 15" style={{marginLeft:"2px",verticalAlign:"middle",position:"relative",top:"-1px"}}>
+              <polygon points="7.5,1.5 9.3,5.6 14,5.8 10.5,8.6 11.7,12.8 7.5,10.4 3.3,12.8 4.5,8.6 1,5.8 5.7,5.6" fill="#f9c74f" stroke="#f9c74f" strokeWidth="0.5"/>
+            </svg>
+          </span>
+        </button>
+      )}
+
+      <style>{`
+        .ai-fab-btn {
+          position:fixed;bottom:30px;right:30px;z-index:1100;
+          background:#00c896;color:#fff;border:none;border-radius:50%;
+          width:56px;height:56px;
+          box-shadow:0 8px 32px rgba(0,200,150,0.4);
+          display:flex;align-items:center;justify-content:center;
+          cursor:pointer;padding:0;font-family:'Nunito',sans-serif;
+          transition:box-shadow .18s,transform .18s,background .18s;
+          animation:fab-pop 1.2s cubic-bezier(.68,-.55,.27,1.55);
+        }
+        .ai-fab-btn:hover{background:#00a87c;box-shadow:0 12px 40px rgba(0,200,150,.55);transform:translateY(-2px) scale(1.06);}
+        .ai-fab-label{font-weight:900;font-size:1.05rem;display:flex;align-items:center;}
+        @keyframes fab-pop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+        @media(max-width:600px){.ai-fab-btn{right:12px;bottom:12px;}}
+      `}</style>
+
+      {showAIChat&&<AIChat isVisible={showAIChat} onClose={()=>setShowAIChat(false)}/>}
     </div>
   );
 };

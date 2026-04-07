@@ -2,17 +2,17 @@
 
 @import '../Admin/admin-dashboard-styles.scss';
 
-$course-primary: #6c47ff;
-$course-primary-hover: #5535e0;
-$course-primary-soft: #ede9ff;
-$course-primary-border: #d2c5ff;
+$course-primary: #00c896;
+$course-primary-hover: #00a87c;
+$course-primary-soft: #e6faf4;
+$course-primary-border: #b3f0de;
 
-$course-page-bg: #f5f6fa;
-$course-surface: #ffffff;
-$course-soft: #fcfbfe;
-$course-border: #e8eaf0;
-$course-text: #1a1a2e;
-$course-muted: #9aa0ad;
+$course-page-bg: var(--teacher-bg, #f5f6fa);
+$course-surface: var(--teacher-card-bg, #ffffff);
+$course-soft: var(--teacher-bg, #fcfbfe);
+$course-border: var(--teacher-border, #e8eaf0);
+$course-text: var(--teacher-text, #1a1a2e);
+$course-muted: var(--teacher-text-muted, #9aa0ad);
 $course-shadow-sm: 0 2px 8px rgba(108, 71, 255, 0.07);
 $course-shadow-lg: 0 12px 40px rgba(108, 71, 255, 0.16);
 $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
@@ -192,7 +192,7 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
   .form-select {
     width: 100%;
     border: 1px solid $course-border;
-    background: #f9fafb;
+    background: $course-page-bg;
     border-radius: 0.85rem;
     color: $course-text;
     transition: all 0.2s ease;
@@ -200,8 +200,8 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
     &:focus {
       outline: none;
       border-color: rgba($course-primary, 0.5);
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.08);
+      background: $course-surface;
+      box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.08);
     }
   }
 
@@ -283,11 +283,11 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
     border: 1px solid $course-border;
     border-radius: 1rem;
     overflow: hidden;
-    background: #fff;
+    background: $course-surface;
     transition: all 0.25s ease;
 
     &.open {
-      box-shadow: 0 10px 26px rgba(147, 51, 234, 0.1);
+      box-shadow: 0 10px 26px rgba(0, 200, 150, 0.1);
       border-color: $course-primary-border;
     }
   }
@@ -497,14 +497,14 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
       padding: 1.5rem 1rem;
       border: 1.5px dashed #d8dbe5;
       border-radius: 1rem;
-      background-color: #fafbff;
+      background-color: $course-page-bg;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
 
       &:hover {
         border-color: $course-primary;
-        background-color: #ffffff;
+        background-color: $course-surface;
       }
 
       .upload-icon {
@@ -553,6 +553,7 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
   }
 
   @media (max-width: 640px) {
+
     .chapter-header,
     .video-item {
       flex-direction: column;

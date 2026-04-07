@@ -1,10 +1,12 @@
 .section-label {
-  color: #eab308 !important; /* vàng đậm */
+  color: #eab308 !important;
+  /* vàng đậm */
   font-weight: 700;
 }
 
-.review-card button, .review-card .btn {
-  background: #6c47ff;
+.review-card button,
+.review-card .btn {
+  background: #00c896;
   color: #fff;
   border: none;
   border-radius: 14px;
@@ -12,13 +14,17 @@
   padding: 0.5rem 1.2rem;
   transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
 }
-.review-card button:hover, .review-card .btn:hover {
-  background: #5535e0;
+
+.review-card button:hover,
+.review-card .btn:hover {
+  background: #00a87c;
   color: #fff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
 }
-.review-card button:disabled, .review-card .btn:disabled {
+
+.review-card button:disabled,
+.review-card .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

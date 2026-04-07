@@ -1,24 +1,23 @@
 // createLesson.scss - Updated for Dashboard consistency
-
 .create-lesson-container {
   min-height: 100vh;
-  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  font-family: 'Nunito', sans-serif;
   padding: 40px;
-  background-color: #f5f6fa;
-  color: #1a1a2e;
+  background-color: transparent; 
+  color: var(--teacher-text);
 
   // --- Header Section ---
   .header-content {
     h3 {
-      font-size: 2.2rem; // Consistent with dashboard title
-      font-weight: 700;
-      color: #2c3e50; // Consistent with dashboard title color
+      font-size: 2.22rem;
+      font-weight: 800;
+      color: var(--teacher-text);
       margin-bottom: 8px;
     }
 
     p {
-      font-size: 1.1rem; // Consistent with dashboard welcome message
-      color: #555;
+      font-size: 1.1rem;
+      color: var(--teacher-text-body);
       margin-bottom: 20px;
     }
   }
@@ -28,94 +27,89 @@
       font-weight: 700;
       border-radius: 14px;
       padding: 8px 20px;
-      transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+      transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
 
       &.btn-outline-primary {
-        border-color: #6c47ff;
-        color: #6c47ff;
+        border-color: #00c896;
+        color: #00c896;
         &:hover {
-          background-color: #ede9ff;
+          background-color: #e6faf4;
           transform: translateY(-1px);
         }
       }
       &.btn-primary {
-        background-color: #6c47ff;
-        border-color: #6c47ff;
+        background-color: #00c896;
+        border-color: #00c896;
         color: white;
         &:hover {
-          background-color: #5535e0;
-          border-color: #5535e0;
-          box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+          background-color: #00a87c;
+          border-color: #00a87c;
+          box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
           transform: translateY(-1px);
         }
       }
     }
   }
 
-  // --- Card Styling (Consistent with Dashboard cards) ---
+  // --- Card Styling ---
   .card {
-    border: 1px solid #e8eaf0;
+    border: 1px solid var(--teacher-border);
     border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(108,71,255,.07);
-    background-color: white;
-    padding: 15px; // Adjust padding as needed for content
-    margin-bottom: 20px; // Spacing between cards
-    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    background-color: var(--teacher-card-bg);
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(108,71,255,.16);
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
     }
 
     h5, h6 {
-      font-weight: 700; // Bolder headings
-      color: #2c3e50; // Darker heading color
+      font-weight: 800;
+      color: var(--teacher-text);
       margin-bottom: 10px;
-      font-size: 1.25rem; // Adjust size for main card titles
+      font-size: 1.25rem;
     }
     h6 {
-      font-size: 1.1rem; // Slightly smaller for sidebar card titles
+      font-size: 1.1rem;
     }
 
     p.text-muted {
-      font-size: 0.95rem; // Consistent text size
-      color: #666;
+      font-size: 0.95rem;
+      color: var(--teacher-text-muted);
       margin-bottom: 20px;
     }
-
-    // No hover effect on general cards unless specific interaction is desired
-    // &:hover {
-    //   transform: translateY(-2px);
-    //   box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-    // }
   }
 
-  // --- Form Element Styling (Consistent with Modal in Dashboard) ---
+  // --- Form Element Styling ---
   form {
     label {
-      font-weight: 600; // Consistent with modal labels
-      color: #555;
-      margin-bottom: 8px; // More space below labels
-      display: block; // Ensure label takes full width for margin
+      font-weight: 700;
+      color: var(--teacher-text-body);
+      margin-bottom: 8px;
+      display: block;
     }
 
     input, select, textarea {
-      border-radius: 8px;
-      border: 1px solid #e8eaf0;
+      border-radius: 12px;
+      border: 1px solid var(--teacher-border);
+      background-color: var(--teacher-bg);
       padding: 10px 15px;
       font-size: 0.95rem;
-      color: #1a1a2e;
-      transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+      color: var(--teacher-text);
+      transition: all 0.2s ease;
 
       &:focus {
-        border-color: #6c47ff;
-        box-shadow: 0 0 0 0.25rem rgba(108, 71, 255, 0.16);
+        border-color: #00c896;
+        box-shadow: 0 0 0 0.25rem rgba(0, 200, 150, 0.16);
       }
     }
 
     .form-text {
-      font-size: 0.85rem; // Smaller text for hints
-      color: #777;
+      font-size: 0.85rem;
+      color: var(--teacher-text-muted);
     }
   }
 
@@ -123,36 +117,36 @@
   .video-input-row {
     .btn {
       width: 100%;
-      border-radius: 8px; // Match input border-radius
+      border-radius: 12px;
       padding: 10px 15px;
       font-weight: 700;
-      color: #6c47ff;
-      border-color: #6c47ff;
-      transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+      color: #00c896;
+      border-color: #00c896;
+      transition: all 0.2s ease;
 
       &:hover {
-        background-color: #ede9ff;
+        background-color: #e6faf4;
         transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+        box-shadow: 0 4px 14px rgba(0, 200, 150, 0.2);
       }
     }
   }
 
   // --- Suggestions List Styling ---
   ul {
-    padding-left: 25px; // Adjust padding for list items
-    font-size: 0.95rem; // Consistent font size
-    color: #444;
-    list-style-type: disc; // Explicit disc for consistency
+    padding-left: 25px;
+    font-size: 0.95rem;
+    color: var(--teacher-text-body);
+    list-style-type: disc;
 
     li {
-      margin-bottom: 10px; // More spacing between list items
+      margin-bottom: 10px;
       line-height: 1.5;
     }
   }
 }
 
-// --- Responsive Adjustments (Mirroring Dashboard) ---
+// --- Responsive Adjustments ---
 @media (max-width: 991.98px) {
   .create-lesson-container {
     padding: 30px;

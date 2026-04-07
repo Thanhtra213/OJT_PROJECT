@@ -56,7 +56,7 @@ const EditLesson = () => {
       });
 
       alert("Cập nhật bài học thành công!");
-      navigate("/teacher/dashboard");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Lỗi khi cập nhật bài học:", error);
       alert("Không thể cập nhật bài học!");
@@ -72,7 +72,7 @@ const EditLesson = () => {
           <p>Cập nhật nội dung cho bài học của bạn</p>
         </Col>
         <Col className="text-end">
-          <Button variant="outline-dark" className="me-2" onClick={() => navigate("/teacher/dashboard")}>
+          <Button variant="outline-dark" className="me-2" onClick={() => navigate("/dashboard")}>
             Hủy
           </Button>
           <Button variant="dark" onClick={handleUpdate}>

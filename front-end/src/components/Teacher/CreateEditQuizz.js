@@ -62,7 +62,7 @@ const CreateEditQuiz = () => {
           setQuizData({
             title: rawData.title || "",
             course: rawData.courseID || rawData.courseId || "",
-            duration: rawData.duration || "30 phút", 
+            duration: rawData.duration ? String(rawData.duration).replace(/[^0-9.,]/g, '') : "30", 
             passingScore: rawData.passingScore || "70%",
             status: rawData.isActive ? "published" : "draft",
             questions: questionsFromGroups.length > 0 ? questionsFromGroups : (rawData.questions || []),
@@ -208,7 +208,7 @@ const CreateEditQuiz = () => {
           <p>{isEditMode ? "Cập nhật thông tin và câu hỏi cho Quiz" : "Thiết kế các bài kiểm tra ngắn cho học viên"}</p>
         </Col>
         <Col className="text-end header-buttons">
-          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/teacher/dashboard")}>
+          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/dashboard")}>
             <FontAwesomeIcon icon={faTimes} className="me-1" /> Hủy
           </Button>
           <Button variant="primary" onClick={handleSubmit} disabled={loading}>
@@ -258,9 +258,9 @@ const CreateEditQuiz = () => {
                       {/* Fallback nếu không có passedCourses */}
                       {passedCourses.length === 0 && (
                           <>
-                              <option value="IELTS Nền Tảng">IELTS Nền Tảng</option>
-                              <option value="IELTS Cơ Bản">IELTS Cơ Bản</option>
-                              <option value="IELTS Nâng Cao">IELTS Nâng Cao</option>
+                              <option value="1">IELTS Nền Tảng</option>
+                              <option value="2">IELTS Cơ Bản</option>
+                              <option value="3">IELTS Nâng Cao</option>
                           </>
                       )}
                     </Form.Select>
@@ -268,13 +268,16 @@ const CreateEditQuiz = () => {
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Thời lượng <span className="text-danger">*</span></Form.Label>
+                    <Form.Label>Thời lượng (Phút) <span className="text-danger">*</span></Form.Label>
                     <Form.Control
                       type="text"
-                      placeholder="Ví dụ: 30 phút"
+                      placeholder="Ví dụ: 30"
                       name="duration"
                       value={quizData.duration}
-                      onChange={handleQuizDetailsChange}
+                      onChange={e => {
+                        const val = e.target.value.replace(/[^0-9.,]/g, '');
+                        handleQuizDetailsChange({ target: { name: "duration", value: val } });
+                      }}
                       required
                     />
                   </Form.Group>
@@ -290,8 +293,11 @@ const CreateEditQuiz = () => {
                         type="text"
                         placeholder="Ví dụ: 70"
                         name="passingScore"
-                        value={(quizData.passingScore || "").replace('%', '')}
-                        onChange={e => handleQuizDetailsChange({ ...e, target: { ...e.target, value: `${e.target.value.replace(/[^0-9]/g, '')}%` } })}
+                        value={String(quizData.passingScore || "").replace('%', '')}
+                        onChange={e => {
+                          const val = e.target.value.replace(/[^0-9.,]/g, '');
+                          handleQuizDetailsChange({ target: { name: "passingScore", value: val ? `${val}%` : '' } });
+                        }}
                         required
                       />
                       <InputGroup.Text>%</InputGroup.Text>

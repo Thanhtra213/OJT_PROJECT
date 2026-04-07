@@ -1,5 +1,5 @@
 .guide-page {
-  background: #f5f6fa;
+  background: var(--teacher-bg);
   min-height: 100vh;
   padding: 20px 0;
 
@@ -20,12 +20,12 @@
   }
 
   .guide-card {
-    background: white;
+    background: var(--teacher-card-bg);
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(108, 71, 255, 0.07);
     border: none;
     margin-bottom: 1.5rem;
-    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+    transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
 
     &:hover {
       transform: translateY(-5px);
@@ -33,54 +33,54 @@
     }
 
     .card-title {
-      color: #000;
+      color: var(--teacher-text);
       margin-bottom: 1rem;
       font-size: 1.1rem;
       padding-bottom: 0.5rem;
     }
 
     .method-card {
-      border: 1px solid #dee2e6;
-      
+      border: 1px solid var(--teacher-border);
+
       &.url-method {
         border-left: 4px solid #dc3545;
       }
-      
+
       &.upload-method {
         border-left: 4px solid #198754;
       }
-      
+
       .method-title {
-        color: #000;
+        color: var(--teacher-text);
         font-size: 0.95rem;
       }
     }
 
     .best-practice-card {
-      border: 1px solid #dee2e6;
-      
+      border: 1px solid var(--teacher-border);
+
       &.do-card {
         border-left: 4px solid #198754;
       }
-      
+
       &.dont-card {
         border-left: 4px solid #dc3545;
       }
-      
+
       .practice-title {
-        color: #000;
+        color: var(--teacher-text);
         font-size: 0.95rem;
       }
     }
 
     .tech-specs-card {
-      background-color: #f8f9fa !important;
-      border: 1px solid #dee2e6;
-      
+      background-color: var(--teacher-bg) !important;
+      border: 1px solid var(--teacher-border);
+
       .specs-title {
         font-size: 0.9rem;
         font-weight: bold;
-        color: #000;
+        color: var(--teacher-text);
       }
     }
 
@@ -88,54 +88,54 @@
       .faq-item {
         border: none;
         margin-bottom: 0.5rem;
-        
+
         .faq-header {
-          background: white;
-          border: 1px solid #dee2e6;
+          background: var(--teacher-card-bg);
+          border: 1px solid var(--teacher-border);
           cursor: pointer;
           padding: 1rem;
           border-radius: 8px;
           transition: background-color 0.2s;
-          
+
           &:hover {
-            background-color: #f8f9fa;
+            background-color: var(--teacher-bg);
           }
-          
+
           .faq-question {
-            color: #000;
+            color: var(--teacher-text);
             margin: 0;
             font-weight: 600;
           }
-          
+
           .faq-icon {
-            color: #000;
+            color: var(--teacher-text);
             font-size: 0.8rem;
             transition: transform 0.2s;
-            
+
             &.open {
               transform: rotate(90deg);
             }
           }
         }
-        
+
         .faq-answer {
-          background-color: #f8f9fa;
-          border: 1px solid #dee2e6;
+          background-color: var(--teacher-bg);
+          border: 1px solid var(--teacher-border);
           border-top: none;
           border-radius: 0 0 8px 8px;
           padding: 1rem;
-          color: #000;
+          color: var(--teacher-text);
         }
       }
     }
 
     .support-card {
-      background: white !important;
-      border: 1px solid #dee2e6;
-      color: #000;
-      
+      background: var(--teacher-card-bg) !important;
+      border: 1px solid var(--teacher-border);
+      color: var(--teacher-text);
+
       .support-title {
-        color: #000;
+        color: var(--teacher-text);
       }
     }
   }
@@ -144,15 +144,16 @@
     li {
       margin-bottom: 0.5rem;
       line-height: 1.5;
-      color: #000;
+      color: var(--teacher-text);
     }
   }
 
-  .method-list, .practice-list {
+  .method-list,
+  .practice-list {
     li {
       margin-bottom: 0.25rem;
       line-height: 1.4;
-      color: #000;
+      color: var(--teacher-text);
     }
   }
 
@@ -160,12 +161,12 @@
     li {
       margin-bottom: 0.2rem;
       line-height: 1.3;
-      color: #000;
+      color: var(--teacher-text);
     }
   }
 
   .text-muted {
-    color: #6c757d !important;
+    color: var(--teacher-text-muted) !important;
   }
 }
 
@@ -174,7 +175,7 @@
   .guide-page {
     .guide-header {
       flex-direction: column;
-      
+
       .close-button {
         margin-left: 0;
         margin-top: 1rem;

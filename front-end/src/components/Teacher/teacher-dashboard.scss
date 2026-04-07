@@ -1,36 +1,69 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 @import "../Admin/admin-dashboard-styles.scss";
 
-$primary: #6c47ff;
-$primary-dark: #5535e0;
-$primary-light: #ede9ff;
+// Main Theme Tokens (Mint to match Student Dashboard)
+$primary: #00c896;      
+$primary-dark: #00a87c; 
+$primary-light: #e6faf4;
+$mint-mid: #b3f0de;
 
-$bg: #f5f6fa;
-$white: #ffffff;
+:root {
+  --teacher-bg: #f9fafb;
+  --teacher-card-bg: #ffffff;
+  --teacher-text: #111827;
+  --teacher-text-body: #4b5563;
+  --teacher-text-muted: #9ca3af;
+  --teacher-border: #e5e7eb;
+}
 
-$text: #1a1a2e;
-$text-body: #5a6275;
-$text-muted: #9aa0ad;
-$border: #e8eaf0;
+html.global-dark-mode, body.global-dark-mode {
+  --teacher-bg: transparent; /* Hoặc #0f172a */
+  --teacher-card-bg: #1e293b;
+  --teacher-text: #f8fafc;
+  --teacher-text-body: #cbd5e1;
+  --teacher-text-muted: #94a3b8;
+  --teacher-border: #334155;
+}
 
-$shadow-sm: 0 2px 8px rgba(108, 71, 255, 0.07);
-$shadow-lg: 0 12px 40px rgba(108, 71, 255, 0.16);
-$transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
+$bg: var(--teacher-bg);
+$white: var(--teacher-card-bg);
+$text: var(--teacher-text);      
+$text-body: var(--teacher-text-body); 
+$text-muted: var(--teacher-text-muted); 
+$border: var(--teacher-border);    
 
-$beginner: #6c47ff;
-$intermediate: #00b894;
-$advanced: #f9a825;
-$expert: #e84393;
-$upper-intermediate: #e17055;
+$shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); // --s1
+$shadow-lg: 0 4px 16px rgba(0,0,0,.08); // --s2
+$transition-main: .2s cubic-bezier(.4, 0, .2, 1); // --t
+
+// Level Colors (Main project tokens)
+$beginner: #f97316;     // --lv0-d
+$intermediate: #10b981; // --lv2-d
+$advanced: #8b5cf6;     // --lv3-d
+$expert: #3b82f6;       // --lv4-d
+$pre-intermediate: #ec4899; // --lv1-d
+
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+}
+
+body {
+  background: $bg;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+}
 
 * {
   box-sizing: border-box;
 }
 
-/* Teacher shell: scroll inside main content; keeps global Header/Footer visible */
 .teacher-app-shell {
-  font-family: "Be Vietnam Pro", "Segoe UI", sans-serif;
-  min-height: calc(100vh - 120px);
+  min-height: 100vh;
+  height: 100vh;
   background: $bg;
   color: $text;
   overflow-y: auto;
@@ -45,7 +78,7 @@ $upper-intermediate: #e17055;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(108, 71, 255, 0.4);
+    background: rgba(0, 200, 150, 0.4);
     border-radius: 999px;
   }
 }
@@ -58,7 +91,7 @@ $upper-intermediate: #e17055;
 
 .teacher-dashboard-page {
   display: flex;
-  min-height: calc(100vh - 120px);
+  min-height: 100vh;
   background: $bg;
   color: $text;
   overflow: hidden;
@@ -75,8 +108,7 @@ $upper-intermediate: #e17055;
   gap: 14px;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 0;
-  align-self: stretch;
+  min-height: 100vh;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -102,7 +134,7 @@ $upper-intermediate: #e17055;
     width: 40px;
     height: 40px;
     border-radius: 14px;
-    background: linear-gradient(135deg, $primary 0%, #8a6dff 100%);
+    background: linear-gradient(135deg, $primary 0%, #0ea5c9 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,7 +228,7 @@ $upper-intermediate: #e17055;
 }
 
 .sidebar-stats-card {
-  margin-top: auto;
+  margin-top: 10px;
   width: 100%;
   max-width: 100%;
   background: $white;
@@ -270,10 +302,10 @@ $upper-intermediate: #e17055;
 .teacher-main {
   flex: 1;
   min-width: 0;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 100vh;
 }
 
 .teacher-topbar {
@@ -334,8 +366,7 @@ $upper-intermediate: #e17055;
 .teacher-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden !important; // Force kill inner scrollbars
   padding: 2rem;
 
   &::-webkit-scrollbar {
@@ -391,86 +422,29 @@ $upper-intermediate: #e17055;
   opacity: 1;
 }
 
-.theme-beginner .course-cover {
-  background: $beginner;
-}
-
-.theme-intermediate .course-cover {
-  background: $intermediate;
-}
-
-.theme-advanced .course-cover {
-  background: $advanced;
-}
-
-.theme-expert .course-cover {
-  background: $expert;
-}
-
-.course-card.theme-beginner .course-cover-overlay {
-  background:
-    linear-gradient(rgba(108, 71, 255, 0.65), rgba(108, 71, 255, 0.65)),
-    url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-intermediate .course-cover-overlay {
-  background:
-    linear-gradient(rgba(0, 184, 148, 0.65), rgba(0, 184, 148, 0.65)),
-    url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-advanced .course-cover-overlay {
-  background:
-    linear-gradient(rgba(249, 168, 37, 0.65), rgba(249, 168, 37, 0.65)),
-    url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
-.course-card.theme-expert .course-cover-overlay {
-  background:
-    linear-gradient(rgba(232, 67, 147, 0.65), rgba(232, 67, 147, 0.65)),
-    url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80");
-  background-size: cover;
-  background-position: center;
-}
-
 .course-level-badge {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 15px;
+  right: 15px;
   z-index: 2;
-  padding: 8px 14px;
+  padding: 10px 22px;
   border-radius: 100px;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 13px;
-  font-weight: 700;
-  max-width: calc(100% - 28px);
+  background: rgba(255, 255, 255, 0.98);
+  font-size: 14px;
+  font-weight: 800;
+  max-width: calc(100% - 30px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.theme-beginner .course-level-badge {
-  color: $beginner;
-}
-
-.theme-intermediate .course-level-badge {
-  color: $intermediate;
-}
-
-.theme-advanced .course-level-badge {
-  color: $advanced;
-}
-
-.theme-expert .course-level-badge {
-  color: $expert;
-}
+.theme-beginner .course-level-badge { color: $beginner; }
+.theme-intermediate .course-level-badge { color: $intermediate; }
+.theme-pre-intermediate .course-level-badge { color: $pre-intermediate; }
+.theme-advanced .course-level-badge { color: $advanced; }
+.theme-expert .course-level-badge { color: $expert; }
 
 .course-card-body {
   padding: 1.4rem 1.5rem;
@@ -611,23 +585,58 @@ $upper-intermediate: #e17055;
   }
 }
 
-.flashcard-card {
+.course-card {
   .course-cover-overlay {
-    background:
-      linear-gradient(rgba(108, 71, 255, 0.65), rgba(108, 71, 255, 0.65)),
-      url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80");
+    position: absolute;
+    inset: 0;
+    z-index: 1;
     background-size: cover;
     background-position: center;
+    opacity: 1;
+    transition: transform 0.5s ease;
+    overflow: hidden !important;
+  }
+
+  &:hover .course-cover-overlay {
+    transform: scale(1.05);
+  }
+
+  &.origin-course-card .course-cover-overlay {
+    background: url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=95") 
+                center / cover no-repeat;
+  }
+
+  &.flashcard-card .course-cover-overlay {
+    background: url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=95") 
+                center / cover no-repeat;
+  }
+
+  &.quiz-card .course-cover-overlay {
+    background: url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=95") 
+                center / cover no-repeat;
+  }
+
+  &:hover .course-cover-overlay {
+    opacity: 1;
   }
 }
 
-.quiz-card {
-  .course-cover-overlay {
-    background:
-      linear-gradient(rgba(0, 184, 148, 0.65), rgba(0, 184, 148, 0.65)),
-      url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80");
-    background-size: cover;
-    background-position: center;
+// Force Mint Scrollbar for the whole dashboard components and children
+* {
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 200, 150, 0.5) !important;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03) !important;
   }
 }
 
@@ -714,6 +723,54 @@ $upper-intermediate: #e17055;
 
 .feedback-page-inner > * {
   width: 100%;
+}
+
+// --- Specific Feedback Components ---
+.teacher-feedback-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.rating-distribution-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .rating-label {
+    font-size: 13px;
+    font-weight: 700;
+    width: 45px;
+    color: $text-body;
+  }
+  
+  .rating-bar-container {
+    flex: 1;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  
+  .rating-bar-fill {
+    height: 100%;
+    background: #facc15; // Star yellow
+    border-radius: 999px;
+  }
+  
+  .rating-count {
+    font-size: 13px;
+    font-weight: 800;
+    width: 25px;
+    text-align: right;
+    color: $text;
+  }
 }
 
 .feedback-page-inner h1,
