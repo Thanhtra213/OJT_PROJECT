@@ -1,0 +1,644 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+// --- Design System Variables (Fresh EdTech Mint & White) ---
+$mint: #00c896;
+$mint-dark: #00a87c;
+$mint-light: #e6faf4;
+$mint-mid: #b3f0de;
+
+$bg-white: #ffffff;
+$page-bg: #f9fafb;
+$text-dark: #111827;
+$text-body: #374151;
+$text-muted: #9ca3af;
+$border: #e5e7eb;
+
+$font-family-base: 'Nunito', sans-serif;
+$font-bold: 800;
+$font-medium: 600;
+
+$transition-duration: 0.22s;
+$border-radius-lg: 20px;
+$border-radius-md: 12px;
+$border-radius-pill: 99px;
+
+/* ==========================================================
+   FIX LỖI BỐ CỤC HEADER (Tránh đè nội dung)
+   ========================================================== */
+.main-header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px !important;
+  z-index: 1050;
+  padding: 0.25rem 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid $border;
+  transition: all $transition-duration ease;
+  font-family: $font-family-base;
+
+  &.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 1.35rem;
+    font-weight: 900;
+    text-decoration: none;
+    color: $text-dark !important;
+    padding: 0;
+    margin: 0;
+
+    .logo-icon {
+      // margin-right: -10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // --- Search Bar ---
+  .search-bar {
+    flex: 1;
+    max-width: 450px;
+    margin: 0 2rem;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transform: translateX(15%);
+
+    @media (max-width: 992px) {
+      margin: 1rem 0;
+      max-width: 100%;
+      order: 3;
+      transform: translateX(0);
+    }
+
+    input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      padding: 0.65rem 1.25rem;
+      border: 1.5px solid $mint;
+      border-radius: $border-radius-pill;
+      background: $bg-white;
+      font-family: $font-family-base;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: $text-dark;
+      transition: all $transition-duration;
+      outline: none !important;
+      box-shadow: none !important;
+
+      &::placeholder {
+        color: $text-muted;
+        font-weight: 700;
+      }
+
+      &:focus {
+        border-color: $mint-dark;
+        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.1) !important;
+      }
+    }
+  }
+
+  // --- Header Actions ---
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    @media (max-width: 992px) {
+      width: 100%;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+  }
+
+  // --- Auth Buttons ---
+  .auth-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .login-btn {
+      background: $mint;
+      color: $bg-white;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: $border-radius-pill;
+      font-weight: 900;
+      font-size: 0.9rem;
+      transition: all $transition-duration;
+
+      &:hover {
+        background: $mint-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 200, 150, 0.35);
+      }
+    }
+
+    .register-btn {
+      background: transparent;
+      border: 2px solid $mint;
+      color: $mint-dark;
+      padding: 0.55rem 1.4rem;
+      border-radius: $border-radius-pill;
+      font-weight: 900;
+      font-size: 0.9rem;
+      transition: all $transition-duration;
+
+      &:hover {
+        background: $mint-light;
+        color: $mint-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 200, 150, 0.15);
+      }
+    }
+  }
+
+  // --- User Dropdown ---
+  .user-dropdown-toggle {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.35rem 0.6rem 0.35rem 0.35rem;
+    border-radius: $border-radius-pill;
+    transition: all $transition-duration;
+    text-decoration: none;
+    border: 1.5px solid transparent !important;
+
+    &::after { display: none; }
+
+    &:hover, &:focus {
+      background: $mint-light !important;
+      border-color: $mint-mid !important;
+      transform: translateY(-1px);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid $bg-white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: all $transition-duration;
+    }
+
+    .user-name {
+      color: $text-dark;
+      font-weight: 900;
+      font-size: 0.9rem;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      @media (max-width: 576px) { max-width: 100px; }
+    }
+
+    &:hover .user-avatar { border-color: $mint; }
+  }
+
+  // Dropdown Menu
+  .dropdown-menu {
+    background: $bg-white;
+    border: 1.5px solid $border;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    font-family: $font-family-base;
+
+    .dropdown-item {
+      padding: 0.6rem 1rem;
+      border-radius: $border-radius-md;
+      color: $text-body;
+      font-weight: 800;
+      font-size: 0.9rem;
+      transition: all $transition-duration;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:hover, &:focus {
+        background: $mint-light;
+        color: $mint-dark;
+        transform: translateX(3px);
+      }
+
+      &.text-danger {
+        color: #ef4444 !important;
+        &:hover {
+          background: #fef2f2;
+          color: #dc2626 !important;
+        }
+      }
+    }
+
+    .dropdown-divider {
+      border-color: $border;
+      margin: 0.5rem 0;
+    }
+  }
+
+  // --- Navbar Toggle (Mobile) ---
+  .navbar-toggler {
+    border: 1.5px solid $border;
+    border-radius: $border-radius-md;
+    padding: 0.4rem 0.6rem;
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px $mint-light;
+    }
+  }
+
+  // --- Mobile Responsive Adjustments ---
+  @media (max-width: 576px) {
+    .navbar-brand {
+      font-size: 1.3rem;
+      .logo-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.8rem;
+        margin-right: 0.5rem;
+      }
+    }
+    .auth-buttons {
+      .login-btn, .register-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// Đẩy nội dung xuống bằng đúng Header
+body { padding-top: 80px !important; }
+
+// --- Auth Modal Styling ---
+.auth-modal {
+  font-family: $font-family-base;
+
+  .modal-content {
+    background: $bg-white;
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+  }
+
+  .modal-header {
+    border-bottom: 1.5px solid $border;
+    padding: 1.5rem 2rem 1rem;
+
+    .modal-title {
+      font-weight: 900;
+      color: $text-dark;
+      font-size: 1.4rem;
+    }
+
+    .btn-close:focus { box-shadow: none; }
+  }
+
+  .modal-body {
+    padding: 1.5rem 2rem 2rem;
+    color: $text-body;
+    .small { color: $text-muted; font-weight: 700; }
+  }
+
+  // Auth Tabs Navigation
+  .auth-tabs-nav {
+    display: flex;
+    background: $page-bg;
+    border-radius: $border-radius-pill;
+    padding: 0.35rem;
+    margin-bottom: 1.5rem;
+    border: 1.5px solid $border;
+
+    .tab-nav-btn {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      border: none;
+      background: transparent;
+      color: $text-muted;
+      font-weight: 900;
+      border-radius: $border-radius-pill;
+      transition: all $transition-duration;
+      font-size: 0.9rem;
+
+      &.active {
+        color: $bg-white;
+        background: $mint !important;
+        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.25);
+      }
+
+      &:not(.active):hover {
+        color: $text-dark;
+        background: $mint-light;
+      }
+    }
+  }
+
+  // Form Styling
+  .form-label {
+    font-weight: 900;
+    color: $text-dark;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-control {
+    border: 1.5px solid $border;
+    border-radius: $border-radius-md;
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+    background: $page-bg;
+    transition: all $transition-duration;
+
+    &:focus {
+      background: $bg-white;
+      border-color: $mint;
+      box-shadow: 0 0 0 3px $mint-light;
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $text-muted;
+      font-weight: 700;
+    }
+  }
+
+  .btn {
+    border-radius: $border-radius-pill;
+    font-weight: 900;
+    transition: all $transition-duration;
+    padding: 0.7rem 1.5rem;
+
+    &.btn-dark {
+      background: $mint;
+      color: $bg-white;
+      border: none;
+      &:hover {
+        background: $mint-dark;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 200, 150, 0.35);
+      }
+    }
+
+    &.btn-outline-dark, &.btn-outline-secondary {
+      border: 2px solid $mint;
+      color: $mint-dark;
+      background: transparent;
+      &:hover {
+        background: $mint-light;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 200, 150, 0.15);
+      }
+    }
+
+    &.btn-link {
+      color: $text-muted;
+      text-decoration: none;
+      &:hover { color: $mint-dark; }
+    }
+  }
+
+  .alert {
+    border-radius: $border-radius-md;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 800;
+
+    &.alert-success { background: $mint-light; color: $mint-dark; }
+    &.alert-danger { background: #fef2f2; color: #dc2626; }
+  }
+}
+
+// --- Toast Notifications ---
+.toast-container {
+  font-family: $font-family-base;
+  
+  .toast {
+    background: $bg-white;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border: 1.5px solid $border;
+
+    .toast-header {
+      background: transparent;
+      border-bottom: 1.5px solid $border;
+      padding: 0.75rem 1rem;
+      .me-auto { font-weight: 900; color: $text-dark; }
+    }
+
+    .toast-body {
+      padding: 1rem;
+      color: $text-body;
+      font-weight: 700;
+    }
+
+    &.bg-success {
+      background: $mint !important; border-color: $mint-dark;
+      .toast-header {
+        border-bottom-color: rgba(255,255,255,0.2);
+        .me-auto, .btn-close { color: $bg-white; filter: invert(1); }
+      }
+      .toast-body { color: $bg-white; }
+    }
+
+    &.bg-danger {
+      background: #ef4444 !important; border-color: #dc2626;
+      .toast-header {
+        border-bottom-color: rgba(255,255,255,0.2);
+        .me-auto, .btn-close { color: $bg-white; filter: invert(1); }
+      }
+      .toast-body { color: $bg-white; }
+    }
+    
+    &.bg-warning {
+      background: #f9c74f !important; border-color: #f59e0b;
+      .toast-header {
+        border-bottom-color: rgba(0,0,0,0.1);
+        .me-auto, .btn-close { color: $text-dark; filter: none; }
+      }
+      .toast-body { color: $text-dark; }
+    }
+  }
+}
+
+// Scroll behavior for header
+@media (min-width: 993px) {
+  .main-header .navbar-collapse {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+
+/* ==========================================================
+   CHẾ ĐỘ TỐI TOÀN TRANG (DARK MODE - Đã tích hợp Theme Mint)
+   ========================================================== */
+body.global-dark-mode {
+  background-color: #0f172a !important; /* Màu nền đen sâu */
+
+  /* --- HEADER TỐI --- */
+  .main-header, .custom-navbar {
+    background-color: #1e293b !important; /* Nền Header nổi */
+    border-bottom: 1px solid #334155 !important;
+    
+    .logo-text, .nav-link, .navbar-brand, .user-name {
+      color: #f8fafc !important;
+    }
+
+    /* Bảng User Dropdown */
+    .dropdown-menu {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      .dropdown-item { color: #f8fafc !important; }
+      .dropdown-item:hover { background-color: #334155 !important; color: $mint !important; }
+    }
+
+    /* Thanh tìm kiếm */
+    .search-bar {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+
+      input, .form-control {
+        background-color: #0f172a !important; 
+        border: 1px solid #334155 !important;
+        border-radius: 50px !important;
+        color: #f8fafc !important;
+        width: 100% !important;
+
+        &::placeholder { color: #94a3b8 !important; }
+
+        &:focus {
+          border-color: $mint !important; /* Đổi màu xanh Mint */
+          background-color: #0f172a !important;
+          box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.2) !important;
+        }
+      }
+    }
+
+    /* Nút Đăng Ký (Dark Mode) */
+    .auth-buttons .register-btn {
+      background: transparent !important;
+      border: 2px solid #94a3b8 !important;
+      color: #f8fafc !important;
+
+      &:hover {
+        background: $mint !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  /* --- FOOTER TỐI --- */
+  footer, .footer, .py-5 {
+    background-color: #1e293b !important;
+    border-top: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+    
+    p, span, div, a { color: #cbd5e1 !important; }
+    h1, h2, h3, h4, h5, h6, strong, b { color: #f8fafc !important; }
+    a:hover { color: $mint !important; }
+  }
+
+  /* --- MODAL ĐĂNG NHẬP/ĐĂNG KÝ (DARK MODE) --- */
+  .auth-modal {
+    .modal-content {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+    }
+    
+    .modal-header {
+      border-bottom-color: #334155 !important;
+      background-color: #1e293b !important;
+      
+      .modal-title { color: #f8fafc !important; }
+      .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%) !important;
+        opacity: 0.8 !important;
+      }
+    }
+
+    .modal-body {
+      background-color: #1e293b !important;
+      
+      /* Chữ phụ đề */
+      p, .small, span {
+        background-color: transparent !important;
+        color: #cbd5e1 !important;
+      }
+
+      /* Khung 2 Tab */
+      .auth-tabs-nav {
+        background-color: #0f172a !important;
+        border: 1px solid #334155 !important;
+        
+        .tab-nav-btn {
+          background-color: transparent !important;
+          color: #94a3b8 !important;
+          border: none !important;
+          
+          &.active {
+            background-color: $mint !important; 
+            color: #ffffff !important;
+          }
+          
+          &:not(.active):hover {
+            background-color: #334155 !important;
+            color: #f8fafc !important;
+          }
+        }
+      }
+
+      /* Ô nhập liệu (Inputs) */
+      .form-label { color: #cbd5e1 !important; }
+
+      .form-control {
+        background-color: #0f172a !important;
+        border: 1px solid #475569 !important;
+        color: #f8fafc !important;
+        
+        &::placeholder { color: #64748b !important; }
+        
+        &:focus {
+          border-color: $mint !important;
+          box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.3) !important;
+        }
+      }
+
+      /* Nút Xác Nhận */
+      .btn-dark {
+        background-color: $mint !important;
+        border-color: $mint !important;
+        color: #ffffff !important;
+        &:hover { background-color: $mint-dark !important; }
+      }
+
+      .btn-link { color: $mint !important; }
+
+      div[style*="justify-content: center"] { background: transparent !important; }
+    }
+  }
+}

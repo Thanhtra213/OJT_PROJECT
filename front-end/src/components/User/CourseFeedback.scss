@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-pill:       100px;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
+// ── Feedback page ─────────────────────────────────────────────────────────────
+.course-feedback-page {
+  min-height: 100vh;
+  background: $bg;
+  padding-top: 2rem;
+  font-family: $font;
+  color: $text-body;
+
+  .card {
+    border: 1.5px solid $border !important; border-radius: $r-card !important;
+    box-shadow: $shadow-card;
+    .card-body h2 { color: $text-dark; font-weight: 900; letter-spacing: -.025em; }
+  }
+
+  .star-rating {
+    display: flex; justify-content: center; gap: 10px;
+    .star {
+      color: $border; transition: all .2s ease; cursor: pointer;
+      &.active { color: #f59e0b; transform: scale(1.15); }
+      &:hover  { transform: scale(1.2); }
+    }
+  }
+
+  .btn-primary {
+    background: $mint; border: none; border-radius: $r-btn;
+    padding: .75rem 2.25rem; font-family: $font; font-weight: 800; font-size: .95rem;
+    box-shadow: $shadow-btn; transition: all $ease; cursor: pointer; color: $white;
+    &:hover:not(:disabled) { background: $mint-dark; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,168,124,.4); }
+    &:disabled { opacity: .6; cursor: not-allowed; }
+  }
+
+  .btn-outline-secondary {
+    border: 1.5px solid $border; color: $text-body; border-radius: $r-btn;
+    padding: .75rem 1.75rem; font-family: $font; font-weight: 700; background: $white; cursor: pointer; transition: all $ease;
+    &:hover:not(:disabled) { background: $bg; border-color: $mint-mid; color: $text-dark; }
+  }
+
+  .btn-link { color: $mint-dark; text-decoration: none; font-weight: 700; &:hover { color: $mint; } }
+
+  textarea.form-control {
+    border-radius: 12px; border: 1.5px solid $border;
+    padding: 1rem; font-size: 1rem; font-family: $font; resize: vertical;
+    &:focus { border-color: $mint; box-shadow: 0 0 0 3px rgba(0,200,150,.15); outline: none; }
+  }
+
+  .alert {
+    border-radius: 14px; border: none; font-family: $font; font-weight: 600;
+    &.alert-success { background: $mint-light; color: $mint-dark; }
+    &.alert-danger  { background: #fef2f2; color: #991b1b; }
+  }
+
+  h4 { color: $text-dark; font-weight: 900; margin-bottom: 1rem; }
+
+  .feedback-item {
+    background: $white; border: 1.5px solid $border; border-radius: 14px;
+    padding: 1.25rem; margin-bottom: 1rem; box-shadow: $shadow-sm;
+    transition: all $ease;
+    &:hover { border-color: $mint-mid; box-shadow: 0 4px 16px rgba(0,200,150,.12); }
+
+    .feedback-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem;
+      strong { color: $text-dark; font-size: 1rem; font-weight: 800; }
+      small  { color: $text-muted; }
+    }
+    .feedback-stars { margin-bottom: .5rem; .fa-star { margin-right: 2px; } }
+    p { color: $text-body; margin: 0; line-height: 1.65; }
+  }
+}
+
+@media (max-width: 768px) {
+  .course-feedback-page {
+    padding-top: 1rem;
+    .card-body { padding: 1.5rem !important; }
+    .star-rating .star { font-size: 32px !important; }
+    .btn-primary, .btn-outline-secondary { padding: .6rem 1.5rem; font-size: .9rem; }
+  }
+}
