@@ -278,11 +278,16 @@ const Header = () => {
     } catch (err) {
       console.error("❌ Google login error:", err);
       const errorMsg =
+            (typeof err.response?.data === "string" && err.response.data)||
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
+<<<<<<< Updated upstream
       setLoginErrorMessage(errorMsg);
       // Đã loại bỏ toast error theo yêu cầu
+=======
+        "Đăng nhập Google thất bại!";
+>>>>>>> Stashed changes
       // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
@@ -364,6 +369,7 @@ const Header = () => {
       }, 1000);
     } catch (err) {
       const errorMsg =
+      (typeof err.response?.data === "string" && err.response.data)||
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||

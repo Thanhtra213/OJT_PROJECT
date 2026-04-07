@@ -1,8 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Button, Spinner, Toast, ToastContainer } from "react-bootstrap";
-import { FaArrowLeft, FaArrowRight, FaVolumeUp, FaTimes, FaExclamationTriangle } from "react-icons/fa";
+import { Container, Button, Spinner } from "react-bootstrap";
+import { FaArrowLeft, FaArrowRight, FaVolumeUp, FaTimes, FaExclamationTriangle, FaBookmark, FaCheck } from "react-icons/fa";
 import { getFlashcardSetById } from "../../middleware/flashcardAPI";
+import { learnFlashcard, saveFlashcardToMyList } from "../../middleware/FlashcardprogressAPI";
 import "./Flashcard.scss";
 
 const Flashcard = () => {
@@ -12,18 +13,21 @@ const Flashcard = () => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [toast, setToast] = useState({ show: false, message: "", type: "info" });
+    const [statusMsg, setStatusMsg] = useState("");
+    const [mastered, setMastered] = useState(new Set());
+    const [saved, setSaved] = useState(new Set());
     const navigate = useNavigate();
 
     const words = useMemo(() => {
-        if (!flashcardSet.items) return [];
-        return flashcardSet.items.map(item => ({
-            id: item.id,
-            word: item.frontText,
-            meaning: item.backText,
-            phonetic: item.example || "",
-        }));
-    }, [flashcardSet.items]);
+    if (!flashcardSet.items) return [];
+    return flashcardSet.items.map(item => ({
+        id: item.itemID,       
+        word: item.frontText,
+        meaning: item.backText,
+        phonetic: item.example || "",
+    }));
+}, [flashcardSet.items]);
+    
 
     useEffect(() => {
         const fetchFlashcards = async () => {
@@ -35,12 +39,9 @@ const Flashcard = () => {
                     setFlashcardSet({ title: data.title, items: data.items });
                 } else {
                     setFlashcardSet({ title: "Không tìm thấy", items: [] });
-                    showToast("Bộ flashcard này trống hoặc không tồn tại.", "warning");
                 }
             } catch (err) {
-                const errorMsg = err.response?.data?.message || "Không thể tải flashcard.";
-                setError(errorMsg);
-                showToast(errorMsg, "error");
+                setError(err.response?.data?.message || "Không thể tải flashcard.");
             } finally {
                 setLoading(false);
             }
@@ -48,8 +49,9 @@ const Flashcard = () => {
         fetchFlashcards();
     }, [setId]);
 
-    const showToast = (message, type = "info") => {
-        setToast({ show: true, message, type });
+    const showStatus = (msg) => {
+        setStatusMsg(msg);
+        setTimeout(() => setStatusMsg(""), 2000);
     };
 
     const handleNext = () => {
@@ -62,19 +64,40 @@ const Flashcard = () => {
         setCurrentIndex(prev => (prev === 0 ? words.length - 1 : prev - 1));
     };
 
+    const handleMastered = async () => {
+        const word = words[currentIndex];
+        try {
+            await learnFlashcard({ itemId: word.id, actionType: "Mastered" });
+            setMastered(prev => new Set([...prev, word.id]));
+            showStatus("✓ Đã đánh dấu thuộc!");
+            setTimeout(handleNext, 600);
+        } catch {
+            showStatus("Lỗi khi đánh dấu.");
+        }
+    };
+
+    const handleSave = async () => {
+        const word = words[currentIndex];
+        if (saved.has(word.id)) {
+            showStatus("Từ này đã có trong danh sách.");
+            return;
+        }
+        try {
+            await saveFlashcardToMyList(word.id);
+            setSaved(prev => new Set([...prev, word.id]));
+            showStatus("🔖 Đã lưu vào danh sách!");
+        } catch {
+            showStatus("Lỗi khi lưu từ.");
+        }
+    };
+
     const speakWord = (text, e) => {
-        e.stopPropagation();
+        e?.stopPropagation();
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US';
             speechSynthesis.speak(utterance);
-        } else {
-            showToast("Trình duyệt không hỗ trợ phát âm.", "warning");
         }
-    };
-
-    const handleCardClick = () => {
-        setIsFlipped(!isFlipped);
     };
 
     const currentWord = words[currentIndex];
@@ -96,8 +119,7 @@ const Flashcard = () => {
                 <h4>Lỗi Tải Dữ Liệu</h4>
                 <p>{error}</p>
                 <Button variant="primary" onClick={() => navigate(-1)}>
-                    <FaArrowLeft className="me-2" />
-                    Quay về danh sách
+                    <FaArrowLeft className="me-2" />Quay về danh sách
                 </Button>
             </div>
         );
@@ -105,73 +127,89 @@ const Flashcard = () => {
 
     return (
         <div className="flashcard-learn-page">
-            <ToastContainer position="top-end" className="p-3">
-                <Toast onClose={() => setToast({ ...toast, show: false })} show={toast.show} delay={3000} autohide bg={toast.type}>
-                    <Toast.Header>
-                        <strong className="me-auto">Thông báo</strong>
-                    </Toast.Header>
-                    <Toast.Body>{toast.message}</Toast.Body>
-                </Toast>
-            </ToastContainer>
-
             <header className="flashcard-learn-header">
                 <h1 className="set-title">{flashcardSet.title}</h1>
-                <button onClick={() => navigate(-1)} className="close-button">
-                    <FaTimes />
-                </button>
+                <button onClick={() => navigate(-1)} className="close-button"><FaTimes /></button>
             </header>
 
             <Container className="flashcard-learn-container">
                 <div className="progress-section">
-                    <p className="progress-text">Tiến độ: {currentIndex + 1} / {words.length}</p>
+                    <p className="progress-text">
+                        Tiến độ: {currentIndex + 1} / {words.length}
+                        &nbsp;·&nbsp;
+                        <span className="mastered-count">Đã thuộc: {mastered.size}</span>
+                    </p>
                     <div className="progress-bar-background">
-                        <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+                        <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
                     </div>
                 </div>
 
                 {words.length > 0 ? (
-                    <div className="main-card-area">
-                        <button onClick={handlePrev} className="nav-arrow-button prev" disabled={words.length === 0}>
-                            <FaArrowLeft />
-                        </button>
-                        <div className="flashcard-scene">
-                            <div className={`flashcard-item ${isFlipped ? 'is-flipped' : ''}`} onClick={handleCardClick}>
-                                <div className="flashcard-face flashcard-front">
-                                    <div className="flashcard-content">
-                                        <div className="word">{currentWord.word}</div>
-                                        <div className="phonetic">{currentWord.phonetic}</div>
-                                        <button className="speak-button" onClick={(e) => speakWord(currentWord.word, e)}>
-                                            <FaVolumeUp />
-                                        </button>
+                    <>
+                        <div className="main-card-area">
+                            <button onClick={handlePrev} className="nav-arrow-button prev">
+                                <FaArrowLeft />
+                            </button>
+
+                            <div className="flashcard-scene">
+                                <div
+                                    className={`flashcard-item ${isFlipped ? 'is-flipped' : ''}`}
+                                    onClick={() => setIsFlipped(!isFlipped)}
+                                >
+                                    <div className="flashcard-face flashcard-front">
+                                        <div className="flashcard-content">
+                                            <div className="word">
+                                                {currentWord.word}
+                                                {mastered.has(currentWord.id) && <span className="mastered-star"> ★</span>}
+                                            </div>
+                                            <div className="phonetic">{currentWord.phonetic}</div>
+                                            <button
+                                                className="speak-button"
+                                                onClick={(e) => speakWord(currentWord.word, e)}
+                                            >
+                                                <FaVolumeUp />
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flashcard-face flashcard-back">
-                                    <div className="flashcard-content">
-                                        <div className="meaning">{currentWord.meaning}</div>
+                                    <div className="flashcard-face flashcard-back">
+                                        <div className="flashcard-content">
+                                            <div className="meaning">{currentWord.meaning}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <button onClick={handleNext} className="nav-arrow-button next">
+                                <FaArrowRight />
+                            </button>
                         </div>
-                        <button onClick={handleNext} className="nav-arrow-button next" disabled={words.length === 0}>
-                            <FaArrowRight />
-                        </button>
-                    </div>
+
+                        {/* Action buttons */}
+                        <div className="flashcard-action-buttons">
+                            <button
+                                className={`action-btn save-btn ${saved.has(currentWord.id) ? 'active' : ''}`}
+                                onClick={handleSave}
+                            >
+                                <FaBookmark className="me-2" />
+                                {saved.has(currentWord.id) ? 'Đã lưu' : 'Lưu từ'}
+                            </button>
+
+                            <button
+                                className={`action-btn mastered-btn ${mastered.has(currentWord.id) ? 'active' : ''}`}
+                                onClick={handleMastered}
+                            >
+                                <FaCheck className="me-2" />
+                                {mastered.has(currentWord.id) ? 'Đã thuộc' : 'Đánh dấu thuộc'}
+                            </button>
+                        </div>
+
+                        {statusMsg && <p className="status-message">{statusMsg}</p>}
+                    </>
                 ) : (
                     <div className="empty-state">
                         <p>Bộ flashcard này không có thẻ nào.</p>
                     </div>
                 )}
-
-                <div className="navigation-controls" style={{ display: 'none' }}>
-                    <Button onClick={handlePrev} disabled={words.length === 0}>
-                        <FaArrowLeft />
-                        <span>Thẻ trước</span>
-                    </Button>
-                    <Button onClick={handleNext} disabled={words.length === 0}>
-                        <span>Thẻ sau</span>
-                        <FaArrowRight />
-                    </Button>
-                </div>
             </Container>
         </div>
     );

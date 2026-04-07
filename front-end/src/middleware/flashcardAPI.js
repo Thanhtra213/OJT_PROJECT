@@ -45,6 +45,8 @@ export const getFlashcardSetById = async (setId) => {
   try {
     const res = await api.get(`/set/${setId}`, { headers: getAuthHeaders() });
     console.log("📘 getFlashcardSetById response:", res.data);
+    console.log("📘 getFlashcardSetById response:", res.data);
+console.log("📘 First item:", res.data?.items?.[0]);
     return res.data;
   } catch (err) {
     console.error("❌ getFlashcardSetById error:", err.response?.data || err.message);
