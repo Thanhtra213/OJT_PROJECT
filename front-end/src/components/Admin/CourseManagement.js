@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Eye, Trash, X, RefreshCw, Search } from "lucide-react";
 import { getAllCourses, deleteCourse, getCourseDetail } from "../../middleware/admin/courseManagementAPI";
-import { getQuizzesByCourse } from "../../middleware/QuizAPI";
 import "./admin-dashboard-styles.scss";
 
 export function CourseManagement() {
-  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(""); 
@@ -15,7 +12,6 @@ export function CourseManagement() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-  const [quizCount, setQuizCount] = useState(0);
 
   const showPopup = (message, type = "success") => {
     setToast({ show: true, message, type });
@@ -54,26 +50,9 @@ export function CourseManagement() {
     try {
       setIsLoadingDetail(true);
       setIsModalOpen(true);
-      setQuizCount(0); 
 
       const data = await getCourseDetail(courseId);
       setSelectedCourse({ ...data, _fallbackId: courseId });
-
-      let count = data.quizzes?.length || 0;
-      if (count === 0 && data.chapters) {
-          count = data.chapters.reduce((sum, ch) => sum + (ch.quizzes?.length || 0), 0);
-      }
-      
-      if (count === 0) {
-        try {
-          const quizRes = await getQuizzesByCourse(courseId);
-          const quizzes = Array.isArray(quizRes?.data || quizRes) ? (quizRes?.data || quizRes) : [];
-          count = quizzes.length;
-        } catch (quizErr) {
-          console.error("Không thể lấy số lượng quiz (Do Backend chặn Admin):", quizErr);
-        }
-      }
-      setQuizCount(count);
 
     } catch (error) {
       console.error("Error loading course detail:", error);
@@ -213,6 +192,9 @@ export function CourseManagement() {
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Chi tiết khóa học</h3>
+              <button className="action-button" onClick={handleCloseModal}>
+                <X size={20} />
+              </button>
             </div>
 
             <div className="modal-body-custom" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '10px' }}>
@@ -249,8 +231,7 @@ export function CourseManagement() {
                     <span className="info-label">Thống kê:</span>
                     <span className="info-val">
                       {selectedCourse.chapters?.length || 0} chương • {' '}
-                      {selectedCourse.chapters?.reduce((sum, ch) => sum + (ch.videos?.length || 0), 0) || 0} video • {' '}
-                      <span style={{color: 'var(--primary)', fontWeight: 800}}>{quizCount}</span> bài luyện tập
+                      {selectedCourse.chapters?.reduce((sum, ch) => sum + (ch.videos?.length || 0), 0) || 0} video
                     </span>
                   </div>
 
@@ -289,17 +270,10 @@ export function CourseManagement() {
               )}
             </div>
             
-            {/* --- NÚT TRẢI NGHIỆM NHƯ HỌC VIÊN --- */}
             {selectedCourse && (
               <div className="modal-foot">
-                <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={handleCloseModal}>
+                <button className="secondary-button" onClick={handleCloseModal}>
                   Đóng
-                </button>
-                <button 
-                  className="primary-button" 
-                  onClick={() => navigate(`/course/${selectedCourse.courseID || selectedCourse.id || selectedCourse._fallbackId}`)}
-                >
-                  <Eye size={16} style={{marginRight: '8px'}} /> Xem chi tiết toàn bộ khóa học
                 </button>
               </div>
             )}
