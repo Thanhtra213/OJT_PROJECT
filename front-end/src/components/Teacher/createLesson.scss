@@ -1,0 +1,220 @@
+// createLesson.scss - Updated for Dashboard consistency
+.create-lesson-container {
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  padding: 40px;
+  background-color: transparent; 
+  color: var(--teacher-text);
+
+  // --- Header Section ---
+  .header-content {
+    h3 {
+      font-size: 2.22rem;
+      font-weight: 800;
+      color: var(--teacher-text);
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--teacher-text-body);
+      margin-bottom: 20px;
+    }
+  }
+
+  .header-buttons {
+    .btn {
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 8px 20px;
+      transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+
+      &.btn-outline-primary {
+        border-color: #00c896;
+        color: #00c896;
+        &:hover {
+          background-color: #e6faf4;
+          transform: translateY(-1px);
+        }
+      }
+      &.btn-primary {
+        background-color: #00c896;
+        border-color: #00c896;
+        color: white;
+        &:hover {
+          background-color: #00a87c;
+          border-color: #00a87c;
+          box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+
+  // --- Card Styling ---
+  .card {
+    border: 1px solid var(--teacher-border);
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    background-color: var(--teacher-card-bg);
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+
+    h5, h6 {
+      font-weight: 800;
+      color: var(--teacher-text);
+      margin-bottom: 10px;
+      font-size: 1.25rem;
+    }
+    h6 {
+      font-size: 1.1rem;
+    }
+
+    p.text-muted {
+      font-size: 0.95rem;
+      color: var(--teacher-text-muted);
+      margin-bottom: 20px;
+    }
+  }
+
+  // --- Form Element Styling ---
+  form {
+    label {
+      font-weight: 700;
+      color: var(--teacher-text-body);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input, select, textarea {
+      border-radius: 12px;
+      border: 1px solid var(--teacher-border);
+      background-color: var(--teacher-bg);
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      color: var(--teacher-text);
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: #00c896;
+        box-shadow: 0 0 0 0.25rem rgba(0, 200, 150, 0.16);
+      }
+    }
+
+    .form-text {
+      font-size: 0.85rem;
+      color: var(--teacher-text-muted);
+    }
+  }
+
+  // Specific styles for the "Video URL" row
+  .video-input-row {
+    .btn {
+      width: 100%;
+      border-radius: 12px;
+      padding: 10px 15px;
+      font-weight: 700;
+      color: #00c896;
+      border-color: #00c896;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #e6faf4;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(0, 200, 150, 0.2);
+      }
+    }
+  }
+
+  // --- Suggestions List Styling ---
+  ul {
+    padding-left: 25px;
+    font-size: 0.95rem;
+    color: var(--teacher-text-body);
+    list-style-type: disc;
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+  }
+}
+
+// --- Responsive Adjustments ---
+@media (max-width: 991.98px) {
+  .create-lesson-container {
+    padding: 30px;
+
+    .header-content {
+      h3 {
+        font-size: 1.8rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+    }
+    .header-buttons {
+      text-align: left !important;
+      margin-top: 15px;
+      .btn {
+        width: 100%;
+        margin-bottom: 10px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .card {
+      padding: 20px;
+      h5, h6 {
+        font-size: 1.15rem;
+      }
+      p.text-muted {
+        font-size: 0.9rem;
+      }
+    }
+    form {
+      input, select, textarea {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .create-lesson-container {
+    padding: 15px;
+
+    .header-content {
+      h3 {
+        font-size: 1.6rem;
+        text-align: center;
+      }
+      p {
+        text-align: center;
+      }
+    }
+    .header-buttons {
+      .btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+    }
+    .card {
+      padding: 15px;
+      h5, h6 {
+        font-size: 1.05rem;
+      }
+      p.text-muted {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}

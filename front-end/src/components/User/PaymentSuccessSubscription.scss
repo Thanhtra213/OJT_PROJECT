@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-card:  0 4px 20px rgba(0,0,0,.07);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       24px;
+$r-pill:       100px;
+$ease:         0.2s;
+
+// ── Payment success page ───────────────────────────────────────────────────────
+.payment-success-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: $bg; padding: 1.5rem; font-family: $font;
+}
+
+.cards {
+  background: $white; border-radius: $r-card;
+  border: 1.5px solid $border; box-shadow: $shadow-card;
+  max-width: 700px; width: 100%;
+}
+.cards-content { padding: 2rem; }
+
+.success-header {
+  text-align: center; margin-bottom: 1.5rem;
+  .icon-circle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 80px; height: 80px;
+    background: $mint-light; border-radius: 50%; margin-bottom: 1rem;
+  }
+  .icon-success { color: $mint; width: 48px; height: 48px; }
+  h1 { font-size: 2rem; font-weight: 900; color: $text-dark; letter-spacing: -.025em; margin-bottom: .5rem; }
+  p  { color: $text-muted; font-size: .95rem; }
+}
+
+.details-box {
+  background: $bg; border: 1.5px solid $border;
+  border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;
+  .detail-row {
+    display: flex; justify-content: space-between; margin-bottom: .5rem;
+    font-size: .9rem;
+    span { color: $text-muted; }
+    .price { color: $mint-dark; font-weight: 800; }
+  }
+}
+
+.next-actions {
+  margin-bottom: 1.5rem;
+  h3 { font-weight: 800; color: $text-dark; margin-bottom: .75rem; }
+  ul { list-style: none; padding: 0;
+    li {
+      display: flex; align-items: flex-start; gap: .5rem;
+      margin-bottom: .5rem; font-size: .95rem; color: $text-body;
+      .li-icon { color: $mint; width: 20px; height: 20px; flex-shrink: 0; }
+    }
+  }
+}
+
+.action-buttons { display: flex; gap: 1rem; margin-top: 1rem; button { flex: 1; } }
+
+// Buttons
+.btn-base {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: $r-pill; font-family: $font; font-weight: 700;
+  transition: all $ease; cursor: pointer; border: none; outline: none;
+}
+.btn-md { height: 44px; padding: 0 1.25rem; font-size: .95rem; }
+
+.btn-default {
+  background: $mint; color: $white; box-shadow: $shadow-btn;
+  &:hover { background: $mint-dark; transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,168,124,.4); }
+}
+.btn-outline {
+  background: transparent; border: 1.5px solid $border; color: $text-body;
+  &:hover { background: $bg; border-color: $mint-mid; }
+}
+
+.confirmation-text { text-align: center; font-size: .88rem; color: $text-muted; margin-top: 1.5rem; font-weight: 600; }
