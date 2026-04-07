@@ -14,6 +14,7 @@ public partial class FlashcardProgress
     public DateTime? LastReviewedAt { get; set; }
 
     public int ReviewCount { get; set; }
+    public bool IsSaved { get; set; } = false;
 
     public bool IsMastered { get; set; }
 

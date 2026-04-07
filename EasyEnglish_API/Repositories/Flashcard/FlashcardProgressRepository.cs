@@ -59,7 +59,19 @@ namespace EasyEnglish_API.Repositories.Flashcard
 
             if (existing == null)
             {
-                _db.FlashcardProgresses.Add(progress);
+                _db.FlashcardProgresses.Add(new FlashcardProgress
+                {
+                    UserId = progress.UserId,
+                    ItemId = progress.ItemId,
+                    FirstLearnedAt = progress.FirstLearnedAt,
+                    LastReviewedAt = progress.LastReviewedAt,
+                    ReviewCount = progress.ReviewCount,
+                    IsSaved = progress.IsSaved,
+                    IsMastered = progress.IsMastered,
+                    NextReviewAt = progress.NextReviewAt,
+                    EaseFactor = progress.EaseFactor,
+                    IntervalDays = progress.IntervalDays
+                });
             }
             else
             {
