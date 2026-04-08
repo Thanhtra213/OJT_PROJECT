@@ -436,8 +436,8 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.ItemId).HasColumnName("ItemID");
             entity.Property(e => e.EaseFactor)
                 .HasDefaultValue(2.5m)
-                .HasColumnType("decimal(4, 2)");
-            entity.Property(e => e.IntervalDays).HasDefaultValue(1);
+                .HasColumnType("decimal(4, 2)").ValueGeneratedOnAdd();
+            entity.Property(e => e.IntervalDays).HasDefaultValue(1).ValueGeneratedOnAdd();
 
             entity.HasOne(d => d.Item).WithMany(p => p.FlashcardProgresses)
                 .HasForeignKey(d => d.ItemId)

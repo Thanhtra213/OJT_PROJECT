@@ -57,13 +57,7 @@ namespace EasyEnglish_API.Services.Score
                 x.AireviewId,
                 Prompt = new
                 {
-                    x.Submission.Prompt.Title,
-                    x.Submission.Prompt.Content
-                },
-                Answer = new
-                {
-                    x.Submission.Transcript,
-                    x.Submission.AnswerText
+                    x.Submission.Prompt.Title
                 },
                 AIReview = new
                 {
@@ -74,10 +68,47 @@ namespace EasyEnglish_API.Services.Score
                     x.ScorePronunciation,
                     x.ScoreFluency,
                     x.ScoreCoherence,
-                    x.Feedback,
                 },
                 x.CreatedAt
             }).ToList<object>();
+        }
+
+        public async Task<object> GetDetail(int aiReviewId)
+        {
+            var data = await _score.GetByIdAsync(aiReviewId);
+
+            if (data == null)
+                throw new Exception("Not found");
+
+            return new
+            {
+                data.AireviewId,
+
+                Prompt = new
+                {
+                    data.Submission.Prompt.Title,
+                    data.Submission.Prompt.Content
+                },
+
+                Answer = new
+                {
+                    data.Submission.Transcript,
+                    data.Submission.AnswerText
+                },
+
+                AIReview = new
+                {
+                    data.ScoreOverall,
+                    data.ScoreTask,
+                    data.ScoreLexical,
+                    data.ScoreGrammar,
+                    data.ScorePronunciation,
+                    data.ScoreFluency,
+                    data.ScoreCoherence,
+                    data.Feedback
+                },
+                data.CreatedAt
+            };
         }
     }
 }

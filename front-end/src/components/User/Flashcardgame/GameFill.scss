@@ -1,0 +1,87 @@
+.game-fill {
+  .fill-card {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .fill-prompt {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    .fill-label { font-size: 0.8rem; color: #9ca3af; margin-right: 6px; }
+    .fill-meaning { font-size: 1.25rem; font-weight: 700; color: #111827; }
+  }
+  .fill-phonetic {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 1.25rem;
+  }
+  .fill-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .fill-choice {
+    padding: 12px;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    &:hover:not(:disabled) { border-color: #9ca3af; background: #f9fafb; }
+    &.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; font-weight: 600; }
+    &.wrong { border-color: #fca5a5; background: #fef2f2; color: #dc2626; }
+    &:disabled { cursor: default; }
+  }
+  .fill-feedback {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    &.success { background: #f0fdf4; color: #16a34a; }
+    &.danger { background: #fef2f2; color: #dc2626; }
+  }
+  .fill-next-row { text-align: center; margin-top: 1rem; }
+}
+
+.game-matching {
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .match-col { display: flex; flex-direction: column; gap: 8px; }
+ 
+  .match-item {
+    padding: 12px 14px;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    user-select: none;
+ 
+    &:hover { border-color: #9ca3af; }
+    &.selected { border-color: #374151; background: #f9fafb; font-weight: 600; }
+    &.correct {
+      border-color: #86efac;
+      background: #f0fdf4;
+      color: #16a34a;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    &.wrong {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #dc2626;
+    }
+  }
+}

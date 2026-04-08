@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { FaTrash, FaPlay } from "react-icons/fa";
-import { getMyVocabList, removeFromMyList } from "../../middleware/flashcardProgressAPI";
-import GameMatching from ".Flashcardgame/GameMatching";
-import GameFill from "./GameFill";
+import { getMyVocabList, removeFromMyList } from "../../../middleware/FlashcardprogressAPI";
+import GameSetup from "./Gamelauncher";
+import GameMatching from "./Gamematching";
+import GameFill from "./Gamefill";
 import GameTyping from "./GameTyping";
-import "./MyVocabList.scss";
+import "./MyVocalList.scss";
+
+const mapItem = (item) => ({
+    id: item.itemId ?? item.itemID ?? item.id,
+    word: item.frontText ?? item.word,
+    meaning: item.backText ?? item.meaning,
+    phonetic: item.example ?? item.phonetic ?? "",
+});
 
 const MyVocabList = () => {
     const [myList, setMyList] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeGame, setActiveGame] = useState(null); // 'match' | 'fill' | 'type' | null
+    const [pendingGame, setPendingGame] = useState(null); // 'match' | 'fill' | 'type'
+    const [activeGame, setActiveGame] = useState(null);   // { type, words }
 
     const fetchList = async () => {
         try {
             setLoading(true);
             const data = await getMyVocabList();
-            setMyList(data || []);
+            setMyList((data || []).map(mapItem));
         } catch (err) {
             console.error("Lỗi tải danh sách từ:", err);
         } finally {
@@ -35,6 +44,29 @@ const MyVocabList = () => {
         }
     };
 
+    // Đang trong game
+    if (activeGame) {
+        const { type, words } = activeGame;
+        const finish = () => setActiveGame(null);
+        if (type === "match") return <GameMatching words={words} onFinish={finish} />;
+        if (type === "fill")  return <GameFill words={words} allWords={words} onFinish={finish} />;
+        if (type === "type")  return <GameTyping words={words} onFinish={finish} />;
+    }
+
+    // Đang ở màn hình setup
+    if (pendingGame) {
+        return (
+            <GameSetup
+                gameType={pendingGame}
+                onStart={(words) => {
+                    setPendingGame(null);
+                    setActiveGame({ type: pendingGame, words });
+                }}
+                onCancel={() => setPendingGame(null)}
+            />
+        );
+    }
+
     if (loading) {
         return (
             <div className="mylist-loading">
@@ -43,31 +75,21 @@ const MyVocabList = () => {
         );
     }
 
-    if (activeGame === 'match') {
-        return <GameMatching words={myList} onFinish={() => setActiveGame(null)} />;
-    }
-    if (activeGame === 'fill') {
-        return <GameFill words={myList} allWords={myList} onFinish={() => setActiveGame(null)} />;
-    }
-    if (activeGame === 'type') {
-        return <GameTyping words={myList} onFinish={() => setActiveGame(null)} />;
-    }
-
     return (
         <div className="mylist-page">
             <div className="mylist-header">
                 <h5>Danh sách từ của tôi <span className="badge bg-secondary">{myList.length}</span></h5>
                 {myList.length >= 4 && (
                     <div className="mylist-game-buttons">
-                        <Button size="sm" variant="outline-dark" onClick={() => setActiveGame('match')}>
+                        <button className="mylist-game-btn" onClick={() => setPendingGame("match")}>
                             <FaPlay className="me-1" /> Nối từ
-                        </Button>
-                        <Button size="sm" variant="outline-dark" onClick={() => setActiveGame('fill')}>
+                        </button>
+                        <button className="mylist-game-btn" onClick={() => setPendingGame("fill")}>
                             <FaPlay className="me-1" /> Điền từ
-                        </Button>
-                        <Button size="sm" variant="outline-dark" onClick={() => setActiveGame('type')}>
+                        </button>
+                        <button className="mylist-game-btn" onClick={() => setPendingGame("type")}>
                             <FaPlay className="me-1" /> Gõ chính tả
-                        </Button>
+                        </button>
                     </div>
                 )}
             </div>
@@ -87,9 +109,9 @@ const MyVocabList = () => {
                             >
                                 <FaTrash />
                             </button>
-                            <div className="mylist-word">{item.word || item.frontText}</div>
-                            <div className="mylist-phonetic">{item.phonetic || item.example}</div>
-                            <div className="mylist-meaning">{item.meaning || item.backText}</div>
+                            <div className="mylist-word">{item.word}</div>
+                            <div className="mylist-phonetic">{item.phonetic}</div>
+                            <div className="mylist-meaning">{item.meaning}</div>
                         </div>
                     ))}
                 </div>

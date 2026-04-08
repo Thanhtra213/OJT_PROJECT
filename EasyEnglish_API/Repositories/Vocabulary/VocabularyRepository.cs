@@ -22,7 +22,9 @@ namespace EasyEnglish_API.Repositories.Vocabulary
 
             if (existing != null)
             {
-                existing.IsSaved = true;
+                await _db.FlashcardProgresses
+                    .Where(x => x.UserId == userId && x.ItemId == itemId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsSaved, true));
             }
             else
             {
@@ -33,42 +35,38 @@ namespace EasyEnglish_API.Repositories.Vocabulary
                     IsSaved = true,
                     IsMastered = false,
                     ReviewCount = 0,
+                    EaseFactor = 2.5m,       
+                    IntervalDays = 1,
                     FirstLearnedAt = DateTime.UtcNow,
-                    LastReviewedAt = DateTime.UtcNow
+                    LastReviewedAt = DateTime.UtcNow,
+                    NextReviewAt = DateTime.UtcNow.AddDays(1)
                 });
+                await _db.SaveChangesAsync();
             }
-
-            await _db.SaveChangesAsync();
         }
 
         public async Task UnsaveWordAsync(int userId, int itemId)
         {
-            var existing = await _db.FlashcardProgresses
-                .FirstOrDefaultAsync(x => x.UserId == userId && x.ItemId == itemId);
-
-            if (existing != null)
-            {
-                existing.IsSaved = false;
-                await _db.SaveChangesAsync();
-            }
+            await _db.FlashcardProgresses
+                .Where(x => x.UserId == userId && x.ItemId == itemId)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.IsSaved, false));
         }
 
         public async Task<List<SavedWordDto>> GetSavedWordsAsync(int userId)
         {
             return await _db.FlashcardProgresses
-                .Include(x => x.Item)
                 .Where(x => x.UserId == userId && x.IsSaved)
-                .OrderByDescending(x => x.LastReviewedAt)
                 .Select(x => new SavedWordDto
                 {
                     ItemId = x.ItemId,
-                    FrontText = x.Item.FrontText,
-                    BackText = x.Item.BackText,
-                    Example = x.Item.Example,
+                    FrontText = x.Item.FrontText ?? "",
+                    BackText = x.Item.BackText ?? "",
+                    Example = x.Item.Example ?? "",
                     IsMastered = x.IsMastered,
                     ReviewCount = x.ReviewCount,
                     LastReviewedAt = x.LastReviewedAt
                 })
+                .OrderByDescending(x => x.LastReviewedAt)
                 .ToListAsync();
         }
 

@@ -35,6 +35,7 @@ namespace EasyEnglish_API.Repositories.AIExam
                 .ThenInclude(s => s.Prompt)
                 .Where(r => r.IsSentToTeacher)
                 .OrderByDescending(r => r.CreatedAt)
+                .Where(x => !x.AnswerTeacherReviews.Any())
                 .ToListAsync();
         }
 
