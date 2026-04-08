@@ -55,9 +55,9 @@ export function TeacherReviewManagement() {
 
   // Filter reviews based on sub-tab
   const filteredReviews = reviews.filter(item => {
-    const category = item.category?.toLowerCase() || "";
-    const isSpeaking = category === "speaking" || !!item.audioUrl || !!item.transcript;
-    const isWriting = category === "writing" || (!isSpeaking && !!item.studentAnswer);
+    const category = (item.category || item.Category || "").toLowerCase();
+    const isSpeaking = category === "speaking" || !!item.audioUrl || !!item.AudioUrl || !!item.transcript || !!item.Transcript;
+    const isWriting = category === "writing" || category === "Writing" || (!isSpeaking);
     
     if (activeSubTab === "Speaking") return isSpeaking;
     return isWriting;
@@ -66,15 +66,15 @@ export function TeacherReviewManagement() {
   const handleViewDetail = (review) => {
     setSelectedReview(review);
     setFormData({
-      aiReviewId: review.aiReviewId,
-      scoreOverall: review.scoreOverall || 0,
+      aiReviewId: review.aiReviewId || review.attemptId || review.id || 0,
+      scoreOverall: review.scoreOverall || review.score || review.autoScore || 0,
       scoreTask: review.scoreTask || 0,
       scoreCoherence: review.scoreCoherence || 0,
       scoreLexical: review.scoreLexical || 0,
       scoreGrammar: review.scoreGrammar || 0,
       scorePronunciation: review.scorePronunciation || 0,
       scoreFluency: review.scoreFluency || 0,
-      feedback: review.feedback || ""
+      feedback: review.feedback || review.aiFeedback || ""
     });
     setMessage({ text: "", type: "" });
   };
@@ -155,30 +155,50 @@ export function TeacherReviewManagement() {
             </thead>
             <tbody>
               {filteredReviews.length > 0 ? (
-                filteredReviews.map((item) => (
-                  <tr key={item.aiReviewId}>
+                filteredReviews.map((item, index) => (
+                  <tr key={item.aiReviewId || item.attemptId || item.id || item.Id || index}>
                     <td>
                       <div className="flex items-center gap-2">
                         <User size={16} className="text-primary" />
-                        <span className="font-bold">{item.studentName || item.username || 'Ẩn danh'}</span>
+                        <span className="font-bold" title={typeof item === 'object' ? JSON.stringify(item) : ''}>
+                          {(() => {
+                            const nameData = item.studentName || item.StudentName || item.fullName || item.FullName || item.username || item.Username || item.userName || item.UserName || 
+                                           item.fullname || item.userFullName || item.user_name || item.student_name || item.student || item.user;
+                            if (typeof nameData === 'object' && nameData !== null) {
+                              return nameData.fullName || nameData.FullName || nameData.fullname || nameData.username || nameData.Username || nameData.userName || nameData.studentName || 'Ẩn danh';
+                            }
+                            return nameData || 'Ẩn danh';
+                          })()}
+                        </span>
                       </div>
                     </td>
                     <td>
-                      <div className="text-sm truncate max-w-[200px]" title={item.studentAnswer}>
-                        {item.studentAnswer || 'Nội dung trống'}
+                      <div className="text-sm overflow-y-auto max-h-[100px] max-w-[400px] leading-relaxed pr-2 italic text-gray-700">
+                        {(() => {
+                          const content = item.studentAnswer || item.StudentAnswer || item.answerText || item.AnswerText || item.transcript || item.content || item.answer || item.text || item.writingContent;
+                          if (typeof content === 'object' && content !== null) {
+                            return content.answerText || content.AnswerText || content.transcript || content.text || 'Nội dung phức hợp';
+                          }
+                          return content || 'Nội dung trống';
+                        })()}
                       </div>
                     </td>
-                    <td>
+                    <td className="w-16">
                       <div className="flex items-center gap-1">
                         <Brain size={14} className="text-purple-500" />
-                        <span>{item.aiScore || 0}/10</span>
+                        <span>{item.aiScore || item.AiScore || item.score || item.Score || item.overallScore || item.OverallScore || item.autoScore || 0}/10</span>
                       </div>
                     </td>
-                    <td><span className="font-bold">{item.scoreOverall || 0}</span></td>
-                    <td>
-                      <span className={`status-badge ${item.isTeacherReviewed ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-                        {item.isTeacherReviewed ? 'Đã chấm' : 'Chờ chấm'}
-                      </span>
+                    <td className="w-16"><span className="font-bold">{item.scoreOverall || item.ScoreOverall || item.overallScore || item.OverallScore || item.score || item.Score || 0}</span></td>
+                    <td className="w-24">
+                      {(() => {
+                        const isReviewed = item.isTeacherReviewed || item.IsTeacherReviewed || item.isReviewed || item.IsReviewed || (item.status === 'REVIEWED') || (item.Status === 'Reviewed');
+                        return (
+                          <span className={`status-badge ${isReviewed ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                            {isReviewed ? 'Đã chấm' : 'Chờ chấm'}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="text-right">
                       <button 
@@ -226,7 +246,7 @@ export function TeacherReviewManagement() {
               <BookOpen size={18} /> Nội dung bài làm
             </h4>
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 min-h-[150px] whitespace-pre-wrap">
-              {selectedReview.studentAnswer || "Học viên chưa nộp nội dung bài làm."}
+              {selectedReview.studentAnswer || selectedReview.answerText || "Học viên chưa nộp nội dung bài làm."}
             </div>
           </div>
 

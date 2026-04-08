@@ -41,7 +41,7 @@ const WritingPractice = () => {
       setLoading(true);
       const res = await generateWriting();
       setSelected({
-        id: Date.now(),
+        promptId: res.promptId || res.id,
         title: res.title || "Chủ đề Writing ngẫu nhiên",
         task: res.content || res.task || "Không có nội dung đề bài.",
         minWords: 150,
@@ -85,7 +85,7 @@ const WritingPractice = () => {
       setShowConfirm(false);
       setMessage({ type: "info", text: "📤 Đang xử lý bài viết, vui lòng đợi..." });
       
-      const res = await submitWriting(selected.task, writing, sendToTeacher);
+      const res = await submitWriting(selected.promptId, writing, sendToTeacher);
       setFeedback(res);
       
       if (sendToTeacher) {
@@ -331,9 +331,6 @@ const WritingPractice = () => {
             </div>
             <div className="modal-body">
               <p>Bài làm của bạn sẽ được gửi tới hệ thống quản lý của Giáo viên để nhận được những nhận xét chuyên sâu hơn.</p>
-              <div className="tip-box-mini">
-                <strong>Lưu ý:</strong> AI vẫn sẽ thực hiện chấm điểm tự động ngay lập tức cho bạn.
-              </div>
             </div>
             <div className="modal-footer">
               <button className="btn-text" onClick={() => setShowConfirm(false)}>Hủy bỏ</button>
