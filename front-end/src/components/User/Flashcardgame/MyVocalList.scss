@@ -1,0 +1,53 @@
+.mylist-page {
+  .mylist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 8px;
+    h5 { margin: 0; font-weight: 700; }
+  }
+  .mylist-game-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+ 
+  .mylist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+  }
+  .mylist-card {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .mylist-remove {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: none; border: none;
+    color: #d1d5db; cursor: pointer;
+    font-size: 0.75rem;
+    &:hover { color: #ef4444; }
+  }
+  .mylist-word { font-weight: 700; font-size: 0.95rem; color: #111827; margin-bottom: 2px; }
+  .mylist-phonetic { font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px; }
+  .mylist-meaning { font-size: 0.8rem; color: #6b7280; }
+ 
+  .mylist-empty {
+    text-align: center;
+    padding: 3rem;
+    color: #9ca3af;
+  }
+  .mylist-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-top: 1rem;
+  }
+  .mylist-loading {
+    padding: 2rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+}

@@ -172,3 +172,68 @@ $ease:         0.3s ease;
     &:last-child { background: $mint; border-color: $mint; color: $white; border-width: 0; box-shadow: 0 4px 16px rgba(0,200,150,.3); &:hover { background: $mint-dark; } }
   }
 }
+
+.mastered-star {
+  color: #f59e0b;
+  font-size: 1.2rem;
+}
+ 
+.mastered-count {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+ 
+// Nút Lưu từ + Đánh dấu thuộc
+.flashcard-action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+ 
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+ 
+    &.save-btn {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+      &:hover { background: #dbeafe; }
+      &.active {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+      }
+    }
+ 
+    &.mastered-btn {
+      background: #f0fdf4;
+      color: #16a34a;
+      border-color: #bbf7d0;
+      &:hover { background: #dcfce7; }
+      &.active {
+        background: #16a34a;
+        color: #fff;
+        border-color: #16a34a;
+      }
+    }
+  }
+}
+ 
+.status-message {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  min-height: 20px;
+  transition: opacity 0.3s;
+}

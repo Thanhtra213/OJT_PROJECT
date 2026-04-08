@@ -2,6 +2,7 @@
 using EasyEnglish_API.Interfaces.Score;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace EasyEnglish_API.Repositories.Score
 {
@@ -26,6 +27,15 @@ namespace EasyEnglish_API.Repositories.Score
             return await _db.AnswerTeacherReviews
            .Where(r => r.AireviewId == id)
            .OrderByDescending(r => r.CreatedAt).ToListAsync();
+        }
+
+        public async Task<AnswerAIReview> GetByIdAsync(int id)
+        {
+            return await _db.AnswerAIReviews
+                .Include(x => x.Submission)
+                    .ThenInclude(s => s.Prompt)
+                .Include(x => x.AnswerTeacherReviews)
+                .FirstOrDefaultAsync(x => x.AireviewId == id);
         }
     }
 }

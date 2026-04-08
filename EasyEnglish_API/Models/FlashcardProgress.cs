@@ -16,13 +16,13 @@ public partial class FlashcardProgress
     public int ReviewCount { get; set; }
     public bool IsSaved { get; set; } = false;
 
-    public bool IsMastered { get; set; }
+    public bool IsMastered { get; set; } = false;
 
     public DateTime? NextReviewAt { get; set; }
 
-    public decimal EaseFactor { get; set; }
+    public decimal? EaseFactor { get; set; }
 
-    public int IntervalDays { get; set; }
+    public int? IntervalDays { get; set; }
 
     public virtual FlashcardItem Item { get; set; } = null!;
 

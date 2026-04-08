@@ -67,3 +67,19 @@ export const getFlashcardProgress = async (setId) => {
     );
     return res.data;
 };
+
+export const getVocabBySet = async (setId) => {
+    const res = await axios.get(
+        `${API_BASE}/flashcard/set/${setId}`,
+        { headers: getAuthHeader() }
+    );
+    return res.data.items;
+};
+
+export const getFlashcardSets = async () => {
+    const res = await axios.get(
+        `${API_BASE}/flashcard/sets`,
+        { headers: getAuthHeader() }
+    );
+    return res.data;
+};
