@@ -218,11 +218,11 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IStreakRepository, StreakRepository>();
             builder.Services.AddScoped<IVideoProgressRepository, VideoProgressRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-<<<<<<< Updated upstream
+
             builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
-=======
+
             builder.Services.AddScoped<IVocabularyRepository, VocabularyRepository>();
->>>>>>> Stashed changes
+
 
             // == Serviecs ==
             builder.Services.AddScoped<IAuthService, AuthService>();
@@ -249,13 +249,13 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIReviewService, AIReviewService>(); 
             builder.Services.AddScoped<ITeacherScoreService, TeacherScoreService>();
             builder.Services.AddScoped<IAIListeningService, AIListeningService>();
-<<<<<<< Updated upstream
+
             builder.Services.AddScoped<IVoucherService, VoucherService>();
 
-=======
+
             builder.Services.AddScoped<IVocabularyService, VocabularyService>();
             builder.Services.AddScoped<IFlashcarProgressService, FlashcardProgressService>();
->>>>>>> Stashed changes
+
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));

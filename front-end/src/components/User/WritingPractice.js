@@ -1,5 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  Plus, 
+  Send, 
+  X, 
+  PenTool, 
+  BookOpen, 
+  CheckCircle, 
+  AlertCircle, 
+  Trophy,
+  MessageCircle,
+  FileText,
+  RefreshCw,
+  ChevronRight
+} from "lucide-react";
 import "./writingpractice.scss";
 import { generateWriting, submitWriting } from "../../middleware/writingAPI";
 
@@ -10,7 +24,16 @@ const WritingPractice = () => {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ Clear message after 5s
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // ✅ Lấy đề từ AI
   const handleGenerate = async () => {
@@ -19,15 +42,17 @@ const WritingPractice = () => {
       const res = await generateWriting();
       setSelected({
         id: Date.now(),
-        title: res.title,
-        task: res.content,
+        title: res.title || "Chủ đề Writing ngẫu nhiên",
+        task: res.content || res.task || "Không có nội dung đề bài.",
         minWords: 150,
         maxWords: 300,
         level: "AI-generated",
-        type: "essay",
-        time: "20 phút",
+        type: "IELTS Essay",
+        time: "40 phút",
       });
       setFeedback(null);
+      setWriting("");
+      setWordCount(0);
     } catch (err) {
       console.error("AI generate failed:", err);
       setMessage({
@@ -43,226 +68,282 @@ const WritingPractice = () => {
   const handleChange = (e) => {
     const text = e.target.value;
     setWriting(text);
-    setWordCount(text.trim().split(/\s+/).filter(Boolean).length);
+    const count = text.trim().split(/\s+/).filter(Boolean).length;
+    setWordCount(count);
   };
 
-  // ✅ Gửi bài để AI chấm điểm
-const handleSubmit = async () => {
-  if (wordCount < selected.minWords) {
-    setMessage({ type: "error", text: `❌ Cần ít nhất ${selected.minWords} từ để hoàn thành bài viết.` });
-    return;
-  }
-  try {
-    setLoading(true);
-    setMessage({ type: "success", text: "📤 Đang chấm điểm, vui lòng đợi..." });
-    const res = await submitWriting(selected.task, writing);
-    setFeedback(res);
-    setMessage({ type: "success", text: "✅ Bài viết đã được chấm xong!" });
-  
-  } catch (err) {
-    console.error("Submit error:", err);
-    setMessage({ type: "error", text: "❌ Gửi bài thất bại. Hãy kiểm tra lại kết nối hoặc token." });
-  } finally {
-    setLoading(false);
-  }
-};
+  // ✅ Gửi bài
+  const handleFinalSubmit = async (sendToTeacher = false) => {
+    if (!selected) return;
+    if (wordCount < 10) {
+      setMessage({ type: "error", text: "❌ Bài viết quá ngắn để có thể chấm điểm." });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setShowConfirm(false);
+      setMessage({ type: "info", text: "📤 Đang xử lý bài viết, vui lòng đợi..." });
+      
+      const res = await submitWriting(selected.task, writing, sendToTeacher);
+      setFeedback(res);
+      
+      if (sendToTeacher) {
+        setMessage({ type: "success", text: "✅ Bài viết đã được gửi cho giáo viên và AI đã chấm điểm xong!" });
+      } else {
+        setMessage({ type: "success", text: "✅ AI đã chấm điểm bài viết của bạn!" });
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      setMessage({ type: "error", text: "❌ Gửi bài thất bại. Hãy kiểm tra lại kết nối." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClose = () => navigate("/home");
 
-  return (
-    <div className="writing-page">
-      <div className="writing-header">
-        <div className="header-left">
-          <h1>Luyện Writing</h1>
-          <p>
-            {selected
-              ? `${selected.title} (${selected.minWords}-${selected.maxWords} từ)`
-              : "Nhấn 'Tạo đề AI' để bắt đầu luyện viết"}
-          </p>
-        </div>
-        <div className="header-right">
-          <button className="btn-primary" onClick={handleGenerate} disabled={loading}>
-            {loading ? "Đang tạo..." : "Tạo đề AI"}
-          </button>
-          <button className="close-btn" onClick={handleClose} aria-label="Đóng">
-            Đóng
-          </button>
-        </div>
-      </div>
+  const wordProgress = selected ? Math.min((wordCount / selected.minWords) * 100, 100) : 0;
 
+  return (
+    <div className="writing-container">
+      {/* Header Area */}
+      <header className="writing-page-header">
+        <div className="header-content">
+          <div className="title-group">
+            <div className="icon-badge">
+              <PenTool size={24} />
+            </div>
+            <div>
+              <h1>Luyện Viết Tiếng Anh</h1>
+              <p>Phát triển kỹ năng Writing với sự hỗ trợ từ AI và Giáo viên</p>
+            </div>
+          </div>
+          <div className="header-actions">
+            {!selected && (
+              <button className="btn-generate" onClick={handleGenerate} disabled={loading}>
+                {loading ? <RefreshCw className="spin" size={18} /> : <Plus size={18} />}
+                {loading ? "Đang tạo đề..." : "Tạo đề AI"}
+              </button>
+            )}
+            <button className="btn-close" onClick={handleClose}>
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Alert System */}
       {message && (
-        <div
-          className={`alert ${message.type === "error" ? "alert-error" : "alert-success"}`}
-        >
-          {message.text}
+        <div className={`alert-toast animation-slide-in ${message.type}`}>
+          {message.type === "error" ? <AlertCircle size={20} /> : <CheckCircle size={20} />}
+          <span>{message.text}</span>
+          <button onClick={() => setMessage(null)}><X size={14} /></button>
         </div>
       )}
 
-      <div className="writing-main">
-        {/* Left Info */}
-        <div className="left-section">
-          {selected ? (
-            <div className="info-box">
-              <h3>Thông tin bài viết</h3>
-              <h4>{selected.title}</h4>
-              <p className="desc">{selected.task}</p>
-              <div className="tags">
-                <span className="tag easy">{selected.level}</span>
-                <span className="tag small">{selected.type}</span>
+      <main className="writing-content">
+        <div className="layout-grid">
+          {/* Sidebar Left: Task Info */}
+          <aside className="sidebar-left">
+            <div className="card task-card">
+              <div className="card-header">
+                <BookOpen size={18} />
+                <h3>Đề bài</h3>
               </div>
-              <div className="info-stats">
-                <p>🎯 {selected.minWords}-{selected.maxWords} từ</p>
-                <p>⏱ {selected.time}</p>
-              </div>
+              {selected ? (
+                <div className="task-content">
+                  <div className="tag-row">
+                    <span className="badge level">{selected.level}</span>
+                    <span className="badge type">{selected.type}</span>
+                  </div>
+                  <h4 className="task-title">{selected.title}</h4>
+                  <p className="task-desc">{selected.task}</p>
+                  <div className="task-meta">
+                    <div className="meta-item">
+                      <span className="label">Mục tiêu:</span>
+                      <span className="value">{selected.minWords}-{selected.maxWords} từ</span>
+                    </div>
+                    <div className="meta-item">
+                      <span className="label">Thời gian:</span>
+                      <span className="value">{selected.time}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="card-placeholder">
+                  <div className="skeleton-line" />
+                  <div className="skeleton-line mid" />
+                  <div className="skeleton-line short" />
+                  <p>Hãy nhấn "Tạo đề AI" để bắt đầu bài luyện tập mới</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="info-box placeholder">
-              <h3>Hãy nhấn "Tạo đề AI" để nhận một chủ đề luyện viết</h3>
-            </div>
-          )}
-        </div>
 
-        {/* Center Section */}
-        <div className="center-section">
-          {selected ? (
-            <div className="writing-area">
-              <div className="writing-title">
-                <h3>Khu vực viết bài</h3>
-                <span className="word-limit">
-                  {wordCount} / {selected.minWords}-{selected.maxWords} từ
-                </span>
+            <div className="card info-card">
+              <div className="card-header">
+                <Trophy size={18} />
+                <h3>Tiêu chí chấm điểm</h3>
               </div>
+              <ul className="criteria-list">
+                <li><strong>Task Response:</strong> Mức độ hoàn thành yêu cầu đề bài.</li>
+                <li><strong>Coherence:</strong> Sự mạch lạc và liên kết của các đoạn văn.</li>
+                <li><strong>Lexical:</strong> Sự đa dạng và chính xác của từ vựng.</li>
+                <li><strong>Grammar:</strong> Độ phong phú và chính xác của ngữ pháp.</li>
+              </ul>
+            </div>
+          </aside>
+
+          {/* Center: Editor */}
+          <section className="editor-section">
+            <div className="card editor-card">
+              <div className="editor-header">
+                <h3>Khu vực làm bài</h3>
+                <div className="word-count-chip">
+                  <FileText size={14} />
+                  <span>{wordCount} từ</span>
+                  {selected && (
+                    <div className="progress-mini">
+                      <div className="bar" style={{ width: `${wordProgress}%` }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+              
               <textarea
-                placeholder="Bắt đầu viết bài của bạn ở đây..."
+                className="writing-textarea"
+                placeholder="Trình bày bài luận của bạn tại đây..."
                 value={writing}
                 onChange={handleChange}
-                disabled={loading}
+                disabled={loading || !selected}
               />
-              <div className="writing-actions">
-                <button className="btn-outline" onClick={() => setSelected(null)}>
-                  Chọn đề mới
-                </button>
-                <button
-                  className="btn-primary submit-btn"
-                  onClick={handleSubmit}
-                  disabled={wordCount < selected.minWords || loading}
-                >
-                  Nộp bài
-                </button>
+
+              <div className="editor-footer">
+                {selected && (
+                  <>
+                    <button 
+                      className="btn-text" 
+                      onClick={() => setSelected(null)} 
+                      disabled={loading}
+                    >
+                      Chọn đề khác
+                    </button>
+                    <div className="footer-btns-container">
+                      <div className="footer-btns">
+                        <button
+                          className="btn-outline"
+                          onClick={() => handleFinalSubmit(false)}
+                          disabled={wordCount < 10 || loading}
+                        >
+                          Chấm điểm AI
+                        </button>
+                        <button
+                          className="btn-primary"
+                          onClick={() => setShowConfirm(true)}
+                          disabled={wordCount < 10 || loading || !feedback}
+                        >
+                          <Send size={16} /> Gửi cho giáo viên
+                        </button>
+                      </div>
+                      {!feedback && wordCount >= 10 && (
+                        <p className="btn-hint">Vui lòng chấm điểm AI trước khi gửi cho giáo viên</p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-          ) : null}
-        </div>
+          </section>
 
-        {/* Right Section: Feedback */}
-        <div className="right-section">
-  {feedback ? (
-    <div className="feedback-box">
-      <h3>Kết quả chấm điểm</h3>
+          {/* Sidebar Right: Feedback */}
+          <aside className="sidebar-right">
+            <div className={`card feedback-card ${feedback ? 'has-content' : ''}`}>
+              <div className="card-header">
+                <MessageCircle size={18} />
+                <h3>Kết quả & Feedback</h3>
+              </div>
+              
+              {feedback ? (
+                <div className="feedback-body">
+                  <div className="overall-score">
+                    <span className="label">Band Score</span>
+                    <h2 className="score-value">{feedback.score}</h2>
+                  </div>
 
-      <div className="score-grid">
-        <div className="score-item"><span>Tổng điểm: </span><strong>{feedback.score}</strong></div>
-        <div className="score-item"><span>Task Response: </span><strong>{feedback.taskResponse}</strong></div>
-        <div className="score-item"><span>Coherence: </span><strong>{feedback.coherence}</strong></div>
-        <div className="score-item"><span>Lexical: </span><strong>{feedback.lexicalResource}</strong></div>
-        <div className="score-item"><span>Grammar: </span><strong>{feedback.grammar}</strong></div>
-      </div>
-
-      {(() => {
-        try {
-          const fb = typeof feedback.feedback === "string"
-            ? JSON.parse(feedback.feedback)
-            : feedback.feedback;
-
-          return (
-            <div className="feedback-detail">
-              {fb.overall && <p className="fb-overall">{fb.overall}</p>}
-
-              {fb.taskResponse && (
-                <div className="fb-section">
-                  <h4>Task Response</h4>
-                  <p>{fb.taskResponse.comment}</p>
-                  {fb.taskResponse.issues?.length > 0 && (
-                    <ul className="fb-issues">{fb.taskResponse.issues.map((i, idx) => <li key={idx}>⚠️ {i}</li>)}</ul>
-                  )}
-                  {fb.taskResponse.suggestions?.length > 0 && (
-                    <ul className="fb-suggestions">{fb.taskResponse.suggestions.map((s, idx) => <li key={idx}>💡 {s}</li>)}</ul>
-                  )}
-                </div>
-              )}
-
-              {fb.coherence && (
-                <div className="fb-section">
-                  <h4>Coherence & Cohesion</h4>
-                  <p>{fb.coherence.comment}</p>
-                  {fb.coherence.issues?.length > 0 && (
-                    <ul className="fb-issues">{fb.coherence.issues.map((i, idx) => <li key={idx}>⚠️ {i}</li>)}</ul>
-                  )}
-                  {fb.coherence.suggestions?.length > 0 && (
-                    <ul className="fb-suggestions">{fb.coherence.suggestions.map((s, idx) => <li key={idx}>💡 {s}</li>)}</ul>
-                  )}
-                </div>
-              )}
-
-              {fb.lexical && (
-                <div className="fb-section">
-                  <h4>Lexical Resource</h4>
-                  <p>{fb.lexical.comment}</p>
-                  {fb.lexical.weakPhrases?.length > 0 && (
-                    <div className="fb-table">
-                      <div className="fb-table-header"><span>Từ gốc →  </span><span>Gợi ý thay thế</span></div>
-                      {fb.lexical.weakPhrases.map((w, idx) => (
-                        <div key={idx} className="fb-table-row">
-                          <span className="original">"{w.original}"</span>
-                          <span className="suggestion">→ "{w.suggestion}"</span>
-                        </div>
-                      ))}
+                  <div className="sub-scores">
+                    <div className="sub-item">
+                      <span>Task: {feedback.taskResponse}</span>
+                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.taskResponse * 10}%`}} /></div>
                     </div>
-                  )}
-                </div>
-              )}
-
-              {fb.grammar && (
-                <div className="fb-section">
-                  <h4>Grammar</h4>
-                  <p>{fb.grammar.comment}</p>
-                  {fb.grammar.errors?.length > 0 && (
-                    <div className="fb-errors">
-                      {fb.grammar.errors.map((e, idx) => (
-                        <div key={idx} className="fb-error-item">
-                          <p className="error-original">Lỗi: {e.original}</p>
-                          <p className="error-correction">Đúng:  {e.correction}</p>
-                          <p className="error-explanation">Explan: {e.explanation}</p>
-                        </div>
-                      ))}
+                    <div className="sub-item">
+                      <span>Coherence: {feedback.coherence}</span>
+                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.coherence * 10}%`}} /></div>
                     </div>
-                  )}
+                    <div className="sub-item">
+                      <span>Lexical: {feedback.lexicalResource}</span>
+                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.lexicalResource * 10}%`}} /></div>
+                    </div>
+                    <div className="sub-item">
+                      <span>Grammar: {feedback.grammar}</span>
+                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.grammar * 10}%`}} /></div>
+                    </div>
+                  </div>
+
+                  <div className="feedback-actions">
+                    <button className="btn-refresh" onClick={() => { setFeedback(null); setWriting(""); setWordCount(0); setSelected(null); }}>
+                      <RefreshCw size={14} /> Làm đề mới
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="feedback-empty">
+                  <div className="empty-icon">☕</div>
+                  <p>Sau khi nộp bài, kết quả chi tiết từ AI sẽ hiển thị tại đây.</p>
                 </div>
               )}
             </div>
-          );
-        } catch {
-          return <p className="feedback-text">{feedback.feedback}</p>;
-        }
-      })()}
 
-      <button className="btn-outline reset-btn" onClick={() => { setFeedback(null); setWriting(""); setWordCount(0); setSelected(null); }}>
-        Làm bài mới
-      </button>
-    </div>
-  ) : (
-    <div className="criteria-box">
-      <h3>Tiêu chí chấm điểm</h3>
-      <ul>
-        <li><strong>Phản hồi đề bài</strong> – Trả lời đầy đủ và đúng trọng tâm.</li>
-        <li><strong>Mạch lạc & liên kết</strong> – Các đoạn logic, liên kết tự nhiên.</li>
-        <li><strong>Từ vựng</strong> – Dùng từ chính xác, đa dạng.</li>
-        <li><strong>Ngữ pháp</strong> – Cấu trúc câu phong phú, chính xác.</li>
-      </ul>
-    </div>
-  )}
-</div>
-      </div>
+            {feedback && (
+              <div className="card info-card animation-fade-in">
+                <div className="card-header">
+                  <AlertCircle size={18} />
+                  <h3>Chi tiết nhận xét</h3>
+                </div>
+                <div className="feedback-text-area">
+                   <p className="text-sm text-gray-600 line-clamp-6">
+                     {typeof feedback.feedback === 'string' ? feedback.feedback : "Xem nhận xét chi tiết bên dưới."}
+                   </p>
+                   <button className="btn-link">Xem đầy đủ <ChevronRight size={14}/></button>
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
+      </main>
+
+      {/* Confirmation Modal */}
+      {showConfirm && (
+        <div className="modal-overlay animation-fade-in">
+          <div className="modal-content animation-scale-up">
+            <div className="modal-header">
+              <h3>Gửi bài cho Giáo viên?</h3>
+              <button className="close-x" onClick={() => setShowConfirm(false)}><X size={18} /></button>
+            </div>
+            <div className="modal-body">
+              <p>Bài làm của bạn sẽ được gửi tới hệ thống quản lý của Giáo viên để nhận được những nhận xét chuyên sâu hơn.</p>
+              <div className="tip-box-mini">
+                <strong>Lưu ý:</strong> AI vẫn sẽ thực hiện chấm điểm tự động ngay lập tức cho bạn.
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-text" onClick={() => setShowConfirm(false)}>Hủy bỏ</button>
+              <button className="btn-primary" onClick={() => handleFinalSubmit(true)}>
+                Xác nhận gửi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

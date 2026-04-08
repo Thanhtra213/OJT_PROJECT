@@ -28,3 +28,77 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+// --- Review Management Sub-Tabs Styles ---
+.review-sub-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin: 1.5rem 0 2rem;
+  padding: 0 0.5rem;
+}
+
+.review-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.22s cubic-bezier(.4, 0, .2, 1);
+  border-radius: 12px 12px 0 0;
+
+  &:hover {
+    color: #111827;
+    background: rgba(0, 200, 150, 0.04);
+  }
+
+  &.active {
+    &.writing {
+      color: #00c896;
+      .active-line { background: #00c896; }
+    }
+    &.speaking {
+      color: #8b5cf6; 
+      .active-line { background: #8b5cf6; }
+      .icon-speaking { color: #8b5cf6; }
+    }
+    background: transparent;
+  }
+
+  .icon-speaking {
+    transform: rotate(-45deg);
+    transition: transform 0.22s;
+  }
+
+  .active-line {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 100px;
+    animation: scale-x 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: left;
+  }
+}
+
+// Global Dark Mode tweaks
+body.global-dark-mode {
+  .review-sub-tabs { border-bottom-color: #334155 !important; }
+  .review-tab-btn {
+    color: #94a3b8 !important;
+    &:hover { color: #f8fafc !important; background: rgba(255, 255, 255, 0.05) !important; }
+    &.active.writing { color: #00c896 !important; }
+    &.active.speaking { 
+        color: #a78bfa !important; 
+        .active-line { background: #a78bfa !important; } 
+        .icon-speaking { color: #a78bfa !important; } 
+    }
+  }
+}
