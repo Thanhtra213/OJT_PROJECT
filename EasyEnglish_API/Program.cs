@@ -220,6 +220,7 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
             builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
+
             builder.Services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
 
@@ -248,9 +249,13 @@ namespace EasyEnglish_API {
             builder.Services.AddScoped<IAIReviewService, AIReviewService>(); 
             builder.Services.AddScoped<ITeacherScoreService, TeacherScoreService>();
             builder.Services.AddScoped<IAIListeningService, AIListeningService>();
+
             builder.Services.AddScoped<IVoucherService, VoucherService>();
+
+
             builder.Services.AddScoped<IVocabularyService, VocabularyService>();
             builder.Services.AddScoped<IFlashcarProgressService, FlashcardProgressService>();
+
 
             // Email Sender
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));

@@ -14,6 +14,7 @@ import {
   BookOpen,
   Brain
 } from "lucide-react";
+import "./Reviews.scss";
 
 export function TeacherReviewManagement() {
   const [reviews, setReviews] = useState([]);
@@ -34,6 +35,8 @@ export function TeacherReviewManagement() {
     feedback: ""
   });
 
+  const [activeSubTab, setActiveSubTab] = useState("Writing"); // Default to Writing
+
   useEffect(() => {
     loadReviews();
   }, []);
@@ -49,6 +52,16 @@ export function TeacherReviewManagement() {
       setIsLoading(false);
     }
   };
+
+  // Filter reviews based on sub-tab
+  const filteredReviews = reviews.filter(item => {
+    const category = item.category?.toLowerCase() || "";
+    const isSpeaking = category === "speaking" || !!item.audioUrl || !!item.transcript;
+    const isWriting = category === "writing" || (!isSpeaking && !!item.studentAnswer);
+    
+    if (activeSubTab === "Speaking") return isSpeaking;
+    return isWriting;
+  });
 
   const handleViewDetail = (review) => {
     setSelectedReview(review);
@@ -102,11 +115,33 @@ export function TeacherReviewManagement() {
     return (
       <div className="management-card">
         <div className="management-card-header">
-          <h2 className="card-title">Chấm điểm bài làm</h2>
-          <p className="card-description">Xem và đánh giá bài làm của học viên</p>
+          <div>
+            <h2 className="card-title">Chấm điểm bài làm</h2>
+            <p className="card-description">Xem và đánh giá bài làm của học viên</p>
+          </div>
         </div>
 
-        <div className="management-table-wrapper mt-4">
+        {/* Sub-Tabs */}
+        <div className="review-sub-tabs">
+          <button 
+            className={`review-tab-btn ${activeSubTab === "Writing" ? "active writing" : ""}`}
+            onClick={() => setActiveSubTab("Writing")}
+          >
+            <BookOpen size={18} />
+            <span>Writing Practice</span>
+            {activeSubTab === "Writing" && <div className="active-line" />}
+          </button>
+          <button 
+            className={`review-tab-btn ${activeSubTab === "Speaking" ? "active speaking" : ""}`}
+            onClick={() => setActiveSubTab("Speaking")}
+          >
+            <Send size={18} className="icon-speaking" />
+            <span>Speaking Practice</span>
+            {activeSubTab === "Speaking" && <div className="active-line" />}
+          </button>
+        </div>
+
+        <div className="management-table-wrapper">
           <table className="management-table">
             <thead>
               <tr>
@@ -119,8 +154,8 @@ export function TeacherReviewManagement() {
               </tr>
             </thead>
             <tbody>
-              {reviews.length > 0 ? (
-                reviews.map((item) => (
+              {filteredReviews.length > 0 ? (
+                filteredReviews.map((item) => (
                   <tr key={item.aiReviewId}>
                     <td>
                       <div className="flex items-center gap-2">

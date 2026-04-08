@@ -448,3 +448,14 @@ body.global-dark-mode .card .list-group-item.selected {
     color: #38bdf8 !important;
 }
 
+/* ==========================================================
+   UTILITY ANIMATIONS
+   ========================================================== */
+@keyframes scale-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.animate-scale-x {
+  animation: scale-x 0.2s ease-out forwards;
+  transform-origin: left;
+}

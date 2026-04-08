@@ -24,9 +24,9 @@ export const generateWriting = async () => {
 };
 
 // ✅ Nộp bài để AI chấm điểm
-export const submitWriting = async (promptContent, answerText) => {
+export const submitWriting = async (promptContent, answerText, sendToTeacher = false) => {
   try {
-    const body = { promptContent, answerText };
+    const body = { promptContent, answerText, sendToTeacher };
     const res = await api.post("/submit", body, { headers: getAuthHeaders() });
     return res.data; // { score, taskResponse, coherence, lexicalResource, grammar, feedback, attemptId }
   } catch (err) {
