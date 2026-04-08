@@ -21,6 +21,8 @@ import SpeakingPractice from './components/User/SpeakingPractice';
 import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
+import MyvocabList from "./components/User/Flashcardgame/MyVocabList";
+import GameLauncher from "./components/User/Flashcardgame/Gamelauncher"; 
 
 // ADMIN ROUTES
 import AdminDashboard from './components/Admin/AdminDashboard'; 
@@ -106,6 +108,8 @@ root.render(
           <Route path="/quiz/publish" element={<QuizPublish />} />
           <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/teacherinfo/:teacherId" element={<TeacherInfo />} />
+          <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
+          <Route path="/game" element={<GameLauncher />} />
           
           <Route path="profile" element={
             <ProtectedRoute>

@@ -77,11 +77,19 @@ const FlashcardList = () => {
         </button>
 
         <header className="page-header">
-          <h1>Bộ sưu tập Flashcard</h1>
-          <p className="page-subtitle">
-            Chọn một bộ flashcard để bắt đầu học từ vựng và củng cố kiến thức của bạn.
-          </p>
-        </header>
+  <div className="header-top">
+    <div>
+      <h1>Bộ sưu tập Flashcard</h1>
+      <p className="page-subtitle">
+        Chọn một bộ flashcard để bắt đầu học từ vựng và củng cố kiến thức của bạn.
+      </p>
+    </div>
+    <button className="btn btn-outline-primary" onClick={() => navigate("/flashcard/my-vocab")}>
+      
+      Danh sách từ của tôi
+    </button>
+  </div>
+</header>
 
         {sets.length === 0 ? (
           <div className="empty-state">

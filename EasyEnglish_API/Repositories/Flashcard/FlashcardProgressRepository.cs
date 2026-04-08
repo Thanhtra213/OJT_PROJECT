@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EasyEnglish_API.Repositories.Flashcard
 {
-    public class FlashcardProgressRepository :IFlashcardProgressRepository
+    public class FlashcardProgressRepository : IFlashcardProgressRepository
     {
         private readonly EasyEnglishDbContext _db;
 
@@ -25,20 +25,24 @@ namespace EasyEnglish_API.Repositories.Flashcard
         public async Task<List<FlashcardProgressDto>> GetProgressBySetAsync(int userId, int setId)
         {
             return await _db.FlashcardProgresses
-                .Where(p => p.UserId == userId && p.Item.SetId == setId)
-                .Select(p => new FlashcardProgressDto
+                .Where(x => x.UserId == userId && x.Item.SetId == setId)
+                .Select(x => new FlashcardProgressDto
                 {
-                    ItemId = p.ItemId,
-                    IsMastered = p.IsMastered,
-                    ReviewCount = p.ReviewCount,
-                    NextReviewAt = p.NextReviewAt
+                    ItemId = x.ItemId,
+                    IsMastered = x.IsMastered,
+                    IsSaved = x.IsSaved,
+                    ReviewCount = x.ReviewCount,
+                    FirstLearnedAt = x.FirstLearnedAt,
+                    LastReviewedAt = x.LastReviewedAt,
+                    NextReviewAt = x.NextReviewAt
                 })
                 .ToListAsync();
         }
         public async Task<FlashcardProgress?> GetProgressByItemAsync(int userId, int itemId)
         {
             return await _db.FlashcardProgresses
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.ItemId == itemId);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.ItemId == itemId);
         }
 
 
@@ -55,27 +59,30 @@ namespace EasyEnglish_API.Repositories.Flashcard
         public async Task UpsertProgressAsync(FlashcardProgress progress)
         {
             var existing = await _db.FlashcardProgresses
-                .FindAsync(progress.UserId, progress.ItemId);
+                .FirstOrDefaultAsync(x => x.UserId == progress.UserId && x.ItemId == progress.ItemId);
 
-            if (existing == null)
+            if (existing != null)
+            {
+                existing.IsMastered = progress.IsMastered;
+                existing.ReviewCount = progress.ReviewCount;
+                existing.NextReviewAt = progress.NextReviewAt;
+                existing.LastReviewedAt = progress.LastReviewedAt;
+                if (existing.FirstLearnedAt == null)
+                    existing.FirstLearnedAt = progress.FirstLearnedAt;
+            }
+            else
             {
                 _db.FlashcardProgresses.Add(new FlashcardProgress
                 {
                     UserId = progress.UserId,
                     ItemId = progress.ItemId,
-                    FirstLearnedAt = progress.FirstLearnedAt,
-                    LastReviewedAt = progress.LastReviewedAt,
-                    ReviewCount = progress.ReviewCount,
-                    IsSaved = progress.IsSaved,
                     IsMastered = progress.IsMastered,
+                    IsSaved = false,        
+                    ReviewCount = progress.ReviewCount,
                     NextReviewAt = progress.NextReviewAt,
-                    EaseFactor = progress.EaseFactor,
-                    IntervalDays = progress.IntervalDays
+                    FirstLearnedAt = progress.FirstLearnedAt ?? DateTime.UtcNow,
+                    LastReviewedAt = progress.LastReviewedAt ?? DateTime.UtcNow
                 });
-            }
-            else
-            {
-                _db.Entry(existing).CurrentValues.SetValues(progress);
             }
 
             await _db.SaveChangesAsync();
@@ -103,24 +110,25 @@ namespace EasyEnglish_API.Repositories.Flashcard
                 ActionType = actionType,
                 CreatedAt = DateTime.UtcNow
             });
-
             await _db.SaveChangesAsync();
         }
 
         public async Task<List<FlashcardHistoryDto>> GetHistoryAsync(int userId, int? setId)
         {
             var query = _db.FlashcardHistories
-                .Where(h => h.UserId == userId);
+                .Where(x => x.UserId == userId);
 
             if (setId.HasValue)
-                query = query.Where(h => h.Item.SetId == setId);
+                query = query.Where(x => x.Item.SetId == setId.Value);
 
             return await query
-                .Select(h => new FlashcardHistoryDto
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new FlashcardHistoryDto
                 {
-                    ItemId = h.ItemId,
-                    ActionType = h.ActionType,
-                    CreatedAt = h.CreatedAt
+                    ItemId = x.ItemId,
+                    FrontText = x.Item.FrontText ?? "",
+                    ActionType = x.ActionType,
+                    CreatedAt = x.CreatedAt
                 })
                 .ToListAsync();
         }

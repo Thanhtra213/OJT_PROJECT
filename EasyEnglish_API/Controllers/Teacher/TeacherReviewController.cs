@@ -34,5 +34,12 @@ namespace EasyEnglish_API.Controllers.Teacher
             var peding = await _score.GetListPending();
             return Ok(peding);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDetail(int id)
+        {
+            var result = await _score.GetDetail(id);
+            return Ok(result);
+        }
     }
 }

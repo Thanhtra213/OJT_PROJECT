@@ -5,6 +5,7 @@ import "./GameMatching.scss";
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 const GameMatching = ({ words = [], onFinish }) => {
+    console.log("words nhận được:", words);
     const [wordItems, setWordItems] = useState([]);
     const [meaningItems, setMeaningItems] = useState([]);
     const [selectedWord, setSelectedWord] = useState(null);
