@@ -1,6 +1,7 @@
 node_modules/
 front-end/node_modules/
 .vs/
+frontend/.env
 bin/
 obj/
 *.user
