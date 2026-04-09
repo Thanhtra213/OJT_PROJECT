@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.Data;
+using EasyEnglish_API.Data;
 using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,9 @@ namespace EasyEnglish_API.Repositories.AIExam
         {
             return await _db.AnswerAIReviews
                 .Include(r => r.Submission)
-                .ThenInclude(s => s.Prompt)
+                    .ThenInclude(s => s.Prompt)
+                .Include(r => r.Submission)
+                    .ThenInclude(s => s.User)
                 .Where(r => r.IsSentToTeacher)
                 .OrderByDescending(r => r.CreatedAt)
                 .Where(x => !x.AnswerTeacherReviews.Any())
