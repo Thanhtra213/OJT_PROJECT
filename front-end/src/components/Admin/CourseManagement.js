@@ -192,9 +192,6 @@ export function CourseManagement() {
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Chi tiết khóa học</h3>
-              <button className="action-button" onClick={handleCloseModal}>
-                <X size={20} />
-              </button>
             </div>
 
             <div className="modal-body-custom" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '10px' }}>

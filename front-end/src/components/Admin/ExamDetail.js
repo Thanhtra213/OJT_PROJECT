@@ -683,9 +683,9 @@ const ExamDetail = () => {
       <div className="management-header" style={{ marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <button className="secondary-button mb-3" onClick={() => navigate(-1)}>
-          <ArrowLeft size={16} /> 
-          <span>Quay lại danh sách</span>
-        </button>
+        <ArrowLeft size={16} /> 
+        <span>Quay lại danh sách</span>
+      </button>
           <h2 className="card-title" style={{ fontSize: '1.5rem', color: 'var(--primary)' }}>
             {quiz?.title || "Chi tiết bài kiểm tra"}
           </h2>
@@ -901,7 +901,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">{editingGroupIndex !== null ? "Sửa Group" : "Thêm Group"}</h3>
-              <button className="action-button" onClick={() => setShowGroupModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Yêu cầu (Instruction)</label>
@@ -923,7 +922,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" style={{ maxWidth: '800px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">{isEditingAsset ? "Sửa đoạn văn" : "Thêm đoạn văn (Text)"}</h3>
-              <button className="action-button" onClick={() => setShowTextAssetModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <textarea className="form-textarea" rows={12} placeholder="Dán nội dung đoạn văn bài đọc vào đây..." value={textAssetContent} onChange={(e) => setTextAssetContent(e.target.value)} style={{ fontSize: '1rem', lineHeight: 1.6 }} />
@@ -944,7 +942,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" style={{ maxWidth: '900px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Thêm câu hỏi vào Group {selectedGroupIndex !== null ? selectedGroupIndex + 1 : ""}</h3>
-              <button className="action-button" onClick={() => setShowImportModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom" style={{ maxHeight: '65vh', overflowY: 'auto', paddingRight: '10px' }}>
               {importQuestions.map((q, qIdx) => (
@@ -1005,7 +1002,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" style={{ maxWidth: '800px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Sửa câu hỏi</h3>
-              <button className="action-button" onClick={() => setShowEditModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -1053,7 +1049,6 @@ const ExamDetail = () => {
               <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#667eea' }}>
                 <Sparkles size={24} /> Tạo câu hỏi bằng AI
               </h3>
-              <button className="action-button" onClick={() => setShowAIModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <div style={{ background: 'rgba(102, 126, 234, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(102, 126, 234, 0.2)', marginBottom: '1.5rem', color: '#4c51bf', fontSize: '0.9rem', lineHeight: 1.6 }}>
@@ -1098,7 +1093,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title" style={{ color: '#ec4899' }}>❌ Thông báo Lỗi</h3>
-              <button className="action-button" onClick={() => setShowErrorModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-dark)' }}>{errorMessage}</p>
@@ -1116,7 +1110,6 @@ const ExamDetail = () => {
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title" style={{ color: '#ec4899' }}>⚠️ Xác nhận xóa</h3>
-              <button className="action-button" onClick={() => setShowDeleteModal(false)}><X size={20} /></button>
             </div>
             <div className="modal-body-custom">
               <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-dark)' }}>Bạn có chắc chắn muốn xóa câu hỏi này không? Hành động này không thể hoàn tác.</p>

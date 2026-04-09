@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash, Edit, X } from "lucide-react";
+import { Plus, Trash, Edit } from "lucide-react";
 import { getAllPlans, createPlan, updatePlan, deletePlan } from "../../middleware/admin/planAdminAPI";
 import "./admin-dashboard-styles.scss";
 
-export function VoucherManagement() {
+export function PlanManagement() {
   const [plans, setPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -35,7 +35,7 @@ export function VoucherManagement() {
       const data = await getAllPlans();
       setPlans(data || []);
     } catch (error) {
-      showPopup("Không thể tải danh sách gói đăng ký", "error");
+      showPopup("Không thể tải danh sách gói hội viên", "error");
     } finally {
       setIsLoading(false);
     }
@@ -48,12 +48,12 @@ export function VoucherManagement() {
     }
     try {
       await createPlan(newPlan);
-      showPopup("Tạo gói đăng ký thành công!", "success");
+      showPopup("Tạo gói hội viên thành công!", "success");
       setShowCreateModal(false);
       setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
       loadPlans();
     } catch (error) {
-      showPopup(error.response?.data?.message || error.message || "Lỗi khi tạo gói đăng ký", "error");
+      showPopup(error.response?.data?.message || error.message || "Lỗi khi tạo gói hội viên", "error");
     }
   };
 
@@ -76,7 +76,7 @@ export function VoucherManagement() {
     }
     try {
       await updatePlan(editingPlan.planID, newPlan);
-      showPopup("Cập nhật gói đăng ký thành công!", "success");
+      showPopup("Cập nhật gói hội viên thành công!", "success");
       setShowEditModal(false);
       setEditingPlan(null);
       setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
@@ -87,13 +87,13 @@ export function VoucherManagement() {
   };
 
   const handleDeletePlan = async (planId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa gói đăng ký này không?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa gói hội viên này không?")) return;
     try {
       await deletePlan(planId, false);
-      showPopup("Đã xóa gói đăng ký thành công", "success");
+      showPopup("Đã xóa gói hội viên thành công", "success");
       setPlans(plans.filter(p => p.planID !== planId));
     } catch (error) {
-      showPopup("Không thể xóa gói đăng ký", "error");
+      showPopup("Không thể xóa gói hội viên", "error");
     }
   };
 
@@ -108,14 +108,13 @@ export function VoucherManagement() {
     return (
       <div className="admin-loading-spinner">
         <div className="admin-spinner"></div>
-        <p>Đang tải dữ liệu gói đăng ký...</p>
+        <p>Đang tải dữ liệu gói hội viên...</p>
       </div>
     );
   }
 
   return (
     <div className="management-card">
-      {/* Toast Notification */}
       {toast.show && (
         <div style={{
           position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
@@ -127,15 +126,13 @@ export function VoucherManagement() {
         </div>
       )}
 
-      {/* HEADER */}
       <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý Gói Hội Viên</h2>
-          <p className="card-description">Tổng số: {plans.length} gói đăng ký trên hệ thống</p>
+          <p className="card-description">Tổng số: {plans.length} gói hội viên trên hệ thống</p>
         </div>
       </div>
 
-      {/* TOOLBAR */}
       <div className="management-header">
         <div style={{ flexGrow: 1 }}></div>
         <button onClick={() => setShowCreateModal(true)} className="primary-button">
@@ -144,7 +141,6 @@ export function VoucherManagement() {
         </button>
       </div>
 
-      {/* BẢNG DỮ LIỆU */}
       <div className="management-table-wrapper">
         <table className="management-table">
           <thead>
@@ -210,17 +206,11 @@ export function VoucherManagement() {
         </table>
       </div>
 
-      {/* ════════════════════════════════════════════
-          MODAL: TẠO MỚI / SỬA GÓI HỘI VIÊN
-      ════════════════════════════════════════════ */}
       {(showCreateModal || showEditModal) && (
         <div className="management-modal-overlay" onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title">{showEditModal ? "Chỉnh sửa gói" : "Tạo gói đăng ký mới"}</h3>
-              {/* <button className="action-button" onClick={() => { setShowCreateModal(false); setShowEditModal(false); }}>
-                <X size={20} />
-              </button> */}
+              <h3 className="modal-title">{showEditModal ? "Chỉnh sửa gói" : "Tạo gói hội viên mới"}</h3>
             </div>
             
             <div className="modal-body-custom">
@@ -306,4 +296,4 @@ export function VoucherManagement() {
   );
 }
 
-export default VoucherManagement;
+export default PlanManagement;
