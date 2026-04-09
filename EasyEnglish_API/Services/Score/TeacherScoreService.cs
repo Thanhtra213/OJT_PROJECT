@@ -1,4 +1,4 @@
-﻿using EasyEnglish_API.DTOs.Score;
+using EasyEnglish_API.DTOs.Score;
 using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Interfaces.Score;
 using EasyEnglish_API.Models;
@@ -54,10 +54,21 @@ namespace EasyEnglish_API.Services.Score
             var pending = await _ai.GetPendingForTeacherAsync();
             return pending.Select(x => new
             {
-                x.AireviewId,
+                AireviewId = x.AireviewId,
+                Category = x.Submission?.Prompt?.SkillType,
+                StudentName = x.Submission?.User?.Username,
+                StudentAnswer = string.IsNullOrEmpty(x.Submission?.AnswerText) ? x.Submission?.Transcript : x.Submission?.AnswerText,
+                AudioUrl = x.Submission?.AudioUrl,
+                Transcript = x.Submission?.Transcript,
+                AiScore = x.ScoreOverall,
+                ScoreOverall = 0,
+                AiFeedback = x.Feedback,
+                AiGrammar = x.ScoreGrammar,
+                AiLexical = x.ScoreLexical,
+                IsTeacherReviewed = false,
                 Prompt = new
                 {
-                    x.Submission.Prompt.Title
+                    Title = x.Submission?.Prompt?.Title
                 },
                 AIReview = new
                 {
