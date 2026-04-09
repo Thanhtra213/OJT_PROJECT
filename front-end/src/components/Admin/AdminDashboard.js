@@ -15,7 +15,7 @@ import { CourseManagement } from "./CourseManagement";
 import { ReviewManagement } from "./ReviewManagement";
 import { ExamManagement } from "./ExamManagement";
 import { FlashcardManagement } from "./FlashcardManagement";
-import { VoucherManagement } from "./VoucherManagement";
+import { PlanManagement } from "./PlanManagement";
 
 import { getDashboardOverview } from "../../middleware/admin/dashboardAdminAPI";
 import { getAllUsers, getStudents, getTeachers } from "../../middleware/admin/userManagementAPI";
@@ -202,7 +202,7 @@ export function AdminDashboard({ onClose }) {
     { id: "flashcard", icon: BookOpen, label: "Flashcard" },
     { id: "reviews", icon: Star, label: "Đánh giá" },
     { id: "exams", icon: Award, label: "Kiểm tra" },
-    { id: "vouchers", icon: Ticket, label: "Gói hội viên" },
+    { id: "plans", icon: Ticket, label: "Gói hội viên" },
   ];
 
   const renderContent = () => {
@@ -481,7 +481,7 @@ export function AdminDashboard({ onClose }) {
       case "reviews": return <ReviewManagement />;
       case "flashcard": return <FlashcardManagement />;
       case "exams": return <ExamManagement />;
-      case "vouchers": return <VoucherManagement />;
+      case "plans": return <PlanManagement />;
       default: return null;
     }
   };
