@@ -99,15 +99,24 @@ namespace EasyEnglish_API.Repositories.Quizs
 
             if (questionIds.Any())
             {
-                _db.Options.RemoveRange(_db.Options.Where(o => questionIds.Contains(o.QuestionId)));
-                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && questionIds.Contains(a.OwnerId)));
-                _db.Questions.RemoveRange(_db.Questions.Where(q => questionIds.Contains(q.QuestionId)));
+                var questionIdsStr = string.Join(",", questionIds);
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Answer] WHERE QuestionId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Option] WHERE QuestionId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Asset] WHERE OwnerType = 2 AND OwnerId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Question] WHERE QuestionId IN ({questionIdsStr})");
             }
 
             if (groupIds.Any())
             {
-                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 1 && groupIds.Contains(a.OwnerId)));
-                _db.QuestionGroups.RemoveRange(_db.QuestionGroups.Where(g => groupIds.Contains(g.GroupId)));
+                var groupIdsStr = string.Join(",", groupIds);
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Asset] WHERE OwnerType = 1 AND OwnerId IN ({groupIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [QuestionGroup] WHERE GroupId IN ({groupIdsStr})");
             }
 
             _db.Quizzes.Remove(quiz);
@@ -263,12 +272,19 @@ namespace EasyEnglish_API.Repositories.Quizs
 
             if (questionIds.Any())
             {
-                _db.Options.RemoveRange(_db.Options.Where(o => questionIds.Contains(o.QuestionId)));
-                _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && questionIds.Contains(a.OwnerId)));
-                _db.Questions.RemoveRange(_db.Questions.Where(q => questionIds.Contains(q.QuestionId)));
+                var questionIdsStr = string.Join(",", questionIds);
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Answer] WHERE QuestionId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Option] WHERE QuestionId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Asset] WHERE OwnerType = 2 AND OwnerId IN ({questionIdsStr})");
+                await _db.Database.ExecuteSqlRawAsync(
+                    $"DELETE FROM [Question] WHERE QuestionId IN ({questionIdsStr})");
             }
 
-            _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 1 && a.OwnerId == groupId));
+            await _db.Database.ExecuteSqlRawAsync(
+                $"DELETE FROM [Asset] WHERE OwnerType = 1 AND OwnerId = {groupId}");
             _db.QuestionGroups.Remove(group);
 
             await _db.SaveChangesAsync();
@@ -315,8 +331,13 @@ namespace EasyEnglish_API.Repositories.Quizs
             var question = await _db.Questions.FindAsync(questionId);
             if (question == null) return false;
 
-            _db.Options.RemoveRange(_db.Options.Where(o => o.QuestionId == questionId));
-            _db.Assets.RemoveRange(_db.Assets.Where(a => a.OwnerType == 2 && a.OwnerId == questionId));
+            await _db.Database.ExecuteSqlRawAsync(
+                $"DELETE FROM [Answer] WHERE QuestionId = {questionId}");
+
+            await _db.Database.ExecuteSqlRawAsync(
+                $"DELETE FROM [Option] WHERE QuestionId = {questionId}");
+            await _db.Database.ExecuteSqlRawAsync(
+                $"DELETE FROM [Asset] WHERE OwnerType = 2 AND OwnerId = {questionId}");
             _db.Questions.Remove(question);
 
             await _db.SaveChangesAsync();
