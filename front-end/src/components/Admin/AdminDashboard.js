@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   Users, BookOpen, Star, Award, Ticket, BarChart3,
   GraduationCap, DollarSign, X, CreditCard, Search,
-  Eye, CheckCircle, Clock, XCircle
+  Eye, CheckCircle, Clock, XCircle, Tag
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
@@ -16,6 +16,7 @@ import { ReviewManagement } from "./ReviewManagement";
 import { ExamManagement } from "./ExamManagement";
 import { FlashcardManagement } from "./FlashcardManagement";
 import { PlanManagement } from "./PlanManagement";
+import { VoucherManagement } from "./VoucherManagement"; // Đã thêm import Voucher
 
 import { getDashboardOverview } from "../../middleware/admin/dashboardAdminAPI";
 import { getAllUsers, getStudents, getTeachers } from "../../middleware/admin/userManagementAPI";
@@ -203,6 +204,7 @@ export function AdminDashboard({ onClose }) {
     { id: "reviews", icon: Star, label: "Đánh giá" },
     { id: "exams", icon: Award, label: "Kiểm tra" },
     { id: "plans", icon: Ticket, label: "Gói hội viên" },
+    { id: "vouchers", icon: Tag, label: "Mã giảm giá" }, // Đã thêm mục Mã giảm giá
   ];
 
   const renderContent = () => {
@@ -482,6 +484,7 @@ export function AdminDashboard({ onClose }) {
       case "flashcard": return <FlashcardManagement />;
       case "exams": return <ExamManagement />;
       case "plans": return <PlanManagement />;
+      case "vouchers": return <VoucherManagement />; // Đã liên kết component Voucher
       default: return null;
     }
   };
