@@ -140,10 +140,27 @@ const CreateEditCourse = () => {
     try {
       setIsLoading(true);
       const data = await getCourseById(id);
-      setCourse(data);
-      setCourseName(data.courseName);
-      setDescription(data.description);
-      setCourseLevel(data.courseLevel);
+      // Support both camelCase (default .NET JSON) and PascalCase
+      const normalized = {
+        courseID: data.courseID || data.CourseID,
+        courseName: data.courseName || data.CourseName || "",
+        description: data.description || data.Description || "",
+        courseLevel: data.courseLevel || data.CourseLevel || 1,
+        chapters: (data.chapters || data.Chapters || []).map(ch => ({
+          chapterID: ch.chapterID || ch.ChapterID,
+          chapterName: ch.chapterName || ch.ChapterName || "",
+          videos: (ch.videos || ch.Videos || []).map(v => ({
+            videoID: v.videoID || v.VideoID,
+            videoName: v.videoName || v.VideoName || "",
+            videoURL: v.videoURL || v.VideoURL || "",
+            isPreview: v.isPreview || v.IsPreview || false,
+          })),
+        })),
+      };
+      setCourse(normalized);
+      setCourseName(normalized.courseName);
+      setDescription(normalized.description);
+      setCourseLevel(normalized.courseLevel);
     } catch (err) {
       console.error("❌ Lỗi tải khóa học:", err);
       showErrorToast("Không thể tải thông tin khóa học. Vui lòng thử lại.");

@@ -39,7 +39,7 @@ const FlashcardItem = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({
     frontText: "",
-    phonetic: "",
+    ipa: "",
     backText: "",
     example: "",
   });
@@ -65,7 +65,7 @@ const FlashcardItem = () => {
   const handleShowAdd = () => {
     setModalMode("add");
     setSelectedItem(null);
-    setFormData({ frontText: "", phonetic: "", backText: "", example: "" });
+    setFormData({ frontText: "", ipa: "", backText: "", example: "" });
     setShowModal(true);
   };
 
@@ -73,10 +73,10 @@ const FlashcardItem = () => {
     setModalMode("edit");
     setSelectedItem(item);
     setFormData({
-      frontText: item.frontText || "",
-      phonetic: item.phonetic || "",
-      backText: item.backText || "",
-      example: item.example || "",
+      frontText: item.frontText || item.FrontText || "",
+      ipa: item.ipa || item.IPA || "",
+      backText: item.backText || item.BackText || "",
+      example: item.example || item.Example || "",
     });
     setShowModal(true);
   };
@@ -85,17 +85,19 @@ const FlashcardItem = () => {
     e.preventDefault();
 
     try {
+      // Map frontend formData fields to backend DTO fields
+      const payload = {
+        setID: parseInt(setId, 10),
+        frontText: formData.frontText,
+        backText: formData.backText,
+        IPA: formData.ipa,
+        example: formData.example,
+      };
       if (modalMode === "add") {
-        await createFlashcardItem({
-          ...formData,
-          setID: parseInt(setId, 10),
-        });
+        await createFlashcardItem(payload);
         setAlertMessage("✅ Đã thêm thẻ thành công!");
       } else {
-        await updateFlashcardItem(selectedItem.itemID, {
-          ...formData,
-          setID: parseInt(setId, 10),
-        });
+        await updateFlashcardItem(selectedItem.itemID || selectedItem.ItemID, payload);
         setAlertMessage("✅ Đã cập nhật thẻ thành công!");
       }
 
@@ -161,18 +163,18 @@ const FlashcardItem = () => {
               <Card className="flashcard-card shadow-sm border-0 rounded-3">
                 <Card.Body>
                   <h6 className="fw-bold">
-                    {item.frontText || "(Chưa có từ)"}
+                    {item.frontText || item.FrontText || "(Chưa có từ)"}
                   </h6>
-                  {item.phonetic && (
+                  {(item.ipa || item.IPA) && (
                     <p className="text-secondary small mb-1 fst-italic">
-                      /{item.phonetic}/
+                      /{item.ipa || item.IPA}/
                     </p>
                   )}
-                  <p className="text-muted mb-1">{item.backText}</p>
+                  <p className="text-muted mb-1">{item.backText || item.BackText}</p>
 
-                  {item.example && (
+                  {(item.example || item.Example) && (
                     <p className="fst-italic text-secondary small">
-                      💡 {item.example}
+                      💡 {item.example || item.Example}
                     </p>
                   )}
 
@@ -188,7 +190,7 @@ const FlashcardItem = () => {
                     <Button
                       size="sm"
                       variant="outline-danger"
-                      onClick={() => handleDelete(item.itemID)}
+                      onClick={() => handleDelete(item.itemID || item.ItemID)}
                     >
                       <FontAwesomeIcon icon={faTrashAlt} /> Xóa
                     </Button>
@@ -222,13 +224,13 @@ const FlashcardItem = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Phiên âm (Phonetic)</Form.Label>
+              <Form.Label>Phiên âm (IPA)</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Ví dụ: /ˈæp.əl/"
-                value={formData.phonetic}
+                value={formData.ipa}
                 onChange={(e) =>
-                  setFormData({ ...formData, phonetic: e.target.value })
+                  setFormData({ ...formData, ipa: e.target.value })
                 }
               />
             </Form.Group>
