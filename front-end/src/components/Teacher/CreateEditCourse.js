@@ -140,10 +140,27 @@ const CreateEditCourse = () => {
     try {
       setIsLoading(true);
       const data = await getCourseById(id);
-      setCourse(data);
-      setCourseName(data.courseName);
-      setDescription(data.description);
-      setCourseLevel(data.courseLevel);
+      // Support both camelCase (default .NET JSON) and PascalCase
+      const normalized = {
+        courseID: data.courseID || data.CourseID,
+        courseName: data.courseName || data.CourseName || "",
+        description: data.description || data.Description || "",
+        courseLevel: data.courseLevel || data.CourseLevel || 1,
+        chapters: (data.chapters || data.Chapters || []).map(ch => ({
+          chapterID: ch.chapterID || ch.ChapterID,
+          chapterName: ch.chapterName || ch.ChapterName || "",
+          videos: (ch.videos || ch.Videos || []).map(v => ({
+            videoID: v.videoID || v.VideoID,
+            videoName: v.videoName || v.VideoName || "",
+            videoURL: v.videoURL || v.VideoURL || "",
+            isPreview: v.isPreview || v.IsPreview || false,
+          })),
+        })),
+      };
+      setCourse(normalized);
+      setCourseName(normalized.courseName);
+      setDescription(normalized.description);
+      setCourseLevel(normalized.courseLevel);
     } catch (err) {
       console.error("❌ Lỗi tải khóa học:", err);
       showErrorToast("Không thể tải thông tin khóa học. Vui lòng thử lại.");
@@ -330,74 +347,76 @@ const CreateEditCourse = () => {
 
   return (
     <div className="edit-course-page">
-      {success && <div className="toast-notification success">{success}</div>}
-      {error && <div className="toast-notification error">{error}</div>}
+      <div className="edit-course-container">
+        {success && <div className="toast-notification success">{success}</div>}
+        {error && <div className="toast-notification error">{error}</div>}
 
-      <a href="#" onClick={(e) => { e.preventDefault(); navigate("/teacher/dashboard"); }} className="back-link">
-        <ChevronLeft size={18} />
-        Quay lại Dashboard
-      </a>
+        <a href="#" onClick={(e) => { e.preventDefault(); navigate("/teacher/dashboard"); }} className="back-link">
+          <ChevronLeft size={18} />
+          Quay lại Dashboard
+        </a>
 
-      <header className="page-header">
-        <h1 className="page-title">{isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}</h1>
-        <p className="page-description">{isEditMode ? "Cập nhật thông tin, chương và video cho khóa học của bạn." : "Điền thông tin cơ bản để tạo khóa học mới."}</p>
-      </header>
+        <header className="page-header">
+          <h1 className="page-title">{isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}</h1>
+          <p className="page-description">{isEditMode ? "Cập nhật thông tin, chương và video cho khóa học của bạn." : "Điền thông tin cơ bản để tạo khóa học mới."}</p>
+        </header>
 
-      <div className="edit-course-grid">
-        {/* Course Information Form */}
-        <div className="info-card">
-          <h3 className="card-header-title">Thông tin khóa học</h3>
-          <div className="form-content-wrapper">
-            <div className="form-group">
-              <label htmlFor="courseName">Tên khóa học</label>
-              <input id="courseName" type="text" className="form-input" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description">Mô tả</label>
-              <textarea id="description" className="form-textarea" rows="4" value={description} onChange={(e) => setDescription(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="courseLevel">Cấp độ</label>
-              <select id="courseLevel" className="form-select" value={courseLevel} onChange={(e) => setCourseLevel(e.target.value)}>
-                {[1, 2, 3, 4, 5].map(lv => <option key={lv} value={lv}>Level {lv}</option>)}
-              </select>
-            </div>
-            <div className="form-actions">
-              <button className="primary-button" onClick={handleSaveCourse}>
-                {isEditMode ? "Lưu thay đổi" : "Tạo khóa học & Tiếp tục"}
-              </button>
+        <div className="edit-course-grid">
+          {/* Course Information Form */}
+          <div className="info-card">
+            <h3 className="card-header-title">Thông tin khóa học</h3>
+            <div className="form-content-wrapper">
+              <div className="form-group">
+                <label htmlFor="courseName">Tên khóa học</label>
+                <input id="courseName" type="text" className="form-input" value={courseName} onChange={(e) => setCourseName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="description">Mô tả</label>
+                <textarea id="description" className="form-textarea" rows="4" value={description} onChange={(e) => setDescription(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="courseLevel">Cấp độ</label>
+                <select id="courseLevel" className="form-select" value={courseLevel} onChange={(e) => setCourseLevel(e.target.value)}>
+                  {[1, 2, 3, 4, 5].map(lv => <option key={lv} value={lv}>Level {lv}</option>)}
+                </select>
+              </div>
+              <div className="form-actions">
+                <button className="primary-button" onClick={handleSaveCourse}>
+                  {isEditMode ? "Lưu thay đổi" : "Tạo khóa học & Tiếp tục"}
+                </button>
+              </div>
             </div>
           </div>
+
+          {/* Course Content Management */}
+          {isEditMode && course && (
+            <div className="content-card">
+              <div className="card-header-title">
+                <h3>Nội dung khóa học</h3>
+                <button className="primary-button" onClick={handleAddChapterClick}>
+                  <Plus size={16} /> Thêm chương
+                </button>
+              </div>
+              <div className="chapter-accordion">
+                {course.chapters?.length > 0 ? (
+                  course.chapters.map((chapter) => (
+                    <ChapterAccordionItem
+                      key={chapter.chapterID}
+                      chapter={chapter}
+                      onEditChapter={handleEditChapterClick}
+                      onDeleteChapter={handleDeleteChapter}
+                      onAddVideo={handleAddVideoClick}
+                      onEditVideo={handleEditVideoClick}
+                      onDeleteVideo={handleDeleteVideo}
+                    />
+                  ))
+                ) : (
+                  <p className="text-center text-muted py-5">Khóa học này chưa có chương nào. Hãy thêm một chương để bắt đầu!</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Course Content Management */}
-        {isEditMode && course && (
-          <div className="content-card">
-            <div className="card-header-title">
-              <h3>Nội dung khóa học</h3>
-              <button className="primary-button" onClick={handleAddChapterClick}>
-                <Plus size={16} /> Thêm chương
-              </button>
-            </div>
-            <div className="chapter-accordion">
-              {course.chapters?.length > 0 ? (
-                course.chapters.map((chapter) => (
-                  <ChapterAccordionItem
-                    key={chapter.chapterID}
-                    chapter={chapter}
-                    onEditChapter={handleEditChapterClick}
-                    onDeleteChapter={handleDeleteChapter}
-                    onAddVideo={handleAddVideoClick}
-                    onEditVideo={handleEditVideoClick}
-                    onDeleteVideo={handleDeleteVideo}
-                  />
-                ))
-              ) : (
-                <p className="text-center text-muted py-5">Khóa học này chưa có chương nào. Hãy thêm một chương để bắt đầu!</p>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Chapter Modal */}

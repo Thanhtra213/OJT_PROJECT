@@ -134,9 +134,9 @@ export const updateFlashcardItem = async (itemId, data) => {
 };
 
 // 🔴 Xóa flashcard item theo itemId
-export const deleteFlashcardItem = async (itemId) => {
+export const deleteFlashcardItem = async (setId, itemId) => {
   try {
-    const res = await api.delete(`/item/${itemId}`, {
+    const res = await api.delete(`/item/${itemId}?setId=${setId}`, {
       headers: getAuthHeaders(),
     });
     console.log("📘 deleteFlashcardItem response:", res.data);

@@ -10,7 +10,7 @@ const SpeakingPractice = () => {
   const [audioBlob, setAudioBlob] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [message, setMessage] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const navigate = useNavigate();
@@ -71,19 +71,21 @@ const SpeakingPractice = () => {
     setAudioBlob(file);
   };
 
-  const handleSubmitClick = () => {
+  const handleFinalSubmit = async (sendToTeacher = false) => {
     if (!audioBlob || !prompt) return alert("Vui lòng ghi âm hoặc tải file trước khi nộp!");
-    setShowConfirm(true);
-  };
-
-  const handleConfirmSubmit = async (sendToTeacher) => {
-    setShowConfirm(false);
+    
     setLoading(true);
+    setMessage({ type: "info", text: "📤 Đang xử lý bài nói, vui lòng đợi..." });
     try {
       const data = await submitSpeakingAnswer(audioBlob, prompt.promptId, sendToTeacher);
       setResult(data);
+      if (sendToTeacher) {
+        setMessage({ type: "success", text: "✅ Bài nói đã được gửi cho giáo viên và AI đã chấm điểm xong!" });
+      } else {
+        setMessage({ type: "success", text: "✅ AI đã chấm điểm bài viết của bạn!" });
+      }
     } catch {
-      alert("Lỗi khi nộp bài. Vui lòng thử lại.");
+      setMessage({ type: "error", text: "❌ Gửi bài thất bại. Hãy thử lại." });
     } finally {
       setLoading(false);
     }
@@ -141,9 +143,32 @@ const SpeakingPractice = () => {
                 </label>
                 {audioURL && <audio controls src={audioURL} className="audio-player" />}
               </div>
-              <button onClick={handleSubmitClick} disabled={!audioBlob || loading} className="submit-btn">
-                {loading ? "Đang chấm..." : "Nộp bài"}
-              </button>
+              
+              <div className="speaking-submit-actions">
+                <button 
+                  onClick={() => handleFinalSubmit(false)} 
+                  disabled={!audioBlob || loading} 
+                  className="submit-btn ai-btn"
+                >
+                  {loading ? "Đang chấm..." : "Chấm điểm AI"}
+                </button>
+                
+                {result && (
+                  <button 
+                    onClick={() => handleFinalSubmit(true)} 
+                    disabled={loading} 
+                    className="submit-btn teacher-btn"
+                  >
+                    Gửi cho giáo viên
+                  </button>
+                )}
+              </div>
+
+              {message && (
+                <div className={`speaking-alert ${message.type}`}>
+                  {message.text}
+                </div>
+              )}
             </div>
           )}
 
@@ -180,22 +205,6 @@ const SpeakingPractice = () => {
         </div>
       </div>
 
-      {showConfirm && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
-            <h3>Send To Teacher?</h3>
-            <p>Bạn có muốn gửi bài nộp này cho giáo viên để nhận thêm nhận xét không?</p>
-            <div className="confirm-actions">
-              <button className="confirm-btn confirm-yes" onClick={() => handleConfirmSubmit(true)}>
-                Yes
-              </button>
-              <button className="confirm-btn confirm-no" onClick={() => handleConfirmSubmit(false)}>
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -12,7 +12,8 @@ import {
   Star,
   User,
   BookOpen,
-  Brain
+  Brain,
+  Volume2
 } from "lucide-react";
 import "./Reviews.scss";
 
@@ -25,13 +26,13 @@ export function TeacherReviewManagement() {
 
   const [formData, setFormData] = useState({
     aiReviewId: 0,
-    scoreOverall: 0,
-    scoreTask: 0,
-    scoreCoherence: 0,
-    scoreLexical: 0,
-    scoreGrammar: 0,
-    scorePronunciation: 0,
-    scoreFluency: 0,
+    scoreOverall: "",
+    scoreTask: "",
+    scoreCoherence: "",
+    scoreLexical: "",
+    scoreGrammar: "",
+    scorePronunciation: "",
+    scoreFluency: "",
     feedback: ""
   });
 
@@ -56,8 +57,19 @@ export function TeacherReviewManagement() {
   // Filter reviews based on sub-tab
   const filteredReviews = reviews.filter(item => {
     const category = (item.category || item.Category || "").toLowerCase();
-    const isSpeaking = category === "speaking" || !!item.audioUrl || !!item.AudioUrl || !!item.transcript || !!item.Transcript;
-    const isWriting = category === "writing" || category === "Writing" || (!isSpeaking);
+    let isSpeaking = category === "speaking";
+    let isWriting = category === "writing";
+
+    if (!category) {
+      // Differentiate based on unique fields to ensure older records are filtered correctly
+      if (item.audioUrl || item.AudioUrl || item.fluency !== undefined || item.Fluency !== undefined || item.pronunciation !== undefined || item.Pronunciation !== undefined) {
+        isSpeaking = true;
+        isWriting = false;
+      } else {
+        isWriting = true;
+        isSpeaking = false;
+      }
+    }
     
     if (activeSubTab === "Speaking") return isSpeaking;
     return isWriting;
@@ -67,14 +79,14 @@ export function TeacherReviewManagement() {
     setSelectedReview(review);
     setFormData({
       aiReviewId: review.aiReviewId || review.attemptId || review.id || 0,
-      scoreOverall: review.scoreOverall || review.score || review.autoScore || 0,
-      scoreTask: review.scoreTask || 0,
-      scoreCoherence: review.scoreCoherence || 0,
-      scoreLexical: review.scoreLexical || 0,
-      scoreGrammar: review.scoreGrammar || 0,
-      scorePronunciation: review.scorePronunciation || 0,
-      scoreFluency: review.scoreFluency || 0,
-      feedback: review.feedback || review.aiFeedback || ""
+      scoreOverall: "",
+      scoreTask: "",
+      scoreCoherence: "",
+      scoreLexical: "",
+      scoreGrammar: "",
+      scorePronunciation: "",
+      scoreFluency: "",
+      feedback: ""
     });
     setMessage({ text: "", type: "" });
   };
@@ -83,7 +95,7 @@ export function TeacherReviewManagement() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name !== "feedback" ? Number(value) : value
+      [name]: name !== "feedback" ? (value === "" ? "" : Number(value)) : value
     }));
   };
 
@@ -173,13 +185,26 @@ export function TeacherReviewManagement() {
                       </div>
                     </td>
                     <td>
-                      <div className="text-sm overflow-y-auto max-h-[100px] max-w-[400px] leading-relaxed pr-2 italic text-gray-700">
+                      <div className="text-sm overflow-y-auto max-h-[100px] max-w-[400px] leading-relaxed pr-2 text-gray-700">
                         {(() => {
+                          if (activeSubTab === "Speaking" && (item.audioUrl || item.AudioUrl)) {
+                            return (
+                              <div className="flex flex-col gap-2" style={{ minWidth: '250px' }}>
+                                <audio controls src={item.audioUrl || item.AudioUrl} className="w-full h-8" />
+                                {(item.transcript || item.Transcript) && (
+                                  <div className="text-xs text-gray-500 line-clamp-2 italic">
+                                    "{item.transcript || item.Transcript}"
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          }
+                          
                           const content = item.studentAnswer || item.StudentAnswer || item.answerText || item.AnswerText || item.transcript || item.content || item.answer || item.text || item.writingContent;
                           if (typeof content === 'object' && content !== null) {
-                            return content.answerText || content.AnswerText || content.transcript || content.text || 'Nội dung phức hợp';
+                            return <span className="italic">{content.answerText || content.AnswerText || content.transcript || content.text || 'Nội dung phức hợp'}</span>;
                           }
-                          return content || 'Nội dung trống';
+                          return <span className="italic">{content || 'Nội dung trống'}</span>;
                         })()}
                       </div>
                     </td>
@@ -246,9 +271,22 @@ export function TeacherReviewManagement() {
               <BookOpen size={18} /> Nội dung bài làm
             </h4>
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 min-h-[150px] whitespace-pre-wrap">
-              {selectedReview.studentAnswer || selectedReview.answerText || "Học viên chưa nộp nội dung bài làm."}
+              {selectedReview.studentAnswer || selectedReview.answerText || selectedReview.transcript || "Học viên chưa nộp nội dung bài làm."}
             </div>
           </div>
+
+          {(selectedReview.audioUrl || selectedReview.AudioUrl) && (
+            <div className="interactive-card p-4 border-l-4 border-blue-400">
+              <h4 className="flex items-center gap-2 text-blue-600 font-bold mb-3">
+                <Volume2 size={18} /> File ghi âm của học viên
+              </h4>
+              <audio 
+                src={selectedReview.audioUrl || selectedReview.AudioUrl} 
+                controls 
+                className="w-full"
+              />
+            </div>
+          )}
 
           <div className="interactive-card p-4 border-l-4 border-purple-400">
             <h4 className="flex items-center gap-2 text-purple-600 font-bold mb-3">
@@ -281,7 +319,7 @@ export function TeacherReviewManagement() {
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Tổng điểm (Overall)</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scoreOverall" value={formData.scoreOverall} onChange={handleInputChange}
                   className="form-input" required
                 />
@@ -289,41 +327,41 @@ export function TeacherReviewManagement() {
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Task Response</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scoreTask" value={formData.scoreTask} onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input" required
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Coherence</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scoreCoherence" value={formData.scoreCoherence} onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input" required
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Lexical Resource</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scoreLexical" value={formData.scoreLexical} onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input" required
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Grammar</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scoreGrammar" value={formData.scoreGrammar} onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input" required
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold mb-1 uppercase">Pronunciation</label>
                 <input 
-                  type="number" step="0.5" min="0" max="10"
+                  type="number" step="0.1" min="0" max="9"
                   name="scorePronunciation" value={formData.scorePronunciation} onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input" required
                 />
               </div>
             </div>
@@ -334,6 +372,7 @@ export function TeacherReviewManagement() {
                 name="feedback" value={formData.feedback} onChange={handleInputChange}
                 className="form-textarea w-full" rows="5"
                 placeholder="Viết nhận xét chi tiết cho học viên ở đây..."
+                required
               ></textarea>
             </div>
 

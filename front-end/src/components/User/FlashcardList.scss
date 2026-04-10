@@ -27,61 +27,61 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   padding: 2rem 0;
   color: $text-dark;
   .container { max-width: 1200px; }
-}
 
-// Back button
-.back-button {
-  display: inline-flex; align-items: center; gap: .5rem;
-  background: $white; border: 1.5px solid $border;
-  border-radius: $r-pill; padding: .5rem 1.2rem;
-  font-family: $font; font-weight: 700; font-size: .9rem;
-  color: $text-body; cursor: pointer;
-  box-shadow: $shadow-sm; transition: all $ease; margin-bottom: 2rem;
-  &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; }
-}
-
-// Page header
-.page-header {
-  text-align: center; margin-bottom: 3rem;
-  h1 { font-size: 2.25rem; font-weight: 900; color: $text-dark; letter-spacing: -.03em; margin-bottom: .75rem; }
-  .page-subtitle { font-size: 1rem; color: $text-muted; max-width: 600px; margin: 0 auto; font-weight: 600; }
-}
-
-// Loading & empty states
-.loading-container, .empty-state {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 4rem 2rem; text-align: center;
-  background: $white; border-radius: $r-card; border: 1.5px solid $border; box-shadow: $shadow-sm;
-  .spinner-border { width: 3rem; height: 3rem; color: $mint; }
-  .empty-icon { font-size: 3.5rem; color: $text-muted; margin-bottom: 1.5rem; }
-  p { font-size: 1rem; color: $text-muted; margin-top: 1rem; margin-bottom: 1.5rem; font-weight: 600; }
-}
-
-// Grid
-.sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-
-// Set card
-.set-card {
-  border: 1.5px solid $border; border-radius: $r-card;
-  background: $white; box-shadow: $shadow-sm;
-  transition: all $ease; cursor: pointer;
-  display: flex; flex-direction: column;
-  &:hover { transform: translateY(-5px); box-shadow: $shadow-hover; border-color: $mint-mid; }
-
-  .card-body { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
-
-  .card-icon-wrapper {
-    width: 48px; height: 48px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    background: $mint-light; color: $mint-dark; font-size: 1.5rem; margin-bottom: 1rem;
+  // Back button
+  .back-button {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: $white; border: 1.5px solid $border;
+    border-radius: $r-pill; padding: .5rem 1.2rem;
+    font-family: $font; font-weight: 700; font-size: .9rem;
+    color: $text-body; cursor: pointer;
+    box-shadow: $shadow-sm; transition: all $ease; margin-bottom: 2rem;
+    &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; }
   }
 
-  .card-title { font-size: 1.1rem; font-weight: 800; color: $text-dark; margin-bottom: .5rem; }
-  .card-text { color: $text-muted; font-size: .9rem; flex-grow: 1; margin-bottom: 1rem; line-height: 1.55; }
+  // Page header
+  .page-header {
+    text-align: center; margin-bottom: 3rem;
+    h1 { font-size: 2.25rem; font-weight: 900; color: $text-dark; letter-spacing: -.03em; margin-bottom: .75rem; }
+    .page-subtitle { font-size: 1rem; color: $text-muted; max-width: 600px; margin: 0 auto; font-weight: 600; }
+  }
 
-  .card-footer-info {
-    margin-top: auto; padding-top: 1rem;
-    border-top: 1px solid $border;
-    font-size: .88rem; color: $text-muted; font-weight: 600;
+  // Loading & empty states
+  .loading-container, .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 4rem 2rem; text-align: center;
+    background: $white; border-radius: $r-card; border: 1.5px solid $border; box-shadow: $shadow-sm;
+    .spinner-border { width: 3rem; height: 3rem; color: $mint; }
+    .empty-icon { font-size: 3.5rem; color: $text-muted; margin-bottom: 1.5rem; }
+    p { font-size: 1rem; color: $text-muted; margin-top: 1rem; margin-bottom: 1.5rem; font-weight: 600; }
+  }
+
+  // Grid
+  .sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+
+  // Set card
+  .set-card {
+    border: 1.5px solid $border; border-radius: $r-card;
+    background: $white; box-shadow: $shadow-sm;
+    transition: all $ease; cursor: pointer;
+    display: flex; flex-direction: column;
+    &:hover { transform: translateY(-5px); box-shadow: $shadow-hover; border-color: $mint-mid; }
+
+    .card-body { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+
+    .card-icon-wrapper {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      background: $mint-light; color: $mint-dark; font-size: 1.5rem; margin-bottom: 1rem;
+    }
+
+    .card-title { font-size: 1.1rem; font-weight: 800; color: $text-dark; margin-bottom: .5rem; }
+    .card-text { color: $text-muted; font-size: .9rem; flex-grow: 1; margin-bottom: 1rem; line-height: 1.55; }
+
+    .card-footer-info {
+      margin-top: auto; padding-top: 1rem;
+      border-top: 1px solid $border;
+      font-size: .88rem; color: $text-muted; font-weight: 600;
+    }
   }
 }

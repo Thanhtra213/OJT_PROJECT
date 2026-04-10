@@ -234,7 +234,7 @@ const CourseDetail = () => {
               <div className="course-info-form-group">
                 <label>Mô tả</label>
                 <div className="course-form-control-static course-textarea">
-                  {course?.description || "Chưa có mô tả"}
+                  {course?.description || course?.Description || "Chưa có mô tả"}
                 </div>
               </div>
 
