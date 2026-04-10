@@ -23,6 +23,12 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
   min-height: 100vh;
   overflow-x: hidden;
 
+  .edit-course-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
   .back-link {
     display: inline-flex;
     align-items: center;
@@ -167,6 +173,13 @@ $transition-main: 0.22s cubic-bezier(.4, 0, .2, 1);
       font-size: 1.5rem;
       font-weight: 800;
       color: $course-text;
+    }
+
+    .primary-button {
+      min-height: 40px;
+      padding: 0.6rem 1rem;
+      font-size: 0.92rem;
+      border-radius: 12px;
     }
   }
 

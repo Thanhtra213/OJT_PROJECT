@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Plus, 
-  Send, 
-  X, 
-  PenTool, 
-  BookOpen, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  Plus,
+  Send,
+  X,
+  PenTool,
+  BookOpen,
+  CheckCircle,
+  AlertCircle,
   Trophy,
   MessageCircle,
   FileText,
@@ -84,10 +84,10 @@ const WritingPractice = () => {
       setLoading(true);
       setShowConfirm(false);
       setMessage({ type: "info", text: "📤 Đang xử lý bài viết, vui lòng đợi..." });
-      
+
       const res = await submitWriting(selected.promptId, writing, sendToTeacher);
       setFeedback(res);
-      
+
       if (sendToTeacher) {
         setMessage({ type: "success", text: "✅ Bài viết đã được gửi cho giáo viên và AI đã chấm điểm xong!" });
       } else {
@@ -172,9 +172,11 @@ const WritingPractice = () => {
                 </div>
               ) : (
                 <div className="card-placeholder">
-                  <div className="skeleton-line" />
-                  <div className="skeleton-line mid" />
-                  <div className="skeleton-line short" />
+                  <div className="skeleton-group">
+                    <div className="skeleton-line" />
+                    <div className="skeleton-line mid" />
+                    <div className="skeleton-line short" />
+                  </div>
                   <p>Hãy nhấn "Tạo đề AI" để bắt đầu bài luyện tập mới</p>
                 </div>
               )}
@@ -209,7 +211,7 @@ const WritingPractice = () => {
                   )}
                 </div>
               </div>
-              
+
               <textarea
                 className="writing-textarea"
                 placeholder="Trình bày bài luận của bạn tại đây..."
@@ -221,9 +223,9 @@ const WritingPractice = () => {
               <div className="editor-footer">
                 {selected && (
                   <>
-                    <button 
-                      className="btn-text" 
-                      onClick={() => setSelected(null)} 
+                    <button
+                      className="btn-text"
+                      onClick={() => setSelected(null)}
                       disabled={loading}
                     >
                       Chọn đề khác
@@ -262,7 +264,7 @@ const WritingPractice = () => {
                 <MessageCircle size={18} />
                 <h3>Kết quả & Feedback</h3>
               </div>
-              
+
               {feedback ? (
                 <div className="feedback-body">
                   <div className="overall-score">
@@ -273,19 +275,19 @@ const WritingPractice = () => {
                   <div className="sub-scores">
                     <div className="sub-item">
                       <span>Task: {feedback.taskResponse}</span>
-                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.taskResponse * 10}%`}} /></div>
+                      <div className="mini-bar"><div className="fill" style={{ width: `${feedback.taskResponse * 10}%` }} /></div>
                     </div>
                     <div className="sub-item">
                       <span>Coherence: {feedback.coherence}</span>
-                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.coherence * 10}%`}} /></div>
+                      <div className="mini-bar"><div className="fill" style={{ width: `${feedback.coherence * 10}%` }} /></div>
                     </div>
                     <div className="sub-item">
                       <span>Lexical: {feedback.lexicalResource}</span>
-                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.lexicalResource * 10}%`}} /></div>
+                      <div className="mini-bar"><div className="fill" style={{ width: `${feedback.lexicalResource * 10}%` }} /></div>
                     </div>
                     <div className="sub-item">
                       <span>Grammar: {feedback.grammar}</span>
-                      <div className="mini-bar"><div className="fill" style={{width: `${feedback.grammar * 10}%`}} /></div>
+                      <div className="mini-bar"><div className="fill" style={{ width: `${feedback.grammar * 10}%` }} /></div>
                     </div>
                   </div>
 
@@ -310,10 +312,10 @@ const WritingPractice = () => {
                   <h3>Chi tiết nhận xét</h3>
                 </div>
                 <div className="feedback-text-area">
-                   <p className="text-sm text-gray-600 line-clamp-6">
-                     {typeof feedback.feedback === 'string' ? feedback.feedback : "Xem nhận xét chi tiết bên dưới."}
-                   </p>
-                   <button className="btn-link">Xem đầy đủ <ChevronRight size={14}/></button>
+                  <p className="text-sm text-gray-600 line-clamp-6">
+                    {typeof feedback.feedback === 'string' ? feedback.feedback : "Xem nhận xét chi tiết bên dưới."}
+                  </p>
+                  <button className="btn-link">Xem đầy đủ <ChevronRight size={14} /></button>
                 </div>
               </div>
             )}

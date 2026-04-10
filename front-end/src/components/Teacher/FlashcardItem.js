@@ -39,6 +39,7 @@ const FlashcardItem = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({
     frontText: "",
+    phonetic: "",
     backText: "",
     example: "",
   });
@@ -64,7 +65,7 @@ const FlashcardItem = () => {
   const handleShowAdd = () => {
     setModalMode("add");
     setSelectedItem(null);
-    setFormData({ frontText: "", backText: "", example: "" });
+    setFormData({ frontText: "", phonetic: "", backText: "", example: "" });
     setShowModal(true);
   };
 
@@ -73,6 +74,7 @@ const FlashcardItem = () => {
     setSelectedItem(item);
     setFormData({
       frontText: item.frontText || "",
+      phonetic: item.phonetic || "",
       backText: item.backText || "",
       example: item.example || "",
     });
@@ -90,7 +92,10 @@ const FlashcardItem = () => {
         });
         setAlertMessage("✅ Đã thêm thẻ thành công!");
       } else {
-        await updateFlashcardItem(selectedItem.itemID, formData);
+        await updateFlashcardItem(selectedItem.itemID, {
+          ...formData,
+          setID: parseInt(setId, 10),
+        });
         setAlertMessage("✅ Đã cập nhật thẻ thành công!");
       }
 
@@ -106,7 +111,7 @@ const FlashcardItem = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa thẻ này không?")) return;
 
     try {
-      await deleteFlashcardItem(itemId);
+      await deleteFlashcardItem(setId, itemId);
       setAlertMessage("🗑️ Đã xóa thẻ thành công!");
       const updatedSet = await getFlashcardSetById(setId);
       setSetData(updatedSet);
@@ -158,7 +163,11 @@ const FlashcardItem = () => {
                   <h6 className="fw-bold">
                     {item.frontText || "(Chưa có từ)"}
                   </h6>
-
+                  {item.phonetic && (
+                    <p className="text-secondary small mb-1 fst-italic">
+                      /{item.phonetic}/
+                    </p>
+                  )}
                   <p className="text-muted mb-1">{item.backText}</p>
 
                   {item.example && (
@@ -209,6 +218,18 @@ const FlashcardItem = () => {
                   setFormData({ ...formData, frontText: e.target.value })
                 }
                 required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Phiên âm (Phonetic)</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Ví dụ: /ˈæp.əl/"
+                value={formData.phonetic}
+                onChange={(e) =>
+                  setFormData({ ...formData, phonetic: e.target.value })
+                }
               />
             </Form.Group>
 
