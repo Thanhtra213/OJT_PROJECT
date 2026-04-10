@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import { getCourses } from "../../middleware/courseAPI";
 import { checkMembership } from "../../middleware/membershipAPI";
+import { getReviewList, getReviewDetail, getPlacementTests, isSpeakingSubmission } from "../../middleware/practiceReviewAPI";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrophy, faFire, faBookOpen, faCheckCircle, faClock,
@@ -61,7 +62,13 @@ const Home = () => {
   const [courses,           setCourses]           = useState([]);
   const [attempts,          setAttempts]          = useState([]);
   const [dbLessonHistory, setDbLessonHistory] = useState([]);
+  // ── Review tab state ─────────────────────────────────────────────────────
+  const [reviewList,        setReviewList]        = useState([]);
+  const [placementTests,    setPlacementTests]    = useState([]);
+  const [reviewLoading,     setReviewLoading]     = useState(false);
+  const [reviewDetail,      setReviewDetail]      = useState(null); // full detail object
   const navigate = useNavigate();
+
 
   const emptyData = {
     user:  { name:"Student", xp:0, streak:0, level:1, progress:0 },
@@ -214,12 +221,25 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[activeTab]);
 
+  useEffect(()=>{
+    if(activeTab!=="review") return;
+    setReviewLoading(true);
+    Promise.all([
+      getReviewList().catch(()=>[]),
+      getPlacementTests().catch(()=>[]),
+    ]).then(([list,tests])=>{
+      setReviewList(list);
+      setPlacementTests(tests);
+    }).finally(()=>setReviewLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[activeTab]);
+
   // ── UI ────────────────────────────────────────────────────────────────────
   const tabs = [
     {id:"luyentap",label:"Luyện tập"},
     {id:"khoahoc", label:"Khóa học"},
     {id:"baihoc",  label:"Lịch sử xem"},
-    {id:"thongke", label:"Thống kê"},
+    {id:"review", label:"Đánh giá & Review"},
   ];
   const filterLevels = [
     {id:"all",label:"Tất cả"},
@@ -539,93 +559,306 @@ const Home = () => {
             )}
 
             {/* ═══════════════════════════════════════════════════════════ */}
-            {/* TAB: Thống kê                                              */}
+            {/* TAB: Review & Placement Test                               */}
             {/* ═══════════════════════════════════════════════════════════ */}
-            {activeTab==="thongke"&&(
-              <div className="new-stats-section">
-                <h4>Tổng quan thành tích</h4>
-                <Row className="g-3">
-                  {[
-                    {title:"Cấp độ hiện tại",   icon:faGraduationCap, color:"#00c896", bg:"#e6faf4", value:statsData?.khoahoc?.currentLevel||"Level 1", label:`${statsData?.khoahoc?.xpToNext||0} XP để lên cấp`},
-                    {title:"Chuỗi ngày học",     icon:faFire,          color:"#f97316", bg:"#fff7ed", value:`${streakDays} ngày`,                          label:statsData?.streak?.message||"Bắt đầu học ngay!"},
-                    {title:"Bài làm hoàn thành", icon:faCheckCircle,   color:"#10b981", bg:"#ecfdf5", value:statsData?.luyentap?.lessonsCompleted||0,       label:`Điểm TB: ${statsData?.luyentap?.averageScore||"0%"}`},
-                    {title:"Thời gian học",      icon:faClock,         color:"#3b82f6", bg:"#eff6ff", value:statsData?.timeSpent?.time||"0h 0m",            label:statsData?.timeSpent?.times||"Tuần này"},
-                  ].map((s,i)=>(
-                    <Col md={6} lg={3} key={i}>
-                      <div className="stat-overview-card">
-                        <div className="icon-wrapper" style={{backgroundColor:s.bg}}>
-                          <FontAwesomeIcon icon={s.icon} className="stat-icon" style={{color:s.color}}/>
+            {activeTab==="review"&&(
+              <div className="review-section" style={{ padding: "1.5rem 0" }}>
+
+                {reviewLoading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border" style={{color:"#00c896"}} role="status"><span className="visually-hidden">Loading...</span></div>
+                    <p style={{color:"#374151",fontWeight:600,marginTop:"1rem"}}>Đang tải dữ liệu review...</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* ─── Header ─────────────────── */}
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <h4 style={{fontWeight:800}}>Phản hồi từ Giáo viên</h4>
+                      <Badge bg="success" style={{padding:'.5rem .8rem',borderRadius:'8px'}}>
+                        {reviewList.filter(s=>s.isTeacherReviewed).length} bài đã chấm
+                      </Badge>
+                    </div>
+
+                    {/* ─── 2 column cards (dynamic from reviewList) ─── */}
+                    {(()=>{
+                      const writingList  = reviewList.filter(s => !isSpeakingSubmission(s));
+                      const speakingList = reviewList.filter(s =>  isSpeakingSubmission(s));
+
+                      const openDetail = async (sub, type) => {
+                        setReviewDetail({ _loading: true, _meta: sub, _type: type });
+                        try {
+                          const d = await getReviewDetail(sub.submissionId);
+                          setReviewDetail({ ...d, _meta: sub, _type: type });
+                        } catch {
+                          setReviewDetail({ _error: true, _meta: sub, _type: type });
+                        }
+                      };
+
+                      const renderCard = (list, type) => {
+                        const isSpeak = type === 'speaking';
+                        const accent  = isSpeak ? '#ec4899' : '#f97316';
+                        const bg      = isSpeak ? '#fdf2f8' : '#fff7ed';
+                        const brdr    = isSpeak ? '#fce7f3' : '#d1fae5';
+                        const icon    = isSpeak ? faMicrophone : faPencilAlt;
+                        return (
+                          <Col md={12} lg={6} key={type}>
+                            <Card className="detail-card h-100" style={{borderTop:`4px solid ${accent}`}}>
+                              <Card.Body>
+                                <div className="d-flex align-items-center mb-4">
+                                  <div style={{background:bg,padding:'12px',borderRadius:'12px',marginRight:'12px'}}>
+                                    <FontAwesomeIcon icon={icon} size="lg" style={{color:accent}} />
+                                  </div>
+                                  <div>
+                                    <h5 className="mb-0" style={{fontWeight:800}}>{isSpeak ? 'Kỹ năng Nói (Speaking)' : 'Kỹ năng Viết (Writing)'}</h5>
+                                    <small className="text-muted">{list.length} bài đã nộp</small>
+                                  </div>
+                                </div>
+
+                                {list.length === 0 ? (
+                                  <div className="text-center py-4" style={{color:'#9ca3af'}}>
+                                    <FontAwesomeIcon icon={icon} size="2x" className="mb-2" />
+                                    <p>Bạn chưa nộp bài {isSpeak?'Speaking':'Writing'} nào.<br/>Vào mục <strong>Luyện tập</strong> để bắt đầu!</p>
+                                  </div>
+                                ) : (
+                                  list.slice(0, 3).map(sub => (
+                                    <div key={sub.submissionId}
+                                      className="p-3 mb-3"
+                                      style={{background: sub.isTeacherReviewed?'#fff':'#f9fafb', borderRadius:'12px',
+                                        border:`1px solid ${sub.isTeacherReviewed?brdr:'#e5e7eb'}`,
+                                        cursor:'pointer', transition:'all .2s'}}
+                                      onClick={()=>openDetail(sub, type)}
+                                      onMouseEnter={e=>e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'}
+                                      onMouseLeave={e=>e.currentTarget.style.boxShadow='none'}
+                                    >
+                                      <div className="d-flex justify-content-between align-items-start mb-1">
+                                        <strong style={{color:'#111827',fontSize:'.93rem'}}>{sub.prompt?.title || (isSpeak?'Speaking Task':'Writing Task')}</strong>
+                                        {sub.isTeacherReviewed
+                                          ? <Badge bg="success">Đã chấm</Badge>
+                                          : <Badge bg="secondary">AI chấm</Badge>}
+                                      </div>
+                                      <div className="d-flex gap-3 mt-1 align-items-center">
+                                        <small style={{color:'#6b7280'}}>
+                                          <FontAwesomeIcon icon={faStar} style={{color:'#f59e0b',marginRight:4}}/>
+                                          Điểm: {sub.scoreOverall ?? '—'}
+                                        </small>
+                                        <small className="text-muted ms-auto">{fmtVN(sub.createdAt)}</small>
+                                      </div>
+                                    </div>
+                                  ))
+                                )}
+
+                                {list.length > 3 && (
+                                  <Button
+                                    variant={isSpeak ? 'outline-danger' : 'outline-warning'}
+                                    className="w-100 mt-2"
+                                    style={{borderRadius:'10px',fontWeight:600,
+                                      color:isSpeak?'#db2777':'#d97706',
+                                      borderColor:isSpeak?'#db2777':'#d97706'}}
+                                    onClick={()=>setReviewDetail({_listMode:true,_type:type,_list:list})}>
+                                    Xem tất cả {list.length} bài {isSpeak?'Nói':'Viết'}
+                                  </Button>
+                                )}
+                              </Card.Body>
+                            </Card>
+                          </Col>
+                        );
+                      };
+
+                      return (
+                        <Row className="g-4 mb-5">
+                          {renderCard(writingList, 'writing')}
+                          {renderCard(speakingList, 'speaking')}
+                        </Row>
+                      );
+                    })()}
+
+
+            {/* ─── Review Detail Modal (real API shape) ─── */}
+            <Modal show={!!reviewDetail} onHide={()=>setReviewDetail(null)} size="lg" centered>
+              <Modal.Header closeButton style={{background:reviewDetail?._type==="speaking"?'#fdf2f8':'#fff7ed',borderBottom:'2px solid #e5e7eb'}}>
+                <Modal.Title style={{fontWeight:800}}>
+                  <FontAwesomeIcon
+                    icon={reviewDetail?._type==="speaking"?faMicrophone:faPencilAlt}
+                    style={{color:reviewDetail?._type==="speaking"?'#ec4899':'#f97316',marginRight:10}}/>
+                  {reviewDetail?._listMode
+                    ? `Tất cả bài ${reviewDetail._type==="speaking"?'Speaking':'Writing'}`
+                    : (reviewDetail?.prompt?.title || reviewDetail?._meta?.prompt?.title || 'Chi tiết bài nộp')}
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body style={{maxHeight:'70vh',overflowY:'auto'}}>
+                {reviewDetail?._loading && (
+                  <div className="text-center py-5">
+                    <div className="spinner-border" style={{color:'#00c896'}} role="status"/>
+                    <p className="mt-3">Đang tải chi tiết...</p>
+                  </div>
+                )}
+                {reviewDetail?._error && (
+                  <div className="text-center py-5 text-danger">Không thể tải dữ liệu. Vui lòng thử lại.</div>
+                )}
+                {reviewDetail?._listMode && (
+                  <div>
+                    {(reviewDetail._list||[]).map(sub=>{
+                      const openDetail = async () => {
+                        setReviewDetail({_loading:true,_meta:sub,_type:reviewDetail._type});
+                        try{
+                          const d = await getReviewDetail(sub.submissionId);
+                          setReviewDetail({...d,_meta:sub,_type:reviewDetail._type});
+                        }catch{ setReviewDetail({_error:true,_meta:sub,_type:reviewDetail._type}); }
+                      };
+                      return (
+                        <div key={sub.submissionId} className="p-3 mb-3"
+                          style={{background:'#f9fafb',borderRadius:'12px',border:'1px solid #e5e7eb',cursor:'pointer'}}
+                          onClick={openDetail}>
+                          <div className="d-flex justify-content-between align-items-start">
+                            <strong>{sub.prompt?.title||'Task'}</strong>
+                            {sub.isTeacherReviewed?<Badge bg="success">Đã chấm</Badge>:<Badge bg="secondary">AI chấm</Badge>}
+                          </div>
+                          <small className="text-muted">{fmtVN(sub.createdAt)} • Điểm: {sub.scoreOverall??'—'}</small>
                         </div>
-                        <h6 className="stat-title">{s.title}</h6>
-                        <p className="stat-value">{s.value}</p>
-                        <p className="stat-label">{s.label}</p>
+                      );
+                    })}
+                  </div>
+                )}
+                {reviewDetail && !reviewDetail._loading && !reviewDetail._error && !reviewDetail._listMode && (
+                  <div>
+                    <div className="d-flex gap-2 mb-3 flex-wrap">
+                      {reviewDetail.teacherReview
+                        ? <Badge bg="success" style={{padding:'.4rem .7rem'}}>Đã chấm bởi Giáo viên</Badge>
+                        : <Badge bg="secondary" style={{padding:'.4rem .7rem'}}>AI chấm</Badge>}
+                      <Badge bg="light" text="dark" style={{padding:'.4rem .7rem',border:'1px solid #e5e7eb'}}>
+                        Nộp lúc: {fmtVN(reviewDetail._meta?.createdAt)}
+                      </Badge>
+                    </div>
+
+                    {reviewDetail.prompt && (
+                      <div className="mb-3 p-3" style={{background:'#f0f9ff',borderRadius:'10px',borderLeft:'3px solid #3b82f6'}}>
+                        <strong style={{color:'#1e40af'}}>Đề bài:</strong>
+                        <p className="mb-0 mt-1" style={{color:'#374151',whiteSpace:'pre-wrap'}}>{reviewDetail.prompt.content}</p>
                       </div>
-                    </Col>
-                  ))}
-                </Row>
+                    )}
 
-                <Row className="g-3 mt-1">
-                  <Col md={12} lg={6}>
-                    <Card className="detail-card h-100">
-                      <Card.Body>
-                        <h5>Mục tiêu hàng tuần</h5>
-                        <p className="text-muted">Duy trì đà học tập của bạn!</p>
-                        <div className="weekly-goal-item mb-3">
-                          <div className="d-flex justify-content-between mb-2">
-                            <span>Hoàn thành bài làm</span>
-                            <span style={{fontWeight:800,color:"#00a87c"}}>{statsData?.weeklyGoal?.lessons?.completed||0}/{statsData?.weeklyGoal?.lessons?.total||7}</span>
-                          </div>
-                          <ProgressBar now={((statsData?.weeklyGoal?.lessons?.completed||0)/(statsData?.weeklyGoal?.lessons?.total||7))*100} className="custom-progress-bar"/>
-                        </div>
-                        <div className="weekly-goal-item">
-                          <div className="d-flex justify-content-between mb-2">
-                            <span>Thời gian học</span>
-                            <span style={{fontWeight:800,color:"#00a87c"}}>{statsData?.weeklyGoal?.studyTime?.completed||0}/{statsData?.weeklyGoal?.studyTime?.total||300} {statsData?.weeklyGoal?.studyTime?.unit||"min"}</span>
-                          </div>
-                          <ProgressBar now={((statsData?.weeklyGoal?.studyTime?.completed||0)/(statsData?.weeklyGoal?.studyTime?.total||300))*100} className="custom-progress-bar"/>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
+                    {(reviewDetail.answer?.transcript || reviewDetail.answer?.answerText) && (
+                      <div className="mb-3 p-3" style={{background:'#f9fafb',borderRadius:'10px',border:'1px solid #e5e7eb'}}>
+                        <strong>Bài làm / Transcript:</strong>
+                        <p className="mb-0 mt-2" style={{whiteSpace:'pre-wrap',color:'#374151',fontSize:'.87rem',maxHeight:'160px',overflowY:'auto'}}>
+                          {reviewDetail.answer.transcript || reviewDetail.answer.answerText}
+                        </p>
+                      </div>
+                    )}
 
-                  <Col md={12} lg={6}>
-                    <Card className="detail-card h-100">
-                      <Card.Body className="d-flex flex-column">
-                        <div className="d-flex align-items-center justify-content-between mb-3">
+                    {reviewDetail.aiReview && (
+                      <div className="mb-3">
+                        <h6 style={{fontWeight:800,color:'#f97316',marginBottom:'10px'}}>Điểm AI chấm</h6>
+                        <Row className="g-2">
+                          {[
+                            {label:'Overall',       v:reviewDetail.aiReview.scoreOverall,      color:'#f59e0b'},
+                            {label:'Fluency',        v:reviewDetail.aiReview.scoreFluency,       color:'#3b82f6'},
+                            {label:'Lexical',        v:reviewDetail.aiReview.scoreLexical,       color:'#8b5cf6'},
+                            {label:'Grammar',        v:reviewDetail.aiReview.scoreGrammar,       color:'#10b981'},
+                            {label:'Pronunciation',  v:reviewDetail.aiReview.scorePronunciation, color:'#ec4899'},
+                            {label:'Coherence',      v:reviewDetail.aiReview.scoreCoherence,     color:'#06b6d4'},
+                          ].filter(s=>s.v!=null).map((s,i)=>(
+                            <Col xs={6} md={4} key={i}>
+                              <div style={{background:'#f9fafb',borderRadius:'10px',padding:'10px',textAlign:'center',border:`2px solid ${s.color}30`}}>
+                                <div style={{fontSize:'1.4rem',fontWeight:900,color:s.color}}>{s.v}</div>
+                                <div style={{fontSize:'.78rem',color:'#6b7280'}}>{s.label}</div>
+                              </div>
+                            </Col>
+                          ))}
+                        </Row>
+                        {reviewDetail.aiReview.feedback && (
+                          <div className="mt-3 p-3" style={{background:'#fff7ed',borderRadius:'10px',borderLeft:'3px solid #f97316'}}>
+                            <strong style={{color:'#c2410c'}}>Nhận xét AI:</strong>
+                            <p className="mb-0 mt-1" style={{color:'#374151',whiteSpace:'pre-wrap'}}>{reviewDetail.aiReview.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {reviewDetail.teacherReview && (
+                      <div className="mt-2">
+                        <h6 style={{fontWeight:800,color:'#10b981',marginBottom:'10px'}}>Nhận xét của Giáo viên</h6>
+                        <Row className="g-2 mb-3">
+                          {[
+                            {label:'Overall',       v:reviewDetail.teacherReview.scoreOverall,      color:'#f59e0b'},
+                            {label:'Task',          v:reviewDetail.teacherReview.scoreTask,          color:'#3b82f6'},
+                            {label:'Lexical',       v:reviewDetail.teacherReview.scoreLexial,        color:'#8b5cf6'},
+                            {label:'Grammar',       v:reviewDetail.teacherReview.scoreGrammar,       color:'#10b981'},
+                            {label:'Pronunciation', v:reviewDetail.teacherReview.scorePronunciation, color:'#ec4899'},
+                            {label:'Fluency',       v:reviewDetail.teacherReview.scoreFluency,       color:'#3b82f6'},
+                            {label:'Coherence',     v:reviewDetail.teacherReview.scoreCoherence,     color:'#06b6d4'},
+                          ].filter(s=>s.v!=null&&s.v!==0).map((s,i)=>(
+                            <Col xs={6} md={4} key={i}>
+                              <div style={{background:'#f0fdf4',borderRadius:'10px',padding:'10px',textAlign:'center',border:`2px solid ${s.color}30`}}>
+                                <div style={{fontSize:'1.4rem',fontWeight:900,color:s.color}}>{s.v}</div>
+                                <div style={{fontSize:'.78rem',color:'#6b7280'}}>{s.label}</div>
+                              </div>
+                            </Col>
+                          ))}
+                        </Row>
+                        {reviewDetail.teacherReview.feedback && (
+                          <div className="p-3" style={{background:'#f0fdf4',borderRadius:'10px',borderLeft:'3px solid #10b981'}}>
+                            <strong style={{color:'#065f46'}}>Nhận xét:</strong>
+                            <p className="mb-0 mt-1" style={{color:'#374151',whiteSpace:'pre-wrap'}}>{reviewDetail.teacherReview.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={()=>setReviewDetail(null)}>Đóng</Button>
+              </Modal.Footer>
+            </Modal>
+
+                    {/* ─── Placement Test ──────────────────── */}
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h4 style={{color:"#1e293b",fontWeight:800}}>Bài kiểm tra đầu vào (Placement Test)</h4>
+                    </div>
+                    <Card className="detail-card mb-4"
+                      style={{background:"linear-gradient(135deg,#f8fafc 0%,#eff6ff 100%)",border:"1px solid #bfdbfe",boxShadow:"0 10px 25px rgba(59,130,246,0.08)"}}>
+                      <Card.Body className="p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between">
+                        <div className="mb-4 mb-md-0 d-flex align-items-center">
+                          <div style={{background:"#fff",padding:"20px",borderRadius:"50%",marginRight:"28px",boxShadow:"0 8px 20px rgba(0,0,0,0.06)"}}>
+                            <FontAwesomeIcon icon={faRocket} size="3x" style={{color:"#3b82f6"}} />
+                          </div>
                           <div>
-                            <h5 className="mb-1">Lịch sử làm bài</h5>
-                            <p className="text-muted mb-0">Các bài quiz bạn đã hoàn thành</p>
-                          </div>
-                          <div className="d-flex align-items-center gap-2">
-                            <div style={{background:"#e6faf4",color:"#00a87c",borderRadius:"100px",padding:".3rem .9rem",fontWeight:800,display:"flex",alignItems:"center",gap:".4rem"}}>
-                              <FontAwesomeIcon icon={faListCheck}/><strong>{attempts.length}</strong>
-                            </div>
-                            <button style={mintBtn({padding:".4rem 1rem",fontSize:".84rem"})} onClick={()=>setShowAttemptModal(true)}
-                              onMouseEnter={e=>{Object.assign(e.currentTarget.style,mintBtnHover);}} onMouseLeave={e=>{e.currentTarget.style.background="#00c896";e.currentTarget.style.boxShadow="";e.currentTarget.style.transform="";}}>
-                              Xem chi tiết
-                            </button>
+                            <h3 style={{fontWeight:800,color:"#1e3a8a",marginBottom:"10px"}}>Placement Test</h3>
+                            <p style={{color:"#475569",fontSize:"1.05rem",maxWidth:"600px",marginBottom:"12px",lineHeight:"1.5"}}>
+                              Đánh giá toàn diện năng lực trong 30 phút để AI và Giáo viên đề xuất lộ trình học tập phù hợp nhất.
+                            </p>
+                            {placementTests.length>0 && (
+                              <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+                                {placementTests.map(t=>(
+                                  <Badge key={t.quizID} bg="light" text="dark"
+                                    style={{padding:".4rem .7rem",border:"1px solid #bfdbfe",borderRadius:"8px",cursor:"pointer",fontWeight:600}}
+                                    onClick={()=>navigate(`/quiz/start/${t.quizID}`)}>
+                                    {t.title}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div>
-                          {attempts.length>0?attempts.slice(0,3).map(a=>(
-                            <div key={a.attemptID} className="d-flex align-items-center justify-content-between p-2 mb-2 rounded" style={{background:"#f0fdf9",border:"1.5px solid #b3f0de"}}>
-                              <div>
-                                <div style={{fontWeight:700,fontSize:".9rem"}}>{a.quizTitle||"Quiz"}</div>
-                                <div style={{color:"#9ca3af",fontSize:".8rem"}}>#{a.attemptID} • {fmtVN(a.submittedAt)}</div>
-                              </div>
-                              <div className="text-end">
-                                <div style={{background:"#e6faf4",color:"#00a87c",borderRadius:"100px",padding:".25rem .75rem",fontWeight:800,fontSize:".78rem"}}>{a.status||"SUBMITTED"}</div>
-                                <div style={{color:"#9ca3af",fontSize:".78rem",marginTop:".2rem"}}>Điểm: {a.autoScore??0}</div>
-                              </div>
-                            </div>
-                          )):(
-                            <div className="text-center py-3" style={{color:"#9ca3af",fontWeight:600}}>Chưa có bài làm nào. Hãy bắt đầu làm quiz!</div>
+                        <div className="mt-3 mt-md-0 text-center">
+                          {placementTests.length>0 ? (
+                            <Button
+                              style={{background:"#2563eb",border:"none",padding:"14px 34px",fontSize:"1.1rem",fontWeight:700,borderRadius:"14px",boxShadow:"0 8px 20px rgba(37,99,235,0.3)"}}
+                              onClick={()=>navigate(`/quiz/start/${placementTests[0].quizID}`)}>
+                              Tham gia ngay <FontAwesomeIcon icon={faChevronRight} className="ms-2"/>
+                            </Button>
+                          ) : (
+                            <Button style={{background:"#94a3b8",border:"none",padding:"14px 34px",fontSize:"1.1rem",fontWeight:700,borderRadius:"14px"}} disabled>
+                              Chưa có bài test
+                            </Button>
                           )}
+                          <div className="mt-2 text-muted" style={{fontSize:'0.8rem'}}>Hoàn toàn miễn phí</div>
                         </div>
                       </Card.Body>
                     </Card>
-                  </Col>
-                </Row>
+                  </>
+                )}
               </div>
             )}
 
