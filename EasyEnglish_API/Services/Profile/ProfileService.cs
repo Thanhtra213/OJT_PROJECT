@@ -2,6 +2,7 @@ using EasyEnglish_API.DTOs.Profile;
 using EasyEnglish_API.ExternalService;
 using EasyEnglish_API.Interfaces.Profile;
 using EasyEnglish_API.Security;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyEnglish_API.Services.Profile
 {
@@ -46,20 +47,69 @@ namespace EasyEnglish_API.Services.Profile
                 return detail.AvatarUrl;
             }
 
-            public async Task UpdateDetailAsync(int userId, UpdateUserDetailRequest req)
+        public async Task UpdateDetailAsync(int userId, UpdateUserDetailRequest req)
+        {
+            // ❗ check null request
+            if (req == null)
+                throw new ArgumentNullException(nameof(req), "Request không được null");
+
+            var detail = await _repo.GetUserDetailAsync(userId);
+
+            // ❗ check user tồn tại
+            if (detail == null)
+                throw new KeyNotFoundException("Account not found");
+
+            // ❗ validate FullName
+            if (!string.IsNullOrWhiteSpace(req.FullName))
             {
-            var detail = await _repo.GetUserDetailAsync(userId)
-                    ?? throw new KeyNotFoundException("Account not found");
+                if (req.FullName.Length > 100)
+                    throw new ArgumentException("FullName không được vượt quá 100 ký tự");
 
-                if (!string.IsNullOrWhiteSpace(req.FullName)) detail.FullName = req.FullName;
-                if (req.Dob.HasValue) detail.Dob = req.Dob.Value;
-                if (!string.IsNullOrWhiteSpace(req.Address)) detail.Address = req.Address.Trim();
-                if (!string.IsNullOrWhiteSpace(req.Phone)) detail.Phone = req.Phone.Trim();
-
-                await _repo.SavechangeAsync();
+                detail.FullName = req.FullName.Trim();
             }
 
-            public async Task<string> ChangeAvatarAsync(int userId, IFormFile file)
+            if (req.Dob.HasValue)
+            {
+                if (req.Dob.Value > DateOnly.FromDateTime(DateTime.UtcNow))
+                    throw new ArgumentException("Ngày sinh không hợp lệ (lớn hơn hiện tại)");
+
+                if (req.Dob.Value.Year < 1900)
+                    throw new ArgumentException("Ngày sinh không hợp lệ");
+
+                detail.Dob = req.Dob.Value;
+            }
+            if (!string.IsNullOrWhiteSpace(req.Address))
+            {
+                if (req.Address.Length > 255)
+                    throw new ArgumentException("Address quá dài");
+
+                detail.Address = req.Address.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(req.Phone))
+            {
+                var phone = req.Phone.Trim();
+                if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^[0-9]{9,11}$"))
+                    throw new ArgumentException("Số điện thoại không hợp lệ");
+
+                detail.Phone = phone;
+            }
+
+            try
+            {
+                await _repo.SavechangeAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Lỗi khi cập nhật dữ liệu DB", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Có lỗi xảy ra khi cập nhật thông tin", ex);
+            }
+        }
+
+        public async Task<string> ChangeAvatarAsync(int userId, IFormFile file)
             {
                 var detail = await _repo.GetUserDetailAsync(userId)
                     ?? throw new KeyNotFoundException("User not found");

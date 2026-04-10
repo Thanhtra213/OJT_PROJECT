@@ -33,7 +33,6 @@ namespace EasyEnglish_API.ExternalService
             GradeSpeakingAsync(string transcript, string topic)
             => _grader.GradeSpeakingAsync(transcript, topic);
 
-        // DEEPGRAM TRANSCRIPTION
         public class TranscriptionModule
         {
             private readonly IListenRESTClient _deepgramClient;
@@ -85,8 +84,7 @@ namespace EasyEnglish_API.ExternalService
             }
         }
 
-        // GEMINI PROMPT GENERATION
-        public class PromptModule
+                public class PromptModule
         {
             private readonly HttpClient _http;
             private readonly string _apiKey;
@@ -95,24 +93,19 @@ namespace EasyEnglish_API.ExternalService
             public PromptModule(IConfiguration cfg, ILogger logger)
             {
                 _http = new HttpClient { Timeout = TimeSpan.FromMinutes(3) };
-
-                _apiKey = cfg["Gemini:ApiKey"]
-                    ?? throw new Exception("Gemini API key missing");
-
+                _apiKey = cfg["Gemini:ApiKey"] ?? throw new Exception("Gemini API key missing");
                 _logger = logger;
             }
 
             public async Task<(string title, string content)> GenerateSpeakingPromptAsync()
             {
                 var prompt = @"
-Generate ONE IELTS Speaking Part 2 topic.
+You are an IELTS Speaking Part 2 question generator.
+Generate ONE unique IELTS Speaking Part 2 cue card question.
 
-Return JSON ONLY:
+IMPORTANT: Respond ONLY with a single valid JSON object. No markdown, no code blocks, no extra text.
 
-{
-  ""Title"": ""IELTS Speaking Part 2 - AI Gen"",
-  ""Content"": ""<question>""
-}
+{""Title"":""IELTS Speaking Part 2 - AI Gen"",""Content"":""<the full cue card question here>""}
 ";
 
                 var response = await CallGeminiAsync(prompt);
@@ -123,13 +116,11 @@ Return JSON ONLY:
                     var doc = JsonDocument.Parse(json);
                     var root = doc.RootElement;
 
-                    string title =
-                        root.TryGetProperty("Title", out var t)
-                        ? t.GetString() ?? ""
+                    string title = root.TryGetProperty("Title", out var t)
+                        ? t.GetString() ?? "IELTS Speaking Part 2 - AI Gen"
                         : "IELTS Speaking Part 2 - AI Gen";
 
-                    string content =
-                        root.TryGetProperty("Content", out var c)
+                    string content = root.TryGetProperty("Content", out var c)
                         ? c.GetString() ?? ""
                         : "";
 
@@ -138,7 +129,6 @@ Return JSON ONLY:
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Prompt parse failed: {res}", response);
-
                     return (
                         "IELTS Speaking Part 2 - AI Gen",
                         "Describe a memorable event in your life and explain why it was special."
@@ -152,85 +142,101 @@ Return JSON ONLY:
                 {
                     contents = new[]
                     {
-                        new
-                        {
-                            parts = new[]
-                            {
-                                new { text = prompt }
-                            }
-                        }
+                        new { parts = new[] { new { text = prompt } } }
                     }
                 };
 
                 var json = JsonSerializer.Serialize(payload);
-
                 var res = await _http.PostAsync(
                     $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
                     new StringContent(json, Encoding.UTF8, "application/json")
                 );
 
                 var body = await res.Content.ReadAsStringAsync();
-
                 _logger.LogInformation("Gemini prompt response: {body}", body);
 
                 using var doc = JsonDocument.Parse(body);
                 var root = doc.RootElement;
 
                 if (root.TryGetProperty("error", out var err))
-                {
-                    var msg = err.GetProperty("message").GetString();
-                    throw new Exception($"Gemini API error: {msg}");
-                }
+                    throw new Exception($"Gemini API error: {err.GetProperty("message").GetString()}");
 
                 if (!root.TryGetProperty("candidates", out var candidates))
                     throw new Exception($"Invalid Gemini response: {body}");
 
-                var text = candidates[0]
+                return candidates[0]
                     .GetProperty("content")
                     .GetProperty("parts")[0]
                     .GetProperty("text")
-                    .GetString();
-
-                return text ?? "{}";
+                    .GetString() ?? "{}";
             }
 
             private static string ExtractJson(string raw)
             {
-                var match = Regex.Match(raw, @"\{[\s\S]*\}");
-                return match.Success ? match.Value : "{}";
+                int start = raw.IndexOf('{');
+                int end = raw.LastIndexOf('}');
+                if (start >= 0 && end > start)
+                    return raw.Substring(start, end - start + 1);
+                return "{}";
             }
         }
 
-        public class GradingModule
+         public class GradingModule
         {
             private readonly HttpClient _http;
             private readonly string _apiKey;
             private readonly ILogger _logger;
 
+            private static readonly string FallbackFeedback = JsonSerializer.Serialize(new
+            {
+                fluency = new
+                {
+                    comment = "Could not evaluate.",
+                    issues = Array.Empty<string>(),
+                    suggestions = Array.Empty<string>()
+                },
+                lexical = new
+                {
+                    comment = "Could not evaluate.",
+                    weakPhrases = Array.Empty<object>()
+                },
+                grammar = new
+                {
+                    comment = "Could not evaluate.",
+                    errors = Array.Empty<object>()
+                },
+                pronunciation = new
+                {
+                    comment = "Could not evaluate.",
+                    issues = Array.Empty<string>(),
+                    suggestions = Array.Empty<string>()
+                },
+                overall = "Scoring failed. Please try again."
+            });
+
             public GradingModule(IConfiguration cfg, ILogger logger)
             {
                 _http = new HttpClient { Timeout = TimeSpan.FromMinutes(3) };
-
-                _apiKey = cfg["Gemini:ApiKey"]
-                    ?? throw new Exception("Gemini API key missing");
-
+                _apiKey = cfg["Gemini:ApiKey"] ?? throw new Exception("Gemini API key missing");
                 _logger = logger;
             }
 
-            public async Task<(decimal overall, decimal fluency, decimal lexical, decimal grammar, decimal pronunciation, string feedback)> GradeSpeakingAsync(string transcript, string topic)
+            public async Task<(decimal overall, decimal fluency, decimal lexical, decimal grammar, decimal pronunciation, string feedback)>
+                GradeSpeakingAsync(string transcript, string topic)
             {
                 var prompt = $@"
 You are a strict IELTS Speaking examiner with 20 years of experience.
 Evaluate the transcript below based on all 4 IELTS Speaking criteria.
-Respond ONLY with a single valid JSON object, no markdown, no extra text.
 
-Format exactly:
+IMPORTANT: You MUST use EXACTLY the field names shown below.
+Do NOT rename any field. Do NOT add markdown. Return ONLY raw JSON, nothing else.
+
 {{
-  ""score"": <overall band 0–9, can be .5>,
-  ""Fluency"": <0–9>,
-  ""LexicalResource"": <0–9>,
-  ""Grammar"": <0–9>,
-  ""Pronunciation"": <0–9>,
+  ""score"": <overall band 0-9, can be .5>,
+  ""Fluency"": <0-9>,
+  ""LexicalResource"": <0-9>,
+  ""Grammar"": <0-9>,
+  ""Pronunciation"": <0-9>,
   ""feedback"": {{
     ""fluency"": {{
       ""comment"": ""<Was the speech smooth? Any long pauses or self-corrections?>"",
@@ -258,7 +264,7 @@ Format exactly:
       ""issues"": [""<specific pronunciation issue if any>""],
       ""suggestions"": [""<improvement tip>""]
     }},
-    ""overall"": ""<2–3 sentences summarising main strengths and the single most important thing to improve>""
+    ""overall"": ""<2-3 sentences summarising main strengths and the single most important thing to improve>""
   }}
 }}
 
@@ -276,19 +282,35 @@ Transcript:
                     var doc = JsonDocument.Parse(json);
                     var root = doc.RootElement;
 
+                    string feedbackJson = "";
+                    foreach (var field in new[] { "feedback", "Feedback", "taskResponse", "evaluation" })
+                    {
+                        if (root.TryGetProperty(field, out var fb))
+                        {
+                            feedbackJson = fb.GetRawText();
+                            break;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(feedbackJson))
+                    {
+                        _logger.LogWarning("feedback field not found in Gemini response: {json}", json);
+                        feedbackJson = FallbackFeedback;
+                    }
+
                     return (
                         root.GetProperty("score").GetDecimal(),
                         root.GetProperty("Fluency").GetDecimal(),
                         root.GetProperty("LexicalResource").GetDecimal(),
                         root.GetProperty("Grammar").GetDecimal(),
                         root.GetProperty("Pronunciation").GetDecimal(),
-                        root.GetProperty("feedback").ToString()
+                        feedbackJson
                     );
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Grading parse failed: {res}", response);
-                    return (6, 6, 6, 6, 6, "AI fallback score.");
+                    return (6, 6, 6, 6, 6, FallbackFeedback);
                 }
             }
 
@@ -298,35 +320,24 @@ Transcript:
                 {
                     contents = new[]
                     {
-                        new
-                        {
-                            parts = new[]
-                            {
-                                new { text = prompt }
-                            }
-                        }
+                        new { parts = new[] { new { text = prompt } } }
                     }
                 };
 
                 var json = JsonSerializer.Serialize(payload);
-
                 var res = await _http.PostAsync(
                     $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
                     new StringContent(json, Encoding.UTF8, "application/json")
                 );
 
                 var body = await res.Content.ReadAsStringAsync();
-
                 _logger.LogInformation("Gemini grading response: {body}", body);
 
                 using var doc = JsonDocument.Parse(body);
                 var root = doc.RootElement;
 
                 if (root.TryGetProperty("error", out var err))
-                {
-                    var msg = err.GetProperty("message").GetString();
-                    throw new Exception($"Gemini API error: {msg}");
-                }
+                    throw new Exception($"Gemini API error: {err.GetProperty("message").GetString()}");
 
                 if (!root.TryGetProperty("candidates", out var candidates))
                     throw new Exception($"Invalid Gemini response: {body}");
@@ -340,8 +351,11 @@ Transcript:
 
             private static string ExtractJson(string raw)
             {
-                var match = Regex.Match(raw, @"\{[\s\S]*\}");
-                return match.Success ? match.Value : "{}";
+                int start = raw.IndexOf('{');
+                int end = raw.LastIndexOf('}');
+                if (start >= 0 && end > start)
+                    return raw.Substring(start, end - start + 1);
+                return "{}";
             }
         }
     }

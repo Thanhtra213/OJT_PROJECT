@@ -5,6 +5,8 @@ namespace EasyEnglish_API.Interfaces.Quizs
 {
     public interface IQuizRepository
     {
+        Task<List<Quiz>> GetPlacementTestsAsync();
+        Task<bool> UpdatePlacementTestFlagAsync(int quizId, bool isPlacementTest, int? targetLevel);
         Task<List<Quiz>> GetQuizzesByCourseAsync(int courseId);
         Task<List<Quiz>> GetAllQuizzesByCourseAsync(int courseId);
         Task<List<Quiz>> GetGlobalQuizzesAsync();

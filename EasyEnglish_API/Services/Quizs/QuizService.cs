@@ -88,7 +88,7 @@ namespace EasyEnglish_API.Services
             };
         }
 
-
+        
         public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId)
         {
             if (!await _membership.HasActiveMembershipAsync(userId))
