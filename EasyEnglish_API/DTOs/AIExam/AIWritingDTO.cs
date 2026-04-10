@@ -24,7 +24,7 @@ namespace EasyEnglish_API.DTOs.AIExam
         public decimal Coherence { get; set; }
         public decimal LexicalResource { get; set; }
         public decimal Grammar { get; set; }
-        public string Feedback { get; set; } = string.Empty;
+        public object Feedback { get; set; } = string.Empty;
         public int AttemptId { get; set; }
     }
 

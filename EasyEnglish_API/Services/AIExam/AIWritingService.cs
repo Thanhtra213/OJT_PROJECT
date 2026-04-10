@@ -4,6 +4,7 @@ using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Interfaces.Membership;
 using EasyEnglish_API.Models;
 using Microsoft.Identity.Client;
+using System.Text.Json;
 
 namespace EasyEnglish_API.Services.AIExam
 {
@@ -66,8 +67,11 @@ namespace EasyEnglish_API.Services.AIExam
             if (wordCount < 150)
                 throw new Exception("Essay must be at least 150 words.");
 
-            var (overall, task, coherence, lexical, grammar, feedback) =
-                await _ai.GradeWritingAsync(req.AnswerText);
+            var (overall, task, coherence, lexical, grammar, feedbackJson) =
+    await _ai.GradeWritingAsync(req.AnswerText);
+
+            using var feedbackDoc = JsonDocument.Parse(feedbackJson);
+            var feedback = feedbackDoc.RootElement.Clone();
 
             if (req.SendToTeacher)
             {
@@ -90,7 +94,7 @@ namespace EasyEnglish_API.Services.AIExam
                     ScoreOverall = overall,
                     ScoreLexical = lexical,
                     ScoreGrammar = grammar,
-                    Feedback = feedback,
+                    Feedback = feedbackJson,
                     IsSentToTeacher = req.SendToTeacher,
                     CreatedAt = DateTime.UtcNow
                 });

@@ -5,6 +5,8 @@ namespace EasyEnglish_API.Interfaces
     public interface ICourseRepository
     {
         // -------- COURSE BASE --------
+
+        Task<List<Course>> GetCoursesByLevelAsync(byte level, int take = 6);
         Task<int?> GetTeacherIdByAccountIdAsync(int accountId);
         Task<List<Course>> GetAllCoursesAsync();
         Task<Course?> GetCourseDetailAsync(int courseId);

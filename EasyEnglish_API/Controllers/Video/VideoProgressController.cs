@@ -59,6 +59,7 @@ namespace EasyEnglish_API.Controllers.Video
                 videoId = progress.VideoId,
                 watchDurationSec = progress.WatchDurationSec,
                 lastPositionSec = progress.LastPositionSec,
+                totalDurationSec = progress.TotalDurationSec,
                 isCompleted = progress.IsCompleted,
                 watchedAt = progress.WatchedAt
             });

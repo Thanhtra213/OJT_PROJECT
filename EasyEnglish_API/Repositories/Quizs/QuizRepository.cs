@@ -1,7 +1,9 @@
+using Amazon.S3.Model;
 using EasyEnglish_API.Data;
 using EasyEnglish_API.Interfaces.Quizs;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace EasyEnglish_API.Repositories.Quizs
 {
@@ -343,7 +345,7 @@ namespace EasyEnglish_API.Repositories.Quizs
             await _db.SaveChangesAsync();
             return true;
         }
-
+        
         // ── OPTION ───────────────────────────────────────────────────────────
 
         public async Task<Option?> CreateOptionAsync(int questionId, Option option)
@@ -414,6 +416,25 @@ namespace EasyEnglish_API.Repositories.Quizs
             if (asset == null) return false;
 
             _db.Assets.Remove(asset);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<Quiz>> GetPlacementTestsAsync()
+        {
+            return await _db.Quizzes
+                .Where(q => q.IsPlacementTest && q.IsActive)
+                .OrderBy(q => q.TargetLevel)
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdatePlacementTestFlagAsync(int quizId, bool isPlacementTest, int? targetLevel)
+        {
+            var quiz = await _db.Quizzes.FindAsync(quizId);
+            if (quiz == null) return false;
+
+            quiz.IsPlacementTest = isPlacementTest;
+            quiz.TargetLevel = targetLevel;
             await _db.SaveChangesAsync();
             return true;
         }

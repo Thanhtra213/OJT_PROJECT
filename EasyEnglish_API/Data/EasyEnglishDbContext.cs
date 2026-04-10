@@ -769,6 +769,7 @@ public partial class EasyEnglishDbContext : DbContext
             entity.Property(e => e.VideoId).HasColumnName("VideoID");
             entity.Property(e => e.WatchedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.LastPositionSec).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.TotalDurationSec).HasDefaultValueSql("(sysutcdatetime())");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserVideoProgresses)
                 .HasForeignKey(d => d.UserId)

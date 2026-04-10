@@ -2,6 +2,7 @@
 using EasyEnglish_API.Interfaces;
 using EasyEnglish_API.Models;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace EasyEnglish_API.Repositories.Courses
 {
@@ -12,6 +13,15 @@ namespace EasyEnglish_API.Repositories.Courses
         public CourseRepository(EasyEnglishDbContext db)
         {
             _db = db;
+        }
+
+        public async Task<List<Course>> GetCoursesByLevelAsync(byte level, int take = 6)
+        {
+            return await _db.Courses
+                .Where(c => c.CourseLevel == level)
+                .OrderByDescending(c => c.CreateAt)
+                .Take(take)
+                .ToListAsync();
         }
 
         public async Task<int?> GetTeacherIdByAccountIdAsync(int accountId)

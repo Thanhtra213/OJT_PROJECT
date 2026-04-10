@@ -17,6 +17,8 @@ public partial class Quiz
 
     public bool IsActive { get; set; }
 
+    public bool IsPlacementTest { get; set; }
+    public int? TargetLevel { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<Attempt> Attempts { get; set; } = new List<Attempt>();

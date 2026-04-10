@@ -9,7 +9,6 @@ namespace EasyEnglish_API.ExternalService
         private readonly string _apiKey;
         private readonly ILogger<AIWritingExternal> _logger;
 
-        // Danh sách topic để random
         private static readonly string[] Topics =
         [
             "technology and society", "environment and climate change",
@@ -26,7 +25,7 @@ namespace EasyEnglish_API.ExternalService
         private static readonly string[] Angles =
         [
             "advantages and disadvantages",
-            "causes and    solutions",
+            "causes and solutions",
             "agree or disagree",
             "to what extent do you agree",
             "discuss both views and give your opinion",
@@ -36,6 +35,33 @@ namespace EasyEnglish_API.ExternalService
 
         private static readonly Random _rng = new();
 
+        private static readonly string FallbackFeedback = JsonSerializer.Serialize(new
+        {
+            taskResponse = new
+            {
+                comment = "Could not evaluate.",
+                issues = Array.Empty<string>(),
+                suggestions = Array.Empty<string>()
+            },
+            coherence = new
+            {
+                comment = "Could not evaluate.",
+                issues = Array.Empty<string>(),
+                suggestions = Array.Empty<string>()
+            },
+            lexical = new
+            {
+                comment = "Could not evaluate.",
+                weakPhrases = Array.Empty<object>()
+            },
+            grammar = new
+            {
+                comment = "Could not evaluate.",
+                errors = Array.Empty<object>()
+            },
+            overall = "Scoring failed. Please try again."
+        });
+
         public AIWritingExternal(IConfiguration config, ILogger<AIWritingExternal> logger)
         {
             _http = new HttpClient();
@@ -43,10 +69,8 @@ namespace EasyEnglish_API.ExternalService
             _logger = logger;
         }
 
-
         public async Task<(string title, string content)> GenerateWritingPromptAsync()
         {
-            // Random topic + angle + seed để Gemini không cache kết quả
             var topic = Topics[_rng.Next(Topics.Length)];
             var angle = Angles[_rng.Next(Angles.Length)];
             var seed = _rng.Next(1000, 9999);
@@ -57,18 +81,19 @@ Generate ONE unique IELTS Writing Task 2 question about the topic: ""{topic}"".
 The question style should be: ""{angle}"".
 Make it different every time (seed: {seed}).
 
-Respond ONLY with a single valid JSON object, no extra text:
+IMPORTANT: Respond ONLY with a single valid JSON object. No markdown, no code blocks, no extra text.
+
 {{""Title"":""Writing Task 2 - {topic}"",""Content"":""<the full question here>""}}
 
 Rules:
 - The question must be realistic and academic
-- 2–3 sentences maximum
+- 2-3 sentences maximum
 - Written in English
 - Do NOT repeat common examples like social media or online shopping
 ";
 
             var jsonResponse = await CallGeminiAsync(prompt);
-            var pureJson = ExtractJsonString(jsonResponse);
+            var pureJson = ExtractJson(jsonResponse);
 
             try
             {
@@ -80,11 +105,9 @@ Rules:
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AI JSON parse error: {Response}", jsonResponse);
-                // Fallback cũng random theo topic
                 return ($"Writing Task 2 - {topic}", $"Discuss the {angle} of {topic} in modern society.");
             }
         }
-
 
         public async Task<(decimal overall, decimal task, decimal coherence, decimal lexical, decimal grammar, string feedback)>
             GradeWritingAsync(string essay)
@@ -92,15 +115,16 @@ Rules:
             var gradingPrompt = $@"
 You are a strict IELTS Writing Task 2 examiner with 20 years of experience.
 Evaluate the essay below across all 4 IELTS criteria.
-Respond ONLY with a single valid JSON object, no markdown, no extra text.
 
-Format exactly:
+IMPORTANT: You MUST use EXACTLY the field names shown below.
+Do NOT rename any field. Do NOT add markdown. Return ONLY raw JSON, nothing else.
+
 {{
-  ""score"": <overall band 0–9, can be .5>,
-  ""TaskResponse"": <0–9>,
-  ""Coherence"": <0–9>,
-  ""LexicalResource"": <0–9>,
-  ""Grammar"": <0–9>,  
+  ""score"": <overall band 0-9, can be .5>,
+  ""TaskResponse"": <0-9>,
+  ""Coherence"": <0-9>,
+  ""LexicalResource"": <0-9>,
+  ""Grammar"": <0-9>,
   ""feedback"": {{
     ""taskResponse"": {{
       ""comment"": ""<Did they answer all parts? Is the position clear and consistent?>"",
@@ -112,7 +136,7 @@ Format exactly:
       ""issues"": [""<specific issue>""],
       ""suggestions"": [""<suggestion>""]
     }},
-    ""lexical"": {{ 
+    ""lexical"": {{
       ""comment"": ""<Is vocabulary range wide and accurate?>"",
       ""weakPhrases"": [
         {{ ""original"": ""<weak phrase from essay>"", ""suggestion"": ""<better alternative>"" }},
@@ -126,7 +150,7 @@ Format exactly:
         {{ ""original"": ""<incorrect>"", ""correction"": ""<corrected>"", ""explanation"": ""<explanation>"" }}
       ]
     }},
-    ""overall"": ""<2–3 sentences summarising the essay's main strengths and the single most important thing to improve>""
+    ""overall"": ""<2-3 sentences summarising the essay's main strengths and the single most important thing to improve>""
   }}
 }}
 
@@ -135,28 +159,44 @@ Essay:
 ";
 
             var jsonResponse = await CallGeminiAsync(gradingPrompt);
-            var pureJson = ExtractJsonString(jsonResponse);
+            var pureJson = ExtractJson(jsonResponse);
 
             try
             {
                 var doc = JsonDocument.Parse(pureJson);
-                decimal overall = doc.RootElement.GetProperty("score").GetDecimal();
-                decimal task = doc.RootElement.GetProperty("TaskResponse").GetDecimal();
-                decimal coherence = doc.RootElement.GetProperty("Coherence").GetDecimal();
-                decimal lexical = doc.RootElement.GetProperty("LexicalResource").GetDecimal();
-                decimal grammar = doc.RootElement.GetProperty("Grammar").GetDecimal();
+                var root = doc.RootElement;
 
-                string feedback = doc.RootElement.GetProperty("feedback").ToString();
+                decimal overall = root.GetProperty("score").GetDecimal();
+                decimal task = root.GetProperty("TaskResponse").GetDecimal();
+                decimal coherence = root.GetProperty("Coherence").GetDecimal();
+                decimal lexical = root.GetProperty("LexicalResource").GetDecimal();
+                decimal grammar = root.GetProperty("Grammar").GetDecimal();
 
-                return (overall, task, coherence, lexical, grammar, feedback);
+                // Tìm feedback linh hoạt dù Gemini đặt tên field khác nhau
+                string feedbackJson = "";
+                foreach (var field in new[] { "feedback", "Feedback", "evaluation", "result" })
+                {
+                    if (root.TryGetProperty(field, out var fb))
+                    {
+                        feedbackJson = fb.GetRawText();
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(feedbackJson))
+                {
+                    _logger.LogWarning("feedback field not found in Gemini response: {json}", pureJson);
+                    feedbackJson = FallbackFeedback;
+                }
+
+                return (overall, task, coherence, lexical, grammar, feedbackJson);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AI grading JSON parse error: {Response}", jsonResponse);
-                return (6.0m, 6.5m, 6.0m, 6.5m, 6.0m, "Fallback: could not parse AI response.");
+                return (6.0m, 6.5m, 6.0m, 6.5m, 6.0m, FallbackFeedback);
             }
         }
-
 
         private async Task<string> CallGeminiAsync(string prompt)
         {
@@ -166,7 +206,6 @@ Essay:
                 {
                     new { parts = new[] { new { text = prompt } } }
                 },
-                // Tăng temperature để output đa dạng hơn
                 generationConfig = new
                 {
                     temperature = 1.2,
@@ -186,28 +225,25 @@ Essay:
             var root = doc.RootElement;
 
             if (root.TryGetProperty("error", out var err))
-            {
-                var msg = err.GetProperty("message").GetString();
-                throw new Exception($"Gemini API error: {msg}");
-            }
+                throw new Exception($"Gemini API error: {err.GetProperty("message").GetString()}");
 
-            var text = root
-                .GetProperty("candidates")[0]
+            if (!root.TryGetProperty("candidates", out var candidates))
+                throw new Exception($"Invalid Gemini response: {body}");
+
+            return candidates[0]
                 .GetProperty("content")
                 .GetProperty("parts")[0]
                 .GetProperty("text")
-                .GetString();
-
-            return text ?? "{}";
+                .GetString() ?? "{}";
         }
 
-        private static string ExtractJsonString(string raw)
+        private static string ExtractJson(string raw)
         {
-            var match = System.Text.RegularExpressions.Regex.Match(
-                raw, @"\{[\s\S]*\}",
-                System.Text.RegularExpressions.RegexOptions.Multiline
-            );
-            return match.Success ? match.Value : "{}";
+            int start = raw.IndexOf('{');
+            int end = raw.LastIndexOf('}');
+            if (start >= 0 && end > start)
+                return raw.Substring(start, end - start + 1);
+            return "{}";
         }
     }
 }

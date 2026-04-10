@@ -68,6 +68,7 @@ using EasyEnglish_API.Services.Vocabulary;
 using EasyEnglish_API.Services.Vouchers;
 using EasyEnglish_API.Interfaces.Vouchers;
 using EasyEnglish_API.Repositories.Vouchers;
+using EasyEnglish_API.Services.PlacementTest;
 
 
 
@@ -255,6 +256,7 @@ namespace EasyEnglish_API {
 
             builder.Services.AddScoped<IVocabularyService, VocabularyService>();
             builder.Services.AddScoped<IFlashcarProgressService, FlashcardProgressService>();
+            builder.Services.AddScoped<IPlacementTestService, PlacementTestService>();
 
 
             // Email Sender

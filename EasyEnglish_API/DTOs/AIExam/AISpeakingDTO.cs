@@ -28,6 +28,6 @@
 
         public decimal Pronunciation { get; set; }
 
-        public string Feedback { get; set; } = "";
+        public object Feedback { get; set; } = "";
     }
 }

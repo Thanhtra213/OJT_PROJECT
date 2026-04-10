@@ -4,6 +4,7 @@ using EasyEnglish_API.ExternalService;
 using EasyEnglish_API.Interfaces.AIExam;
 using EasyEnglish_API.Interfaces.Membership;
 using EasyEnglish_API.Models;
+using System.Text.Json;
 
 namespace EasyEnglish_API.Services.AIExam
 {
@@ -70,8 +71,11 @@ namespace EasyEnglish_API.Services.AIExam
                 throw new Exception("Audio could not be transcribed.");
 
             _logger.LogInformation("Starting grading...");
-            var (score, flu, lex, gra, pro, fb) =
-                await _ai.GradeSpeakingAsync(transcript, prompt.Content);
+            var (score, flu, lex, gra, pro, fbJson) =
+    await _ai.GradeSpeakingAsync(transcript, prompt.Content);
+
+            using var feedbackDoc = JsonDocument.Parse(fbJson);
+            var fb = feedbackDoc.RootElement.Clone();
 
             if (req.SendToTeacher)
             {
@@ -93,7 +97,7 @@ namespace EasyEnglish_API.Services.AIExam
                     ScoreLexical = lex,
                     ScoreGrammar = gra,
                     ScorePronunciation = pro,
-                    Feedback = fb,
+                    Feedback = fbJson,
                     IsSentToTeacher = true,
                     CreatedAt = DateTime.UtcNow
                 });
