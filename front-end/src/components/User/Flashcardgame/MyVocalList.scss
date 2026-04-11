@@ -1,53 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+// ─── Design Tokens (synced with Home.scss) ────────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$hero-blue:    #1a73e8;
+$hero-yellow:  #f9c74f;
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-pill:       100px;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 .mylist-page {
-  .mylist-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.25rem;
-    flex-wrap: wrap;
-    gap: 8px;
-    h5 { margin: 0; font-weight: 700; }
+  background: $white;
+  min-height: 100vh;
+  font-family: $font;
+  padding: 2rem 0 4rem;
+  color: $text-dark;
+
+  .container { max-width: 1100px; }
+
+  // ── Back Button ──────────────────────────────────────────────────────────
+  .mylist-back {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: $white; border: 2px solid $border;
+    border-radius: $r-pill; padding: .5rem 1.2rem;
+    font-family: $font; font-weight: 700; font-size: .9rem;
+    color: $text-body; cursor: pointer;
+    box-shadow: $shadow-sm; transition: all $ease;
+    margin-bottom: 2rem;
+    &:hover {
+      border-color: $mint; color: $mint-dark; background: $mint-light;
+      transform: translateY(-1px); box-shadow: $shadow-hover;
+    }
   }
-  .mylist-game-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
- 
+
+  // ── Header ───────────────────────────────────────────────────────────────
+  .mylist-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1.5px solid $border;
+  }
+
+  .mylist-title-area {
+    h4 {
+      font-weight: 900; color: $text-dark; margin-bottom: .3rem;
+      font-size: 1.4rem; display: flex; align-items: center;
+    }
+    .mylist-subtitle {
+      color: $text-muted; font-size: .92rem; font-weight: 600; margin: 0;
+    }
+  }
+
+  .mylist-count {
+    background: $mint; color: $white;
+    font-size: .75rem; font-weight: 800;
+    padding: .25rem .7rem; border-radius: $r-pill;
+    margin-left: .75rem; vertical-align: middle;
+  }
+
+  // ── Game Buttons ─────────────────────────────────────────────────────────
+  .mylist-game-buttons {
+    display: flex; gap: .5rem; flex-wrap: wrap;
+  }
+
+  .mylist-game-btn {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: $white; border: 2px solid $border;
+    border-radius: $r-btn; padding: .55rem 1.15rem;
+    font-family: $font; font-weight: 700; font-size: .85rem;
+    color: $text-body; cursor: pointer;
+    transition: all $ease;
+    &:hover {
+      background: $mint; color: $white; border-color: $mint;
+      box-shadow: $shadow-btn; transform: translateY(-1px);
+    }
+    svg { font-size: .7rem; }
+  }
+
+  // ── Loading ──────────────────────────────────────────────────────────────
+  .mylist-loading {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 4rem 2rem; text-align: center;
+    background: $white; border-radius: $r-card;
+    border: 1.5px solid $border; box-shadow: $shadow-card;
+    p { color: $text-body; font-weight: 600; margin-top: 1rem; }
+  }
+
+  // ── Empty State ──────────────────────────────────────────────────────────
+  .mylist-empty {
+    text-align: center; padding: 4rem 2rem;
+    background: $white; border-radius: $r-card;
+    border: 1.5px solid $border; box-shadow: $shadow-card;
+
+    .mylist-empty-icon {
+      font-size: 3.5rem; color: $mint-mid; margin-bottom: 1.5rem;
+    }
+    h5 { font-weight: 800; color: $text-dark; margin-bottom: .5rem; }
+    p  { color: $text-muted; font-weight: 600; margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+  }
+
+  .mylist-go-learn {
+    background: $mint; color: $white; border: none;
+    border-radius: $r-btn; padding: .7rem 1.5rem;
+    font-family: $font; font-weight: 800; font-size: .92rem;
+    cursor: pointer; transition: all $ease;
+    &:hover { background: $mint-dark; box-shadow: $shadow-btn; transform: translateY(-1px); }
+  }
+
+  // ── Grid ─────────────────────────────────────────────────────────────────
   .mylist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
   }
+
+  // ── Vocab Card ───────────────────────────────────────────────────────────
   .mylist-card {
-    position: relative;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
+    position: relative; background: $white;
+    border: 1.5px solid $border; border-radius: 16px;
+    padding: 1.25rem 1rem 1rem;
+    box-shadow: $shadow-card;
+    transition: all $ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: $shadow-hover;
+      border-color: $mint;
+    }
   }
+
   .mylist-remove {
-    position: absolute;
-    top: 8px; right: 8px;
-    background: none; border: none;
-    color: #d1d5db; cursor: pointer;
-    font-size: 0.75rem;
-    &:hover { color: #ef4444; }
+    position: absolute; top: 10px; right: 10px;
+    background: transparent; border: 1.5px solid $border;
+    border-radius: 50%; width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: $text-muted; cursor: pointer; font-size: .65rem;
+    transition: all $ease;
+    &:hover {
+      color: #ef4444; background: #fef2f2; border-color: #fca5a5;
+    }
   }
-  .mylist-word { font-weight: 700; font-size: 0.95rem; color: #111827; margin-bottom: 2px; }
-  .mylist-phonetic { font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px; }
-  .mylist-meaning { font-size: 0.8rem; color: #6b7280; }
- 
-  .mylist-empty {
-    text-align: center;
-    padding: 3rem;
-    color: #9ca3af;
+
+  .mylist-word {
+    font-weight: 900; font-size: 1.05rem; color: $text-dark;
+    margin-bottom: 2px; padding-right: 2rem;
   }
+  .mylist-phonetic {
+    font-size: .8rem; color: $text-muted; margin-bottom: 6px;
+    font-style: italic;
+  }
+  .mylist-meaning {
+    font-size: .88rem; color: $text-body; line-height: 1.45;
+    font-weight: 600;
+  }
+
+  // ── Hint ─────────────────────────────────────────────────────────────────
   .mylist-hint {
-    text-align: center;
-    font-size: 0.8rem;
-    color: #9ca3af;
-    margin-top: 1rem;
+    text-align: center; font-size: .88rem;
+    color: $text-muted; margin-top: 1.5rem; font-weight: 600;
+    background: $mint-light; padding: .75rem 1.25rem;
+    border-radius: 12px; border: 1px solid $mint-mid;
   }
-  .mylist-loading {
-    padding: 2rem;
-    color: #6b7280;
-    font-size: 0.875rem;
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .mylist-page {
+    padding: 1.25rem 0 3rem;
+    .mylist-header { flex-direction: column; }
+    .mylist-title-area h4 { font-size: 1.2rem; }
+    .mylist-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; }
   }
 }

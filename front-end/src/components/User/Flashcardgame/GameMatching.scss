@@ -1,71 +1,118 @@
+// ─── Game Matching (synced with site design) ─────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$green:        #10b981;
+$green-bg:     #f0fdf4;
+$green-border: #86efac;
+$red:          #ef4444;
+$red-bg:       #fef2f2;
+$red-border:   #fca5a5;
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
 .game-matching {
-  .match-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+  font-family: $font;
+  max-width: 650px; margin: 2rem auto;
+  padding: 2rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-card;
+  box-shadow: $shadow-card;
+
+  .game-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem; padding-bottom: 1rem;
+    border-bottom: 1px solid $border;
   }
-  .match-col { display: flex; flex-direction: column; gap: 8px; }
- 
+  .game-title {
+    font-size: 1.1rem; font-weight: 800; color: $text-dark; margin: 0;
+  }
+  .game-meta {
+    display: flex; align-items: center; gap: .75rem;
+    font-size: .9rem; color: $text-body; font-weight: 600;
+    .btn { font-family: $font; font-weight: 700; border-radius: $r-btn; font-size: .8rem; }
+  }
+
+  .match-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .match-col { display: flex; flex-direction: column; gap: 10px; }
+
   .match-item {
-    padding: 12px 14px;
-    font-size: 0.875rem;
-    border-radius: 10px;
-    border: 1.5px solid #e5e7eb;
-    background: #fff;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    user-select: none;
- 
-    &:hover { border-color: #9ca3af; }
-    &.selected { border-color: #374151; background: #f9fafb; font-weight: 600; }
+    padding: 14px 16px; font-size: .9rem; font-weight: 600;
+    font-family: $font;
+    border-radius: 14px; border: 2px solid $border;
+    background: $white; cursor: pointer; text-align: center;
+    transition: all $ease; user-select: none;
+    box-shadow: $shadow-card;
+
+    &:hover {
+      border-color: $mint; background: $mint-light;
+      transform: translateY(-2px); box-shadow: $shadow-hover;
+    }
+    &.selected {
+      border-color: $text-dark; background: $bg;
+      font-weight: 700; box-shadow: $shadow-hover;
+    }
     &.correct {
-      border-color: #86efac;
-      background: #f0fdf4;
-      color: #16a34a;
-      font-weight: 600;
-      pointer-events: none;
+      border-color: $green-border; background: $green-bg;
+      color: $green; font-weight: 700; pointer-events: none;
     }
     &.wrong {
-      border-color: #fca5a5;
-      background: #fef2f2;
-      color: #dc2626;
+      border-color: $red-border; background: $red-bg; color: $red;
+      animation: matchShake .35s ease;
     }
   }
 }
 
-.game-matching {
-  .match-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+// ─── Game Result (shared across all games) ───────────────────────────────────
+.game-result {
+  font-family: $font;
+  max-width: 420px; margin: 4rem auto;
+  padding: 3rem 2rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-card;
+  box-shadow: $shadow-card;
+  text-align: center;
+
+  .result-score {
+    font-size: 3.5rem; font-weight: 900; color: $mint;
+    letter-spacing: -.03em; margin-bottom: .25rem;
   }
-  .match-col { display: flex; flex-direction: column; gap: 8px; }
- 
-  .match-item {
-    padding: 12px 14px;
-    font-size: 0.875rem;
-    border-radius: 10px;
-    border: 1.5px solid #e5e7eb;
-    background: #fff;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    user-select: none;
- 
-    &:hover { border-color: #9ca3af; }
-    &.selected { border-color: #374151; background: #f9fafb; font-weight: 600; }
-    &.correct {
-      border-color: #86efac;
-      background: #f0fdf4;
-      color: #16a34a;
-      font-weight: 600;
-      pointer-events: none;
+  .result-label {
+    font-size: 1rem; color: $text-muted; font-weight: 600;
+    margin-bottom: 2rem;
+  }
+  .result-actions {
+    display: flex; gap: .75rem; justify-content: center;
+    .btn {
+      font-family: $font; font-weight: 700;
+      border-radius: $r-btn; padding: .6rem 1.5rem;
+      font-size: .9rem;
     }
-    &.wrong {
-      border-color: #fca5a5;
-      background: #fef2f2;
-      color: #dc2626;
+    .btn-dark {
+      background: $mint; border-color: $mint;
+      &:hover { background: $mint-dark; box-shadow: $shadow-btn; }
     }
   }
+}
+
+@keyframes matchShake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
 }

@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
-// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+// ─── Design Tokens (synced with Home.scss) ────────────────────────────────────
 $font:         'Nunito', sans-serif;
 $mint:         #00c896;
 $mint-dark:    #00a87c;
@@ -12,76 +12,134 @@ $text-dark:    #111827;
 $text-body:    #374151;
 $text-muted:   #9ca3af;
 $border:       #e5e7eb;
+$hero-blue:    #1a73e8;
 $shadow-sm:    0 2px 10px rgba(0,200,150,.08);
 $shadow-card:  0 4px 24px rgba(0,0,0,.07);
 $shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
 $r-card:       20px;
 $r-pill:       100px;
+$r-btn:        50px;
 $ease:         0.22s cubic-bezier(.4,0,.2,1);
 
-// ── FlashcardList page ────────────────────────────────────────────────────────
+// ─── FlashcardList Page ──────────────────────────────────────────────────────
 .flashcard-list-page {
-  background: $bg;
+  background: $white;
   min-height: 100vh;
   font-family: $font;
-  padding: 2rem 0;
+  padding: 2rem 0 4rem;
   color: $text-dark;
+
   .container { max-width: 1200px; }
 
-  // Back button
+  // Back button (same style as Home nav buttons)
   .back-button {
     display: inline-flex; align-items: center; gap: .5rem;
-    background: $white; border: 1.5px solid $border;
+    background: $white; border: 2px solid $border;
     border-radius: $r-pill; padding: .5rem 1.2rem;
     font-family: $font; font-weight: 700; font-size: .9rem;
     color: $text-body; cursor: pointer;
     box-shadow: $shadow-sm; transition: all $ease; margin-bottom: 2rem;
-    &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; }
+    &:hover {
+      border-color: $mint; color: $mint-dark; background: $mint-light;
+      transform: translateY(-1px); box-shadow: $shadow-hover;
+    }
   }
 
   // Page header
   .page-header {
-    text-align: center; margin-bottom: 3rem;
-    h1 { font-size: 2.25rem; font-weight: 900; color: $text-dark; letter-spacing: -.03em; margin-bottom: .75rem; }
-    .page-subtitle { font-size: 1rem; color: $text-muted; max-width: 600px; margin: 0 auto; font-weight: 600; }
+    margin-bottom: 2.5rem;
+
+    .header-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 1rem;
+    }
+
+    h1 {
+      font-size: 2rem; font-weight: 900; color: $text-dark;
+      letter-spacing: -.03em; margin-bottom: .5rem;
+    }
+    .page-subtitle {
+      font-size: 1rem; color: $text-muted; max-width: 600px;
+      font-weight: 600; line-height: 1.55;
+    }
+
+    .btn-outline-primary {
+      font-family: $font; font-weight: 700; font-size: .9rem;
+      border-radius: $r-btn; padding: .55rem 1.3rem;
+      border: 2px solid $mint; color: $mint-dark; background: transparent;
+      transition: all $ease;
+      &:hover {
+        background: $mint; color: $white; border-color: $mint;
+        box-shadow: $shadow-btn; transform: translateY(-1px);
+      }
+    }
   }
 
   // Loading & empty states
   .loading-container, .empty-state {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 4rem 2rem; text-align: center;
-    background: $white; border-radius: $r-card; border: 1.5px solid $border; box-shadow: $shadow-sm;
-    .spinner-border { width: 3rem; height: 3rem; color: $mint; }
+    background: $white; border-radius: $r-card;
+    border: 1.5px solid $border; box-shadow: $shadow-card;
+    .spinner-border { width: 3rem; height: 3rem; color: $mint !important; }
     .empty-icon { font-size: 3.5rem; color: $text-muted; margin-bottom: 1.5rem; }
     p { font-size: 1rem; color: $text-muted; margin-top: 1rem; margin-bottom: 1.5rem; font-weight: 600; }
   }
 
   // Grid
-  .sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+  .sets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
 
-  // Set card
+  // Set card (matches course-card style from Home)
   .set-card {
     border: 1.5px solid $border; border-radius: $r-card;
-    background: $white; box-shadow: $shadow-sm;
+    background: $white; box-shadow: $shadow-card;
     transition: all $ease; cursor: pointer;
     display: flex; flex-direction: column;
-    &:hover { transform: translateY(-5px); box-shadow: $shadow-hover; border-color: $mint-mid; }
 
-    .card-body { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+    &:hover {
+      transform: translateY(-7px);
+      box-shadow: $shadow-hover;
+      border-color: $mint !important;
+    }
+
+    .card-body {
+      padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1;
+    }
 
     .card-icon-wrapper {
       width: 48px; height: 48px; border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      background: $mint-light; color: $mint-dark; font-size: 1.5rem; margin-bottom: 1rem;
+      background: linear-gradient(135deg, $mint-light, $mint-mid);
+      color: $mint-dark; font-size: 1.5rem; margin-bottom: 1rem;
     }
 
-    .card-title { font-size: 1.1rem; font-weight: 800; color: $text-dark; margin-bottom: .5rem; }
-    .card-text { color: $text-muted; font-size: .9rem; flex-grow: 1; margin-bottom: 1rem; line-height: 1.55; }
+    .card-title {
+      font-size: 1.02rem; font-weight: 800; color: $text-dark;
+      margin-bottom: .5rem;
+    }
+    .card-text {
+      color: $text-muted; font-size: .9rem; flex-grow: 1;
+      margin-bottom: 1rem; line-height: 1.55;
+    }
 
     .card-footer-info {
       margin-top: auto; padding-top: 1rem;
       border-top: 1px solid $border;
       font-size: .88rem; color: $text-muted; font-weight: 600;
     }
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .flashcard-list-page {
+    padding: 1.25rem 0 3rem;
+    .page-header h1 { font-size: 1.65rem; }
+    .sets-grid { grid-template-columns: 1fr; gap: 1rem; }
   }
 }
