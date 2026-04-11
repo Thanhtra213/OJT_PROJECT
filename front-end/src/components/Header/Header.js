@@ -505,7 +505,26 @@ const Header = () => {
 
       <Navbar expand="lg" className="main-header">
         <Container>
-          <Navbar.Brand href="/" className="logo" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Navbar.Brand
+            onClick={() => {
+              const raw = localStorage.getItem("user");
+              let user = null;
+              try {
+                if (raw && raw !== "undefined" && raw !== "null") {
+                  user = JSON.parse(raw);
+                }
+              } catch { user = null; }
+
+              if (!user) { navigate("/"); return; }
+
+              const role = String(user.role || "").toUpperCase();
+              if (role === "ADMIN") navigate("/admin/dashboard");
+              else if (role === "TEACHER") navigate("/teacher/dashboard");
+              else navigate("/home");
+            }}
+            className="logo"
+            style={{ position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          >
             <div style={{ position: 'absolute', top: '0', left: '-6px', zIndex: 1, transform: 'rotate(-10deg)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
                 <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />

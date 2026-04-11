@@ -41,10 +41,24 @@ import TeacherCreateLesson from "./components/Teacher/CreateLesson";
 import TeacherEditLesson from "./components/Teacher/EditLesson";
 
 import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from "sonner";
 
 const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user ? children : <Navigate to="/" replace />; 
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch { user = null; }
+
+  if (!user) return <Navigate to="/" replace />;
+
+  const role = String(user.role || "").toUpperCase();
+  if (role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
+  if (role === "TEACHER") return <Navigate to="/teacher/dashboard" replace />;
+
+  return children;
 };
 
 const AdminRoute = ({ children }) => {
@@ -83,6 +97,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <ThemeProvider>
+       <Toaster        
+        position="top-right"
+        richColors
+        duration={3000}
+        closeButton
+      />
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={

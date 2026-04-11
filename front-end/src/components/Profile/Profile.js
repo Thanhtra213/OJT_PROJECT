@@ -225,12 +225,16 @@ const Profile = () => {
 
         let email = "";
         try {
-          const storedUser = JSON.parse(
-            localStorage.getItem("user") || "{}"
-          );
-          email = storedUser.email || storedUser.Email || "";
+          // ✅ API đã trả về đúng field "email"
+          email = detailData?.email || "";
+
+          // Fallback sang localStorage nếu API không có
+          if (!email) {
+            const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+            email = storedUser.email || storedUser.Email || "";
+          }
         } catch (e) {
-          console.warn("Cannot get email from localStorage");
+          console.warn("Cannot get email");
         }
 
         // Avatar
@@ -263,7 +267,7 @@ const Profile = () => {
         if (isMounted) {
           setUser({
             fullName: detailData?.fullName || username || "Chưa cập nhật",
-            email: email || username || "Chưa có email",
+            email: email || "Chưa có email",  // ✅ bỏ fallback username
             bio: detailData?.bio || "",
             address: detailData?.address || "",
             dob: detailData?.dob ? detailData.dob.split("T")[0] : "",

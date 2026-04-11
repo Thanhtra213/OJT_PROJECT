@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import "./PaymentForm.scss";
 import { getPlans } from "../../middleware/planAPI";
 import { createPayment } from "../../middleware/paymentAPI";
-import Footer from "../Footer/footer";
+import { validateVoucher } from "../../middleware/paymentAPI";
+//import Footer from "../Footer/footer";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -38,14 +39,12 @@ function Label({ className, ...props }) {
 function PaymentForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [discount, setDiscount] = useState(0);
 
   const [plan, setPlan] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-  });
+  const [voucher, setVoucher] = useState("");
+  const [finalPrice, setFinalPrice] = useState(null);
 
   useEffect(() => {
     const loadPlan = async () => {
@@ -61,43 +60,56 @@ function PaymentForm() {
     loadPlan();
   }, [id]);
 
+  useEffect(() => {
+    if (voucher.trim() === "") {
+      setDiscount(0);
+      setFinalPrice(null);
+    }
+  }, [voucher]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.fullName || !formData.email || !formData.phone) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
-      return;
-    }
-
     setIsProcessing(true);
-    try {
-      // 🔹 Gọi API với planID
-      const paymentUrl = await createPayment(plan.planID);
-      
-      if (paymentUrl) {
-        toast.success("Đang chuyển đến trang thanh toán...");
-        
-        // 🔹 Chờ 500ms để user thấy toast, sau đó redirect
-        setTimeout(() => {
-          window.location.href = paymentUrl;
-        }, 500);
-      } else {
-        toast.error("Không nhận được URL thanh toán");
-        setIsProcessing(false);
-      }
-      
-    } catch (err) {
-      console.error("Lỗi khi tạo thanh toán:", err);
 
-      // 🔹 Xử lý lỗi 401 Unauthorized
+    try {
+      const paymentUrl = await createPayment(
+        plan.planID,
+        voucher?.trim() || null   // 🔥 QUAN TRỌNG
+      );
+
+      toast.success("Đang chuyển đến trang thanh toán...");
+
+      setTimeout(() => {
+        window.location.href = paymentUrl;
+      }, 500);
+
+    } catch (err) {
+      console.error(err);
+
       if (err.response?.status === 401) {
-        toast.error("Bạn cần đăng nhập để thực hiện thanh toán");
+        toast.error("Bạn cần đăng nhập");
         navigate("/login");
         return;
       }
 
-      toast.error(err.response?.data?.message || "Lỗi khi tạo thanh toán. Vui lòng thử lại.");
+      toast.error(err.response?.data || "Lỗi thanh toán");
       setIsProcessing(false);
+    }
+  };
+
+  const handleApplyVoucher = async () => {
+    try {
+      const data = await validateVoucher(plan.planID, voucher);
+
+      setDiscount(data.discountAmount);
+      setFinalPrice(data.finalPrice);
+
+      toast.success("Áp dụng mã giảm giá thành công! 🎉");
+    } catch (err) {
+      setDiscount(0);
+      setFinalPrice(null);
+      toast.error(err.message || "Mã voucher không hợp lệ");
     }
   };
 
@@ -124,30 +136,17 @@ function PaymentForm() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="form">
-                  <Label>Họ và tên *</Label>
+
+                  <Label>Mã voucher</Label>
                   <Input
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Nguyễn Văn A"
-                    required
+                    value={voucher}
+                    onChange={(e) => setVoucher(e.target.value)}
+                    placeholder="T4VJP271204"
                   />
 
-                  <Label>Email *</Label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="example@email.com"
-                    required
-                  />
-
-                  <Label>Số điện thoại *</Label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="0123456789"
-                    required
-                  />
+                  <Button type="button" onClick={handleApplyVoucher}>
+                    Áp dụng
+                  </Button>
 
                   <Button type="submit" disabled={isProcessing} className="submit-btn">
                     {isProcessing ? "Đang xử lý..." : "Thanh toán ngay"}
@@ -164,10 +163,28 @@ function PaymentForm() {
                 <CardTitle>Tóm tắt đơn hàng</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="plan-name">{plan.name}</p>
-                <p className="plan-duration">{plan.durationDays} ngày</p>
+                <p className="plan-name">Gói: {plan.name}</p>
+                <p className="plan-duration">
+                  Thời hạn: {plan.durationDays} ngày
+                </p>
+
+                <p>
+                  Giá gốc:{" "}
+                  <strong>{plan.price.toLocaleString("vi-VN")}đ</strong>
+                </p>
+
+                <p>
+                  Giảm giá:{" "}
+                  <strong>
+                    -{discount.toLocaleString("vi-VN")}đ
+                  </strong>
+                </p>
+
                 <p className="price-total">
-                  Tổng cộng: <strong>{plan.price.toLocaleString("vi-VN")}đ</strong>
+                  Thanh toán:{" "}
+                  <strong>
+                    {(plan.price - discount).toLocaleString("vi-VN")}đ
+                  </strong>
                 </p>
               </CardContent>
             </Card>
