@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Spinner } from "react-bootstrap";
-import { FaTrash, FaPlay } from "react-icons/fa";
+import { Container, Spinner } from "react-bootstrap";
+import { FaTrash, FaPlay, FaArrowLeft, FaBookOpen } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { getMyVocabList, removeFromMyList } from "../../../middleware/FlashcardprogressAPI";
 import GameSetup from "./Gamelauncher";
 import GameMatching from "./Gamematching";
@@ -18,8 +19,9 @@ const mapItem = (item) => ({
 const MyVocabList = () => {
     const [myList, setMyList] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [pendingGame, setPendingGame] = useState(null); // 'match' | 'fill' | 'type'
-    const [activeGame, setActiveGame] = useState(null);   // { type, words }
+    const [pendingGame, setPendingGame] = useState(null);
+    const [activeGame, setActiveGame] = useState(null);
+    const navigate = useNavigate();
 
     const fetchList = async () => {
         try {
@@ -67,59 +69,78 @@ const MyVocabList = () => {
         );
     }
 
-    if (loading) {
-        return (
-            <div className="mylist-loading">
-                <Spinner animation="border" size="sm" /> Đang tải danh sách...
-            </div>
-        );
-    }
-
     return (
         <div className="mylist-page">
-            <div className="mylist-header">
-                <h5>Danh sách từ của tôi <span className="badge bg-secondary">{myList.length}</span></h5>
-                {myList.length >= 4 && (
-                    <div className="mylist-game-buttons">
-                        <button className="mylist-game-btn" onClick={() => setPendingGame("match")}>
-                            <FaPlay className="me-1" /> Nối từ
-                        </button>
-                        <button className="mylist-game-btn" onClick={() => setPendingGame("fill")}>
-                            <FaPlay className="me-1" /> Điền từ
-                        </button>
-                        <button className="mylist-game-btn" onClick={() => setPendingGame("type")}>
-                            <FaPlay className="me-1" /> Gõ chính tả
+            <Container>
+                {/* Back button */}
+                <button className="mylist-back" onClick={() => navigate(-1)}>
+                    <FaArrowLeft /> <span>Quay lại</span>
+                </button>
+
+                {/* Page header */}
+                <div className="mylist-header">
+                    <div className="mylist-title-area">
+                        <h4>
+                            <FaBookOpen className="me-2" style={{color:"#00c896"}} />
+                            Danh sách từ của tôi
+                            <span className="mylist-count">{myList.length}</span>
+                        </h4>
+                        <p className="mylist-subtitle">Các từ vựng bạn đã lưu khi học flashcard</p>
+                    </div>
+
+                    {myList.length >= 4 && (
+                        <div className="mylist-game-buttons">
+                            <button className="mylist-game-btn" onClick={() => setPendingGame("match")}>
+                                <FaPlay className="me-1" /> Nối từ
+                            </button>
+                            <button className="mylist-game-btn" onClick={() => setPendingGame("fill")}>
+                                <FaPlay className="me-1" /> Điền từ
+                            </button>
+                            <button className="mylist-game-btn" onClick={() => setPendingGame("type")}>
+                                <FaPlay className="me-1" /> Gõ chính tả
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Content */}
+                {loading ? (
+                    <div className="mylist-loading">
+                        <Spinner animation="border" style={{color:"#00c896"}} />
+                        <p>Đang tải danh sách từ...</p>
+                    </div>
+                ) : myList.length === 0 ? (
+                    <div className="mylist-empty">
+                        <FaBookOpen className="mylist-empty-icon" />
+                        <h5>Chưa có từ nào</h5>
+                        <p>Hãy lưu từ khi học flashcard để ôn tập tại đây!</p>
+                        <button className="mylist-go-learn" onClick={() => navigate("/flashcard-list")}>
+                            Đi học flashcard
                         </button>
                     </div>
+                ) : (
+                    <div className="mylist-grid">
+                        {myList.map(item => (
+                            <div key={item.id} className="mylist-card">
+                                <button
+                                    className="mylist-remove"
+                                    onClick={() => handleRemove(item.id)}
+                                    title="Xóa khỏi danh sách"
+                                >
+                                    <FaTrash />
+                                </button>
+                                <div className="mylist-word">{item.word}</div>
+                                <div className="mylist-phonetic">{item.phonetic}</div>
+                                <div className="mylist-meaning">{item.meaning}</div>
+                            </div>
+                        ))}
+                    </div>
                 )}
-            </div>
 
-            {myList.length === 0 ? (
-                <div className="mylist-empty">
-                    <p>Chưa có từ nào. Hãy lưu từ khi học flashcard!</p>
-                </div>
-            ) : (
-                <div className="mylist-grid">
-                    {myList.map(item => (
-                        <div key={item.id} className="mylist-card">
-                            <button
-                                className="mylist-remove"
-                                onClick={() => handleRemove(item.id)}
-                                title="Xóa"
-                            >
-                                <FaTrash />
-                            </button>
-                            <div className="mylist-word">{item.word}</div>
-                            <div className="mylist-phonetic">{item.phonetic}</div>
-                            <div className="mylist-meaning">{item.meaning}</div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {myList.length > 0 && myList.length < 4 && (
-                <p className="mylist-hint">Cần ít nhất 4 từ để chơi trò chơi.</p>
-            )}
+                {myList.length > 0 && myList.length < 4 && (
+                    <p className="mylist-hint">💡 Cần ít nhất 4 từ để chơi trò chơi ôn tập.</p>
+                )}
+            </Container>
         </div>
     );
 };

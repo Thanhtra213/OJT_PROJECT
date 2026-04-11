@@ -1,193 +1,148 @@
+// ─── Game Setup / Launcher (synced with site design) ─────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-pill:       100px;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
 .game-setup {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 1.5rem 1rem;
+  max-width: 580px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-card;
+  box-shadow: $shadow-card;
+  font-family: $font;
 
   .gs-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid $border;
   }
 
   .gs-back {
-    background: none;
-    border: none;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    padding: 0;
-    &:hover { color: var(--color-text-primary); }
+    background: $white; border: 2px solid $border;
+    border-radius: $r-pill; padding: .45rem 1.1rem;
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .85rem; font-weight: 700; font-family: $font;
+    color: $text-body; cursor: pointer;
+    transition: all $ease; white-space: nowrap;
+    &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; }
   }
 
   .gs-title {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0;
-    color: var(--color-text-primary);
+    font-size: 1.1rem; font-weight: 800;
+    margin: 0; color: $text-dark;
   }
 
-  .gs-section {
-    margin-bottom: 1.5rem;
-  }
+  .gs-section { margin-bottom: 1.5rem; }
 
   .gs-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
+    font-size: .82rem; font-weight: 700; color: $text-body;
     margin-bottom: 8px;
   }
 
-  .gs-total {
-    font-weight: 400;
-    color: var(--color-text-tertiary);
-  }
+  .gs-total { font-weight: 500; color: $text-muted; }
 
-  .gs-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+  .gs-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .gs-pill {
-    padding: 6px 16px;
-    border-radius: 999px;
-    border: 0.5px solid var(--color-border-secondary);
-    background: var(--color-background-primary);
-    font-size: 14px;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    transition: all 0.15s;
+    padding: 7px 16px; border-radius: $r-pill;
+    border: 2px solid $border; background: $white;
+    font-size: .88rem; font-weight: 700; font-family: $font;
+    color: $text-body; cursor: pointer; transition: all $ease;
 
-    &:hover:not(.disabled) {
-      background: var(--color-background-secondary);
-    }
+    &:hover:not(.disabled) { border-color: $mint; background: $mint-light; color: $mint-dark; }
 
     &.active {
-      background: var(--color-text-primary);
-      color: var(--color-background-primary);
-      border-color: var(--color-text-primary);
+      background: $mint; color: $white; border-color: $mint;
+      box-shadow: $shadow-btn;
     }
 
-    &.disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
+    &.disabled { opacity: .35; cursor: not-allowed; }
   }
 
   .gs-set-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 200px;
-    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 200px; overflow-y: auto;
   }
 
   .gs-set-item {
-    text-align: left;
-    padding: 10px 14px;
-    border-radius: var(--border-radius-md);
-    border: 0.5px solid var(--color-border-tertiary);
-    background: var(--color-background-primary);
-    font-size: 14px;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    transition: all 0.15s;
+    text-align: left; padding: 10px 14px;
+    border-radius: 12px; border: 1.5px solid $border;
+    background: $white; font-size: .9rem; font-weight: 600;
+    font-family: $font; color: $text-body; cursor: pointer;
+    transition: all $ease;
 
-    &:hover { background: var(--color-background-secondary); }
-
+    &:hover { background: $bg; border-color: $text-muted; }
     &.active {
-      border-color: var(--color-border-primary);
-      background: var(--color-background-secondary);
-      font-weight: 500;
+      border-color: $mint; background: $mint-light; color: $mint-dark;
+      font-weight: 700;
     }
   }
 
   .gs-loading {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 1rem;
+    font-size: .88rem; color: $text-muted; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 1rem;
   }
 
   .gs-preview-toggle {
-    background: none;
-    border: none;
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
+    background: none; border: none;
+    font-size: .82rem; color: $mint-dark; font-weight: 700;
+    cursor: pointer; padding: 0; text-decoration: underline;
     margin-bottom: 10px;
-    &:hover { color: var(--color-text-primary); }
+    &:hover { color: $mint; }
   }
 
   .gs-preview-list {
-    border: 0.5px solid var(--color-border-tertiary);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    max-height: 240px;
-    overflow-y: auto;
+    border: 1.5px solid $border; border-radius: 12px;
+    overflow: hidden; max-height: 240px; overflow-y: auto;
   }
 
   .gs-preview-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    font-size: 13px;
-    border-bottom: 0.5px solid var(--color-border-tertiary);
-
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; font-size: .85rem;
+    border-bottom: 1px solid $border;
     &:last-child { border-bottom: none; }
-
-    &:nth-child(even) {
-      background: var(--color-background-secondary);
-    }
+    &:nth-child(even) { background: $bg; }
   }
 
-  .gs-preview-word {
-    font-weight: 500;
-    color: var(--color-text-primary);
-  }
-
-  .gs-preview-meaning {
-    color: var(--color-text-secondary);
-    font-size: 12px;
-  }
+  .gs-preview-word { font-weight: 700; color: $text-dark; }
+  .gs-preview-meaning { color: $text-muted; font-size: .8rem; }
 
   .gs-footer {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    margin-top: 2rem; display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
   }
 
-  .gs-warn {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    margin: 0;
-  }
+  .gs-warn { font-size: .82rem; color: $text-muted; margin: 0; }
 
   .gs-start {
-    width: 100%;
-    padding: 12px;
-    border-radius: var(--border-radius-md);
-    border: none;
-    background: var(--color-text-primary);
-    color: var(--color-background-primary);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.15s;
+    width: 100%; padding: 12px; border-radius: $r-btn;
+    border: none; background: $mint; color: $white;
+    font-size: 1rem; font-weight: 800; font-family: $font;
+    cursor: pointer; transition: all $ease;
+    box-shadow: $shadow-btn;
 
-    &:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
+    &:not(:disabled):hover {
+      background: $mint-dark;
+      transform: translateY(-1px);
     }
-
-    &:not(:disabled):hover { opacity: 0.85; }
+    &:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
   }
 }

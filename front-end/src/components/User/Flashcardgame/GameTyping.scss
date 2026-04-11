@@ -1,99 +1,98 @@
+// ─── Game Typing (synced with site design) ───────────────────────────────────
+$font:         'Nunito', sans-serif;
+$mint:         #00c896;
+$mint-dark:    #00a87c;
+$mint-light:   #e6faf4;
+$mint-mid:     #b3f0de;
+$white:        #ffffff;
+$bg:           #f9fafb;
+$text-dark:    #111827;
+$text-body:    #374151;
+$text-muted:   #9ca3af;
+$border:       #e5e7eb;
+$green:        #10b981;
+$green-bg:     #f0fdf4;
+$green-border: #86efac;
+$red:          #ef4444;
+$red-bg:       #fef2f2;
+$red-border:   #fca5a5;
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
+
 .game-typing {
+  font-family: $font;
+  max-width: 600px; margin: 2rem auto; padding: 2rem;
+  background: $white; border: 1.5px solid $border;
+  border-radius: $r-card; box-shadow: $shadow-card;
+
+  .game-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem; padding-bottom: 1rem;
+    border-bottom: 1px solid $border;
+  }
+  .game-title { font-size: 1.1rem; font-weight: 800; color: $text-dark; margin: 0; }
+  .game-meta {
+    display: flex; align-items: center; gap: .75rem;
+    font-size: .9rem; color: $text-body; font-weight: 600;
+    .btn { font-family: $font; font-weight: 700; border-radius: $r-btn; font-size: .8rem; }
+  }
+
   .typing-card {
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    margin-bottom: 1rem;
+    background: $bg; border: 1.5px solid $border;
+    border-radius: 16px; padding: 1.5rem;
+    text-align: center; margin-bottom: 1rem;
   }
   .typing-meaning {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.25rem;
+    font-size: 1.5rem; font-weight: 800;
+    color: $text-dark; margin-bottom: 0.25rem;
   }
   .typing-phonetic {
-    font-size: 0.875rem;
-    color: #9ca3af;
-    margin-bottom: 1rem;
+    font-size: 0.875rem; color: $text-muted;
+    margin-bottom: 1rem; font-style: italic;
   }
   .speak-btn {
-    display: inline-flex;
-    align-items: center;
-    background: none;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 50px;
-    padding: 6px 14px;
-    font-size: 0.8rem;
-    color: #6b7280;
-    cursor: pointer;
-    margin-bottom: 1.25rem;
-    &:hover { border-color: #9ca3af; color: #374151; }
+    display: inline-flex; align-items: center;
+    background: $mint-light; border: 1.5px solid $mint-mid;
+    border-radius: 50px; padding: 8px 16px;
+    font-size: .82rem; font-weight: 700; font-family: $font;
+    color: $mint-dark; cursor: pointer;
+    margin-bottom: 1.25rem; transition: all $ease;
+    &:hover { background: $mint; color: $white; border-color: $mint; box-shadow: $shadow-btn; }
   }
   .typing-input-row {
-    display: flex;
-    gap: 8px;
-    max-width: 360px;
-    margin: 0 auto;
+    display: flex; gap: 10px; max-width: 380px; margin: 0 auto;
+    .btn-dark {
+      background: $mint; border-color: $mint; border-radius: $r-btn;
+      font-family: $font; font-weight: 700; white-space: nowrap;
+      &:hover { background: $mint-dark; box-shadow: $shadow-btn; }
+    }
   }
   .typing-input {
-    flex: 1;
-    padding: 10px 14px;
-    font-size: 1rem;
-    border-radius: 10px;
-    border: 1.5px solid #e5e7eb;
-    outline: none;
-    transition: border-color 0.15s;
-    &:focus { border-color: #374151; }
-    &.correct { border-color: #86efac; background: #f0fdf4; }
-    &.wrong { border-color: #fca5a5; background: #fef2f2; }
-    &:disabled { cursor: default; }
+    flex: 1; padding: 10px 14px; font-size: 1rem; font-weight: 600;
+    font-family: $font;
+    border-radius: 14px; border: 2px solid $border;
+    outline: none; transition: all $ease;
+    &:focus { border-color: $mint; box-shadow: 0 0 0 3px rgba(0,200,150,.1); }
+    &.correct { border-color: $green-border; background: $green-bg; color: $green; }
+    &.wrong { border-color: $red-border; background: $red-bg; color: $red; }
+    &:disabled { cursor: default; background: $bg; }
   }
   .typing-feedback {
-    margin-top: 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    padding: 8px 12px;
-    border-radius: 8px;
-    &.success { background: #f0fdf4; color: #16a34a; }
-    &.danger { background: #fef2f2; color: #dc2626; }
+    margin-top: 1rem; font-size: .875rem; font-weight: 700;
+    padding: 10px 14px; border-radius: 12px;
+    &.success { background: $green-bg; color: $green; border: 1px solid $green-border; }
+    &.danger { background: $red-bg; color: $red; border: 1px solid $red-border; }
   }
-  .typing-next-row { text-align: center; margin-top: 1rem; }
-}
-
-.game-matching {
-  .match-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .match-col { display: flex; flex-direction: column; gap: 8px; }
- 
-  .match-item {
-    padding: 12px 14px;
-    font-size: 0.875rem;
-    border-radius: 10px;
-    border: 1.5px solid #e5e7eb;
-    background: #fff;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    user-select: none;
- 
-    &:hover { border-color: #9ca3af; }
-    &.selected { border-color: #374151; background: #f9fafb; font-weight: 600; }
-    &.correct {
-      border-color: #86efac;
-      background: #f0fdf4;
-      color: #16a34a;
-      font-weight: 600;
-      pointer-events: none;
-    }
-    &.wrong {
-      border-color: #fca5a5;
-      background: #fef2f2;
-      color: #dc2626;
+  .typing-next-row {
+    text-align: center; margin-top: 1.25rem;
+    .btn-dark {
+      background: $mint; border-color: $mint; border-radius: $r-btn;
+      font-family: $font; font-weight: 700;
+      &:hover { background: $mint-dark; box-shadow: $shadow-btn; }
     }
   }
 }

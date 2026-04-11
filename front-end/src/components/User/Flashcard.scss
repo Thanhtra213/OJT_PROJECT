@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
-// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+// ─── Design Tokens (synced with Home.scss) ────────────────────────────────────
 $font:         'Nunito', sans-serif;
 $mint:         #00c896;
 $mint-dark:    #00a87c;
@@ -12,72 +12,120 @@ $text-dark:    #111827;
 $text-body:    #374151;
 $text-muted:   #9ca3af;
 $border:       #e5e7eb;
+$hero-blue:    #1a73e8;
+$hero-yellow:  #f9c74f;
+$card-green:   #10b981;
+$card-purple:  #8b5cf6;
+$card-blue:    #3b82f6;
+$card-amber:   #f59e0b;
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
 $shadow-card:  0 4px 24px rgba(0,0,0,.07);
 $shadow-hover: 0 12px 40px rgba(0,200,150,.18);
-$shadow-lg:    0 10px 28px rgba(0,0,0,.1);
-$r-xl:         24px;
+$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
+$r-card:       20px;
 $r-pill:       100px;
-$ease:         0.3s ease;
+$r-btn:        50px;
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
 
-// ── Page containers ───────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 .flashcard-learn-page {
-  background-color: $bg;
+  background: $white;
   min-height: 100vh;
   font-family: $font;
-  display: flex; flex-direction: column;
+  display: flex;
+  flex-direction: column;
   color: $text-dark;
+  padding-bottom: 3rem;
 }
 
 .flashcard-page-loading,
 .flashcard-page-error {
   display: flex; flex-direction: column;
   justify-content: center; align-items: center;
-  min-height: 100vh; background: $bg; font-family: $font;
-  .spinner { width: 44px; height: 44px; border: 3px solid $mint-mid; border-top-color: $mint; border-radius: 50%; animation: spin .75s linear infinite; margin-bottom: 1rem; }
-  p { font-size: 1rem; color: $text-muted; font-weight: 600; }
+  min-height: 100vh; background: $white; font-family: $font;
+  .spinner-border { width: 3rem; height: 3rem; color: $mint !important; }
+  p { font-size: 1rem; color: $text-body; font-weight: 600; margin-top: 1rem; }
 }
 
-@keyframes spin  { to { transform: rotate(360deg); } }
-@keyframes flipY { to { transform: rotateY(180deg); } }
-
-// ── Header ────────────────────────────────────────────────────────────────────
+// ─── Header (matches hero gradient from Home) ────────────────────────────────
 .flashcard-learn-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1.5rem 2rem; width: 100%;
-  background: $white; border-bottom: 1px solid $border;
+  background: linear-gradient(135deg, #1557b0 0%, #1a73e8 45%, #0ea5c9 100%);
+  padding: 2rem 2rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  // Decorative blobs (same as Home hero)
+  &::before {
+    content: '';
+    position: absolute; top: -70px; right: -70px;
+    width: 250px; height: 250px;
+    background: $hero-yellow; border-radius: 50%;
+    opacity: .15;
+    animation: blob-pulse 6s ease-in-out infinite;
+  }
+  &::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -40px;
+    width: 200px; height: 200px;
+    background: $mint; border-radius: 50%;
+    opacity: .12;
+    animation: blob-pulse 8s ease-in-out infinite reverse;
+  }
 
   .set-title {
-    font-size: 1.5rem; font-weight: 900; color: $text-dark;
+    font-size: 1.5rem; font-weight: 900; color: $white;
     margin: 0; flex: 1; text-align: center; padding: 0 2.5rem;
     letter-spacing: -.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,.15);
+    position: relative; z-index: 2;
   }
 
   .close-button {
-    background: $bg; border: 1.5px solid $border; border-radius: 50%;
-    width: 40px; height: 40px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 50%;
+    width: 42px; height: 42px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; color: $text-muted; cursor: pointer;
-    transition: all $ease;
-    &:hover { background: $mint-light; border-color: $mint-mid; color: $mint-dark; transform: scale(1.05); }
+    font-size: 1.1rem; color: $white; cursor: pointer;
+    transition: all $ease; position: relative; z-index: 2;
+    &:hover {
+      background: rgba(255,255,255,.3);
+      transform: scale(1.08);
+    }
   }
 }
 
-// ── Main container ────────────────────────────────────────────────────────────
+@keyframes blob-pulse {
+  0%,100% { transform: scale(1); opacity: .55; }
+  50%     { transform: scale(1.12); opacity: .35; }
+}
+
+// ─── Main Container ──────────────────────────────────────────────────────────
 .flashcard-learn-container {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; padding: 2rem 2rem;
   width: 100%; max-width: 800px; margin: 0 auto;
 }
 
-// ── Progress ──────────────────────────────────────────────────────────────────
+// ─── Progress ────────────────────────────────────────────────────────────────
 .progress-section {
   width: 100%; margin-bottom: 2rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-card;
+  padding: 1.25rem 1.5rem;
+  box-shadow: $shadow-card;
+
   .progress-text {
-    text-align: center; font-size: .88rem; font-weight: 600;
-    color: $text-muted; margin-bottom: .75rem;
+    text-align: center; font-size: .88rem; font-weight: 700;
+    color: $text-body; margin-bottom: .75rem;
   }
   .progress-bar-background {
-    background: $mint-light; border-radius: 99px; height: 8px; overflow: hidden;
+    background: $mint-light; border-radius: 99px; height: 9px; overflow: hidden;
     .progress-bar-fill {
       background: $mint; height: 100%; border-radius: 99px;
       transition: width .5s ease-in-out;
@@ -85,7 +133,7 @@ $ease:         0.3s ease;
   }
 }
 
-// ── 3D Flashcard ──────────────────────────────────────────────────────────────
+// ─── 3D Flashcard ────────────────────────────────────────────────────────────
 .flashcard-scene {
   width: 100%; height: 400px; perspective: 1000px; margin-bottom: 2rem;
 }
@@ -99,64 +147,134 @@ $ease:         0.3s ease;
 
 .flashcard-face {
   position: absolute; width: 100%; height: 100%;
-  backface-visibility: hidden; border-radius: $r-xl;
-  box-shadow: $shadow-lg;
+  backface-visibility: hidden; border-radius: $r-card;
   display: flex; align-items: center; justify-content: center;
   text-align: center; padding: 2rem;
 }
 
 .flashcard-front {
-  background: $white; border: 1.5px solid $border;
+  background: $white;
+  border: 2px solid $border;
+  box-shadow: $shadow-card;
+
+  &:hover { box-shadow: $shadow-hover; }
+
   .flashcard-content {
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
     height: 100%; width: 100%; position: relative;
-    .word { font-size: 3rem; font-weight: 900; color: $text-dark; margin-bottom: .5rem; letter-spacing: -.03em; }
-    .phonetic { font-size: 1.25rem; color: $text-muted; font-weight: 600; margin-bottom: 3rem; }
+
+    .word {
+      font-size: 3rem; font-weight: 900; color: $text-dark;
+      margin-bottom: .5rem; letter-spacing: -.03em;
+    }
+    .phonetic {
+      font-size: 1.25rem; color: $text-muted; font-weight: 600;
+      margin-bottom: 3rem;
+    }
     .speak-button {
       position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      background: $mint-light; border: none; border-radius: 50%;
-      width: 48px; height: 48px; font-size: 1.2rem; color: $mint-dark;
+      background: $mint-light; border: 2px solid $mint-mid;
+      border-radius: 50%;
+      width: 50px; height: 50px; font-size: 1.2rem; color: $mint-dark;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all $ease;
-      &:hover { background: $mint-mid; transform: translateX(-50%) scale(1.1); }
+      &:hover {
+        background: $mint; color: $white; border-color: $mint;
+        transform: translateX(-50%) scale(1.08);
+        box-shadow: $shadow-btn;
+      }
     }
   }
 }
 
 .flashcard-back {
-  background: linear-gradient(135deg, $mint, $mint-dark);
+  background: linear-gradient(135deg, #1557b0 0%, #1a73e8 45%, #0ea5c9 100%);
   color: $white; transform: rotateY(180deg);
+  box-shadow: 0 8px 32px rgba(21,87,176,.25);
+
   .flashcard-content {
-    .meaning { font-size: 2.5rem; font-weight: 900; letter-spacing: -.025em; }
+    .meaning {
+      font-size: 2.5rem; font-weight: 900; letter-spacing: -.025em;
+      text-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
   }
 }
 
-// ── Main card area with arrows ────────────────────────────────────────────────
+// ─── Card Area with Nav Arrows ───────────────────────────────────────────────
 .main-card-area {
   display: flex; align-items: center; justify-content: center;
   gap: 1rem; width: 100%; margin-bottom: 2rem;
 }
 
 .nav-arrow-button {
-  background: $white; border: 1.5px solid $border; border-radius: 50%;
+  background: $white; border: 2px solid $border; border-radius: 50%;
   width: 50px; height: 50px;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.2rem; color: $text-muted; cursor: pointer;
   transition: all $ease; flex-shrink: 0; box-shadow: $shadow-card;
-  &:hover { background: $mint-light; border-color: $mint-mid; color: $mint-dark; transform: scale(1.05); }
+
+  &:hover {
+    border-color: $mint; color: $mint-dark; background: $mint-light;
+    transform: translateY(-2px); box-shadow: $shadow-hover;
+  }
   &:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
 }
 
-// ── Empty state ───────────────────────────────────────────────────────────────
+// ─── Badges ──────────────────────────────────────────────────────────────────
+.mastered-star {
+  color: $card-amber;
+  font-size: 1.2rem;
+}
+
+.mastered-count {
+  color: $card-green; font-weight: 700; font-size: .85rem;
+}
+
+// ─── Action Buttons ──────────────────────────────────────────────────────────
+.flashcard-action-buttons {
+  display: flex; gap: 12px; justify-content: center;
+  margin-top: 1.25rem; flex-wrap: wrap;
+
+  .action-btn {
+    display: inline-flex; align-items: center;
+    padding: 10px 22px; border-radius: $r-btn;
+    font-size: .9rem; font-weight: 700; font-family: $font;
+    cursor: pointer; border: 2px solid transparent;
+    transition: all $ease;
+
+    &.save-btn {
+      background: #eff6ff; color: $card-blue; border-color: #bfdbfe;
+      &:hover { background: #dbeafe; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,.15); }
+      &.active { background: $card-blue; color: $white; border-color: $card-blue; }
+    }
+
+    &.mastered-btn {
+      background: #f0fdf4; color: $card-green; border-color: #bbf7d0;
+      &:hover { background: #dcfce7; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,.15); }
+      &.active { background: $card-green; color: $white; border-color: $card-green; }
+    }
+  }
+}
+
+// ─── Status ──────────────────────────────────────────────────────────────────
+.status-message {
+  text-align: center; font-size: .875rem; font-weight: 700;
+  color: $card-green; margin-top: .5rem; min-height: 20px;
+  transition: opacity .3s;
+}
+
+// ─── Empty State ─────────────────────────────────────────────────────────────
 .empty-state {
   display: flex; justify-content: center; align-items: center;
   height: 400px; width: 100%;
-  background: $mint-light; border-radius: $r-xl;
+  background: $white; border-radius: $r-card;
+  border: 2px solid $border;
   color: $text-muted; font-size: 1.1rem; font-weight: 600;
+  box-shadow: $shadow-card;
 }
 
-// ── Navigation controls ───────────────────────────────────────────────────────
+// ─── Navigation Controls (legacy) ────────────────────────────────────────────
 .navigation-controls {
   display: flex; justify-content: space-between;
   width: 100%; max-width: 500px; margin-top: auto;
@@ -164,76 +282,34 @@ $ease:         0.3s ease;
   .btn {
     display: flex; align-items: center; gap: .5rem;
     padding: .75rem 1.5rem; font-family: $font;
-    font-size: 1rem; font-weight: 700; border-radius: $r-xl;
+    font-size: 1rem; font-weight: 700; border-radius: $r-card;
     border: 1.5px solid $border; background: $white; color: $text-body;
     box-shadow: $shadow-card; transition: all $ease; cursor: pointer;
     &:hover { transform: translateY(-2px); box-shadow: $shadow-hover; }
     &:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
-    &:last-child { background: $mint; border-color: $mint; color: $white; border-width: 0; box-shadow: 0 4px 16px rgba(0,200,150,.3); &:hover { background: $mint-dark; } }
+    &:last-child {
+      background: $mint; border-color: $mint; color: $white; border-width: 0;
+      box-shadow: $shadow-btn;
+      &:hover { background: $mint-dark; }
+    }
   }
 }
 
-.mastered-star {
-  color: #f59e0b;
-  font-size: 1.2rem;
-}
- 
-.mastered-count {
-  color: #10b981;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
- 
-// Nút Lưu từ + Đánh dấu thuộc
-.flashcard-action-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 1.25rem;
-  flex-wrap: wrap;
- 
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
- 
-    &.save-btn {
-      background: #eff6ff;
-      color: #2563eb;
-      border-color: #bfdbfe;
-      &:hover { background: #dbeafe; }
-      &.active {
-        background: #2563eb;
-        color: #fff;
-        border-color: #2563eb;
-      }
-    }
- 
-    &.mastered-btn {
-      background: #f0fdf4;
-      color: #16a34a;
-      border-color: #bbf7d0;
-      &:hover { background: #dcfce7; }
-      &.active {
-        background: #16a34a;
-        color: #fff;
-        border-color: #16a34a;
-      }
-    }
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .flashcard-learn-header {
+    padding: 1.5rem 1.25rem 2rem;
+    .set-title { font-size: 1.2rem; padding: 0 1rem; }
   }
+  .flashcard-learn-container { padding: 1.5rem 1rem; }
+  .flashcard-scene { height: 320px; }
+  .flashcard-front .flashcard-content .word { font-size: 2.2rem; }
+  .flashcard-back .flashcard-content .meaning { font-size: 2rem; }
+  .nav-arrow-button { width: 44px; height: 44px; font-size: 1rem; }
 }
- 
-.status-message {
-  text-align: center;
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 0.5rem;
-  min-height: 20px;
-  transition: opacity 0.3s;
+
+@media (max-width: 576px) {
+  .flashcard-scene { height: 280px; }
+  .flashcard-front .flashcard-content .word { font-size: 1.8rem; }
+  .flashcard-back .flashcard-content .meaning { font-size: 1.6rem; }
 }
