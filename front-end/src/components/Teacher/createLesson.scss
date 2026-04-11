@@ -1,10 +1,16 @@
-// createLesson.scss - Updated for Dashboard consistency
 .create-lesson-container {
-  min-height: 100vh;
-  font-family: 'Nunito', sans-serif;
-  padding: 40px;
-  background-color: transparent; 
-  color: var(--teacher-text);
+  &.container-fluid {
+    background-color: var(--teacher-bg, #f5f6fa);
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    padding-left: max(1rem, calc((100vw - 1200px) / 2 + 2rem)) !important;
+    padding-right: max(1rem, calc((100vw - 1200px) / 2 + 2rem)) !important;
+    padding-top: 1.75rem !important;
+    padding-bottom: 2.5rem !important;
+    color: var(--teacher-text);
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 
   // --- Header Section ---
   .header-content {
