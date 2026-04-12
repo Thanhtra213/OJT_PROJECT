@@ -7,7 +7,6 @@ namespace EasyEnglish_API.Services.Video
     public class VideoProgressService : IVideoProgressService
     {
         private readonly IVideoProgressRepository _repo;
-
         public VideoProgressService(IVideoProgressRepository repo)
         {
             _repo = repo;
@@ -24,34 +23,23 @@ namespace EasyEnglish_API.Services.Video
                     UserId = userId,
                     VideoId = req.VideoId,
                     WatchDurationSec = req.WatchDurationSec,
-                    LastPositionSec = Math.Min(req.WatchDurationSec, 30),
+                    LastPositionSec = req.LastPositionSec,
                     TotalDurationSec = req.TotalDurationSec,
                     WatchedAt = DateTime.UtcNow,
                     IsCompleted = req.IsCompleted
                 };
-                await _repo.AddAsync(progress);
+                await _repo.UpsertAsync(progress);
             }
             else
             {
-                const int SKIP_BUFFER_SEC = 15;
                 int currentWatch = progress.WatchDurationSec ?? 0;
                 int currentLast = progress.LastPositionSec ?? 0;
-                int maxAllowed = currentWatch + SKIP_BUFFER_SEC;
 
-                if (req.LastPositionSec > maxAllowed)
-                {
-                    // Bị skip: không update lastPosition, không cho watchDuration vượt quá currentWatch + buffer nhỏ
-                    progress.WatchDurationSec = Math.Max(currentWatch, Math.Min(req.WatchDurationSec, currentWatch + SKIP_BUFFER_SEC));
-                    // lastPositionSec giữ nguyên giá trị cũ — không update
-                    progress.WatchedAt = DateTime.UtcNow;
-                }
-                else
-                {
-                    progress.WatchDurationSec = Math.Max(currentWatch, req.WatchDurationSec);
-                    progress.LastPositionSec = req.LastPositionSec;
-                    progress.WatchedAt = DateTime.UtcNow;
-                }
-                if ((progress.TotalDurationSec ?? 0) == 0 && req.TotalDurationSec > 0)
+                progress.WatchDurationSec = Math.Max(currentWatch, req.WatchDurationSec);
+                progress.LastPositionSec = Math.Max(currentLast, req.LastPositionSec ?? 0);
+                progress.WatchedAt = DateTime.UtcNow;
+
+                if (req.TotalDurationSec > 0 && req.TotalDurationSec > (progress.TotalDurationSec ?? 0))
                     progress.TotalDurationSec = req.TotalDurationSec;
 
                 if (req.IsCompleted)

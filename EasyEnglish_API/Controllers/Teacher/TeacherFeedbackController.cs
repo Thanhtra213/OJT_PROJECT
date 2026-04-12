@@ -16,9 +16,16 @@ namespace EasyEnglish_API.Controllers.Teacher
         [HttpGet]
         public async Task<IActionResult> GetMyCourseFeedbacks()
         {
-            int teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var feedbacks = await _feedback.GetTeacherFeedbacksAsync(teacherId);
-            return Ok(feedbacks);
+            try
+            {
+                int teacherId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var feedbacks = await _feedback.GetTeacherFeedbacksAsync(teacherId);
+                return Ok(feedbacks);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
