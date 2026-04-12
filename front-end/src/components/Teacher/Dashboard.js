@@ -403,8 +403,8 @@ const TeacherDashboard = () => {
 
     return (
       <div className="course-grid">
-        {courses.map((course) => {
-          const levelClass = getLevelClass(course.courseLevel, course.courseName);
+        {courses.map((course, index) => {
+          const levelClass = getLevelClass(course.courseLevel || course.CourseLevel, course.courseName || course.CourseName);
           const studentCount =
             course.totalStudents ||
             course.studentCount ||
@@ -419,7 +419,7 @@ const TeacherDashboard = () => {
             0;
 
           return (
-            <div key={course.courseID} className={`course-card origin-course-card ${levelClass}`}>
+            <div key={course.courseID || course.CourseID || index} className={`course-card origin-course-card ${levelClass}`}>
               <div className="course-cover">
                 <span className="course-level-badge">
                   {getLevelLabel(course.courseLevel, course.courseName)}
@@ -453,6 +453,16 @@ const TeacherDashboard = () => {
                   </button>
 
                   <div className="course-icon-actions">
+                    <button
+                      onClick={() =>
+                        navigate("/teacher/create-quiz", { state: { courses, preSelectedCourseId: course.courseID } })
+                      }
+                      className="icon-action-btn"
+                      style={{ color: '#8b5cf6' }}
+                      title="Tạo Quiz cho khóa này"
+                    >
+                      <Brain size={16} />
+                    </button>
                     <button
                       onClick={() =>
                         navigate(`/teacher/edit-course/${course.courseID}`)
@@ -508,12 +518,12 @@ const TeacherDashboard = () => {
 
     return (
       <div className="course-grid">
-        {flashcards.map((set) => {
-          const themeClass = getLevelClass(set.courseLevel, set.courseName || set.title);
+        {flashcards.map((set, index) => {
+          const themeClass = getLevelClass(set.courseLevel || set.CourseLevel, set.courseName || set.CourseName || set.title || set.Title);
 
           return (
             <div
-              key={set.setID}
+              key={set.setID || set.SetID || index}
               className={`course-card flashcard-card ${themeClass}`}
             >
               <div className="course-cover">
@@ -598,12 +608,12 @@ const TeacherDashboard = () => {
           </div>
         ) : (
           <div className="course-grid">
-            {quizzes.map((quiz) => {
-              const themeClass = getLevelClass(quiz.courseLevel, quiz.courseName || quiz.title);
+            {quizzes.map((quiz, index) => {
+              const themeClass = getLevelClass(quiz.courseLevel || quiz.CourseLevel, quiz.courseName || quiz.CourseName || quiz.title || quiz.Title);
 
               return (
                 <div
-                  key={quiz.quizID}
+                  key={quiz.quizID || quiz.QuizID || index}
                   className={`course-card quiz-card ${themeClass}`}
                 >
                   <div className="course-cover">

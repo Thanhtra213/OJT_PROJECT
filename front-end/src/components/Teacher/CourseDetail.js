@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTeacherCourseDetail } from "../../middleware/teacher/courseTeacherAPI";
+import { getQuizzesByCourse, deleteQuiz } from "../../middleware/teacher/quizTeacherAPI";
 import {
   ChevronLeft,
   Plus,
@@ -8,6 +9,9 @@ import {
   Eye,
   PlayCircle,
   BookOpen,
+  Brain,
+  Trash2,
+  Edit,
 } from "lucide-react";
 import "../Admin/admin-dashboard-styles.scss";
 import "./CourseDetail.scss";
@@ -120,13 +124,26 @@ const CourseDetail = () => {
   const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (courseId) fetchCourseDetail();
+    if (courseId) {
+      fetchCourseDetail();
+      fetchQuizzes();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
+
+  const fetchQuizzes = async () => {
+    try {
+      const data = await getQuizzesByCourse(courseId);
+      setQuizzes(data || []);
+    } catch (err) {
+      console.error("❌ Lỗi khi tải danh sách quiz:", err);
+    }
+  };
 
   const fetchCourseDetail = async () => {
     try {
@@ -158,8 +175,10 @@ const CourseDetail = () => {
       course?.enrolledStudents ||
       0;
 
-    return { chapterCount, videoCount, studentCount };
-  }, [course]);
+    const quizCount = quizzes.length;
+
+    return { chapterCount, videoCount, studentCount, quizCount };
+  }, [course, quizzes]);
 
   if (isLoading) {
     return (
@@ -264,6 +283,10 @@ const CourseDetail = () => {
                     <span>Học viên:</span>
                     <strong>{stats.studentCount} người</strong>
                   </div>
+                  <div className="course-stat-row">
+                    <span>Tổng số Quiz:</span>
+                    <strong>{stats.quizCount} bài tập</strong>
+                  </div>
                 </div>
               </div>
 
@@ -277,18 +300,18 @@ const CourseDetail = () => {
 
                 <button
                   className="course-secondary-button"
-                  onClick={() => navigate("/teacher/createcourse")}
+                  onClick={() => navigate("/teacher/create-quiz", { state: { preSelectedCourseId: course?.courseID } })}
                 >
                   <Plus size={15} />
-                  Tạo mới
+                  Thêm Quiz
                 </button>
               </div>
             </div>
           </aside>
 
           <section className="course-content-card">
-            <div className="course-content-card-head">
-              <h3 className="course-card-header-title">Nội dung khóa học</h3>
+            <div className="course-content-tabs mb-3" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #eef0f3', paddingBottom: '0.5rem' }}>
+                <h3 className={`course-card-header-title`} style={{ cursor: 'pointer' }}>Nội dung khóa học</h3>
             </div>
 
             {((course?.chapters || course?.Chapters) || []).length > 0 ? (
@@ -305,6 +328,75 @@ const CourseDetail = () => {
               <div className="course-empty-state course-empty-state-lg">
                 Chưa có chương nào trong khóa học.
               </div>
+            )}
+
+            <div className="course-content-card-head mt-5">
+              <h3 className="course-card-header-title">Danh sách Quiz</h3>
+              <button 
+                className="course-ghost-button" 
+                onClick={() => navigate("/teacher/create-quiz", { state: { preSelectedCourseId: course?.courseID } })}
+              >
+                <Plus size={16} /> Thêm Quiz mới
+              </button>
+            </div>
+
+            {quizzes.length > 0 ? (
+                <div className="course-video-list">
+                    {quizzes.map((quiz) => (
+                        <div key={quiz.quizID} className="course-video-item">
+                            <div className="course-video-info">
+                                <span className="course-video-icon-wrap" style={{ background: '#f5f3ff', color: '#8b5cf6' }}>
+                                    <Brain size={15} />
+                                </span>
+                                <div className="course-video-text">
+                                    <span className="course-video-name">{quiz.title}</span>
+                                    <div className="course-video-meta-row">
+                                        <span className="course-video-duration">{quiz.duration || '30'} phút</span>
+                                        <span className="course-video-duration ms-2">| {quiz.passingScore || '70%'} để đạt</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="course-video-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                                <button 
+                                    className="course-video-link" 
+                                    title="Quản lý câu hỏi & nhóm"
+                                    onClick={() => navigate(`/teacher/quizdetail/${quiz.quizID}`)}
+                                >
+                                    Chi tiết
+                                </button>
+                                <button 
+                                    className="course-video-link" 
+                                    style={{ color: '#6366f1' }}
+                                    title="Sửa tiêu đề & cấu hình"
+                                    onClick={() => navigate(`/teacher/edit-quiz/${quiz.quizID}`, { state: { courses: [course] } })}
+                                >
+                                    Sửa
+                                </button>
+                                <button 
+                                    className="course-video-link" 
+                                    style={{ color: '#ef4444' }}
+                                    title="Xóa quiz"
+                                    onClick={async () => {
+                                        if (window.confirm("Bạn có chắc chắn muốn xóa quiz này?")) {
+                                            try {
+                                                await deleteQuiz(quiz.quizID);
+                                                fetchQuizzes();
+                                            } catch (err) {
+                                                alert("Không thể xóa quiz");
+                                            }
+                                        }
+                                    }}
+                                >
+                                    Xóa
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="course-empty-state course-empty-state-sm">
+                    Khóa học này chưa có bài kiểm tra nào.
+                </div>
             )}
           </section>
         </div>
