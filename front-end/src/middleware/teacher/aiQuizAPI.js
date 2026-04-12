@@ -1,32 +1,6 @@
-import axios from "axios";
+import api from "../axiosInstance";
 
-const API_BASE = `${process.env.REACT_APP_API_URL}/api/teacher/ai-quiz`;
-
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("accessToken");
-  
-  if (!token) {
-    console.error("❌ Không có token! Cần đăng nhập lại");
-    throw new Error("Phiên đăng nhập hết hạn");
-  }
-
-  // 🔍 DEBUG: Decode token để xem role
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log("🔑 Token payload:", payload);
-    console.log("👤 User role:", payload.role || payload.Role || payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]);
-  } catch (e) {
-    console.error("❌ Cannot decode token:", e);
-  }
-
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true",
-  };
-};
-
+const AI_QUIZ_URL = "/teacher/ai-quiz";
 
 export const generateAIQuiz = async (prompt) => {
   try {
@@ -36,11 +10,11 @@ export const generateAIQuiz = async (prompt) => {
 
     console.log("Generating AI quiz with prompt:", prompt);
 
-    const response = await axios.post(
-      `${API_BASE}/generate`,
+    // Sử dụng instance 'api' đã có interceptor xử lý Authorization và refresh token
+    const response = await api.post(
+      `${AI_QUIZ_URL}/generate`,
       { prompt: prompt.trim() },
       { 
-        headers: getAuthHeaders(),
         timeout: 60000, // 60 seconds timeout for AI generation
       }
     );
@@ -54,8 +28,9 @@ export const generateAIQuiz = async (prompt) => {
       throw new Error("AI generation timeout - Vui lòng thử lại");
     }
     
+    // axiosInstance đã xử lý 401 redirect, nhưng ta vẫn ném lỗi để UI nhận biết
     if (error.response?.status === 401 || error.response?.status === 403) {
-      throw new Error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+      throw new Error("Phiên đăng nhập hết hạn hoặc không có quyền. Vui lòng đăng nhập lại.");
     }
     
     throw new Error(
@@ -66,7 +41,6 @@ export const generateAIQuiz = async (prompt) => {
     );
   }
 };
-
 
 export const parseAIQuizResponse = (aiResponse) => {
   try {
@@ -99,7 +73,6 @@ export const parseAIQuizResponse = (aiResponse) => {
     throw new Error("Không thể parse dữ liệu từ AI");
   }
 };
-
 
 export const convertAIQuestionsToImportFormat = (aiQuestions) => {
   return aiQuestions.map((q) => {

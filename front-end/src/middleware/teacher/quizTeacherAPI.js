@@ -1,19 +1,7 @@
 // middleware/teacher/quizTeacherAPI.js
-import axios from "axios";
+import api from "../axiosInstance";
 
-const API_BASE = `${process.env.REACT_APP_API_URL}/api/teacher/quiz`;
-
-/* =====================
- * ⚙️ Helper: Header có token
- * ===================== */
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true",
-  };
-};
+const TEACHER_QUIZ_URL = "/teacher/quiz";
 
 /* =====================
  * 📘 API: Lấy danh sách quiz của 1 khóa học
@@ -21,9 +9,7 @@ const getAuthHeaders = () => {
  * ===================== */
 export const getQuizzesByCourse = async (courseId) => {
   try {
-    const res = await axios.get(`${API_BASE}/course/${courseId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.get(`${TEACHER_QUIZ_URL}/course/${courseId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi lấy quiz theo course:", error);
@@ -37,9 +23,7 @@ export const getQuizzesByCourse = async (courseId) => {
  * ===================== */
 export const getQuizById = async (quizId) => {
   try {
-    const res = await axios.get(`${API_BASE}/${quizId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.get(`${TEACHER_QUIZ_URL}/${quizId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi lấy chi tiết quiz:", error);
@@ -61,9 +45,7 @@ export const createQuiz = async (quizData) => {
       quizType: quizData.quizType,
     };
 
-    const res = await axios.post(API_BASE, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(TEACHER_QUIZ_URL, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo quiz:", error.response?.data || error);
@@ -85,9 +67,7 @@ export const updateQuiz = async (quizId, quizData) => {
       isActive: quizData.isActive,
     };
 
-    const res = await axios.put(`${API_BASE}/${quizId}`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_QUIZ_URL}/${quizId}`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi cập nhật quiz:", error.response?.data || error);
@@ -101,9 +81,7 @@ export const updateQuiz = async (quizId, quizData) => {
  * ===================== */
 export const deleteQuiz = async (quizId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/${quizId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_QUIZ_URL}/${quizId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi xóa quiz:", error);
@@ -127,9 +105,7 @@ export const createQuizGroup = async (quizId, groupData) => {
       groupOrder: groupData.groupOrder || 1,
     };
 
-    const res = await axios.post(`${API_BASE}/${quizId}/group`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/${quizId}/group`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo group:", error);
@@ -149,9 +125,7 @@ export const updateQuizGroup = async (groupId, groupData) => {
       groupOrder: groupData.groupOrder,
     };
 
-    const res = await axios.put(`${API_BASE}/group/${groupId}`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_QUIZ_URL}/group/${groupId}`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi cập nhật group:", error);
@@ -164,9 +138,7 @@ export const updateQuizGroup = async (groupId, groupData) => {
  */
 export const deleteQuizGroup = async (groupId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/group/${groupId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_QUIZ_URL}/group/${groupId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi xóa group:", error);
@@ -192,9 +164,7 @@ export const createQuestion = async (groupId, questionData) => {
       metaJson: questionData.metaJson || null,
     };
 
-    const res = await axios.post(`${API_BASE}/group/${groupId}/question`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/group/${groupId}/question`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo câu hỏi:", error);
@@ -216,9 +186,7 @@ export const updateQuestion = async (questionId, questionData) => {
       metaJson: questionData.metaJson || null,
     };
 
-    const res = await axios.put(`${API_BASE}/question/${questionId}`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_QUIZ_URL}/question/${questionId}`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi cập nhật câu hỏi:", error);
@@ -231,9 +199,7 @@ export const updateQuestion = async (questionId, questionData) => {
  */
 export const deleteQuestion = async (questionId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/question/${questionId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_QUIZ_URL}/question/${questionId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi xóa câu hỏi:", error);
@@ -257,9 +223,7 @@ export const createOption = async (questionId, optionData) => {
       isCorrect: optionData.isCorrect || false,
     };
 
-    const res = await axios.post(`${API_BASE}/question/${questionId}/option`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/question/${questionId}/option`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo option:", error);
@@ -278,9 +242,7 @@ export const updateOption = async (optionId, optionData) => {
       isCorrect: optionData.isCorrect,
     };
 
-    const res = await axios.put(`${API_BASE}/option/${optionId}`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_QUIZ_URL}/option/${optionId}`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi cập nhật option:", error);
@@ -293,9 +255,7 @@ export const updateOption = async (optionId, optionData) => {
  */
 export const deleteOption = async (optionId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/option/${optionId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_QUIZ_URL}/option/${optionId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi xóa option:", error);
@@ -321,9 +281,7 @@ export const createGroupAsset = async (groupId, assetData) => {
       mimeType: assetData.mimeType || "",
     };
 
-    const res = await axios.post(`${API_BASE}/group/${groupId}/asset`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/group/${groupId}/asset`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo group asset:", error);
@@ -345,9 +303,7 @@ export const createQuestionAsset = async (questionId, assetData) => {
       mimeType: assetData.mimeType || "",
     };
 
-    const res = await axios.post(`${API_BASE}/question/${questionId}/asset`, payload, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/question/${questionId}/asset`, payload);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi tạo question asset:", error);
@@ -360,9 +316,7 @@ export const createQuestionAsset = async (questionId, assetData) => {
  */
 export const deleteAsset = async (assetId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/asset/${assetId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_QUIZ_URL}/asset/${assetId}`);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi xóa asset:", error);
@@ -377,9 +331,7 @@ export const deleteAsset = async (assetId) => {
 export const importQuizGroups = async (quizId, importData) => {
   try {
     console.warn("⚠️ importQuizGroups is deprecated. Consider using individual APIs instead.");
-    const res = await axios.post(`${API_BASE}/${quizId}/import`, importData, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_QUIZ_URL}/${quizId}/import`, importData);
     return res.data;
   } catch (error) {
     console.error("❌ Lỗi khi import nhóm câu hỏi vào quiz:", error);
