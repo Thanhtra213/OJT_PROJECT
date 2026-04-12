@@ -163,7 +163,7 @@ const GameLauncher = ({ gameType, onStart, onCancel }) => {
                                         className={`gs-set-item ${selectedSetId === id ? "active" : ""}`}
                                         onClick={() => handleSetSelect(id)}
                                     >
-                                        <span className="gs-set-title">{s.title}</span>
+                                        <span className="gs-set-title">{s.title}: </span>
                                         {s.description && (
                                             <span className="gs-set-desc">{s.description}</span>
                                         )}
