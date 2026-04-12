@@ -49,6 +49,7 @@ window.alert = (msg) => {
   console.warn("alert bị chặn:", msg);
 };
 
+// 1. Dùng cho trang /home (Đá Admin/Teacher về Dashboard)
 const ProtectedRoute = ({ children }) => {
   const raw = localStorage.getItem("user");
   let user = null;
@@ -64,6 +65,20 @@ const ProtectedRoute = ({ children }) => {
   if (role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
   if (role === "TEACHER") return <Navigate to="/teacher/dashboard" replace />;
 
+  return children;
+};
+
+// 2. TẠO MỚI: Dùng cho trang Profile (Ai đăng nhập cũng được vào)
+const AnyAuthRoute = ({ children }) => {
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch { user = null; }
+
+  if (!user) return <Navigate to="/" replace />;
   return children;
 };
 
@@ -138,10 +153,11 @@ root.render(
           <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
           <Route path="/game" element={<GameLauncher />} />
           
+          {/* ✅ ĐÃ SỬA: Thay ProtectedRoute bằng AnyAuthRoute cho phép Admin/Teacher truy cập */}
           <Route path="profile" element={
-            <ProtectedRoute>
+            <AnyAuthRoute>
               <Profile />
-            </ProtectedRoute>
+            </AnyAuthRoute>
           } />
 
           <Route path="forgotpassword" element={<ForgotPass />} />
@@ -244,6 +260,4 @@ root.render(
       </Routes>
     </ThemeProvider>
   </BrowserRouter>
-
-  
 );
