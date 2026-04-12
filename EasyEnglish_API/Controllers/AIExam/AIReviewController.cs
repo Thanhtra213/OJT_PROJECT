@@ -31,8 +31,15 @@ namespace EasyEnglish_API.Controllers.AIExam
         [HttpGet("list")]
         public async Task<IActionResult> GetSubmissionList()
         {
-            var result = await _ai.GetSubmissionList(GetUserId());
-            return Ok(result);
+            try
+            {
+                var result = await _ai.GetSubmissionList(GetUserId());
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

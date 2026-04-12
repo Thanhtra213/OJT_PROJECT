@@ -41,14 +41,12 @@ export const saveVideoProgress = async (videoId, watchDurationSec, isCompleted, 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    // ✅ Không re-throw để tránh Uncaught promise
     console.warn("saveVideoProgress skipped:", err.message);
     return null;
   }
 };
 
 export const getVideoProgressFromDB = async (videoId) => {
-  // ✅ Chưa đăng nhập thì không gọi API
   const token = localStorage.getItem("accessToken");
   if (!token) return null;
 
