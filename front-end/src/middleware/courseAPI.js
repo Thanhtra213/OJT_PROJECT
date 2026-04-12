@@ -11,23 +11,39 @@ const getAuthHeaders = () => {
   };
 };
 
+const parseError = (error) => {
+  const data = error.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
+
 // Hàm mới để xử lý an toàn lỗi trả về HTML thay vì JSON
 const fetchAndParseJSON = async (url, options) => {
   const response = await fetch(url, options);
   
   if (!response.ok) {
-    // Xử lý các lỗi 401, 403, 404, 500...
-    throw new Error(`HTTP error! status: ${response.status} at ${url}`);
+    const rawText = await response.text();
+    let message = "";
+    try {
+      const json = JSON.parse(rawText);
+      message = json.message || json.error || json.title || "";
+    } catch {
+      message = rawText.trim(); // text/plain
+    }
+    const err = new Error(message || `Lỗi ${response.status}`);
+    err.status = response.status;
+    throw err;
   }
 
-  const rawText = await response.text(); // Lấy text thô trước thay vì ép sang JSON ngay
-  
+  const rawText = await response.text();
   try {
     return JSON.parse(rawText);
-  } catch (error) {
-    console.error(`❌ CẢNH BÁO: API [${url}] trả về HTML thay vì JSON!`);
-    console.error("Dữ liệu thô (200 ký tự đầu):", rawText.substring(0, 200));
-    throw new Error("Lỗi định dạng dữ liệu: Server trả về HTML chứ không phải JSON.");
+  } catch {
+    console.error(`❌ API [${url}] trả về HTML thay vì JSON!`);
+    throw new Error("Server trả về dữ liệu không hợp lệ.");
   }
 };
 
@@ -69,6 +85,7 @@ export const getCourses = async () => {
             };
           } catch (err) {
             console.error(`❌ Lỗi khi lấy thông tin giảng viên ${course.teacherID}:`, err.message);
+            throw new Error(parseError(err));
           }
         }
         return course;
@@ -81,7 +98,7 @@ export const getCourses = async () => {
     };
   } catch (error) {
     console.error("❌ Error fetching courses:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -114,7 +131,7 @@ export const getCourseById = async (courseId) => {
     return course;
   } catch (error) {
     console.error("❌ Error fetching course:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -134,7 +151,7 @@ export const getAllCoursesWithDetails = async () => {
     return detailedCourses;
   } catch (error) {
     console.error("Error in getAllCoursesWithDetails:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -149,7 +166,7 @@ export const getCourseRating = async (courseId) => {
     return data;
   } catch (error) {
     console.error("❌ Error fetching course rating:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -164,7 +181,7 @@ export const getCourseFeedbacks = async (courseId) => {
     return data;
   } catch (error) {
     console.error("❌ Error fetching course feedbacks:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -186,7 +203,7 @@ export const submitCourseFeedback = async (feedbackData) => {
     return await response.json();
   } catch (error) {
     console.error("❌ Error submitting feedback:", error.message);
-    throw error;
+     throw new Error(parseError(error));
   }
 };
 
@@ -214,6 +231,6 @@ export const getVideoById = async (videoId) => {
     }
   } catch (error) {
     console.error("Error in getVideoById:", error.message);
-    throw error;
+    throw new Error(parseError(error));
   }
 };

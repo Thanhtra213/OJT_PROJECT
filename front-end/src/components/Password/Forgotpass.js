@@ -3,6 +3,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { forgotPasswordApi } from "../../middleware/auth"; 
 import "./forgotpass.scss";
 
+const parseError = (error) => {
+  const data = error?.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
 export default function ForgotPass() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -18,7 +26,7 @@ export default function ForgotPass() {
       setSent(true);
     } catch (err) {
       console.error("❌ Lỗi khi gửi OTP:", err);
-      setError("Gửi OTP thất bại. Vui lòng kiểm tra lại email.");
+      setError(parseError(err));
     }
   };
 

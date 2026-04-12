@@ -8,18 +8,33 @@ const getAuthHeaders = () => {
     "ngrok-skip-browser-warning": "true",
   };
 };
+const parseError = (error) => {
+  const data = error.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
 
-export const saveVideoProgress = async (videoId, watchDurationSec, isCompleted, lastPositionSec = null) => {
+export const saveVideoProgress = async (videoId, watchDurationSec, isCompleted, lastPositionSec = null, totalDurationSec = null) => {
   try {
     const res = await fetch(`${BASE_URL}/user/video/progress`, {
       method: "POST",
       headers: getAuthHeaders(),
-      body: JSON.stringify({ videoId, watchDurationSec, isCompleted, lastPositionSec }),
+      body: JSON.stringify({ 
+        videoId, 
+        watchDurationSec, 
+        isCompleted, 
+        lastPositionSec,
+        totalDurationSec  
+      }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
     console.error("saveVideoProgress error:", err);
+    throw new Error(parseError(err));
   }
 };
 
@@ -33,5 +48,6 @@ export const getVideoProgressFromDB = async (videoId) => {
   } catch (err) {
     console.error("getVideoProgressFromDB error:", err);
     return null;
+    
   }
 };

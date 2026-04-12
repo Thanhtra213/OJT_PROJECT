@@ -39,6 +39,15 @@ import {
 import "./Profile.scss";
 
 // ========== JWT Helpers ==========
+const parseError = (error) => {
+  const data = error?.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
+
 const decodeToken = (token) => {
   try {
     const base64Url = token.split(".")[1];
@@ -413,6 +422,7 @@ const Profile = () => {
       }
     } catch (err) {
       console.error("❌ Update avatar error:", err);
+      showToast(parseError(err), "error");
     }
     window.dispatchEvent(new Event("avatarUpdated"));
   };
@@ -435,6 +445,7 @@ const Profile = () => {
       showToast("Cập nhật thành công!", "success");
     } catch (err) {
       console.error("❌ Update profile error:", err);
+      showToast(parseError(err), "error");
     }
   };
 
@@ -506,25 +517,16 @@ const Profile = () => {
           }
         }, 800);
       }
-    } catch (err) {
-      console.error("❌ Save error:", err);
+    }  catch (err) {
+  console.error("❌ Save error:", err);
+  const status = err?.response?.status;
+  if (status === 401) {
+    showToast("Phiên hết hạn. Vui lòng đăng nhập lại!", "error");
+    setTimeout(() => { localStorage.clear(); navigate("/login"); }, 2000);
+  } else {
+    showToast(parseError(err), "error");
+  }
 
-      if (String(err.message).includes("401")) {
-        showToast("⚠️ Phiên hết hạn. Vui lòng đăng nhập lại!", "error");
-        setTimeout(() => {
-          localStorage.clear();
-          navigate("/login");
-        }, 2000);
-      } else if (String(err.message).includes("403")) {
-        showToast("❌ Bạn không có quyền thực hiện thao tác này!", "error");
-      } else if (String(err.message).includes("404")) {
-        showToast("❌ Không tìm thấy thông tin giáo viên!", "error");
-      } else {
-        showToast(
-          err.message || "❌ Không thể cập nhật thông tin giáo viên",
-          "error"
-        );
-      }
     }
   };
 
@@ -561,6 +563,7 @@ const Profile = () => {
       setConfirmPassword("");
     } catch (err) {
       console.error("❌ Change password error:", err);
+      showToast(parseError(err), "error");
     }
   };
 

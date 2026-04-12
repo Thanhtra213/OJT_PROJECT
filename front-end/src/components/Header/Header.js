@@ -22,6 +22,7 @@ import {
 } from "../../middleware/auth";
 
 import BookLogoModern from "../Footer/BookLogoModern";
+import { migrateVideoHistory } from '../../redux/videoWatchHelper';
 import "./Header.scss";
 
 // Import Icon và ThemeContext cho Dark Mode
@@ -258,10 +259,12 @@ const Header = () => {
       };
 
       localStorage.setItem("user", JSON.stringify(loggedUser));
+      migrateVideoHistory(loggedUser.accountID);
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userName", loggedUser.username);
 
       setUser(loggedUser);
+      migrateVideoHistory(loggedUser.accountID);
       setUsername(loggedUser.username);
 
       await fetchUserProfile();
@@ -282,13 +285,10 @@ const Header = () => {
         err.response?.data?.error ||
         err.message ||
       setLoginErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
   const resetLoginForm = () => {
-    // Khôi phục lại thông tin đã nhớ nếu có (Remember Me)
     const remembered = localStorage.getItem("rememberedUser") || "";
     const rememberedPass = remembered ? (localStorage.getItem("rememberedPass") || "") : "";
     setEmailOrUsername(remembered);
@@ -348,6 +348,7 @@ const Header = () => {
       }
 
       setUser(loggedUser);
+      migrateVideoHistory(loggedUser.accountID);
       setUsername(usernameFromToken || emailOrUsername);
 
       await fetchUserProfile();
@@ -363,14 +364,16 @@ const Header = () => {
         window.location.href = targetUrl;
       }, 1000);
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Đăng nhập thất bại!";
-      setLoginErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
+  const data = err.response?.data;
+  const errorMsg =
+    (typeof data === "string" && data.trim())   
+    || data?.message
+    || data?.error
+    || "Đăng nhập thất bại!";
+
+  setLoginErrorMessage(errorMsg);
+  showToastNotification(`❌ ${errorMsg}`, "danger");
+
     }
   };
 
