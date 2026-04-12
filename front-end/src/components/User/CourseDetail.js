@@ -44,7 +44,7 @@ const CourseDetail = () => {
   const ytPlayerRef  = useRef(null);
   const ytTickRef    = useRef(null);
   const ytTickCount  = useRef(0);
-  const ytInitTimer  = useRef(null); // ✅ timer cho setTimeout init
+  const ytInitTimer  = useRef(null);
 
   // ── States ────────────────────────────────────────────────────────────────
   const [showResumeBanner, setShowResumeBanner] = useState(false);
@@ -163,13 +163,12 @@ const CourseDetail = () => {
     document.head.appendChild(tag);
   }, []);
 
-  // ── YouTube Player init — chạy sau khi loadingVideo = false ──────────────
+  // ── YouTube Player init ───────────────────────────────────────────────────
   useEffect(() => {
     if (!selectedVideo || selectedVideo.platform !== 'youtube') return;
-    if (loadingVideo) return; // ✅ chờ DOM render xong
+    if (loadingVideo) return;
 
     const initPlayer = () => {
-      // Clear timer cũ nếu có
       if (ytInitTimer.current) { clearTimeout(ytInitTimer.current); ytInitTimer.current = null; }
 
       if (ytPlayerRef.current) {
@@ -177,12 +176,9 @@ const CourseDetail = () => {
         ytPlayerRef.current = null;
       }
 
-      // ✅ Đợi 1 tick để React flush DOM, đảm bảo yt-player-div tồn tại
       ytInitTimer.current = setTimeout(() => {
         const el = document.getElementById('yt-player-div');
         if (!el) {
-          console.warn('⚠️ yt-player-div chưa có trong DOM, thử lại...');
-          // Thử lại sau 200ms nữa
           ytInitTimer.current = setTimeout(() => {
             const el2 = document.getElementById('yt-player-div');
             if (!el2) return;
@@ -256,7 +252,7 @@ const CourseDetail = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedVideo?.videoID, selectedVideo?.platform, loadingVideo]); // ✅ thêm loadingVideo
+  }, [selectedVideo?.videoID, selectedVideo?.platform, loadingVideo]);
 
   // ── YouTube tick ──────────────────────────────────────────────────────────
   const startYtTick = () => {
@@ -359,7 +355,7 @@ const CourseDetail = () => {
     setVideoError(null);
     setShowResumeBanner(false);
 
-    // ✅ Reset tất cả
+    // Reset tất cả
     currentTimeRef.current   = 0;
     videoDurationRef.current = 0;
     pendingResumeRef.current = 0;
@@ -404,7 +400,8 @@ const CourseDetail = () => {
               : 0;
           setVideoProgress(prog);
 
-          if (videoInfo.platform === 'gdrive' && lastPosSec > 5) {
+          // ✅ FIX: Hiển thị banner cho TẤT CẢ platform (không chỉ gdrive)
+          if (lastPosSec > 5) {
             setResumeBannerTime(lastPosSec);
             setShowResumeBanner(true);
             if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
@@ -436,7 +433,7 @@ const CourseDetail = () => {
       setSelectedVideo(null);
       selectedVideoRef.current = null;
     } finally {
-      setLoadingVideo(false); // ✅ set false → useEffect YT sẽ trigger initPlayer
+      setLoadingVideo(false);
     }
   };
 
@@ -695,7 +692,27 @@ const CourseDetail = () => {
           <Col lg={8} className="main-content-col">
 
             {/* ── Player ── */}
-            <div className="video-player-wrapper">
+            {/* ✅ FIX: video-player-wrapper có position:relative, banner nằm ngoài video-container */}
+            <div className="video-player-wrapper" style={{ position: 'relative' }}>
+
+              {/* ✅ FIX: Banner đặt ở đây — ngoài video-container, hiển thị cho mọi platform */}
+              {showResumeBanner && !loadingVideo && (
+                <div className="resume-banner">
+                  <span>⏱</span>
+                  <span className="resume-banner__text">Lần trước bạn đã xem đến</span>
+                  <span className="resume-banner__time">{formatTime(resumeBannerTime)}</span>
+                  <button
+                    className="resume-banner__btn"
+                    onClick={() => {
+                      setShowResumeBanner(false);
+                      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+                    }}
+                  >
+                    Đã hiểu
+                  </button>
+                </div>
+              )}
+
               {loadingVideo ? (
                 <div className="player-placeholder">
                   <Spinner animation="border" /><p>Đang tải video...</p>
@@ -715,11 +732,11 @@ const CourseDetail = () => {
               ) : selectedVideo ? (
                 <div className="video-container">
                   {selectedVideo.platform === 'youtube' ? (
-                    // ✅ div này phải tồn tại trong DOM khi loadingVideo = false
                     <div className="iframe-wrapper">
                       <div id="yt-player-div" style={{ width: '100%', height: '100%' }} />
                     </div>
                   ) : selectedVideo.videoType === 'iframe' ? (
+                    // ✅ FIX: Xóa banner cũ bên trong iframe-wrapper (đã chuyển lên trên)
                     <div className="iframe-wrapper">
                       <iframe
                         ref={iframeRef}
@@ -729,22 +746,6 @@ const CourseDetail = () => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />
-                      {showResumeBanner && (
-                        <div className="resume-banner">
-                          <span>⏱</span>
-                          <span className="resume-banner__text">Lần trước bạn đã xem đến</span>
-                          <span className="resume-banner__time">{formatTime(resumeBannerTime)}</span>
-                          <button
-                            className="resume-banner__btn"
-                            onClick={() => {
-                              setShowResumeBanner(false);
-                              if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
-                            }}
-                          >
-                            Đã hiểu
-                          </button>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     <video
