@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash, Edit } from "lucide-react";
+import Swal from "sweetalert2"; 
 import { getAllPlans, createPlan, updatePlan, deletePlan } from "../../middleware/admin/planAdminAPI";
 import "./admin-dashboard-styles.scss";
 
@@ -9,7 +10,6 @@ export function PlanManagement() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const [newPlan, setNewPlan] = useState({
     planCode: '',
@@ -18,11 +18,6 @@ export function PlanManagement() {
     durationDays: 30,
     isActive: true
   });
-
-  const showPopup = (message, type = "success") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
-  };
 
   useEffect(() => {
     loadPlans();
@@ -33,27 +28,52 @@ export function PlanManagement() {
     try {
       setIsLoading(true);
       const data = await getAllPlans();
-      setPlans(data || []);
+      
+      const mappedPlans = (data || []).map(p => ({
+        ...p,
+        planID: p.planId || p.planID || p.id || p.Id, 
+        planCode: p.planCode || p.PlanCode,
+        name: p.name || p.Name,
+        price: p.price || p.Price || 0,
+        durationDays: p.durationDays || p.DurationDays || 30,
+        isActive: p.isActive !== undefined ? p.isActive : (p.status === 'ACTIVE' || p.status === 1 || p.status === true),
+        createdAt: p.createdAt || p.CreatedAt || new Date().toISOString()
+      }));
+
+      setPlans(mappedPlans);
     } catch (error) {
-      showPopup("Không thể tải danh sách gói hội viên", "error");
+      Swal.fire("Lỗi!", "Không thể tải danh sách gói hội viên", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreatePlan = async () => {
+  const validatePlan = () => {
     if (!newPlan.planCode || !newPlan.name) {
-      showPopup("Vui lòng nhập mã và tên gói", "error");
-      return;
+      Swal.fire("Lỗi!", "Vui lòng nhập mã và tên gói", "error");
+      return false;
     }
+    if (newPlan.price < 0) {
+      Swal.fire("Lỗi!", "Giá gói không được là số âm", "error");
+      return false;
+    }
+    if (newPlan.durationDays <= 0) {
+      Swal.fire("Lỗi!", "Thời hạn gói phải từ 1 ngày trở lên", "error");
+      return false;
+    }
+    return true;
+  };
+
+  const handleCreatePlan = async () => {
+    if (!validatePlan()) return;
     try {
       await createPlan(newPlan);
-      showPopup("Tạo gói hội viên thành công!", "success");
+      Swal.fire("Thành công!", "Tạo gói hội viên thành công!", "success");
       setShowCreateModal(false);
       setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
-      loadPlans();
+      loadPlans(); 
     } catch (error) {
-      showPopup(error.response?.data?.message || error.message || "Lỗi khi tạo gói hội viên", "error");
+      Swal.fire("Lỗi!", error.response?.data?.message || "Lỗi khi tạo gói hội viên", "error");
     }
   };
 
@@ -70,31 +90,48 @@ export function PlanManagement() {
   };
 
   const handleUpdatePlan = async () => {
-    if (!newPlan.planCode || !newPlan.name) {
-      showPopup("Vui lòng nhập mã và tên gói", "error");
-      return;
-    }
+    if (!validatePlan()) return;
     try {
       await updatePlan(editingPlan.planID, newPlan);
-      showPopup("Cập nhật gói hội viên thành công!", "success");
+      Swal.fire("Thành công!", "Cập nhật gói hội viên thành công!", "success");
       setShowEditModal(false);
       setEditingPlan(null);
       setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
       loadPlans();
     } catch (error) {
-      showPopup(error.response?.data?.message || error.message || "Lỗi khi cập nhật gói", "error");
+      Swal.fire("Lỗi!", error.response?.data?.message || "Lỗi khi cập nhật gói", "error");
     }
   };
 
-  const handleDeletePlan = async (planId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa gói hội viên này không?")) return;
-    try {
-      await deletePlan(planId, false);
-      showPopup("Đã xóa gói hội viên thành công", "success");
-      setPlans(plans.filter(p => p.planID !== planId));
-    } catch (error) {
-      showPopup("Không thể xóa gói hội viên", "error");
+  // ✅ ĐÃ SỬA: Hỏi xác nhận xóa vĩnh viễn & Tự động Reload
+  const handleDeletePlan = (planId) => {
+    if (!planId) {
+      Swal.fire("Lỗi Dữ Liệu!", "Hệ thống không tìm thấy ID của gói này.", "error");
+      return;
     }
+
+    Swal.fire({
+      title: "Xác nhận xóa vĩnh viễn?",
+      text: "Gói hội viên này sẽ bị xóa hoàn toàn khỏi hệ thống!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ec4899",
+      cancelButtonColor: "#9ca3af",
+      confirmButtonText: "Xóa vĩnh viễn",
+      cancelButtonText: "Hủy"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deletePlan(planId);
+          Swal.fire("Đã xóa!", "Gói hội viên đã bị xóa vĩnh viễn.", "success").then(() => {
+            // ✅ Tự động load lại toàn bộ trang web
+            window.location.reload();
+          });
+        } catch (error) {
+          Swal.fire("Lỗi!", error.response?.data?.message || "Không thể xóa gói hội viên này.", "error");
+        }
+      }
+    });
   };
 
   const formatDuration = (days) => {
@@ -115,17 +152,6 @@ export function PlanManagement() {
 
   return (
     <div className="management-card">
-      {toast.show && (
-        <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
-          background: toast.type === 'success' ? 'var(--primary)' : '#ec4899',
-          color: '#fff', padding: '12px 24px', borderRadius: '99px',
-          fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-        }}>
-          {toast.message}
-        </div>
-      )}
-
       <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý Gói Hội Viên</h2>
@@ -135,7 +161,10 @@ export function PlanManagement() {
 
       <div className="management-header">
         <div style={{ flexGrow: 1 }}></div>
-        <button onClick={() => setShowCreateModal(true)} className="primary-button">
+        <button onClick={() => {
+          setNewPlan({ planCode: '', name: '', price: 0, durationDays: 30, isActive: true });
+          setShowCreateModal(true);
+        }} className="primary-button">
           <Plus size={18} />
           <span>Tạo gói mới</span>
         </button>
@@ -160,14 +189,14 @@ export function PlanManagement() {
                 <tr key={plan.planID}>
                   <td className="fw-800" style={{ color: 'var(--primary)', letterSpacing: '0.5px' }}>{plan.planCode}</td>
                   <td className="fw-800 td-title">{plan.name}</td>
-                  <td className="fw-800" style={{ color: '#f59e0b' }}>{plan.price.toLocaleString()} VNĐ</td>
+                  <td className="fw-800" style={{ color: '#f59e0b' }}>{plan.price.toLocaleString('vi-VN')} VNĐ</td>
                   <td className="td-sub fw-700">{formatDuration(plan.durationDays)}</td>
                   <td style={{ textAlign: 'center' }}>
                     <span 
                       className="status-badge" 
                       style={{ 
-                        backgroundColor: plan.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(107,114,128,0.12)', 
-                        color: plan.isActive ? 'var(--primary)' : '#6b7280' 
+                        backgroundColor: plan.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(236,72,153,0.12)', 
+                        color: plan.isActive ? 'var(--primary)' : '#ec4899' 
                       }}
                     >
                       {plan.isActive ? 'Hoạt động' : 'Tạm dừng'}
@@ -186,7 +215,7 @@ export function PlanManagement() {
                       onClick={() => handleDeletePlan(plan.planID)} 
                       className="action-button"
                       style={{ color: '#ec4899', marginLeft: '8px' }}
-                      title="Xóa"
+                      title="Xóa vĩnh viễn"
                     >
                       <Trash size={18} />
                     </button>
@@ -241,20 +270,26 @@ export function PlanManagement() {
                 <div style={{ flex: 1, minWidth: '200px' }}>
                   <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Giá (VNĐ)</label>
                   <input 
-                    type="number" 
+                    type="text" 
                     placeholder="Nhập giá tiền..." 
-                    value={newPlan.price} 
-                    onChange={e => setNewPlan({ ...newPlan, price: Number(e.target.value) })} 
+                    value={newPlan.price === 0 ? '' : newPlan.price.toLocaleString('vi-VN')} 
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/\D/g, ''); // Ngăn nhập số âm, chữ cái
+                      setNewPlan({ ...newPlan, price: rawValue ? Number(rawValue) : 0 });
+                    }} 
                     className="form-input"
                   />
                 </div>
                 <div style={{ flex: 1, minWidth: '200px' }}>
                   <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Thời hạn (Ngày)</label>
                   <input 
-                    type="number" 
+                    type="text" 
                     placeholder="Số ngày..." 
-                    value={newPlan.durationDays} 
-                    onChange={e => setNewPlan({ ...newPlan, durationDays: Number(e.target.value) })} 
+                    value={newPlan.durationDays === 0 ? '' : newPlan.durationDays.toLocaleString('vi-VN')} 
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/\D/g, '');
+                      setNewPlan({ ...newPlan, durationDays: rawValue ? Number(rawValue) : 0 });
+                    }} 
                     className="form-input"
                   />
                 </div>
