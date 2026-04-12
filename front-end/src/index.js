@@ -28,6 +28,7 @@ import GameLauncher from "./components/User/Flashcardgame/Gamelauncher";
 // ADMIN ROUTES
 import AdminDashboard from './components/Admin/AdminDashboard'; 
 import ExamDetail from './components/Admin/ExamDetail';
+import AdminCourseDetail from './components/Admin/AdminCourseDetail';
 
 // TEACHER ROUTES
 import TeacherDashboard from "./components/Teacher/Dashboard";
@@ -153,7 +154,6 @@ root.render(
           <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
           <Route path="/game" element={<GameLauncher />} />
           
-          {/* ✅ ĐÃ SỬA: Thay ProtectedRoute bằng AnyAuthRoute cho phép Admin/Teacher truy cập */}
           <Route path="profile" element={
             <AnyAuthRoute>
               <Profile />
@@ -172,6 +172,11 @@ root.render(
           <Route path="/admin/examdetail/:quizId" element={
             <AdminRoute>
               <ExamDetail />
+            </AdminRoute>
+          } />
+          <Route path="/admin/coursedetail/:id" element={
+            <AdminRoute>
+              <AdminCourseDetail />
             </AdminRoute>
           } />
 
