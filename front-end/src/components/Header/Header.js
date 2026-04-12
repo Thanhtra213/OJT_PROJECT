@@ -284,6 +284,7 @@ const Header = () => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
+        "Đăng nhập thất bại!";
       setLoginErrorMessage(errorMsg);
     }
   };
@@ -364,16 +365,15 @@ const Header = () => {
         window.location.href = targetUrl;
       }, 1000);
     } catch (err) {
-  const data = err.response?.data;
-  const errorMsg =
-    (typeof data === "string" && data.trim())   
-    || data?.message
-    || data?.error
-    || "Đăng nhập thất bại!";
+      const data = err.response?.data;
+      const errorMsg =
+        (typeof data === "string" && data.trim())   
+        || data?.message
+        || data?.error
+        || "Đăng nhập thất bại!";
 
-  setLoginErrorMessage(errorMsg);
-  showToastNotification(`❌ ${errorMsg}`, "danger");
-
+      setLoginErrorMessage(errorMsg);
+      showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -383,14 +383,12 @@ const Header = () => {
     if (!registerOtp) {
       const msg = "Vui lòng nhập mã OTP";
       setRegisterErrorMessage(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
     if (registerPassword !== registerConfirmPassword) {
       const msg = "Mật khẩu xác nhận không khớp!";
       setRegisterErrorMessage(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -444,8 +442,6 @@ const Header = () => {
         err.message ||
         "Đăng ký thất bại!";
       setRegisterErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -453,7 +449,6 @@ const Header = () => {
     if (!registerEmail) {
       const msg = "Vui lòng nhập email trước khi gửi OTP!";
       setOtpError(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -471,8 +466,6 @@ const Header = () => {
         "Gửi OTP thất bại!";
       setOtpError(errorMsg);
       setOtpMessage("");
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -624,13 +617,12 @@ const Header = () => {
 
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</Dropdown.Item>
-                    <Dropdown.Item onClick={() => navigate("/profile")}>Cài đặt</Dropdown.Item>
                     
                     {/* Link điều hướng cho Admin / Teacher */}
-                    {user.role === "ADMIN" && (
+                    {String(user.role || "").toUpperCase() === "ADMIN" && (
                       <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>Trang quản trị</Dropdown.Item>
                     )}
-                    {user.role === "TEACHER" && (
+                    {String(user.role || "").toUpperCase() === "TEACHER" && (
                       <Dropdown.Item onClick={() => navigate("/teacher/dashboard")}>Trang giảng viên</Dropdown.Item>
                     )}
 
