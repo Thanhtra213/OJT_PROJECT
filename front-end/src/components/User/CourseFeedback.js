@@ -6,11 +6,14 @@ import { FaStar, FaArrowLeft } from "react-icons/fa";
 import "./CourseFeedback.scss";
 
 const CourseFeedback = () => {
-    const { courseId, id } = useParams(); // Try both common parameter names
+    const params = useParams();
+console.log("ALL PARAMS:", params);
+console.log("CURRENT URL:", window.location.pathname);
+const { id } = params; // Try both common parameter names
     const navigate = useNavigate();
     
     // Use whichever param is defined
-    const actualCourseId = courseId || id;
+    const actualCourseId = id;
     
     const [course, setCourse] = useState(null);
     const [rating, setRating] = useState(0);
@@ -37,16 +40,18 @@ const CourseFeedback = () => {
                 
                 console.log("Loading course with ID:", actualCourseId);
                 
-                const [courseData, feedbacks] = await Promise.all([
-                    getCourseById(actualCourseId),
-                    getCourseFeedbacks(actualCourseId).catch((err) => {
-                        console.warn("Could not load feedbacks:", err);
-                        return [];
-                    })
-                ]);
-                
-                setCourse(courseData);
-                setExistingFeedbacks(Array.isArray(feedbacks) ? feedbacks : []);
+                const [courseData, feedbackData] = await Promise.all([
+    getCourseById(actualCourseId),
+    getCourseFeedbacks(actualCourseId).catch((err) => {
+        console.warn("Could not load feedbacks:", err);
+        return null;
+    })
+]);
+
+setCourse(courseData);
+// feedbackData là object { feedbacks: [...] }, không phải array
+const feedbackList = feedbackData?.feedbacks || feedbackData || [];
+setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
             } catch (err) {
                 console.error("Error loading course:", err);
                 setError("Không thể tải thông tin khóa học. Vui lòng kiểm tra lại.");
@@ -87,11 +92,12 @@ const CourseFeedback = () => {
             
             // Reload feedbacks
             try {
-                const updatedFeedbacks = await getCourseFeedbacks(actualCourseId);
-                setExistingFeedbacks(Array.isArray(updatedFeedbacks) ? updatedFeedbacks : []);
-            } catch (err) {
-                console.warn("Could not reload feedbacks:", err);
-            }
+    const updatedFeedbackData = await getCourseFeedbacks(actualCourseId);
+    const updatedList = updatedFeedbackData?.feedbacks || updatedFeedbackData || [];
+    setExistingFeedbacks(Array.isArray(updatedList) ? updatedList : []);
+} catch (err) {
+    console.warn("Could not reload feedbacks:", err);
+}
 
             setTimeout(() => {
                 navigate(`/course/${actualCourseId}`);
@@ -260,7 +266,7 @@ const CourseFeedback = () => {
                                         <Card.Body>
                                             <div className="d-flex justify-content-between align-items-start mb-2">
                                                 <div>
-                                                    <strong>{feedback.userName || "Học viên"}</strong>
+                                                    <strong>{feedback.username || feedback.userName || "Học viên"}</strong>
                                                     <div className="mt-1">
                                                         {[...Array(5)].map((_, i) => (
                                                             <FaStar 
@@ -272,8 +278,7 @@ const CourseFeedback = () => {
                                                     </div>
                                                 </div>
                                                 <small className="text-muted">
-                                                    {feedback.createdDate ? new Date(feedback.createdDate).toLocaleDateString('vi-VN') : ''}
-                                                </small>
+{feedback.createdAt ? new Date(feedback.createdAt).toLocaleDateString('vi-VN') : ''}                                                </small>
                                             </div>
                                             <p className="mb-0">{feedback.comment}</p>
                                         </Card.Body>

@@ -23,25 +23,46 @@ namespace EasyEnglish_API.Controllers.Profile
         [HttpGet("detail")]
         public async Task<ActionResult> GetDetail()
         {
-            var userId = GetUserId();
-            var result = await _profile.GetDetailAsync(userId);
-            return Ok(result);
+            try
+            {
+                var userId = GetUserId();
+                var result = await _profile.GetDetailAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("avatar")]
         public async Task<ActionResult> GetAvatar()
         {
-            var userId = GetUserId();
-            var avatarUrl = await _profile.GetAvatarAsync(userId);
-            return Ok(new { avatarUrl });
+            try
+            {
+                var userId = GetUserId();
+                var avatarUrl = await _profile.GetAvatarAsync(userId);
+                return Ok(new { avatarUrl });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("detail")]
         public async Task<ActionResult> UpdateDetail([FromBody] UpdateUserDetailRequest req)
         {
-            var userId = GetUserId();
-            await _profile.UpdateDetailAsync(userId, req);
-            return Ok(new { message = "Update profile successfully" });
+            try
+            {
+                var userId = GetUserId();
+                await _profile.UpdateDetailAsync(userId, req);
+                return Ok(new { message = "Update profile successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("avatar")]
@@ -49,17 +70,30 @@ namespace EasyEnglish_API.Controllers.Profile
         [Consumes("multipart/form-data")]
         public async Task<ActionResult> ChangeAvatar([FromForm] AvatarUploadRequest req)
         {
-            var userId = GetUserId();
-            var avatarUrl = await _profile.ChangeAvatarAsync(userId, req.File);
-            return Ok(new { message = "Avatar updated", avatarUrl });
+            try
+            {
+                var userId = GetUserId();
+                var avatarUrl = await _profile.ChangeAvatarAsync(userId, req.File);
+                return Ok(new { message = "Avatar updated", avatarUrl });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("password")]
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
         {
-            var userId = GetUserId();
-            await _profile.ChangePasswordAsync(userId, req);
-            return Ok(new { message = "Password changed successfully." });
+            try
+            {
+                var userId = GetUserId();
+                await _profile.ChangePasswordAsync(userId, req);
+                return Ok(new { message = "Password changed successfully." });
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

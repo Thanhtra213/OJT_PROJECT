@@ -21,10 +21,20 @@ namespace EasyEnglish_API.Controllers.Quizz
         private int GetUserId()
             => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        private string GetUserRole()
+    => User.FindFirstValue(ClaimTypes.Role) ?? "USER";
+
         [HttpGet("course/{courseId}")]
         public async Task<IActionResult> GetQuizzesByCourse(int courseId)
         {
-            return Ok(await _service.GetQuizzesByCourseAsync(GetUserId(), courseId));
+            try
+            {
+                return Ok(await _service.GetQuizzesByCourseAsync(GetUserId(), courseId, GetUserRole()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{quizId:int}")]
@@ -48,8 +58,15 @@ namespace EasyEnglish_API.Controllers.Quizz
         [HttpGet("system-quiz")]
         public async Task<IActionResult> GetGlobalQuiz()
         {
-            return Ok(await _service.GetGlobalQuizzesAsync(GetUserId()));
-        } 
+            try
+            {
+                return Ok(await _service.GetGlobalQuizzesAsync(GetUserId(), GetUserRole()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         [HttpPost("start/{quizId}")]
         public async Task<IActionResult> StartQuiz(int quizId)
@@ -64,7 +81,7 @@ namespace EasyEnglish_API.Controllers.Quizz
                 var score = await _service.SubmitQuizAsync(attemptId, userId, req);
                 if (score == null)
                     return NotFound(new { message = "Attempt not found" });
-                return Ok(await _service.SubmitQuizAsync(userId, attemptId, req));
+                return Ok(score);
             }
             catch (Exception ex)
             {

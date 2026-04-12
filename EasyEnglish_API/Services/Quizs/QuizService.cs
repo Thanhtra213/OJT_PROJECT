@@ -88,17 +88,17 @@ namespace EasyEnglish_API.Services
             };
         }
 
-        
-        public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId)
+
+        public async Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId, string role = "USER")
         {
-            if (!await _membership.HasActiveMembershipAsync(userId))
+            if (role != "ADMIN" && !await _membership.HasActiveMembershipAsync(userId))
                 throw new Exception("Membership expired");
             return (await _repo.GetQuizzesByCourseAsync(courseId)).Select(ToDto).ToList();
         }
 
-        public async Task<List<QuizDto>> GetGlobalQuizzesAsync(int userId)
+        public async Task<List<QuizDto>> GetGlobalQuizzesAsync(int userId, string role = "USER")
         {
-            if (!await _membership.HasActiveMembershipAsync(userId))
+            if (role != "ADMIN" && !await _membership.HasActiveMembershipAsync(userId))
                 throw new Exception("Membership expired");
             return (await _repo.GetGlobalQuizzesAsync()).Select(ToDto).ToList();
         }
@@ -452,5 +452,17 @@ namespace EasyEnglish_API.Services
         }
 
         public Task<bool> DeleteAssetAsync(int assetId) => _repo.DeleteAssetAsync(assetId);
+
+       
+
+        public async Task<List<QuizDto>> GetAdminQuizzesByCourseAsync(int courseId)
+        {
+            return (await _repo.GetAllQuizzesByCourseAsync(courseId)).Select(ToDto).ToList();
+        }
+
+        public async Task<List<QuizDto>> GetAdminGlobalQuizzesAsync()
+        {
+            return (await _repo.GetAllGlobalQuizzesAsync()).Select(ToDto).ToList();
+        }
     }
 }

@@ -18,6 +18,7 @@ import PaymentSuccessSubscription from "./components/User/PaymentSuccessSubscrip
 import StartQuiz from "./components/User/StartQuiz";
 import FlashcardList from './components/User/FlashcardList';
 import SpeakingPractice from './components/User/SpeakingPractice';
+import ListeningPractice from './components/User/ListeningPractice';
 import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
@@ -43,6 +44,12 @@ import TeacherEditLesson from "./components/Teacher/EditLesson";
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from "sonner";
 
+const _alert = window.alert;
+window.alert = (msg) => {
+  console.warn("alert bị chặn:", msg);
+};
+
+// 1. Dùng cho trang /home (Đá Admin/Teacher về Dashboard)
 const ProtectedRoute = ({ children }) => {
   const raw = localStorage.getItem("user");
   let user = null;
@@ -58,6 +65,20 @@ const ProtectedRoute = ({ children }) => {
   if (role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
   if (role === "TEACHER") return <Navigate to="/teacher/dashboard" replace />;
 
+  return children;
+};
+
+// 2. TẠO MỚI: Dùng cho trang Profile (Ai đăng nhập cũng được vào)
+const AnyAuthRoute = ({ children }) => {
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch { user = null; }
+
+  if (!user) return <Navigate to="/" replace />;
   return children;
 };
 
@@ -116,8 +137,10 @@ root.render(
           } />
           
           <Route path="writingpractice" element={<WritingPractice />} />
+          <Route path="listeningpractice" element={<ListeningPractice />} />
           <Route path="membership" element={<Membership />} />
           <Route path="/payment/:id" element={<PaymentForm />} />
+          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/flashcards" element={<FlashcardList />} />
           <Route path="/flashcard/:setId" element={<Flashcard />} />
@@ -126,15 +149,15 @@ root.render(
           <Route path="/quiz/start/:quizId" element={<StartQuiz />} />
           <Route path="speakingpractice" element={<SpeakingPractice />} />
           <Route path="/quiz/publish" element={<QuizPublish />} />
-          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/teacherinfo/:teacherId" element={<TeacherInfo />} />
           <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
           <Route path="/game" element={<GameLauncher />} />
           
+          {/* ✅ ĐÃ SỬA: Thay ProtectedRoute bằng AnyAuthRoute cho phép Admin/Teacher truy cập */}
           <Route path="profile" element={
-            <ProtectedRoute>
+            <AnyAuthRoute>
               <Profile />
-            </ProtectedRoute>
+            </AnyAuthRoute>
           } />
 
           <Route path="forgotpassword" element={<ForgotPass />} />

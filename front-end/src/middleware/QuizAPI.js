@@ -20,6 +20,15 @@ const getAuthHeader = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
+const parseError = (error) => {
+  const data = error.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
+
 // Lấy tất cả quizzes
 export const getAllQuizzes = async () => {
   try {
@@ -28,7 +37,7 @@ export const getAllQuizzes = async () => {
     return res.data;
   } catch (err) {
     console.error("❌ getAllQuizzes error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -39,7 +48,7 @@ export const getAllQuizzesPublish = async () => {
     return res.data;
   } catch (err) {
     console.error("❌ getAllQuizzes error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -51,7 +60,7 @@ export const getQuizzesByCourse = async (courseId) => {
     return res.data;
   } catch (err) {
     console.error("❌ getQuizzesByCourse error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -63,7 +72,7 @@ export const getQuizById = async (quizId) => {
     return res.data;
   } catch (err) {
     console.error("❌ getQuizById error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -75,7 +84,7 @@ export const startQuiz = async (quizId) => {
     return res.data;
   } catch (err) {
     console.error("❌ startQuiz error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -99,7 +108,7 @@ export const submitQuiz = async (attemptId, answers) => {
     return res.data;
   } catch (err) {
     console.error("❌ submitQuiz error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -111,6 +120,6 @@ export const getQuizHistory = async () => {
     return res.data;
   } catch (err) {
     console.error("❌ getQuizHistory error:", err.response?.data || err.message);
-    throw err;
+    throw new Error(parseError(err));
   }
 };

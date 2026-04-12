@@ -29,7 +29,7 @@ export function TeacherManagement() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 📦 TẢI VÀ BÓC TÁCH DỮ LIỆU
+    //TẢI VÀ BÓC TÁCH DỮ LIỆU
     const loadTeachers = async () => {
         try {
             setIsLoading(true);

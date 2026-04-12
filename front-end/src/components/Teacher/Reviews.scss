@@ -64,9 +64,9 @@
       .active-line { background: #00c896; }
     }
     &.speaking {
-      color: #8b5cf6; 
-      .active-line { background: #8b5cf6; }
-      .icon-speaking { color: #8b5cf6; }
+      color: #00c896; 
+      .active-line { background: #00c896; }
+      .icon-speaking { color: #00c896; }
     }
     background: transparent;
   }
@@ -96,9 +96,9 @@ body.global-dark-mode {
     &:hover { color: #f8fafc !important; background: rgba(255, 255, 255, 0.05) !important; }
     &.active.writing { color: #00c896 !important; }
     &.active.speaking { 
-        color: #a78bfa !important; 
-        .active-line { background: #a78bfa !important; } 
-        .icon-speaking { color: #a78bfa !important; } 
+        color: #00c896 !important; 
+        .active-line { background: #00c896 !important; } 
+        .icon-speaking { color: #00c896 !important; } 
     }
   }
 }
