@@ -3,38 +3,13 @@ import axios from "axios";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
-// 🧩 Hàm hiển thị thông báo lỗi rõ ràng
-const showErrorPopup = (error) => {
-  let message = "Đã xảy ra lỗi không xác định!";
-
-  if (error.response?.data?.message) {
-    message = error.response.data.message;
-  } else if (error.response?.data?.error) {
-    message = error.response.data.error;
-  } else if (error.message) {
-    message = error.message;
-  }
-
-  alert(`❌ Lỗi: ${message}`);
-};
-
-// 🟢 Xử lý lỗi chung
-const handleApiError = (error) => {
-  console.error("API Error:", error.response?.data || error.message);
-
-  // Nếu token hết hạn hoặc chưa đăng nhập
-  if (error.response?.status === 401) {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    alert("🔒 Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại!");
-    window.location.href = "/";
-    throw new Error("Token hết hạn");
-  }
-
-  // Hiển thị popup lỗi
-  showErrorPopup(error);
-
-  throw error;
+const parseError = (error) => {
+  const data = error.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
 };
 
 // 🟢 Lấy thông tin chi tiết profile
@@ -47,7 +22,7 @@ export const getUser = async (accessToken) => {
     console.log("✅ Response:", res.data);
     return res.data;
   } catch (error) {
-    handleApiError(error);
+    throw new Error(parseError(error));
   }
 };
 
@@ -63,10 +38,9 @@ export const updateUser = async (userData, accessToken) => {
       },
     });
     console.log("✅ Update success:", res.data);
-    alert("✅ Cập nhật thông tin thành công!");
     return res.data;
   } catch (error) {
-    handleApiError(error);
+    throw new Error(parseError(error));
   }
 };
 
@@ -87,7 +61,7 @@ export const updateAvatar = async (file, token) => {
 
     return res.data;
   } catch (error) {
-    handleApiError(error);
+    throw new Error(parseError(error));
   }
 };
 
@@ -115,7 +89,7 @@ export const changePassword = async (
     alert("✅ Mật khẩu đã được thay đổi thành công!");
     return res.data;
   } catch (error) {
-    handleApiError(error);
+    throw new Error(parseError(error));
   }
 };
 
@@ -128,6 +102,6 @@ export const getAvatar = async (accessToken) => {
     console.log("✅ Avatar response:", res.data);
     return res.data; // { avatarUrl: "..." }
   } catch (error) {
-    handleApiError(error);
+   throw new Error(parseError(error));
   }
 };

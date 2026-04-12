@@ -18,6 +18,7 @@ import PaymentSuccessSubscription from "./components/User/PaymentSuccessSubscrip
 import StartQuiz from "./components/User/StartQuiz";
 import FlashcardList from './components/User/FlashcardList';
 import SpeakingPractice from './components/User/SpeakingPractice';
+import ListeningPractice from './components/User/ListeningPractice';
 import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
@@ -42,6 +43,11 @@ import TeacherEditLesson from "./components/Teacher/EditLesson";
 
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from "sonner";
+
+const _alert = window.alert;
+window.alert = (msg) => {
+  console.warn("alert bị chặn:", msg);
+};
 
 const ProtectedRoute = ({ children }) => {
   const raw = localStorage.getItem("user");
@@ -116,8 +122,10 @@ root.render(
           } />
           
           <Route path="writingpractice" element={<WritingPractice />} />
+          <Route path="listeningpractice" element={<ListeningPractice />} />
           <Route path="membership" element={<Membership />} />
           <Route path="/payment/:id" element={<PaymentForm />} />
+          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/flashcards" element={<FlashcardList />} />
           <Route path="/flashcard/:setId" element={<Flashcard />} />
@@ -126,7 +134,6 @@ root.render(
           <Route path="/quiz/start/:quizId" element={<StartQuiz />} />
           <Route path="speakingpractice" element={<SpeakingPractice />} />
           <Route path="/quiz/publish" element={<QuizPublish />} />
-          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/teacherinfo/:teacherId" element={<TeacherInfo />} />
           <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
           <Route path="/game" element={<GameLauncher />} />
@@ -237,4 +244,6 @@ root.render(
       </Routes>
     </ThemeProvider>
   </BrowserRouter>
+
+  
 );

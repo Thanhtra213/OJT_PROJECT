@@ -12,6 +12,14 @@ const getAuthHeaders = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
+const parseError = (error) => {
+  const data = error.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
 // ✅ API gọi AI tạo đề speaking
 export const generateSpeakingPrompt = async () => {
   try {
@@ -19,7 +27,7 @@ export const generateSpeakingPrompt = async () => {
     return res.data;
   } catch (err) {
     console.error("Error generating speaking prompt:", err);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
 
@@ -38,6 +46,6 @@ export const submitSpeakingAnswer = async (audioFile, promptId, sendToTeacher = 
     return res.data;
   } catch (err) {
     console.error("Error submitting speaking answer:", err.response?.data);
-    throw err;
+    throw new Error(parseError(err));
   }
 };
