@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Spinner, Form, Alert, Container, Badge, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +19,7 @@ const StartQuiz = () => {
   const [score, setScore] = useState(null);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  const hasFetched = useRef(false);
 
   const showToast = (message, type = "error") => {
     setToast({ show: true, message, type });
@@ -64,6 +65,9 @@ const StartQuiz = () => {
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      if (hasFetched.current) return;
+      hasFetched.current = true;
+
       try {
         const data = await getQuizById(quizId);
         let parsedGroups = [];
@@ -103,7 +107,7 @@ const StartQuiz = () => {
         setQuiz(data);
         setGroups(parsedGroups);
         const attempt = await startQuiz(quizId);
-        setAttemptId(attempt.attemptId || attempt.attemptID);
+        setAttemptId(attempt?.attemptId || attempt?.attemptID || attempt);
         showToast("Quiz đã sẵn sàng! Hãy bắt đầu làm bài.", "success");
       } catch (err) {
         const errorMsg = err.response?.data?.message || err.message || "Không thể tải quiz. Vui lòng thử lại sau!";

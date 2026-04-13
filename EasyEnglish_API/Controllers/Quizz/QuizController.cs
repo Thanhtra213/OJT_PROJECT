@@ -61,10 +61,10 @@ namespace EasyEnglish_API.Controllers.Quizz
             try
             {
                 int userId = GetUserId();
-                var score = await _service.SubmitQuizAsync(attemptId, userId, req);
-                if (score == null)
+                var result = await _service.SubmitQuizAsync(userId, attemptId, req);
+                if (result == null)
                     return NotFound(new { message = "Attempt not found" });
-                return Ok(await _service.SubmitQuizAsync(userId, attemptId, req));
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -1,7 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { generateSpeakingPrompt, submitSpeakingAnswer } from "../../middleware/speakingAPI";
 import "./speakingpractice.scss";
 import { useNavigate } from "react-router-dom";
+
+const THINK_TIME = 2 * 60;   // 2 phút suy nghĩ
+const SPEAK_TIME = 5 * 60;   // 5 phút nói
+
+const formatTime = (secs) => {
+  const m = Math.floor(secs / 60).toString().padStart(2, "0");
+  const s = (secs % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+};
 
 const SpeakingPractice = () => {
   const [prompt, setPrompt] = useState(null);
@@ -11,10 +20,62 @@ const SpeakingPractice = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+
+  // Timer states
+  const [timerPhase, setTimerPhase] = useState(null); // null | "think" | "speak" | "done"
+  const [timeLeft, setTimeLeft] = useState(0);
+  const timerRef = useRef(null);
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const recordingRef = useRef(false); // mirror of recording state for use inside timer
   const navigate = useNavigate();
 
+  // ── Timer logic ──────────────────────────────────────────────────────────
+  const clearTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const startSpeakPhase = useCallback(() => {
+    setTimerPhase("speak");
+    setTimeLeft(SPEAK_TIME);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setTimerPhase("done");
+          // Auto-stop recording if still active
+          if (recordingRef.current && mediaRecorderRef.current) {
+            mediaRecorderRef.current.stop();
+            recordingRef.current = false;
+            setRecording(false);
+          }
+          setMessage({ type: "error", text: "⏰ Hết giờ! Hãy nộp bài ngay." });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  const startThinkPhase = useCallback(() => {
+    setTimerPhase("think");
+    setTimeLeft(THINK_TIME);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          startSpeakPhase();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, [startSpeakPhase]);
+
+  useEffect(() => () => clearTimer(), [clearTimer]);
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
   const handleGeneratePrompt = async () => {
     try {
       const data = await generateSpeakingPrompt();
@@ -22,7 +83,9 @@ const SpeakingPractice = () => {
       setResult(null);
       setAudioURL(null);
       setAudioBlob(null);
-       console.log("PROMPT DATA:", data);
+      // Reset & start think timer
+      clearTimer();
+      startThinkPhase();
     } catch {
       alert("Lỗi khi tạo đề. Vui lòng thử lại.");
     }
@@ -47,6 +110,13 @@ const SpeakingPractice = () => {
 
       mediaRecorderRef.current.start();
       setRecording(true);
+      recordingRef.current = true;
+
+      // Move to speak phase when user starts recording if still in think phase
+      if (timerPhase === "think") {
+        clearTimer();
+        startSpeakPhase();
+      }
     } catch {
       alert("Không thể truy cập micro. Vui lòng cấp quyền.");
     }
@@ -56,6 +126,7 @@ const SpeakingPractice = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setRecording(false);
+      recordingRef.current = false;
     }
   };
 
@@ -73,17 +144,18 @@ const SpeakingPractice = () => {
 
   const handleFinalSubmit = async (sendToTeacher = false) => {
     if (!audioBlob || !prompt) return alert("Vui lòng ghi âm hoặc tải file trước khi nộp!");
-    
+    clearTimer();
     setLoading(true);
     setMessage({ type: "info", text: "📤 Đang xử lý bài nói, vui lòng đợi..." });
     try {
       const data = await submitSpeakingAnswer(audioBlob, prompt.promptId, sendToTeacher);
       setResult(data);
-      if (sendToTeacher) {
-        setMessage({ type: "success", text: "✅ Bài nói đã được gửi cho giáo viên và AI đã chấm điểm xong!" });
-      } else {
-        setMessage({ type: "success", text: "✅ AI đã chấm điểm bài viết của bạn!" });
-      }
+      setMessage({
+        type: "success",
+        text: sendToTeacher
+          ? "✅ Bài nói đã được gửi cho giáo viên và AI đã chấm điểm xong!"
+          : "✅ AI đã chấm điểm bài nói của bạn!"
+      });
     } catch {
       setMessage({ type: "error", text: "❌ Gửi bài thất bại. Hãy thử lại." });
     } finally {
@@ -92,6 +164,21 @@ const SpeakingPractice = () => {
   };
 
   const handleClose = () => navigate("/home");
+
+  // ── Timer display helpers ─────────────────────────────────────────────────
+  const timerColor = timerPhase === "think"
+    ? (timeLeft < 30 ? "#ef4444" : "#f59e0b")
+    : timerPhase === "speak"
+    ? (timeLeft < 60 ? "#ef4444" : "#10b981")
+    : "#9ca3af";
+
+  const timerLabel = timerPhase === "think"
+    ? "🤔 Thời gian suy nghĩ"
+    : timerPhase === "speak"
+    ? "🎙️ Thời gian nói"
+    : timerPhase === "done"
+    ? "⏰ Hết giờ"
+    : null;
 
   return (
     <div className="speaking-page-outer-container">
@@ -124,12 +211,37 @@ const SpeakingPractice = () => {
             )}
           </div>
 
+          {/* ── Timer Display ─────────────────────────────────────────────── */}
+          {timerPhase && (
+            <div className="speaking-timer-box" style={{ borderColor: timerColor }}>
+              <div className="speaking-timer-label">{timerLabel}</div>
+              <div className="speaking-timer-display" style={{ color: timerColor }}>
+                {timerPhase === "done" ? "00:00" : formatTime(timeLeft)}
+              </div>
+              {timerPhase === "think" && (
+                <div className="speaking-timer-hint">Hãy đọc đề và chuẩn bị ý tưởng</div>
+              )}
+              {timerPhase === "speak" && (
+                <div className="speaking-timer-hint">Ghi âm câu trả lời của bạn ngay!</div>
+              )}
+              {timerPhase === "done" && (
+                <div className="speaking-timer-hint" style={{ color: "#ef4444" }}>
+                  Đã hết thời gian! Hãy dừng ghi âm và nộp bài.
+                </div>
+              )}
+            </div>
+          )}
+
           {prompt && (
             <div className="record-section">
               <h3 className="record-section-title">Ghi âm hoặc tải file</h3>
               <div className="record-controls">
                 {!recording ? (
-                  <button onClick={handleStartRecording} className="record-btn start-record-btn">
+                  <button
+                    onClick={handleStartRecording}
+                    className="record-btn start-record-btn"
+                    disabled={timerPhase === "done"}
+                  >
                     Bắt đầu ghi âm
                   </button>
                 ) : (
@@ -143,20 +255,20 @@ const SpeakingPractice = () => {
                 </label>
                 {audioURL && <audio controls src={audioURL} className="audio-player" />}
               </div>
-              
+
               <div className="speaking-submit-actions">
-                <button 
-                  onClick={() => handleFinalSubmit(false)} 
-                  disabled={!audioBlob || loading} 
+                <button
+                  onClick={() => handleFinalSubmit(false)}
+                  disabled={!audioBlob || loading}
                   className="submit-btn ai-btn"
                 >
                   {loading ? "Đang chấm..." : "Chấm điểm AI"}
                 </button>
-                
+
                 {result && (
-                  <button 
-                    onClick={() => handleFinalSubmit(true)} 
-                    disabled={loading} 
+                  <button
+                    onClick={() => handleFinalSubmit(true)}
+                    disabled={loading}
                     className="submit-btn teacher-btn"
                   >
                     Gửi cho giáo viên
@@ -204,7 +316,6 @@ const SpeakingPractice = () => {
           </ul>
         </div>
       </div>
-
     </div>
   );
 };

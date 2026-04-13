@@ -298,7 +298,38 @@ $transit:        all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         .bar { height: 100%; background: $primary; transition: width 0.3s; }
       }
     }
+
+    .editor-header-right {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    // ── Writing Timer Chip ────────────────────────────────────────
+    .writing-timer-chip {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: white; padding: 6px 14px;
+      border-radius: 12px; border: 2px solid #e2e8f0;
+      font-size: 0.875rem; font-weight: 800;
+      color: $text-main; transition: all 0.3s;
+
+      .timer-icon { font-size: 1rem; }
+      .timer-value { font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+      .timer-over-text {
+        font-size: 0.7rem; font-weight: 900;
+        text-transform: uppercase; opacity: 0.85;
+      }
+
+      &.timer-warn {
+        border-color: #f59e0b; color: #b45309;
+        background: #fffbeb;
+        animation: timerPulse 1s ease-in-out infinite;
+      }
+      &.timer-done {
+        border-color: #ef4444; color: #b91c1c;
+        background: #fef2f2;
+      }
+    }
   }
+
 
   .writing-textarea {
     width: 100%;
@@ -586,7 +617,9 @@ $transit:        all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes timerPulse { 0%,100% { opacity: 1; } 50% { opacity: .65; } }
 .spin { animation: spin 1s linear infinite; }
+
 
 // ── Responsive ───────────────────────────────────────────────────
 @media (max-width: 1200px) {
