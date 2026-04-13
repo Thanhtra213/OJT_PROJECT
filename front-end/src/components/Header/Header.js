@@ -22,6 +22,7 @@ import {
 } from "../../middleware/auth";
 
 import BookLogoModern from "../Footer/BookLogoModern";
+import { migrateVideoHistory } from '../../redux/videoWatchHelper';
 import "./Header.scss";
 
 // Import Icon và ThemeContext cho Dark Mode
@@ -258,10 +259,12 @@ const Header = () => {
       };
 
       localStorage.setItem("user", JSON.stringify(loggedUser));
+      migrateVideoHistory(loggedUser.accountID);
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userName", loggedUser.username);
 
       setUser(loggedUser);
+      migrateVideoHistory(loggedUser.accountID);
       setUsername(loggedUser.username);
 
       await fetchUserProfile();
@@ -281,14 +284,12 @@ const Header = () => {
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
+        "Đăng nhập thất bại!";
       setLoginErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
   const resetLoginForm = () => {
-    // Khôi phục lại thông tin đã nhớ nếu có (Remember Me)
     const remembered = localStorage.getItem("rememberedUser") || "";
     const rememberedPass = remembered ? (localStorage.getItem("rememberedPass") || "") : "";
     setEmailOrUsername(remembered);
@@ -348,6 +349,7 @@ const Header = () => {
       }
 
       setUser(loggedUser);
+      migrateVideoHistory(loggedUser.accountID);
       setUsername(usernameFromToken || emailOrUsername);
 
       await fetchUserProfile();
@@ -363,14 +365,15 @@ const Header = () => {
         window.location.href = targetUrl;
       }, 1000);
     } catch (err) {
+      const data = err.response?.data;
       const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Đăng nhập thất bại!";
+        (typeof data === "string" && data.trim())   
+        || data?.message
+        || data?.error
+        || "Đăng nhập thất bại!";
+
       setLoginErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
+      showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -380,14 +383,12 @@ const Header = () => {
     if (!registerOtp) {
       const msg = "Vui lòng nhập mã OTP";
       setRegisterErrorMessage(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
     if (registerPassword !== registerConfirmPassword) {
       const msg = "Mật khẩu xác nhận không khớp!";
       setRegisterErrorMessage(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -441,8 +442,6 @@ const Header = () => {
         err.message ||
         "Đăng ký thất bại!";
       setRegisterErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -450,7 +449,6 @@ const Header = () => {
     if (!registerEmail) {
       const msg = "Vui lòng nhập email trước khi gửi OTP!";
       setOtpError(msg);
-      // showToastNotification(msg, "warning");
       return;
     }
 
@@ -468,8 +466,6 @@ const Header = () => {
         "Gửi OTP thất bại!";
       setOtpError(errorMsg);
       setOtpMessage("");
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
     }
   };
 
@@ -505,7 +501,26 @@ const Header = () => {
 
       <Navbar expand="lg" className="main-header">
         <Container>
-          <Navbar.Brand href="/" className="logo" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <Navbar.Brand
+            onClick={() => {
+              const raw = localStorage.getItem("user");
+              let user = null;
+              try {
+                if (raw && raw !== "undefined" && raw !== "null") {
+                  user = JSON.parse(raw);
+                }
+              } catch { user = null; }
+
+              if (!user) { navigate("/"); return; }
+
+              const role = String(user.role || "").toUpperCase();
+              if (role === "ADMIN") navigate("/admin/dashboard");
+              else if (role === "TEACHER") navigate("/teacher/dashboard");
+              else navigate("/home");
+            }}
+            className="logo"
+            style={{ position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          >
             <div style={{ position: 'absolute', top: '0', left: '-6px', zIndex: 1, transform: 'rotate(-10deg)' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24">
                 <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
@@ -602,13 +617,12 @@ const Header = () => {
 
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</Dropdown.Item>
-                    <Dropdown.Item onClick={() => navigate("/profile")}>Cài đặt</Dropdown.Item>
                     
                     {/* Link điều hướng cho Admin / Teacher */}
-                    {user.role === "ADMIN" && (
+                    {String(user.role || "").toUpperCase() === "ADMIN" && (
                       <Dropdown.Item onClick={() => navigate("/admin/dashboard")}>Trang quản trị</Dropdown.Item>
                     )}
-                    {user.role === "TEACHER" && (
+                    {String(user.role || "").toUpperCase() === "TEACHER" && (
                       <Dropdown.Item onClick={() => navigate("/teacher/dashboard")}>Trang giảng viên</Dropdown.Item>
                     )}
 

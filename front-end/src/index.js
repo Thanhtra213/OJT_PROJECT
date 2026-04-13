@@ -45,8 +45,35 @@ const TeacherEditLesson = lazy(() => import("./components/Teacher/EditLesson"));
 
 // ── PROTECTED ROUTES ──────────────────────────────
 const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user ? children : <Navigate to="/" replace />; 
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch { user = null; }
+
+  if (!user) return <Navigate to="/" replace />;
+
+  const role = String(user.role || "").toUpperCase();
+  if (role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
+  if (role === "TEACHER") return <Navigate to="/teacher/dashboard" replace />;
+
+  return children;
+};
+
+// 2. TẠO MỚI: Dùng cho trang Profile (Ai đăng nhập cũng được vào)
+const AnyAuthRoute = ({ children }) => {
+  const raw = localStorage.getItem("user");
+  let user = null;
+  try {
+    if (raw && raw !== "undefined" && raw !== "null") {
+      user = JSON.parse(raw);
+    }
+  } catch { user = null; }
+
+  if (!user) return <Navigate to="/" replace />;
+  return children;
 };
 
 const AdminRoute = ({ children }) => {

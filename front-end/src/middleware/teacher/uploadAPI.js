@@ -1,15 +1,7 @@
 // middleware/uploadAPI.js
-import axios from "axios";
+import api from "../axiosInstance";
 
-const API_BASE = `${process.env.REACT_APP_API_URL}/api/upload/asset`;
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-    Authorization: `Bearer ${token}`,
-    "ngrok-skip-browser-warning": "true",
-  };
-};
+const UPLOAD_URL = "/upload/asset";
 
 /**
  * ✅ Upload file lên server (Cloudflare R2)
@@ -72,9 +64,9 @@ export const uploadAsset = async (file, type, onProgress = null) => {
   });
 
   try {
-    const res = await axios.post(API_BASE, formData, {
+    // Sử dụng instance 'api' có interceptor xử lý token và refresh
+    const res = await api.post(UPLOAD_URL, formData, {
       headers: {
-        ...getAuthHeaders(),
         "Content-Type": "multipart/form-data",
       },
       timeout: 10 * 60 * 1000, // 10 minutes for large files
@@ -160,8 +152,7 @@ export const uploadCertificate = async (file, onProgress = null) => {
  */
 export const deleteAsset = async (fileUrl) => {
   try {
-    const res = await axios.delete(`${API_BASE}`, {
-      headers: getAuthHeaders(),
+    const res = await api.delete(UPLOAD_URL, {
       data: { url: fileUrl },
     });
     console.log("✅ File deleted:", fileUrl);

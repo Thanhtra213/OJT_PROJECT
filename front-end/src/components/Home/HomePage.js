@@ -15,6 +15,14 @@ const LEVEL_CLASS = { 0: "beginner", 1: "pre-intermediate", 2: "intermediate", 3
 
 const lvText = l => LEVEL_TEXT[l] ?? "Beginner";
 const lvClass = l => LEVEL_CLASS[l] ?? "beginner";
+const parseError = (error) => {
+  const data = error?.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
 
 // ─── component ────────────────────────────────────────────────────────────────
 const HomePage = ({ onShowAuthModal }) => {

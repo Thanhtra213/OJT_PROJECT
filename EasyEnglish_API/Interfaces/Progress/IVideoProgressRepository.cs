@@ -9,7 +9,6 @@ namespace EasyEnglish_API.Interfaces.Progress
         Task AddAsync(UserVideoProgress progress);
 
         Task UpdateAsync(UserVideoProgress progress);
-
-        Task SaveAsync();
+        Task UpsertAsync(UserVideoProgress progress);
     }
 }

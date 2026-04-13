@@ -128,8 +128,7 @@ export function TeacherReviewManagement() {
       <div className="management-card">
         <div className="management-card-header">
           <div>
-            <h2 className="card-title">Chấm điểm bài làm</h2>
-            <p className="card-description">Xem và đánh giá bài làm của học viên</p>
+            <h2 className="card-title">Danh sách bài làm</h2>
           </div>
         </div>
 

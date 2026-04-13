@@ -190,8 +190,70 @@ const Home = () => {
           timeSpent: { time: toHM(wm), times: "Tuần này" },
           weeklyGoal: { lessons: { completed: wk.length, total: 7 }, studyTime: { completed: Math.round(wm), total: 300, unit: "min" } },
         });
-      } else { setStreakDays(0); setStatsData(emptyData.stats); }
-    } catch { setStreakDays(0); setStatsData(emptyData.stats); }
+      } else {
+        setStreakDays(0);
+        setStatsData(emptyData.stats);
+      }
+    } catch {
+      setStreakDays(0);
+      setStatsData(emptyData.stats);
+    }
+  };
+
+  // ✅ loadDbHistory: load TẤT CẢ từ DB, KHÔNG phụ thuộc localStorage
+  // Kết hợp: localStorage (metadata: tên, khóa học) + DB (progress thực)
+  const loadDbHistory = async () => {
+    try {
+      const historyKey = getHistoryKey();
+      const localRaw   = localStorage.getItem(historyKey);
+      const localHistory = localRaw ? JSON.parse(localRaw) : [];
+      const localMap = {};
+      if (Array.isArray(localHistory)) {
+        localHistory.forEach(item => {
+          if (item.lessonID) localMap[String(item.lessonID)] = item;
+        });
+      }
+
+      // ✅ Enrich từng item trong localStorage với data DB
+      const enriched = await Promise.all(
+        Object.values(localMap).map(async (item) => {
+          try {
+            const dbData = await getVideoProgressFromDB(item.lessonID);
+            if (!dbData) return item;
+
+            const totalDurSec   = dbData.totalDurationSec || 0;
+            const lastPosSec    = dbData.lastPositionSec  || 0;
+            const watchDurSec   = dbData.watchDurationSec || 0;
+
+            // ✅ Duration thực = totalDurationSec từ DB (server lưu khi save)
+            const displayDurSec = totalDurSec || 0;
+
+            const progress = dbData.isCompleted
+  ? 100
+  : totalDurSec > 0 && lastPosSec > 0
+    ? Math.min(99, Math.round((lastPosSec / totalDurSec) * 100))
+    : 0; // ← nếu không biết duration thì hiện 0%, không guess
+
+return {
+  ...item,
+  progress,
+  durationSec: displayDurSec,
+  watchedSec: dbData.watchDurationSec || 0,
+  lastWatched: dbData.watchedAt || item.lastWatched,
+  isCompleted: dbData.isCompleted,
+};
+          } catch {
+            return item;
+          }
+        })
+      );
+
+      // Sắp xếp: mới nhất lên đầu
+      enriched.sort((a, b) => new Date(b.lastWatched) - new Date(a.lastWatched));
+      setDbLessonHistory(enriched);
+    } catch (e) {
+      console.error("loadDbHistory error:", e);
+    }
   };
 
   const handleClearHistory = () => {
@@ -311,9 +373,6 @@ const Home = () => {
         </Container>
       ) : (
         <>
-          {/* ═══════════════════════════════════════════════════════════════ */}
-          {/* HERO                                                           */}
-          {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="welcome-section">
             <Container>
               <div className="hero-inner">
@@ -322,18 +381,13 @@ const Home = () => {
                     <FontAwesomeIcon icon={faStar} style={{ color: "#f9c74f" }} />
                     Nền tảng học tập thông minh
                   </div>
-                  <h1>
-                    Chào mừng trở lại,{" "}
-                    <span className="highlight">{user?.name || "User"}!</span>
-                  </h1>
+                  <h1>Chào mừng trở lại, <span className="highlight">{user?.name || "User"}!</span></h1>
                   <p className="welcome-sub">Tiếp tục hành trình học tập của bạn hôm nay nhé 🚀</p>
                 </div>
 
                 <div className="hero-illustration" aria-hidden="true">
-                  <div className="blob-shape b1" />
-                  <div className="blob-shape b2" />
-                  <div className="blob-shape b3" />
-                  <div className="blob-shape b4" />
+                  <div className="blob-shape b1" /><div className="blob-shape b2" />
+                  <div className="blob-shape b3" /><div className="blob-shape b4" />
                   <FontAwesomeIcon icon={faGraduationCap} className="hero-icon" />
                 </div>
               </div>
@@ -436,6 +490,7 @@ const Home = () => {
                                     <div style={{ height: "100%", width: `${lesson.progress}%`, background: "#00c896", borderRadius: "99px" }} />
                                   </div>
                                 )}
+
                                 <button
                                   style={{
                                     ...mintBtn({ padding: ".6rem 1rem", fontSize: ".88rem", width: "100%", background: lesson.progress >= 100 ? "transparent" : "#00c896", border: lesson.progress >= 100 ? "2px solid #10b981" : "none", color: lesson.progress >= 100 ? "#059669" : "#fff" })
@@ -624,13 +679,11 @@ const Home = () => {
                       const speakingList = reviewList.filter(s => isSpeakingSubmission(s));
 
                       const openDetail = async (sub, type) => {
-                        setReviewDetail({ _loading: true, _meta: sub, _type: type });
+                        setReviewDetail({ _loading:true, _meta:sub, _type:type });
                         try {
                           const d = await getReviewDetail(sub.submissionId);
-                          setReviewDetail({ ...d, _meta: sub, _type: type });
-                        } catch {
-                          setReviewDetail({ _error: true, _meta: sub, _type: type });
-                        }
+                          setReviewDetail({ ...d, _meta:sub, _type:type });
+                        } catch { setReviewDetail({ _error:true, _meta:sub, _type:type }); }
                       };
 
                       const renderCard = (list, type) => {
@@ -652,7 +705,6 @@ const Home = () => {
                                     <small className="text-muted">{list.length} bài đã nộp</small>
                                   </div>
                                 </div>
-
                                 {list.length === 0 ? (
                                   <div className="text-center py-4" style={{ color: '#9ca3af' }}>
                                     <FontAwesomeIcon icon={icon} size="2x" className="mb-2" />
@@ -687,7 +739,6 @@ const Home = () => {
                                     </div>
                                   ))
                                 )}
-
                                 {list.length > 3 && (
                                   <Button
                                     variant={isSpeak ? 'outline-danger' : 'outline-warning'}
