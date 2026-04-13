@@ -138,5 +138,34 @@ namespace EasyEnglish_API.Controllers.Teacher
             var ok = await _flashcardService.DeleteItemAsync(itemId);
             return ok ? Ok(new { message = "Deleted" }) : NotFound();
         }
+
+        [HttpPost("set/{setId:int}/import")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ImportItems(int setId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "Vui lòng chọn file." });
+
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (ext != ".xlsx" && ext != ".csv")
+                return BadRequest(new { message = "Chỉ hỗ trợ file .xlsx hoặc .csv" });
+
+            if (!await _flashcardService.EnsureTeacherOwnsSet(setId, GetUserId()))
+                return Forbid();
+
+            try
+            {
+                var result = await _flashcardService.ImportItemsFromFileAsync(setId, file);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Import thất bại: " + ex.Message });
+            }
+        }
     }
 }
