@@ -1,30 +1,14 @@
-import axios from "axios";
+// src/middleware/teacher/flashcardTeacherAPI.js
+import api from "../axiosInstance";
 
-const API_URL = `${process.env.REACT_APP_API_URL}/api/teacher/flashcard`;
-
-const api = axios.create({
-  baseURL: API_URL,
-  headers: { "Content-Type": "application/json" },
-});
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("accessToken");
-  return {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true",
-  };
-};
+const TEACHER_FLASHCARD_URL = "/teacher/flashcard";
 
 // ===================== 🟢 FLASHCARD SETS =====================
 
 // Lấy danh sách flashcard set public (không gắn với course)
-
 export const getPublicFlashcardSets = async () => {
   try {
-    const res = await api.get(`/sets/public`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.get(`${TEACHER_FLASHCARD_URL}/sets/public`);
     console.log("📘 getPublicFlashcardSets response:", res.data);
     return res.data;
   } catch (err) {
@@ -36,9 +20,7 @@ export const getPublicFlashcardSets = async () => {
 // Lấy danh sách flashcard set theo courseId
 export const getFlashcardSetsByCourse = async (courseId) => {
   try {
-    const res = await api.get(`/sets/course/${courseId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.get(`${TEACHER_FLASHCARD_URL}/sets/course/${courseId}`);
     console.log("📘 getFlashcardSetsByCourse response:", res.data);
     return res.data;
   } catch (err) {
@@ -50,9 +32,7 @@ export const getFlashcardSetsByCourse = async (courseId) => {
 // Lấy chi tiết 1 flashcard set (bao gồm items)
 export const getFlashcardSetById = async (setId) => {
   try {
-    const res = await api.get(`/set/${setId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.get(`${TEACHER_FLASHCARD_URL}/set/${setId}`);
     console.log("📘 getFlashcardSetById response:", res.data);
     return res.data;
   } catch (err) {
@@ -64,9 +44,7 @@ export const getFlashcardSetById = async (setId) => {
 // 🟢 Tạo mới flashcard set
 export const createFlashcardSet = async (data) => {
   try {
-    const res = await api.post(`/set`, data, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_FLASHCARD_URL}/set`, data);
     console.log("📘 createFlashcardSet response:", res.data);
     return res.data;
   } catch (err) {
@@ -78,9 +56,7 @@ export const createFlashcardSet = async (data) => {
 // 🟡 Cập nhật flashcard set theo setId
 export const updateFlashcardSet = async (setId, data) => {
   try {
-    const res = await api.put(`/set/${setId}`, data, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_FLASHCARD_URL}/set/${setId}`, data);
     console.log("📘 updateFlashcardSet response:", res.data);
     return res.data;
   } catch (err) {
@@ -92,9 +68,7 @@ export const updateFlashcardSet = async (setId, data) => {
 // 🔴 Xóa flashcard set theo setId
 export const deleteFlashcardSet = async (setId) => {
   try {
-    const res = await api.delete(`/set/${setId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_FLASHCARD_URL}/set/${setId}`);
     console.log("📘 deleteFlashcardSet response:", res.data);
     return res.data;
   } catch (err) {
@@ -108,9 +82,7 @@ export const deleteFlashcardSet = async (setId) => {
 // 🟢 Tạo flashcard item (thẻ)
 export const createFlashcardItem = async (data) => {
   try {
-    const res = await api.post(`/item`, data, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.post(`${TEACHER_FLASHCARD_URL}/item`, data);
     console.log("📘 createFlashcardItem response:", res.data);
     return res.data;
   } catch (err) {
@@ -122,9 +94,7 @@ export const createFlashcardItem = async (data) => {
 // 🟡 Cập nhật flashcard item theo itemId
 export const updateFlashcardItem = async (itemId, data) => {
   try {
-    const res = await api.put(`/item/${itemId}`, data, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.put(`${TEACHER_FLASHCARD_URL}/item/${itemId}`, data);
     console.log("📘 updateFlashcardItem response:", res.data);
     return res.data;
   } catch (err) {
@@ -136,9 +106,7 @@ export const updateFlashcardItem = async (itemId, data) => {
 // 🔴 Xóa flashcard item theo itemId
 export const deleteFlashcardItem = async (setId, itemId) => {
   try {
-    const res = await api.delete(`/item/${itemId}?setId=${setId}`, {
-      headers: getAuthHeaders(),
-    });
+    const res = await api.delete(`${TEACHER_FLASHCARD_URL}/item/${itemId}?setId=${setId}`);
     console.log("📘 deleteFlashcardItem response:", res.data);
     return res.data;
   } catch (err) {

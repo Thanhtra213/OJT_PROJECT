@@ -2,8 +2,8 @@
 @import "../Admin/admin-dashboard-styles.scss";
 
 // Main Theme Tokens (Mint to match Student Dashboard)
-$primary: #00c896;      
-$primary-dark: #00a87c; 
+$primary: #00c896;
+$primary-dark: #00a87c;
 $primary-light: #e6faf4;
 $mint-mid: #b3f0de;
 
@@ -16,8 +16,10 @@ $mint-mid: #b3f0de;
   --teacher-border: #e5e7eb;
 }
 
-html.global-dark-mode, body.global-dark-mode {
-  --teacher-bg: transparent; /* Hoặc #0f172a */
+html.global-dark-mode,
+body.global-dark-mode {
+  --teacher-bg: transparent;
+  /* Hoặc #0f172a */
   --teacher-card-bg: #1e293b;
   --teacher-text: #f8fafc;
   --teacher-text-body: #cbd5e1;
@@ -27,20 +29,20 @@ html.global-dark-mode, body.global-dark-mode {
 
 $bg: var(--teacher-bg);
 $white: var(--teacher-card-bg);
-$text: var(--teacher-text);      
-$text-body: var(--teacher-text-body); 
-$text-muted: var(--teacher-text-muted); 
-$border: var(--teacher-border);    
+$text: var(--teacher-text);
+$text-body: var(--teacher-text-body);
+$text-muted: var(--teacher-text-muted);
+$border: var(--teacher-border);
 
-$shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); // --s1
-$shadow-lg: 0 4px 16px rgba(0,0,0,.08); // --s2
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04); // --s1
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, .08); // --s2
 $transition-main: .2s cubic-bezier(.4, 0, .2, 1); // --t
 
 // Level Colors (Main project tokens)
-$beginner: #f97316;     // --lv0-d
+$beginner: #f97316; // --lv0-d
 $intermediate: #10b981; // --lv2-d
-$advanced: #8b5cf6;     // --lv3-d
-$expert: #3b82f6;       // --lv4-d
+$advanced: #8b5cf6; // --lv3-d
+$expert: #3b82f6; // --lv4-d
 $pre-intermediate: #ec4899; // --lv1-d
 
 html,
@@ -119,7 +121,7 @@ body {
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(108, 71, 255, 0.2);
+    background: rgba(0, 200, 150, 0.2);
     border-radius: 999px;
   }
 }
@@ -134,7 +136,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 14px;
-    background: linear-gradient(135deg, $primary 0%, #0ea5c9 100%);
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,8 +173,8 @@ body {
   transition: all $transition-main;
 
   &:hover {
-    background: #f8f7ff;
-    border-color: #ece8ff;
+    background: $primary-light;
+    border-color: $mint-mid;
     transform: translateY(-1px);
   }
 
@@ -197,8 +199,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(108, 71, 255, 0.12);
-  border: 1px solid rgba(108, 71, 255, 0.12);
+  background: rgba(0, 200, 150, 0.12);
+  border: 1px solid rgba(0, 200, 150, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,7 +251,7 @@ body {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: rgba(108, 71, 255, 0.18);
+    background: rgba(0, 200, 150, 0.18);
     color: $primary;
     display: flex;
     align-items: center;
@@ -352,14 +354,14 @@ body {
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(108, 71, 255, 0.16);
+  box-shadow: 0 2px 8px rgba(0, 200, 150, 0.16);
   transition: all $transition-main;
   flex-shrink: 0;
 
   &:hover {
     transform: translateY(-1px);
     background: $primary-dark;
-    box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
   }
 }
 
@@ -379,12 +381,12 @@ body {
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(108, 71, 255, 0.45);
+    background: rgba(0, 200, 150, 0.45);
     border-radius: 999px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: rgba(108, 71, 255, 0.7);
+    background: rgba(0, 200, 150, 0.7);
   }
 }
 
@@ -440,11 +442,25 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.theme-beginner .course-level-badge { color: $beginner; }
-.theme-intermediate .course-level-badge { color: $intermediate; }
-.theme-pre-intermediate .course-level-badge { color: $pre-intermediate; }
-.theme-advanced .course-level-badge { color: $advanced; }
-.theme-expert .course-level-badge { color: $expert; }
+.theme-beginner .course-level-badge {
+  color: $beginner;
+}
+
+.theme-intermediate .course-level-badge {
+  color: $intermediate;
+}
+
+.theme-pre-intermediate .course-level-badge {
+  color: $pre-intermediate;
+}
+
+.theme-advanced .course-level-badge {
+  color: $advanced;
+}
+
+.theme-expert .course-level-badge {
+  color: $expert;
+}
 
 .course-card-body {
   padding: 1.4rem 1.5rem;
@@ -515,12 +531,12 @@ body {
   font-size: 14px;
   cursor: pointer;
   transition: all $transition-main;
-  box-shadow: 0 2px 8px rgba(108, 71, 255, 0.16);
+  box-shadow: 0 2px 8px rgba(0, 200, 150, 0.16);
 
   &:hover {
     background: $primary-dark;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
   }
 }
 
@@ -547,9 +563,9 @@ body {
   box-shadow: none;
 
   &:hover {
-    background: #f8f7ff;
+    background: $primary-light;
     color: $primary;
-    border-color: #ddd6ff;
+    border-color: $mint-mid;
     transform: translateY(-1px);
   }
 
@@ -602,18 +618,15 @@ body {
   }
 
   &.origin-course-card .course-cover-overlay {
-    background: url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=95") 
-                center / cover no-repeat;
+    background: url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=95") center / cover no-repeat;
   }
 
   &.flashcard-card .course-cover-overlay {
-    background: url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=95") 
-                center / cover no-repeat;
+    background: url("https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=95") center / cover no-repeat;
   }
 
   &.quiz-card .course-cover-overlay {
-    background: url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=95") 
-                center / cover no-repeat;
+    background: url("https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=95") center / cover no-repeat;
   }
 
   &:hover .course-cover-overlay {
@@ -629,12 +642,12 @@ body {
     background-clip: padding-box;
     border-radius: 10px;
   }
-  
+
   &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.03) !important;
   }
@@ -674,7 +687,7 @@ body {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: rgba(108, 71, 255, 0.18);
+  background: rgba(0, 200, 150, 0.18);
   color: $primary;
   display: flex;
   align-items: center;
@@ -721,7 +734,7 @@ body {
   padding: 1.5rem;
 }
 
-.feedback-page-inner > * {
+.feedback-page-inner>* {
   width: 100%;
 }
 
@@ -742,14 +755,14 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   .rating-label {
     font-size: 13px;
     font-weight: 700;
     width: 45px;
     color: $text-body;
   }
-  
+
   .rating-bar-container {
     flex: 1;
     height: 8px;
@@ -757,13 +770,13 @@ body {
     border-radius: 999px;
     overflow: hidden;
   }
-  
+
   .rating-bar-fill {
     height: 100%;
     background: #facc15; // Star yellow
     border-radius: 999px;
   }
-  
+
   .rating-count {
     font-size: 13px;
     font-weight: 800;
@@ -854,12 +867,12 @@ body {
   align-items: center;
   gap: 8px;
   transition: all $transition-main;
-  box-shadow: 0 2px 8px rgba(108, 71, 255, 0.16);
+  box-shadow: 0 2px 8px rgba(0, 200, 150, 0.16);
 
   &:hover {
     background: $primary-dark;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(108, 71, 255, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 200, 150, 0.35);
   }
 }
 
@@ -923,8 +936,8 @@ body {
   transition: border-color $transition-main, box-shadow $transition-main;
 
   &:focus {
-    border-color: rgba(108, 71, 255, 0.35);
-    box-shadow: 0 0 0 4px rgba(108, 71, 255, 0.08);
+    border-color: rgba(0, 200, 150, 0.35);
+    box-shadow: 0 0 0 4px rgba(0, 200, 150, 0.08);
   }
 
   &::placeholder {
@@ -999,7 +1012,7 @@ textarea.form-input {
 .admin-spinner {
   width: 42px;
   height: 42px;
-  border: 4px solid #e8eaff;
+  border: 4px solid $primary-light;
   border-top-color: $primary;
   border-radius: 50%;
   animation: spin 0.9s linear infinite;
@@ -1016,6 +1029,7 @@ textarea.form-input {
     transform: scale(0.88);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -1026,6 +1040,7 @@ textarea.form-input {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

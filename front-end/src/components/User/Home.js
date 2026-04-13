@@ -286,14 +286,14 @@ const Home = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    const h = () => { loadHistory(); loadStats(); loadDbHistory(); };
+    const h = () => { loadHistory(); loadStats(); };
     window.addEventListener("videoHistoryUpdated", h);
     return () => window.removeEventListener("videoHistoryUpdated", h);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (activeTab === "baihoc") { loadHistory(); loadStats(); loadDbHistory(); }
+    if (activeTab === "baihoc") { loadHistory(); loadStats(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 

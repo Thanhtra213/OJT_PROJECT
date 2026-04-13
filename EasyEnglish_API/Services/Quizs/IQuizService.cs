@@ -5,8 +5,8 @@ namespace EasyEnglish_API.Interfaces.Quizs
     public interface IQuizService
     {
         // ================= USER =================
-        Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId);
-        Task<List<QuizDto>> GetGlobalQuizzesAsync(int userId);
+        Task<List<QuizDto>> GetQuizzesByCourseAsync(int userId, int courseId, string role = "USER");
+        Task<List<QuizDto>> GetGlobalQuizzesAsync(int userId, string role = "USER");
         Task<QuizDetailDto?> GetQuizDetailAsync(int userId, int quizId);
 
         Task<int> StartQuizAsync(int userId, int quizId);
@@ -61,6 +61,9 @@ namespace EasyEnglish_API.Interfaces.Quizs
         Task<int> CreateAssetForGroupAsync(int groupId, CreateAssetRequest req);
         Task<int> CreateAssetForQuestionAsync(int questionId, CreateAssetRequest req);
         Task<bool> DeleteAssetAsync(int assetId);
+
+        Task<List<QuizDto>> GetAdminQuizzesByCourseAsync(int courseId);
+        Task<List<QuizDto>> GetAdminGlobalQuizzesAsync();
 
         Task<List<object>> GetAttemptsAsync(string role, int userId);
     }

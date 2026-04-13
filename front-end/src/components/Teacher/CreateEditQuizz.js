@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button, Form, Card, Alert, InputGroup } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Card, Alert, InputGroup, Nav, Tab } from "react-bootstrap";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CreateEditQuizz.scss";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faTimes, faEdit, faPlus, faQuestionCircle, faTrashAlt, faLightbulb, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faTimes, faEdit, faPlus, faQuestionCircle, faTrashAlt, faLightbulb, faCircleXmark, faCheckSquare, faPenNib } from '@fortawesome/free-solid-svg-icons';
 
 const CreateEditQuiz = () => {
   const navigate = useNavigate();
@@ -25,6 +25,17 @@ const CreateEditQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      const preSelectedId = location.state?.preSelectedCourseId || location.state?.courseId;
+      if (preSelectedId) {
+        setQuizData(prev => ({ ...prev, course: preSelectedId }));
+      } else if (passedCourses.length > 0) {
+        setQuizData(prev => ({ ...prev, course: passedCourses[0].courseID }));
+      }
+    }
+  }, [isEditMode, location.state, passedCourses]);
 
   useEffect(() => {
     if (isEditMode) {
@@ -48,11 +59,30 @@ const CreateEditQuiz = () => {
             rawData.groups.forEach(group => {
               if (group.questions) {
                 group.questions.forEach(q => {
+                  const qType = q.questionType || q.QuestionType || ((q.options && q.options.length > 0) ? 1 : 2);
+                  let correctAnswer = "";
+                  
+                  if (qType === 2) {
+                    // Ưu tiên lấy từ metaJson cho câu tự luận
+                    if (q.metaJson) {
+                      try {
+                        const meta = JSON.parse(q.metaJson);
+                        correctAnswer = meta.answer || meta.Answer || "";
+                      } catch (e) {}
+                    }
+                    if (!correctAnswer && q.options && q.options.length > 0) {
+                      correctAnswer = q.options[0].content || q.options[0];
+                    }
+                  } else {
+                    correctAnswer = (q.options || []).find(opt => opt.isCorrect || opt.IsCorrect)?.content || "";
+                  }
+
                   questionsFromGroups.push({
                     id: q.questionID || q.id || Date.now() + Math.random(),
                     text: q.content || q.text || "",
+                    type: qType === 2 ? "essay" : "multiple-choice",
                     options: (q.options || []).map(opt => opt.content || opt),
-                    correctAnswer: (q.options || []).find(opt => opt.isCorrect)?.content || ""
+                    correctAnswer: correctAnswer
                   });
                 });
               }
@@ -92,6 +122,14 @@ const CreateEditQuiz = () => {
   const handleQuestionChange = (qIndex, field, value) => {
     const newQuestions = [...quizData.questions];
     newQuestions[qIndex][field] = value;
+    
+    // Nếu chuyển sang tự luận, thu gọn options lại còn 1 và đồng bộ correctAnswer
+    if (field === "type" && value === "essay") {
+      const firstOpt = newQuestions[qIndex].options[0] || "";
+      newQuestions[qIndex].options = [firstOpt];
+      newQuestions[qIndex].correctAnswer = firstOpt;
+    }
+    
     setQuizData({ ...quizData, questions: newQuestions });
   };
 
@@ -106,7 +144,7 @@ const CreateEditQuiz = () => {
       ...quizData,
       questions: [
         ...quizData.questions,
-        { id: Date.now(), text: "", options: ["", ""], correctAnswer: "" },
+        { id: Date.now(), text: "", options: ["", ""], correctAnswer: "", type: "multiple-choice" },
       ],
     });
   };
@@ -144,10 +182,23 @@ const CreateEditQuiz = () => {
 
     // Basic validation for questions
     for (const q of quizData.questions) {
-      if (!q.text || q.options.some(opt => !opt) || !q.correctAnswer || !q.options.includes(q.correctAnswer)) {
-        setError("Vui lòng đảm bảo tất cả câu hỏi có nội dung, ít nhất 2 lựa chọn và đáp án đúng được chọn từ các lựa chọn có sẵn.");
+      if (!q.text) {
+        setError("Vui lòng nhập nội dung cho tất cả các câu hỏi.");
         setLoading(false);
         return;
+      }
+      if (q.type === "multiple-choice") {
+          if (q.options.some(opt => !opt) || !q.correctAnswer || !q.options.includes(q.correctAnswer)) {
+            setError("Vui lòng đảm bảo tất cả câu hỏi trắc nghiệm có ít nhất 2 lựa chọn và đáp án đúng được chọn.");
+            setLoading(false);
+            return;
+          }
+      } else if (q.type === "essay") {
+          if (!q.correctAnswer) {
+            setError("Vui lòng nhập đáp án đúng/tham khảo cho câu hỏi tự luận.");
+            setLoading(false);
+            return;
+          }
       }
     }
 
@@ -159,13 +210,33 @@ const CreateEditQuiz = () => {
           },
       };
 
+      const formattedQuestions = quizData.questions.map((q, index) => {
+        const type = q.type === "multiple-choice" ? 1 : 2;
+        const answer = q.type === "multiple-choice" ? q.correctAnswer : q.options[0];
+
+        return {
+          content: q.text,
+          questionType: type,
+          questionOrder: index + 1,
+          scoreWeight: 1.0,
+          metaJson: type === 2 ? JSON.stringify({ answer: answer }) : null,
+          options: q.type === "multiple-choice" 
+            ? q.options.map(opt => ({
+                content: opt,
+                isCorrect: opt === answer && opt !== ""
+              }))
+            : [{ content: answer, isCorrect: true }]
+        };
+      });
+
       if (isEditMode) {
-        // Cập nhật thông tin cơ bản của Quiz qua endpoint giáo viên
+        // Cập nhật thông tin Quiz kèm câu hỏi
         await axios.put(`${apiBase}/${id}`, {
             title: quizData.title,
             description: quizData.title, 
             quizType: 1, 
-            isActive: quizData.status === "published"
+            isActive: quizData.status === "published",
+            questions: formattedQuestions
         }, config);
         setSuccess("Cập nhật thông tin Quiz thành công!");
       } else {
@@ -173,7 +244,8 @@ const CreateEditQuiz = () => {
             courseID: parseInt(quizData.course),
             title: quizData.title,
             description: quizData.title,
-            quizType: 1
+            quizType: 1,
+            questions: formattedQuestions
         }, config);
         setSuccess("Tạo Quiz thành công!");
       }
@@ -327,59 +399,115 @@ const CreateEditQuiz = () => {
             <p className="text-muted">Thêm các câu hỏi và lựa chọn đáp án đúng</p>
 
             {quizData.questions?.map((q, qIndex) => (
-              <Card key={q.id || qIndex} className="mb-3 question-card">
-                <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h6>Câu hỏi {qIndex + 1}</h6>
-                    <Button variant="outline-danger" size="sm" onClick={() => removeQuestion(qIndex)} title="Xóa câu hỏi">
+              <Card key={q.id || qIndex} className="mb-4 question-card shadow-sm border-0">
+                <Card.Body className="p-0">
+                  <div className="question-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <div className="d-flex align-items-center">
+                        <span className="question-number me-3">#{qIndex + 1}</span>
+                        <h6 className="mb-0">Cấu hình câu hỏi</h6>
+                    </div>
+                    <Button variant="link" className="text-danger p-0" onClick={() => removeQuestion(qIndex)} title="Xóa câu hỏi">
                       <FontAwesomeIcon icon={faTrashAlt} />
                     </Button>
                   </div>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Nội dung câu hỏi <span className="text-danger">*</span></Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                      placeholder="Nhập nội dung câu hỏi..."
-                      value={q.text}
-                      onChange={(e) => handleQuestionChange(qIndex, "text", e.target.value)}
-                      required
-                    />
-                  </Form.Group>
+                  <div className="p-3">
+                    <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={q.type || "multiple-choice"} onSelect={(k) => handleQuestionChange(qIndex, "type", k)}>
+                        <Nav.Item>
+                        <Nav.Link eventKey="multiple-choice">
+                            <FontAwesomeIcon icon={faCheckSquare} className="me-2" /> Trắc nghiệm
+                        </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                        <Nav.Link eventKey="essay">
+                            <FontAwesomeIcon icon={faPenNib} className="me-2" /> Tự luận
+                        </Nav.Link>
+                        </Nav.Item>
+                    </Nav>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Các lựa chọn <span className="text-danger">*</span></Form.Label>
-                    {q.options.map((option, optIndex) => (
-                      <InputGroup key={optIndex} className="mb-2">
-                        <InputGroup.Radio
-                          name={`correctAnswer-${qIndex}`}
-                          value={option}
-                          checked={q.correctAnswer === option}
-                          onChange={(e) => handleQuestionChange(qIndex, "correctAnswer", e.target.value)}
-                          aria-label={`Đáp án đúng cho lựa chọn ${optIndex + 1}`}
-                          title="Chọn làm đáp án đúng"
-                        />
+                    <Form.Group className="mb-4">
+                        <Form.Label className="fw-bold">Nội dung câu hỏi <span className="text-danger">*</span></Form.Label>
                         <Form.Control
-                          type="text"
-                          placeholder={`Lựa chọn ${optIndex + 1}`}
-                          value={option}
-                          onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
-                          required
+                        as="textarea"
+                        rows={3}
+                        className="question-textarea"
+                        placeholder="Nhập nội dung câu hỏi tại đây..."
+                        value={q.text}
+                        onChange={(e) => handleQuestionChange(qIndex, "text", e.target.value)}
+                        required
                         />
-                        {q.options.length > 2 && ( // Allow removing options if more than 2
-                          <Button variant="outline-danger" onClick={() => removeOption(qIndex, optIndex)} title="Xóa lựa chọn">
-                            <FontAwesomeIcon icon={faTimes} />
-                          </Button>
+                    </Form.Group>
+
+                    {(!q.type || q.type === "multiple-choice") ? (
+                        <div className="multiple-choice-section p-3 bg-light rounded-3">
+                        <Form.Label className="fw-bold mb-3">Các lựa chọn đáp án</Form.Label>
+                        {q.options.map((option, optIndex) => (
+                            <InputGroup key={optIndex} className="mb-3 custom-input-group">
+                            <InputGroup.Text className="bg-white border-end-0">
+                                <Form.Check
+                                type="radio"
+                                name={`correctAnswer-${qIndex}`}
+                                id={`q-${qIndex}-opt-${optIndex}`}
+                                checked={q.correctAnswer === option && option !== ""}
+                                onChange={() => handleQuestionChange(qIndex, "correctAnswer", option)}
+                                aria-label="Đánh dấu là đáp án đúng"
+                                />
+                            </InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                className="border-start-0"
+                                placeholder={`Nhập nội dung lựa chọn ${optIndex + 1}...`}
+                                value={option}
+                                onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
+                                required
+                            />
+                            {q.options.length > 2 && (
+                                <Button variant="outline-danger" className="border-start-0" onClick={() => removeOption(qIndex, optIndex)}>
+                                <FontAwesomeIcon icon={faTimes} />
+                                </Button>
+                            )}
+                            </InputGroup>
+                        ))}
+                        <Button variant="outline-primary" size="sm" onClick={() => addOption(qIndex)} className="rounded-pill px-3">
+                            <FontAwesomeIcon icon={faPlus} className="me-1" /> Thêm lựa chọn
+                        </Button>
+                        {q.correctAnswer && (
+                            <div className="mt-3 text-success d-flex align-items-center">
+                            <FontAwesomeIcon icon={faCheckSquare} className="me-2" />
+                            <span>Đáp án đúng: <strong>{q.correctAnswer}</strong></span>
+                            </div>
                         )}
-                      </InputGroup>
-                    ))}
-                    <Button variant="outline-secondary" size="sm" onClick={() => addOption(qIndex)} className="mt-2">
-                      <FontAwesomeIcon icon={faPlus} className="me-1" /> Thêm lựa chọn
-                    </Button>
-                  </Form.Group>
-                  <div className="text-success mt-2">
-                      Đáp án đúng: <strong>{q.correctAnswer || "Chưa chọn"}</strong>
+                        </div>
+                    ) : (
+                        <div className="essay-section p-4 bg-light rounded-3 border-dashed">
+                          <div className="essay-header d-flex align-items-center mb-3">
+                              <div className="essay-icon-container me-3">
+                                  <FontAwesomeIcon icon={faPenNib} className="text-primary" />
+                              </div>
+                              <h6 className="mb-0 fw-bold">Đáp án câu hỏi tự luận</h6>
+                          </div>
+                          
+                          <Form.Group>
+                              <Form.Label className="small text-muted mb-2 italic">Nhập đáp án đúng hoặc nội dung tham khảo để hệ thống đối chiếu (không phân biệt hoa thường)</Form.Label>
+                              <Form.Control
+                                  as="textarea"
+                                  rows={2}
+                                  className="essay-answer-input"
+                                  placeholder="Ví dụ: Rome, Paris, v.v..."
+                                  value={q.options[0] || ""}
+                                  onChange={(e) => handleOptionChange(qIndex, 0, e.target.value)}
+                                  required
+                              />
+                          </Form.Group>
+                          
+                          <div className="mt-3 info-box d-flex align-items-start p-2 rounded bg-white border">
+                              <FontAwesomeIcon icon={faLightbulb} className="text-warning me-2 mt-1" />
+                              <small className="text-muted">
+                                  Hệ thống sẽ tự động chấm điểm dựa trên việc so khớp chính xác cụm từ này (không phân biệt chữ hoa/thường).
+                              </small>
+                          </div>
+                        </div>
+                    )}
                   </div>
                 </Card.Body>
               </Card>

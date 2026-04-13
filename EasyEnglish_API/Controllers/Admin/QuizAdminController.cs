@@ -58,6 +58,15 @@ namespace EasyEnglish_API.Controllers.AdminSide
             });
         }
 
+
+        [HttpGet("course/{courseId}")]
+        public async Task<IActionResult> GetQuizzesByCourse(int courseId)
+        {
+            var result = await _service.GetAdminQuizzesByCourseAsync(courseId);
+            return Ok(result);
+        }
+
+
         [HttpPut("{quizId:int}")]
         public async Task<IActionResult> UpdateGlobalQuiz(int quizId, [FromBody] UpdateQuizRequest req)
         {

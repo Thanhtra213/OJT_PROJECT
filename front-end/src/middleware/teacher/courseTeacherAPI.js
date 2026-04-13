@@ -1,24 +1,7 @@
 // src/middleware/teacher/courseTeacherAPI.js
-import axios from "axios";
+import api from "../axiosInstance";
 
-const API_BASE = `${process.env.REACT_APP_API_URL}/api/teacher/course`;
-
-/* =====================
- * ⚙️ Helper: Header có token
- * ===================== */
-const getAuthHeader = () => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    console.warn("⚠️ Không tìm thấy token trong localStorage");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "true",
-    },
-  };
-};
+const TEACHER_COURSE_URL = "/teacher/course";
 
 /* =====================
  * 📘 COURSE API
@@ -27,7 +10,7 @@ const getAuthHeader = () => {
 // ✅ Lấy tất cả khóa học của giáo viên
 export const getTeacherCourses = async () => {
   try {
-    const res = await axios.get(API_BASE, getAuthHeader());
+    const res = await api.get(TEACHER_COURSE_URL);
     return res.data?.EasyEnglish_API || res.data?.courses || res.data?.Courses || res.data || [];
   } catch (err) {
     console.error("❌ Lỗi lấy danh sách khóa học:", err.response || err);
@@ -38,7 +21,7 @@ export const getTeacherCourses = async () => {
 // ✅ Lấy chi tiết 1 khóa học
 export const getTeacherCourseDetail = async (courseId) => {
   try {
-    const res = await axios.get(`${API_BASE}/${courseId}`, getAuthHeader());
+    const res = await api.get(`${TEACHER_COURSE_URL}/${courseId}`);
     return res.data;
   } catch (err) {
     console.error("❌ Lỗi lấy chi tiết khóa học:", err.response || err);
@@ -49,7 +32,7 @@ export const getTeacherCourseDetail = async (courseId) => {
 // ✅ Tạo mới khóa học
 export const createTeacherCourse = async (courseData) => {
   try {
-    const res = await axios.post(API_BASE, courseData, getAuthHeader());
+    const res = await api.post(TEACHER_COURSE_URL, courseData);
     return res.data;
   } catch (err) {
     console.error("❌ Lỗi tạo khóa học:", err.response || err);
@@ -60,7 +43,7 @@ export const createTeacherCourse = async (courseData) => {
 // ✅ Cập nhật khóa học
 export const updateTeacherCourse = async (courseId, courseData) => {
   try {
-    const res = await axios.put(`${API_BASE}/${courseId}`, courseData, getAuthHeader());
+    const res = await api.put(`${TEACHER_COURSE_URL}/${courseId}`, courseData);
     return res.data;
   } catch (err) {
     console.error("❌ Lỗi cập nhật khóa học:", err.response || err);
@@ -71,7 +54,7 @@ export const updateTeacherCourse = async (courseId, courseData) => {
 // ✅ Xóa khóa học
 export const deleteTeacherCourse = async (courseId) => {
   try {
-    const res = await axios.delete(`${API_BASE}/${courseId}`, getAuthHeader());
+    const res = await api.delete(`${TEACHER_COURSE_URL}/${courseId}`);
     return res.data;
   } catch (err) {
     console.error("❌ Lỗi xóa khóa học:", err.response || err);
@@ -86,10 +69,9 @@ export const deleteTeacherCourse = async (courseId) => {
 // ✅ Tạo chương trong khóa học
 export const createChapter = async (courseId, chapterData) => {
   try {
-    const res = await axios.post(
-      `${API_BASE}/${courseId}/chapter`,
-      chapterData,
-      getAuthHeader()
+    const res = await api.post(
+      `${TEACHER_COURSE_URL}/${courseId}/chapter`,
+      chapterData
     );
     return res.data;
   } catch (err) {
@@ -101,10 +83,9 @@ export const createChapter = async (courseId, chapterData) => {
 // ✅ Cập nhật chương
 export const updateChapter = async (chapterId, chapterData) => {
   try {
-    const res = await axios.put(
-      `${API_BASE}/chapter/${chapterId}`,
-      chapterData,
-      getAuthHeader()
+    const res = await api.put(
+      `${TEACHER_COURSE_URL}/chapter/${chapterId}`,
+      chapterData
     );
     return res.data;
   } catch (err) {
@@ -116,9 +97,8 @@ export const updateChapter = async (chapterId, chapterData) => {
 // ✅ Xóa chương
 export const deleteChapter = async (chapterId) => {
   try {
-    const res = await axios.delete(
-      `${API_BASE}/chapter/${chapterId}`,
-      getAuthHeader()
+    const res = await api.delete(
+      `${TEACHER_COURSE_URL}/chapter/${chapterId}`
     );
     return res.data;
   } catch (err) {
@@ -134,10 +114,9 @@ export const deleteChapter = async (chapterId) => {
 // ✅ Tạo video trong chương
 export const createVideo = async (chapterId, videoData) => {
   try {
-    const res = await axios.post(
-      `${API_BASE}/${chapterId}/video`,
-      videoData,
-      getAuthHeader()
+    const res = await api.post(
+      `${TEACHER_COURSE_URL}/${chapterId}/video`,
+      videoData
     );
     return res.data;
   } catch (err) {
@@ -149,9 +128,8 @@ export const createVideo = async (chapterId, videoData) => {
 // ✅ Xóa video
 export const deleteVideo = async (videoId) => {
   try {
-    const res = await axios.delete(
-      `${API_BASE}/video/${videoId}`,
-      getAuthHeader()
+    const res = await api.delete(
+      `${TEACHER_COURSE_URL}/video/${videoId}`
     );
     return res.data;
   } catch (err) {
@@ -160,18 +138,15 @@ export const deleteVideo = async (videoId) => {
   }
 };
 
-// Thêm vào courseTeacherAPI.js
-
 /**
  * ✅ Update video
  */
 export const updateVideo = async (videoId, data) => {
   try {
     console.log(`🔄 Updating video ${videoId}...`, data);
-    const res = await axios.put(
-      `${API_BASE}/teacher/video/${videoId}`, 
-      data, 
-      { headers: getAuthHeader() }
+    const res = await api.put(
+      `${TEACHER_COURSE_URL}/teacher/video/${videoId}`, 
+      data
     );
     console.log("✅ Video updated:", res.data);
     return res.data;
@@ -184,4 +159,3 @@ export const updateVideo = async (videoId, data) => {
     );
   }
 };
-
