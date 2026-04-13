@@ -1,6 +1,5 @@
 ﻿using EasyEnglish_API.DTOs.Flashcard;
 using EasyEnglish_API.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EasyEnglish_API.Services.Flashcard
 {
@@ -25,5 +24,8 @@ namespace EasyEnglish_API.Services.Flashcard
 
         Task<bool> EnsureTeacherOwnsCourse(int courseId, int userId);
         Task<bool> EnsureTeacherOwnsSet(int setId, int userId);
+
+        // ---- IMPORT ----
+        Task<ImportFlashcardResponse> ImportItemsFromFileAsync(int setId, IFormFile file);
     }
 }
