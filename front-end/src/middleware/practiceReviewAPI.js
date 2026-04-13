@@ -30,20 +30,6 @@ export const getReviewDetail = async (submissionId) => {
 };
 
 /**
- * Lấy danh sách bài Placement Test (system exam, CourseID = null).
- * GET /api/admin/system-exams/view (public access needed – falls back to [])
- */
-export const getPlacementTests = async () => {
-  try {
-    const res = await fetch(`${BASE}/admin/system-exams/view`, { headers: authHeaders() });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-};
-
-/**
  * Helper: phân loại Speaking / Writing dựa vào title của prompt.
  */
 export const isSpeakingSubmission = (item) => {

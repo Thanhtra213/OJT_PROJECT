@@ -44,6 +44,8 @@ export const updateVideoHistory = (videoData, currentTimeSec = 0, durationSec = 
       courseName: videoData.courseName || "Course",
       lessonID: videoData.lessonID,
       lessonTitle: videoData.lessonTitle || videoData.title || "Video",
+      videoURL: videoData.videoURL,
+      platform: videoData.platform,
       durationSec: Math.round(durationSec),       // ✅ Lưu giây
       currentTimeSec: Math.round(currentTimeSec), // ✅ Lưu giây
       watchedSec: finalProgress >= 100            // ✅ Lưu giây
