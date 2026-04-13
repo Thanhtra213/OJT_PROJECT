@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, X, RefreshCw, Power, PowerOff } from "lucide-react";
-import { getAllVouchers, createVoucher, updateVoucher } from "../../middleware/admin/voucherManagementAPI";
+import { Plus, RefreshCw, Power, PowerOff } from "lucide-react";
+import Swal from "sweetalert2"; 
+import { getAllVouchers, createVoucher, toggleVoucher } from "../../middleware/admin/voucherManagementAPI";
 import { getAllPlans } from "../../middleware/admin/planAdminAPI";
 import "./admin-dashboard-styles.scss";
 
@@ -9,7 +10,6 @@ export function VoucherManagement() {
   const [plans, setPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editingVoucher, setEditingVoucher] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const [formData, setFormData] = useState({
@@ -25,7 +25,6 @@ export function VoucherManagement() {
     setTimeout(() => setToast(prev => ({ ...prev, show: false })), 3000);
   };
 
-  // --- TẢI DỮ LIỆU ---
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -36,7 +35,7 @@ export function VoucherManagement() {
       setVouchers(vouchersData || []);
       setPlans(plansData || []);
     } catch (error) {
-      showPopup("Không thể tải dữ liệu từ máy chủ", "error");
+      showPopup("Không thể tải dữ liệu", "error");
     } finally {
       setIsLoading(false);
     }
@@ -47,43 +46,40 @@ export function VoucherManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- LOGIC XỬ LÝ ---
-  const handleOpenModal = (voucher = null) => {
-    if (voucher) {
-      setEditingVoucher(voucher);
-      setFormData({
-        code: voucher.code || "",
-        discountAmount: voucher.discountAmount || 0,
-        expiresAt: voucher.expiresAt ? voucher.expiresAt.split('T')[0] : '',
-        applicablePlanID: voucher.applicablePlanID || '',
-        isActive: voucher.isActive
-      });
-    } else {
-      setEditingVoucher(null);
-      setFormData({ code: '', discountAmount: 0, expiresAt: '', applicablePlanID: '', isActive: true });
-    }
+  const getSafeId = (v) => {
+    return v.voucherID || v.voucherId || v.VoucherId || v.VoucherID || v.id || v.Id || v.ID;
+  };
+
+  const handleOpenModal = () => {
+    setFormData({ code: '', discountAmount: 0, expiresAt: '', applicablePlanID: '', isActive: true });
     setShowModal(true);
   };
 
   const handleSave = async () => {
+    const todayDate = new Date().toISOString().split('T')[0];
+
     if (!formData.code || formData.discountAmount <= 0 || !formData.expiresAt) {
-      showPopup("Vui lòng nhập đầy đủ Mã, Số tiền và Ngày hết hạn", "error");
+      showPopup("Vui lòng nhập đầy đủ Mã, Số tiền (lớn hơn 0) và Ngày hết hạn", "error");
       return;
     }
 
+    if (formData.expiresAt < todayDate) {
+      showPopup("Lỗi: Ngày hết hạn phải từ ngày hôm nay trở đi!", "error");
+      return;
+    }
+
+    // ✅ FIX LỖI DATABASE NULL: Ép định dạng JSON chuẩn xác 100% để C# đọc được
     const payload = {
-      ...formData,
-      applicablePlanID: formData.applicablePlanID ? parseInt(formData.applicablePlanID) : null
+      code: formData.code.trim(),
+      discountAmount: Number(formData.discountAmount),
+      expiresAt: `${formData.expiresAt}T00:00:00.000Z`, 
+      applicablePlanId: formData.applicablePlanID ? Number(formData.applicablePlanID) : null,
+      isActive: formData.isActive
     };
 
     try {
-      if (editingVoucher) {
-        await updateVoucher(editingVoucher.voucherID, payload);
-        showPopup("Cập nhật mã giảm giá thành công");
-      } else {
-        await createVoucher(payload);
-        showPopup("Tạo mã giảm giá mới thành công");
-      }
+      await createVoucher(payload);
+      showPopup("Tạo mã giảm giá mới thành công");
       setShowModal(false);
       fetchData();
     } catch (error) {
@@ -91,29 +87,36 @@ export function VoucherManagement() {
     }
   };
 
-  // --- LOGIC ẨN/HIỆN (THAY CHO XÓA) ---
-  const handleToggleStatus = async (voucher) => {
-    const newStatus = !voucher.isActive;
-    const actionName = newStatus ? "kích hoạt (hiện)" : "vô hiệu hóa (ẩn)";
-    
-    if (!window.confirm(`Bạn có chắc muốn ${actionName} mã giảm giá này không?`)) return;
+  // ✅ LOGIC BẬT/TẮT THEO ĐÚNG BACKEND C#
+  const handleToggle = async (voucher) => {
+    const vId = getSafeId(voucher);
+    if (!vId) return;
 
-    try {
-      const payload = {
-        ...voucher,
-        isActive: newStatus
-      };
-      await updateVoucher(voucher.voucherID, payload);
-      showPopup(`Đã ${actionName} mã giảm giá thành công!`);
-      fetchData();
-    } catch (error) {
-      showPopup(`Lỗi: Không thể ${actionName} mã giảm giá`, "error");
-    }
+    const actionText = voucher.isActive ? "vô hiệu hóa" : "kích hoạt";
+
+    Swal.fire({
+      title: `Xác nhận ${actionText}?`,
+      text: `Bạn có chắc muốn ${actionText} mã "${voucher.code}" không?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Đồng ý",
+      cancelButtonText: "Hủy"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await toggleVoucher(vId);
+          showPopup(`Đã ${actionText} thành công!`);
+          fetchData();
+        } catch (error) {
+          showPopup(`Lỗi khi ${actionText}`, "error");
+        }
+      }
+    });
   };
 
   const getPlanName = (planID) => {
     if (!planID) return "Tất cả các gói";
-    const plan = plans.find(p => p.planID === planID);
+    const plan = plans.find(p => (p.planID || p.planId || p.id || p.Id) == planID);
     return plan ? plan.name : "";
   };
 
@@ -126,12 +129,17 @@ export function VoucherManagement() {
     );
   }
 
+  const todayDate = new Date().toISOString().split('T')[0];
+
   return (
     <div className="management-card">
-      {/* Toast thông báo */}
+      <style>{`
+        .swal2-container { z-index: 10000 !important; }
+      `}</style>
+
       {toast.show && (
         <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+          position: 'fixed', top: '20px', right: '20px', zIndex: 99999,
           background: toast.type === 'success' ? '#00c896' : '#ec4899',
           color: '#fff', padding: '12px 24px', borderRadius: '99px',
           fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
@@ -152,7 +160,7 @@ export function VoucherManagement() {
         <button className="secondary-button" style={{ marginRight: '10px' }} onClick={fetchData}>
           <RefreshCw size={16} /> Làm mới
         </button>
-        <button onClick={() => handleOpenModal()} className="primary-button">
+        <button onClick={handleOpenModal} className="primary-button">
           <Plus size={18} /> <span>Tạo mã mới</span>
         </button>
       </div>
@@ -170,42 +178,48 @@ export function VoucherManagement() {
             </tr>
           </thead>
           <tbody>
-            {vouchers.length > 0 ? vouchers.map((v) => (
-              <tr key={v.voucherID}>
-                <td className="fw-800" style={{ color: 'var(--primary)', letterSpacing: '1px' }}>{v.code || ""}</td>
+            {vouchers.length > 0 ? vouchers.map((v) => {
+              const vId = getSafeId(v) || Math.random();
+              const vCode = v.code || v.Code || "";
+              const vDiscount = v.discountAmount || v.DiscountAmount || 0;
+              const vExpiresAt = v.expiresAt || v.ExpiresAt;
+              const vPlanId = v.applicablePlanID || v.ApplicablePlanID;
+              const vActive = v.isActive !== undefined ? v.isActive : (v.IsActive !== undefined ? v.IsActive : true);
+
+              return (
+              <tr key={vId}>
+                <td className="fw-800" style={{ color: 'var(--primary)', letterSpacing: '1px' }}>{vCode}</td>
                 <td className="fw-800" style={{ color: '#f59e0b' }}>
-                  {v.discountAmount ? v.discountAmount.toLocaleString() : 0} VNĐ
+                  {vDiscount ? vDiscount.toLocaleString('vi-VN') : 0} VNĐ
                 </td>
                 <td className="fw-600">
-                  {v.expiresAt ? new Date(v.expiresAt).toLocaleDateString('vi-VN') : ""}
+                  {vExpiresAt ? new Date(vExpiresAt).toLocaleDateString('vi-VN') : ""}
                 </td>
-                <td className="td-sub fw-700">{getPlanName(v.applicablePlanID)}</td>
+                <td className="td-sub fw-700">{getPlanName(vPlanId)}</td>
                 <td style={{ textAlign: 'center' }}>
                   <span 
                     className="status-badge" 
                     style={{ 
-                      backgroundColor: v.isActive ? 'rgba(0,200,150,0.12)' : 'rgba(107,114,128,0.12)', 
-                      color: v.isActive ? 'var(--primary)' : '#6b7280' 
+                      backgroundColor: vActive ? 'rgba(0,200,150,0.12)' : 'rgba(107,114,128,0.12)', 
+                      color: vActive ? 'var(--primary)' : '#6b7280' 
                     }}
                   >
-                    {v.isActive ? 'Kích hoạt' : 'Vô hiệu (Ẩn)'}
+                    {vActive ? 'Kích hoạt' : 'Vô hiệu (Ẩn)'}
                   </span>
                 </td>
                 <td style={{ textAlign: 'right' }}>
-                  <button onClick={() => handleOpenModal(v)} className="action-button" title="Sửa">
-                    <Edit size={18} />
-                  </button>
+                  {/* Thay thế nút Edit/Delete bằng nút Bật/Tắt theo đúng Backend */}
                   <button 
-                    onClick={() => handleToggleStatus(v)} 
+                    onClick={() => handleToggle(v)} 
                     className="action-button" 
-                    style={{ color: v.isActive ? '#ec4899' : '#00c896', marginLeft: '8px' }} 
-                    title={v.isActive ? "Vô hiệu hóa mã này" : "Kích hoạt mã này"}
+                    style={{ color: vActive ? '#ec4899' : '#00c896' }} 
+                    title={vActive ? "Vô hiệu hóa" : "Kích hoạt mã này"}
                   >
-                    {v.isActive ? <PowerOff size={18} /> : <Power size={18} />}
+                    {vActive ? <PowerOff size={18} /> : <Power size={18} />}
                   </button>
                 </td>
               </tr>
-            )) : (
+            )}) : (
               <tr>
                 <td colSpan="6">
                   <div className="admin-empty-data" style={{ padding: '3rem 0' }}>Không có dữ liệu voucher.</div>
@@ -216,12 +230,11 @@ export function VoucherManagement() {
         </table>
       </div>
 
-      {/* --- MODAL THÊM / SỬA --- */}
       {showModal && (
         <div className="management-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title">{editingVoucher ? "Chỉnh sửa Voucher" : "Tạo Voucher mới"}</h3>
+              <h3 className="modal-title">Tạo Voucher mới</h3>
             </div>
             
             <div className="modal-body-custom">
@@ -239,10 +252,13 @@ export function VoucherManagement() {
                 <div style={{ flex: 1, minWidth: '200px' }}>
                   <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Số tiền giảm (VNĐ)</label>
                   <input 
-                    type="number" 
+                    type="text" 
                     placeholder="Nhập số tiền giảm..." 
-                    value={formData.discountAmount} 
-                    onChange={e => setFormData({ ...formData, discountAmount: Number(e.target.value) })} 
+                    value={formData.discountAmount === 0 ? '' : formData.discountAmount.toLocaleString('vi-VN')} 
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/\D/g, ''); 
+                      setFormData({ ...formData, discountAmount: rawValue ? Number(rawValue) : 0 });
+                    }} 
                     className="form-input"
                   />
                 </div>
@@ -253,6 +269,7 @@ export function VoucherManagement() {
                   <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Ngày hết hạn</label>
                   <input 
                     type="date" 
+                    min={todayDate}
                     value={formData.expiresAt} 
                     onChange={e => setFormData({ ...formData, expiresAt: e.target.value })} 
                     className="form-input"
@@ -266,9 +283,11 @@ export function VoucherManagement() {
                     onChange={e => setFormData({ ...formData, applicablePlanID: e.target.value })}
                   >
                     <option value="">Tất cả các gói</option>
-                    {plans.map(p => (
-                      <option key={p.planID} value={p.planID}>{p.name} ({p.price.toLocaleString()}đ)</option>
-                    ))}
+                    {plans.map(p => {
+                      const pId = p.planID || p.planId || p.id || p.Id;
+                      return (
+                      <option key={pId} value={pId}>{p.name || p.Name} ({(p.price || p.Price || 0).toLocaleString('vi-VN')}đ)</option>
+                    )})}
                   </select>
                 </div>
               </div>
@@ -287,9 +306,7 @@ export function VoucherManagement() {
 
             <div className="modal-foot">
               <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowModal(false)}>Hủy</button>
-              <button className="primary-button" onClick={handleSave}>
-                {editingVoucher ? "Lưu thay đổi" : "Tạo Voucher"}
-              </button>
+              <button className="primary-button" onClick={handleSave}>Tạo Voucher</button>
             </div>
           </div>
         </div>

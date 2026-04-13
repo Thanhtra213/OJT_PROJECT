@@ -103,7 +103,6 @@ export function PlanManagement() {
     }
   };
 
-  // ✅ ĐÃ SỬA: Hỏi xác nhận xóa vĩnh viễn & Tự động Reload
   const handleDeletePlan = (planId) => {
     if (!planId) {
       Swal.fire("Lỗi Dữ Liệu!", "Hệ thống không tìm thấy ID của gói này.", "error");
@@ -124,7 +123,6 @@ export function PlanManagement() {
         try {
           await deletePlan(planId);
           Swal.fire("Đã xóa!", "Gói hội viên đã bị xóa vĩnh viễn.", "success").then(() => {
-            // ✅ Tự động load lại toàn bộ trang web
             window.location.reload();
           });
         } catch (error) {
@@ -152,6 +150,13 @@ export function PlanManagement() {
 
   return (
     <div className="management-card">
+      {/* ✅ FIX LỖI THÔNG BÁO BỊ ĐÈ: Ép z-index của SweetAlert2 lên cao nhất */}
+      <style>{`
+        .swal2-container {
+          z-index: 10000 !important;
+        }
+      `}</style>
+
       <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý Gói Hội Viên</h2>
