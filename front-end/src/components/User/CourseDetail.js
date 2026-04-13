@@ -11,11 +11,11 @@ import { FaPlayCircle, FaBook, FaQuestionCircle, FaLock, FaArrowLeft, FaCheckCir
 import "./CourseDetail.scss";
 
 const LEVELS = {
-  1: { label: "Beginner",     color: "#f97316", bg: "#fff7ed", text: "#c2410c" },
+  1: { label: "Beginner", color: "#f97316", bg: "#fff7ed", text: "#c2410c" },
   2: { label: "Intermediate", color: "#ec4899", bg: "#fdf2f8", text: "#be185d" },
   3: { label: "Intermediate", color: "#10b981", bg: "#ecfdf5", text: "#065f46" },
-  4: { label: "Advanced",     color: "#8b5cf6", bg: "#f5f3ff", text: "#5b21b6" },
-  5: { label: "Expert",       color: "#3b82f6", bg: "#eff6ff", text: "#1d4ed8" },
+  4: { label: "Advanced", color: "#8b5cf6", bg: "#f5f3ff", text: "#5b21b6" },
+  5: { label: "Expert", color: "#3b82f6", bg: "#eff6ff", text: "#1d4ed8" },
 };
 const getLevel = (n) => LEVELS[Number(n)] || LEVELS[1];
 
@@ -24,60 +24,61 @@ const CourseDetail = () => {
   const navigate = useNavigate();
 
   // ── Refs ──────────────────────────────────────────────────────────────────
-  const videoRef            = useRef(null);
-  const iframeRef           = useRef(null);
+  const videoRef = useRef(null);
+  const iframeRef = useRef(null);
   const progressIntervalRef = useRef(null);
-  const selectedVideoRef    = useRef(null);
-  const currentTimeRef      = useRef(0);
-  const videoDurationRef    = useRef(0);
-  const courseRef           = useRef(null);
-  const pendingResumeRef    = useRef(0);
-  const bannerTimerRef      = useRef(null);
+  const selectedVideoRef = useRef(null);
+  const currentTimeRef = useRef(0);
+  const videoDurationRef = useRef(0);
+  const courseRef = useRef(null);
+  const pendingResumeRef = useRef(0);
+  const bannerTimerRef = useRef(null);
 
   // GDrive iframe tick
   const iframePlayingRef = useRef(false);
-  const iframeTickRef    = useRef(null);
+  const iframeTickRef = useRef(null);
   const tickStartTimeRef = useRef(0);
-  const tickStartOffset  = useRef(0);
+  const tickStartOffset = useRef(0);
+  const iframeHasPlayedOnce = useRef(false);
 
   // YouTube IFrame Player API
-  const ytPlayerRef  = useRef(null);
-  const ytTickRef    = useRef(null);
-  const ytTickCount  = useRef(0);
-  const ytInitTimer  = useRef(null);
+  const ytPlayerRef = useRef(null);
+  const ytTickRef = useRef(null);
+  const ytTickCount = useRef(0);
+  const ytInitTimer = useRef(null);
 
   // ── States ────────────────────────────────────────────────────────────────
   const [showResumeBanner, setShowResumeBanner] = useState(false);
   const [resumeBannerTime, setResumeBannerTime] = useState(0);
-  const [activeTab,         setActiveTab]         = useState("video");
-  const [course,            setCourse]            = useState(null);
-  const [isLoading,         setIsLoading]         = useState(true);
-  const [selectedVideo,     setSelectedVideo]     = useState(null);
-  const [hasMembership,     setHasMembership]     = useState(false);
-  const [videoError,        setVideoError]        = useState(null);
-  const [loadingVideo,      setLoadingVideo]      = useState(false);
-  const [videoProgress,     setVideoProgress]     = useState(0);
-  const [videoDuration,     setVideoDuration]     = useState(0);
-  const [currentTime,       setCurrentTime]       = useState(0);
-  const [quizzes,           setQuizzes]           = useState([]);
-  const [loadingQuizzes,    setLoadingQuizzes]    = useState(false);
-  const [quizError,         setQuizError]         = useState(null);
-  const [flashcardSets,     setFlashcardSets]     = useState([]);
+  const [activeTab, setActiveTab] = useState("video");
+  const [course, setCourse] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [hasMembership, setHasMembership] = useState(false);
+  const [videoError, setVideoError] = useState(null);
+  const [loadingVideo, setLoadingVideo] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [quizzes, setQuizzes] = useState([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
+  const [quizError, setQuizError] = useState(null);
+  const [flashcardSets, setFlashcardSets] = useState([]);
   const [loadingFlashcards, setLoadingFlashcards] = useState(false);
-  const [flashcardError,    setFlashcardError]    = useState(null);
-  const [courseRating,      setCourseRating]      = useState(null);
-  const [courseFeedbacks,   setCourseFeedbacks]   = useState([]);
-  const [loadingFeedbacks,  setLoadingFeedbacks]  = useState(false);
+  const [flashcardError, setFlashcardError] = useState(null);
+  const [courseRating, setCourseRating] = useState(null);
+  const [courseFeedbacks, setCourseFeedbacks] = useState([]);
+  const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
 
   // ── URL helpers ───────────────────────────────────────────────────────────
-  const isYouTubeUrl     = (url) => url && (url.includes('youtube.com') || url.includes('youtu.be'));
+  const isYouTubeUrl = (url) => url && (url.includes('youtube.com') || url.includes('youtu.be'));
   const isGoogleDriveUrl = (url) => url && (url.includes('drive.google.com') || url.includes('drive.usercontent.google.com'));
 
   const extractYouTubeId = (url) => {
     if (!url) return null;
-    const m1 = url.match(/[?&]v=([^&]+)/);     if (m1) return m1[1];
+    const m1 = url.match(/[?&]v=([^&]+)/); if (m1) return m1[1];
     const m2 = url.match(/youtu\.be\/([^?]+)/); if (m2) return m2[1];
-    const m3 = url.match(/\/embed\/([^?]+)/);   if (m3) return m3[1];
+    const m3 = url.match(/\/embed\/([^?]+)/); if (m3) return m3[1];
     return null;
   };
 
@@ -89,9 +90,10 @@ const CourseDetail = () => {
     }
     if (isGoogleDriveUrl(url)) {
       let fileId = null;
-      const m1 = url.match(/[?&]id=([^&]+)/);     if (m1) fileId = m1[1];
+      const m1 = url.match(/[?&]id=([^&]+)/); if (m1) fileId = m1[1];
       const m2 = url.match(/\/file\/d\/([^\/]+)/); if (m2) fileId = m2[1];
-      const m3 = url.match(/open\?id=([^&]+)/);    if (m3) fileId = m3[1];
+      const m3 = url.match(/open\?id=([^&]+)/); if (m3) fileId = m3[1];
+      // Phục hồi lại thành iframe do Native <video> bị chặn bởi Google Drive
       if (fileId) return { type: 'iframe', url: `https://drive.google.com/file/d/${fileId}/preview`, platform: 'gdrive' };
     }
     return { type: 'video', url, platform: 'direct' };
@@ -99,7 +101,7 @@ const CourseDetail = () => {
 
   // ── Save progress ─────────────────────────────────────────────────────────
   const saveVideoProgressLocal = (forceCurSec, forceDurSec) => {
-    const video     = selectedVideoRef.current;
+    const video = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj) return;
 
@@ -112,14 +114,14 @@ const CourseDetail = () => {
           const c = ytPlayerRef.current.getCurrentTime();
           const d = ytPlayerRef.current.getDuration();
           if (!isNaN(c) && c >= 0) curSec = curSec ?? c;
-          if (!isNaN(d) && d > 0)  durSec = durSec ?? d;
-        } catch {}
+          if (!isNaN(d) && d > 0) durSec = durSec ?? d;
+        } catch { }
       }
       if (video.videoType === 'video' && videoRef.current) {
         const elCur = videoRef.current.currentTime;
         const elDur = videoRef.current.duration;
         if (!isNaN(elCur) && elCur >= 0) curSec = curSec ?? elCur;
-        if (!isNaN(elDur) && elDur > 0)  durSec = durSec ?? elDur;
+        if (!isNaN(elDur) && elDur > 0) durSec = durSec ?? elDur;
       }
       if (curSec === undefined) curSec = currentTimeRef.current || 0;
       if (durSec === undefined) durSec = videoDurationRef.current || 0;
@@ -129,10 +131,12 @@ const CourseDetail = () => {
 
     if (durSec && durSec > 0) {
       updateVideoHistory({
-        courseID:    parseInt(id),
-        courseName:  courseObj.courseName,
-        lessonID:    video.videoID,
+        courseID: parseInt(id),
+        courseName: courseObj.courseName,
+        lessonID: video.videoID,
         lessonTitle: video.videoName,
+        videoURL: video.videoURL,
+        platform: video.platform,
       }, curSec, durSec);
       window.dispatchEvent(new Event("videoHistoryUpdated"));
 
@@ -172,7 +176,7 @@ const CourseDetail = () => {
       if (ytInitTimer.current) { clearTimeout(ytInitTimer.current); ytInitTimer.current = null; }
 
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch {}
+        try { ytPlayerRef.current.destroy(); } catch { }
         ytPlayerRef.current = null;
       }
 
@@ -214,13 +218,14 @@ const CourseDetail = () => {
               stopYtTick(true);
             } else if (e.data === S.ENDED) {
               stopYtTick(false);
-              const dur       = videoDurationRef.current;
-              const video     = selectedVideoRef.current;
+              const dur = videoDurationRef.current;
+              const video = selectedVideoRef.current;
               const courseObj = courseRef.current;
               if (!video || !courseObj || dur <= 0) return;
               updateVideoHistory({
                 courseID: parseInt(id), courseName: courseObj.courseName,
                 lessonID: video.videoID, lessonTitle: video.videoName,
+                videoURL: video.videoURL, platform: video.platform,
               }, dur, dur);
               setVideoProgress(100);
               setCurrentTime(dur);
@@ -247,7 +252,7 @@ const CourseDetail = () => {
       if (ytInitTimer.current) { clearTimeout(ytInitTimer.current); ytInitTimer.current = null; }
       stopYtTick(false);
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch {}
+        try { ytPlayerRef.current.destroy(); } catch { }
         ytPlayerRef.current = null;
       }
     };
@@ -262,8 +267,8 @@ const CourseDetail = () => {
       if (document.hidden || !ytPlayerRef.current) return;
       try {
         const cur = ytPlayerRef.current.getCurrentTime() || 0;
-        const dur = ytPlayerRef.current.getDuration()    || videoDurationRef.current;
-        currentTimeRef.current   = cur;
+        const dur = ytPlayerRef.current.getDuration() || videoDurationRef.current;
+        currentTimeRef.current = cur;
         videoDurationRef.current = dur;
         setCurrentTime(cur);
         if (dur > 0) setVideoProgress(Math.min(100, Math.round((cur / dur) * 100)));
@@ -274,7 +279,7 @@ const CourseDetail = () => {
             saveProgressToDB(video.videoID, Math.round(cur), false, Math.round(cur), Math.round(dur));
           }
         }
-      } catch {}
+      } catch { }
     }, 1_000);
   };
 
@@ -288,15 +293,23 @@ const CourseDetail = () => {
     if (iframeTickRef.current) return;
     iframePlayingRef.current = true;
     tickStartTimeRef.current = Date.now();
-    tickStartOffset.current  = currentTimeRef.current;
+
+    // Đối với GDrive iframe, bộ phát luôn tự động reset về 0 mỗi khi load lại.
+    // Nên nếu đây là lần bấm Play đầu tiên, ta ép bộ đếm thời gian phía dưới cũng về 0s
+    // để đồng bộ chạy khớp với hình ảnh video.
+    if (!iframeHasPlayedOnce.current) {
+      tickStartOffset.current = 0;
+      iframeHasPlayedOnce.current = true;
+    } else {
+      tickStartOffset.current = currentTimeRef.current;
+    }
 
     let lastSaveCount = 0;
-
     iframeTickRef.current = setInterval(() => {
       if (document.hidden || !iframePlayingRef.current) return;
 
       const elapsed = Math.floor((Date.now() - tickStartTimeRef.current) / 1000);
-      const cur     = tickStartOffset.current + elapsed;
+      const cur = tickStartOffset.current + elapsed;
       currentTimeRef.current = cur;
       setCurrentTime(cur);
 
@@ -305,23 +318,12 @@ const CourseDetail = () => {
 
       lastSaveCount += 1;
       if (lastSaveCount % 10 === 0) {
-        const video     = selectedVideoRef.current;
+        const video = selectedVideoRef.current;
         const courseObj = courseRef.current;
         if (video) {
-          saveProgressToDB(
-            video.videoID,
-            Math.round(cur),
-            false,
-            Math.round(cur),
-            dur > 0 ? Math.round(dur) : undefined,
-          );
+          saveProgressToDB(video.videoID, Math.round(cur), false, Math.round(cur), dur > 0 ? Math.round(dur) : undefined);
           if (dur > 0 && courseObj) {
-            updateVideoHistory({
-              courseID:    parseInt(id),
-              courseName:  courseObj.courseName,
-              lessonID:    video.videoID,
-              lessonTitle: video.videoName,
-            }, cur, dur);
+            updateVideoHistory({ courseID: parseInt(id), courseName: courseObj.courseName, lessonID: video.videoID, lessonTitle: video.videoName, videoURL: video.videoURL, platform: video.platform }, cur, dur);
             window.dispatchEvent(new Event("videoHistoryUpdated"));
           }
         }
@@ -356,27 +358,26 @@ const CourseDetail = () => {
     setShowResumeBanner(false);
 
     // Reset tất cả
-    currentTimeRef.current   = 0;
+    currentTimeRef.current = 0;
     videoDurationRef.current = 0;
     pendingResumeRef.current = 0;
-    tickStartTimeRef.current = 0;
-    tickStartOffset.current  = 0;
+    iframeHasPlayedOnce.current = false;
     setCurrentTime(0);
     setVideoDuration(0);
     setVideoProgress(0);
 
     try {
       const videoData = await getVideoById(videoId);
-      const canWatch  = videoData.canWatch || videoData.isPreview;
+      const canWatch = videoData.canWatch || videoData.isPreview;
 
       if (canWatch) {
         const videoInfo = getDirectVideoUrl(videoData.videoURL);
-        const newVideo  = {
-          videoID:   videoId,
+        const newVideo = {
+          videoID: videoId,
           videoName,
-          videoURL:  videoInfo.url,
+          videoURL: videoInfo.url,
           videoType: videoInfo.type,
-          platform:  videoInfo.platform,
+          platform: videoInfo.platform,
           canWatch,
           chapterName,
         };
@@ -386,10 +387,10 @@ const CourseDetail = () => {
         const dbProgress = await getVideoProgressFromDB(videoId);
         if (dbProgress) {
           const totalDurSec = dbProgress.totalDurationSec || 0;
-          const lastPosSec  = dbProgress.lastPositionSec  || 0;
+          const lastPosSec = dbProgress.lastPositionSec || 0;
 
           pendingResumeRef.current = lastPosSec;
-          currentTimeRef.current   = lastPosSec;
+          currentTimeRef.current = lastPosSec;
           videoDurationRef.current = totalDurSec;
           setCurrentTime(lastPosSec);
           setVideoDuration(totalDurSec);
@@ -408,7 +409,7 @@ const CourseDetail = () => {
             bannerTimerRef.current = setTimeout(() => setShowResumeBanner(false), 9000);
           }
         } else {
-          currentTimeRef.current   = 0;
+          currentTimeRef.current = 0;
           videoDurationRef.current = 0;
           pendingResumeRef.current = 0;
           setVideoProgress(0);
@@ -416,10 +417,8 @@ const CourseDetail = () => {
           setVideoDuration(0);
         }
 
-        // GDrive: start tick ngay
-        if (videoInfo.platform === 'gdrive') {
-          startIframeTick();
-        }
+        // GDrive: đợi user click (blur trick) để start tick
+        // (xóa startIframeTick tự động để không bị đếm tốn tiến độ ảo)
 
         startProgressTracking(newVideo);
       } else {
@@ -464,7 +463,7 @@ const CourseDetail = () => {
   };
 
   const handleVideoEnded = () => {
-    const video     = selectedVideoRef.current;
+    const video = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj || !videoRef.current) return;
     const dur = videoRef.current.duration;
@@ -472,6 +471,7 @@ const CourseDetail = () => {
     updateVideoHistory({
       courseID: parseInt(id), courseName: courseObj.courseName || "Khóa học",
       lessonID: video.videoID, lessonTitle: video.videoName,
+      videoURL: video.videoURL, platform: video.platform,
     }, dur, dur);
     setVideoProgress(100);
     setCurrentTime(dur);
@@ -502,13 +502,13 @@ const CourseDetail = () => {
 
   // ── Mark completed ────────────────────────────────────────────────────────
   const markVideoAsCompleted = () => {
-    const video     = selectedVideoRef.current;
+    const video = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj) return;
 
     let durSec = 0;
     if (video.platform === 'youtube' && ytPlayerRef.current) {
-      try { durSec = ytPlayerRef.current.getDuration() || 0; } catch {}
+      try { durSec = ytPlayerRef.current.getDuration() || 0; } catch { }
     }
     if (!durSec && video.videoType === 'video' && videoRef.current) {
       const d = videoRef.current.duration;
@@ -520,6 +520,7 @@ const CourseDetail = () => {
     updateVideoHistory({
       courseID: parseInt(id), courseName: courseObj.courseName,
       lessonID: video.videoID, lessonTitle: video.videoName,
+      videoURL: video.videoURL, platform: video.platform,
     }, durSec, durSec);
 
     setVideoProgress(100);
@@ -547,9 +548,9 @@ const CourseDetail = () => {
         setHasMembership(membershipData.hasMembership || false);
         setCourse(courseData);
         courseRef.current = courseData;
-        try { const rating = await getCourseRating(id); setCourseRating(rating); } catch {}
+        try { const rating = await getCourseRating(id); setCourseRating(rating); } catch { }
 
-        const searchParams  = new URLSearchParams(window.location.search);
+        const searchParams = new URLSearchParams(window.location.search);
         const targetVideoId = searchParams.get('videoId');
 
         if (targetVideoId && courseData.chapters?.length > 0) {
@@ -584,21 +585,33 @@ const CourseDetail = () => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  // ── Visibility change ─────────────────────────────────────────────────────
+  // ── Visibility change ───────────────────────────────────────────────────
+  const gdriveWasPlaying = useRef(false);
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.hidden) {
+        gdriveWasPlaying.current = iframePlayingRef.current || !!iframeTickRef.current;
         stopYtTick(true);
         stopIframeTick();
       } else {
         if (selectedVideoRef.current?.platform === 'gdrive' && !iframeTickRef.current) {
-          startIframeTick();
+          if (gdriveWasPlaying.current) startIframeTick();
         }
       }
     };
+    const onBlur = () => {
+      setTimeout(() => {
+        if (document.activeElement && iframeRef.current && document.activeElement === iframeRef.current) {
+          if (!iframeTickRef.current) startIframeTick();
+        }
+      }, 50);
+    };
     document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("blur", onBlur);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -653,15 +666,15 @@ const CourseDetail = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "quiz")      handleLoadQuizzes();
+    if (activeTab === "quiz") handleLoadQuizzes();
     if (activeTab === "flashcard") handleLoadFlashcards();
-    if (activeTab === "feedback")  handleLoadFeedbacks();
+    if (activeTab === "feedback") handleLoadFeedbacks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const formatTime = (s) => {
     if (!s || isNaN(s) || s < 0) return "0:00";
-    const m  = Math.floor(s / 60);
+    const m = Math.floor(s / 60);
     const sc = Math.floor(s % 60);
     return `${m}:${sc.toString().padStart(2, '0')}`;
   };
@@ -823,19 +836,17 @@ const CourseDetail = () => {
                           )}
                         </div>
 
-                        {videoDuration > 0 && (
-                          <div style={{ marginTop: ".85rem" }}>
-                            <div style={{ height: "7px", background: "#b3f0de", borderRadius: "99px", overflow: "hidden" }}>
-                              <div style={{ height: "100%", width: `${videoProgress}%`, background: "#00c896", borderRadius: "99px", transition: "width .4s ease" }} />
-                            </div>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
-                              <small style={{ color: "#9ca3af", fontSize: ".76rem", fontWeight: 600 }}>
-                                {formatTime(currentTime)} / {formatTime(videoDuration)}
-                              </small>
-                              <small style={{ color: "#00a87c", fontWeight: 700, fontSize: ".76rem" }}>{videoProgress}%</small>
-                            </div>
+                        <div style={{ marginTop: ".85rem" }}>
+                          <div style={{ height: "7px", background: "#b3f0de", borderRadius: "99px", overflow: "hidden" }}>
+                            <div style={{ height: "100%", width: `${videoProgress}%`, background: "#00c896", borderRadius: "99px", transition: "width .4s ease" }} />
                           </div>
-                        )}
+                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
+                            <small style={{ color: "#9ca3af", fontSize: ".76rem", fontWeight: 600 }}>
+                              {formatTime(currentTime)} / {videoDuration > 0 ? formatTime(videoDuration) : "0:00"}
+                            </small>
+                            <small style={{ color: "#00a87c", fontWeight: 700, fontSize: ".76rem" }}>{videoProgress}%</small>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -849,13 +860,13 @@ const CourseDetail = () => {
                         ? <Alert variant="danger">{quizError}</Alert>
                         : quizzes.length > 0
                           ? <div className="resource-list">
-                              {quizzes.map(quiz => (
-                                <div key={quiz.quizID} className="resource-item" onClick={() => navigate(`/quiz/start/${quiz.quizID}`)}>
-                                  <FaQuestionCircle className="resource-icon" />
-                                  <div className="resource-info"><strong>{quiz.title}</strong></div>
-                                </div>
-                              ))}
-                            </div>
+                            {quizzes.map(quiz => (
+                              <div key={quiz.quizID} className="resource-item" onClick={() => navigate(`/quiz/start/${quiz.quizID}`)}>
+                                <FaQuestionCircle className="resource-icon" />
+                                <div className="resource-info"><strong>{quiz.title}</strong></div>
+                              </div>
+                            ))}
+                          </div>
                           : <p style={{ color: "#9ca3af", fontWeight: 600 }}>Không có bài luyện tập nào.</p>
                     }
                   </div>
@@ -869,13 +880,13 @@ const CourseDetail = () => {
                         ? <Alert variant="danger">{flashcardError}</Alert>
                         : flashcardSets.length > 0
                           ? <div className="resource-list">
-                              {flashcardSets.map(set => (
-                                <div key={set.setID} className="resource-item" onClick={() => navigate(`/flashcard/${set.setID}`)}>
-                                  <FaLayerGroup className="resource-icon" />
-                                  <div className="resource-info"><strong>{set.title}</strong></div>
-                                </div>
-                              ))}
-                            </div>
+                            {flashcardSets.map(set => (
+                              <div key={set.setID} className="resource-item" onClick={() => navigate(`/flashcard/${set.setID}`)}>
+                                <FaLayerGroup className="resource-icon" />
+                                <div className="resource-info"><strong>{set.title}</strong></div>
+                              </div>
+                            ))}
+                          </div>
                           : <p style={{ color: "#9ca3af", fontWeight: 600 }}>Không có bộ flashcard nào.</p>
                     }
                   </div>
@@ -898,25 +909,25 @@ const CourseDetail = () => {
                       ? <div className="text-center py-4"><Spinner animation="border" style={{ color: "#00c896" }} /></div>
                       : courseFeedbacks.length > 0
                         ? <div className="feedback-list">
-                            {courseFeedbacks.map((fb, i) => (
-                              <Card key={i}><Card.Body>
-                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                  <div>
-                                    <strong>{fb.userName || "Học viên"}</strong>
-                                    <div className="mt-1">
-                                      {[...Array(5)].map((_, j) => (
-                                        <FaStar key={j} size={13} className={j < fb.rating ? "text-warning" : "text-muted"} />
-                                      ))}
-                                    </div>
+                          {courseFeedbacks.map((fb, i) => (
+                            <Card key={i}><Card.Body>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                  <strong>{fb.userName || "Học viên"}</strong>
+                                  <div className="mt-1">
+                                    {[...Array(5)].map((_, j) => (
+                                      <FaStar key={j} size={13} className={j < fb.rating ? "text-warning" : "text-muted"} />
+                                    ))}
                                   </div>
-                                  <small className="text-muted">
-                                    {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('vi-VN') : ''}
-                                  </small>
                                 </div>
-                                <p className="mb-0">{fb.comment}</p>
-                              </Card.Body></Card>
-                            ))}
-                          </div>
+                                <small className="text-muted">
+                                  {fb.createdAt ? new Date(fb.createdAt).toLocaleDateString('vi-VN') : ''}
+                                </small>
+                              </div>
+                              <p className="mb-0">{fb.comment}</p>
+                            </Card.Body></Card>
+                          ))}
+                        </div>
                         : <Alert variant="info">Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!</Alert>
                     }
                   </div>
@@ -940,11 +951,11 @@ const CourseDetail = () => {
                     <Accordion.Body>
                       <ul className="video-list">
                         {chapter.videos?.map(video => {
-                          const vid         = video.videoId ?? video.videoID;
-                          const canWatch    = video.isPreview || hasMembership;
-                          const isPlaying   = selectedVideo?.videoID === video.videoID;
-                          const saved       = getVideoProgress(video.videoID);
-                          const hasWatched  = saved && saved.progress > 0;
+                          const vid = video.videoId ?? video.videoID;
+                          const canWatch = video.isPreview || hasMembership;
+                          const isPlaying = selectedVideo?.videoID === video.videoID;
+                          const saved = getVideoProgress(video.videoID);
+                          const hasWatched = saved && saved.progress > 0;
                           const isCompleted = saved && saved.progress >= 100;
                           return (
                             <li
