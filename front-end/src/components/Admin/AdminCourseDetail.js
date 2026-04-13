@@ -55,8 +55,16 @@ export default function AdminCourseDetail() {
         return;
       }
 
-      if (courseRes.status === "fulfilled") setCourse(courseRes.value.data);
-      else Swal.fire("Lỗi", "Không thể tải thông tin chi tiết khóa học.", "error");
+      // ✅ Bóc tách lớp vỏ "data" dư thừa để lấy đúng thông tin khóa học
+      if (courseRes.status === "fulfilled") {
+        let cData = courseRes.value.data;
+        if (cData && typeof cData === 'object' && cData.data && !Array.isArray(cData.data)) {
+          cData = cData.data; 
+        }
+        setCourse(cData);
+      } else {
+        Swal.fire("Lỗi", "Không thể tải thông tin chi tiết khóa học.", "error");
+      }
 
       if (flashcardRes.status === "fulfilled") {
         let fcData = flashcardRes.value.data;
@@ -98,9 +106,7 @@ export default function AdminCourseDetail() {
           if (arrayKey) cardsArray = data[arrayKey];
         }
         
-        if (cardsArray.length === 0 && data) {
-          cardsArray = [{ term: "Debug Raw Data", definition: JSON.stringify(data) }];
-        }
+        // Đã xóa khối code in ra "Debug Raw Data" gây lỗi ở đây
         
         setDetailedFCs(prev => ({ ...prev, [setId]: cardsArray }));
       } catch (err) {
@@ -140,13 +146,6 @@ export default function AdminCourseDetail() {
             if (data[key].length > 0 && data[key][0].questions) groupsList = data[key];
             else groupsList = [{ groupName: "Danh sách câu hỏi", questions: data[key] }];
           }
-        }
-
-        if (groupsList.length === 0 && data) {
-           groupsList = [{ 
-             groupName: "Cảnh báo (Không nhận diện được cấu trúc)", 
-             questions: [{ content: "Dữ liệu Backend trả về:", answers: [{ content: JSON.stringify(data), isCorrect: false }] }] 
-           }];
         }
 
         setDetailedQuizzes(prev => ({ ...prev, [quizId]: groupsList }));
@@ -194,7 +193,6 @@ export default function AdminCourseDetail() {
   }
 
   return (
-    // THÊM WRAPPER: Ép khoảng cách 4 cạnh và tự động căn giữa màn hình
     <div style={{ padding: "2rem 1.5rem", maxWidth: "1200px", margin: "0 auto", boxSizing: "border-box", width: "100%" }}>
       <div className="management-card" style={{ padding: "0", overflow: "hidden", borderRadius: "12px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
         
@@ -215,18 +213,24 @@ export default function AdminCourseDetail() {
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
             <div>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "var(--text-dark)", marginBottom: "0.5rem" }}>{course.courseName}</h1>
-              <p style={{ color: "var(--text-body)", fontSize: "1rem", maxWidth: "800px", lineHeight: "1.6", margin: "0 0 10px 0" }}>{course.description || course.courseDescription || "Chưa có mô tả."}</p>
+              <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "var(--text-dark)", marginBottom: "0.5rem" }}>
+                {course.courseName || course.title || "Chưa có tên khóa học"}
+              </h1>
+              <p style={{ color: "var(--text-body)", fontSize: "1rem", maxWidth: "800px", lineHeight: "1.6", margin: "0 0 10px 0" }}>
+                {course.description || course.courseDescription || "Chưa có mô tả."}
+              </p>
               <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem", flexWrap: "wrap" }}>
-                <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Giảng viên: {course.teacher?.teacherName || course.teacherName || "N/A"}</span>
-                <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Ngày tạo: {new Date(course.createAt || course.createdAt).toLocaleDateString("vi-VN")}</span>
+                <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Giảng viên: {course.teacher?.teacherName || course.teacherName || course.teacher?.fullName || "Chưa cập nhật"}</span>
+                <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Ngày tạo: {new Date(course.createAt || course.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
                <span className="status-badge" style={{ backgroundColor: isCourseActive ? 'rgba(0,200,150,0.12)' : 'rgba(245,158,11,0.12)', color: isCourseActive ? 'var(--primary)' : '#f59e0b', fontSize: '0.9rem', padding: '8px 16px', display: "inline-block" }}>
                   {isCourseActive ? "Đang hoạt động" : "Đã ẩn"}
                </span>
-               <p style={{ marginTop: "10px", fontWeight: 800, color: "var(--text-muted)", fontSize: "0.9rem", margin: "10px 0 0 0" }}>Mã KH: <span style={{ color: "var(--primary)" }}>#{course.courseID || course.id}</span></p>
+               <p style={{ marginTop: "10px", fontWeight: 800, color: "var(--text-muted)", fontSize: "0.9rem", margin: "10px 0 0 0" }}>
+                 Mã KH: <span style={{ color: "var(--primary)" }}>#{course.courseID || course.courseId || course.id || course.Id || id}</span>
+               </p>
             </div>
           </div>
         </div>
@@ -416,10 +420,10 @@ export default function AdminCourseDetail() {
                                                   display: "flex", alignItems: "center", gap: "8px", 
                                                   fontSize: "0.9rem", color: isCorrect ? "#059669" : "var(--text-body)", 
                                                   fontWeight: isCorrect ? 700 : 500, 
-                                                  backgroundColor: isCorrect ? "#ecfdf5" : "#f8fafc", 
-                                                  padding: "8px 12px", borderRadius: "8px", 
-                                                  border: isCorrect ? "1px solid #6ee7b7" : "1px solid #e2e8f0" 
+                                                  backgroundColor: isCorrect ? "#ecfdf5" : "transparent", 
+                                                  padding: "6px 10px", borderRadius: "6px" 
                                                 }}>
+                                                  {isCorrect ? <strong style={{color: "#059669"}}></strong> : <span style={{color: "#cbd5e1"}}> </span>}
                                                   {text}
                                                 </div>
                                               )})}
