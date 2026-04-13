@@ -455,16 +455,7 @@ const TeacherDashboard = () => {
                   </button>
 
                   <div className="course-icon-actions">
-                    <button
-                      onClick={() =>
-                        navigate("/teacher/create-quiz", { state: { courses, preSelectedCourseId: course.courseID } })
-                      }
-                      className="icon-action-btn"
-                      style={{ color: '#8b5cf6' }}
-                      title="Tạo Quiz cho khóa này"
-                    >
-                      <Brain size={16} />
-                    </button>
+
                     <button
                       onClick={() =>
                         navigate(`/teacher/edit-course/${course.courseID}`)
@@ -481,9 +472,7 @@ const TeacherDashboard = () => {
                     >
                       <Trash size={16} />
                     </button>
-                    <button className="icon-action-btn" title="Tùy chọn">
-                      <MoreVertical size={16} />
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -571,9 +560,7 @@ const TeacherDashboard = () => {
                     >
                       <Trash size={16} />
                     </button>
-                    <button className="icon-action-btn" title="Tùy chọn">
-                      <MoreVertical size={16} />
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -667,9 +654,7 @@ const TeacherDashboard = () => {
                           <Trash size={16} />
                         </button>
 
-                        <button className="icon-action-btn" title="Tùy chọn">
-                          <MoreVertical size={16} />
-                        </button>
+
                       </div>
                     </div>
                   </div>
