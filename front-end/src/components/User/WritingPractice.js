@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -27,6 +27,45 @@ const WritingPractice = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
+  // ── Timer: 40 phút = 2400 giây ──────────────────────────────────────────
+  const WRITE_TIME = 40 * 60;
+  const [timeLeft, setTimeLeft] = useState(WRITE_TIME);
+  const [timerActive, setTimerActive] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+  const timerRef = useRef(null);
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, "0");
+    const s = (secs % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const startTimer = useCallback(() => {
+    clearTimer();
+    setTimeLeft(WRITE_TIME);
+    setTimerActive(true);
+    setTimerDone(false);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setTimerActive(false);
+          setTimerDone(true);
+          setShowConfirm(true); // Auto-show submit modal
+          setMessage({ type: "error", text: "⏰ Hết 40 phút! Hãy nộp bài ngay." });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, [clearTimer]);
+
+  useEffect(() => () => clearTimer(), [clearTimer]);
+
   // ✅ Clear message after 5s
   useEffect(() => {
     if (message) {
@@ -53,6 +92,7 @@ const WritingPractice = () => {
       setFeedback(null);
       setWriting("");
       setWordCount(0);
+      startTimer(); // ← Start 40-min writing timer
     } catch (err) {
       console.error("AI generate failed:", err);
       setMessage({
@@ -83,6 +123,8 @@ const WritingPractice = () => {
     try {
       setLoading(true);
       setShowConfirm(false);
+      clearTimer();
+      setTimerActive(false);
       setMessage({ type: "info", text: "📤 Đang xử lý bài viết, vui lòng đợi..." });
 
       const res = await submitWriting(selected.promptId, writing, sendToTeacher);
@@ -201,14 +243,24 @@ const WritingPractice = () => {
             <div className="card editor-card">
               <div className="editor-header">
                 <h3>Khu vực làm bài</h3>
-                <div className="word-count-chip">
-                  <FileText size={14} />
-                  <span>{wordCount} từ</span>
+                <div className="editor-header-right">
+                  {/* Timer hiển thị */}
                   {selected && (
-                    <div className="progress-mini">
-                      <div className="bar" style={{ width: `${wordProgress}%` }} />
+                    <div className={`writing-timer-chip ${timerDone ? "timer-done" : timeLeft < 300 ? "timer-warn" : ""}`}>
+                      <span className="timer-icon">⏱</span>
+                      <span className="timer-value">{formatTime(timeLeft)}</span>
+                      {timerDone && <span className="timer-over-text">Hết giờ!</span>}
                     </div>
                   )}
+                  <div className="word-count-chip">
+                    <FileText size={14} />
+                    <span>{wordCount} từ</span>
+                    {selected && (
+                      <div className="progress-mini">
+                        <div className="bar" style={{ width: `${wordProgress}%` }} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -217,7 +269,7 @@ const WritingPractice = () => {
                 placeholder="Trình bày bài luận của bạn tại đây..."
                 value={writing}
                 onChange={handleChange}
-                disabled={loading || !selected}
+                disabled={loading || !selected || timerDone}
               />
 
               <div className="editor-footer">

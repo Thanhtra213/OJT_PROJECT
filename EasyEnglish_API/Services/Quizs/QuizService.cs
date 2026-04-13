@@ -125,6 +125,7 @@ namespace EasyEnglish_API.Services
 
             var attempt = await _repo.GetAttemptAsync(attemptId, userId)
                           ?? throw new Exception("Attempt not found");
+            Console.WriteLine($"[DEBUG] attempt.UserId={attempt.UserId}, attempt.Status={attempt.Status}");
 
             if (attempt.Status != "IN_PROGRESS")
                 throw new Exception("Quiz already submitted");

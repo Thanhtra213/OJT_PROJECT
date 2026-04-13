@@ -17,7 +17,6 @@ const FlashcardList = () => {
         setLoading(true);
         setError(null);
         const data = await getFlashcardSets();
-        // API returns an object with a 'data' property which is the array
         const flashcardData = data.data || data;
         setSets(Array.isArray(flashcardData) ? flashcardData : []);
       } catch (err) {
@@ -34,12 +33,6 @@ const FlashcardList = () => {
     navigate(`/flashcard/${setId}`);
   };
 
-  const getCardCount = (set) => {
-    if (set.items && Array.isArray(set.items)) {
-      return set.items.length;
-    }
-    return set.itemCount || 0;
-  };
 
   if (loading) {
     return (
@@ -108,9 +101,7 @@ const FlashcardList = () => {
                   <Card.Text>
                     {set.description || "Bộ flashcard học từ vựng tiếng Anh."}
                   </Card.Text>
-                  <div className="card-footer-info">
-                    <span>{getCardCount(set)} thẻ</span>
-                  </div>
+
                 </Card.Body>
               </Card>
             ))}
