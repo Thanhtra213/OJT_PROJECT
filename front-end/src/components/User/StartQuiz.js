@@ -19,11 +19,20 @@ const StartQuiz = () => {
   const [score, setScore] = useState(null);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  const [timeLeft, setTimeLeft] = useState(null);
   const hasFetched = useRef(false);
+  const timerRef = useRef(null);
 
   const showToast = (message, type = "error") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 5000);
+  };
+
+  const formatTime = (seconds) => {
+    if (seconds === null) return "";
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   const renderAsset = (asset, idx) => {
@@ -106,6 +115,11 @@ const StartQuiz = () => {
 
         setQuiz(data);
         setGroups(parsedGroups);
+        
+        if (data.duration && data.duration > 0) {
+          setTimeLeft(data.duration * 60);
+        }
+
         const attempt = await startQuiz(quizId);
         setAttemptId(attempt?.attemptId || attempt?.attemptID || attempt);
         showToast("Quiz đã sẵn sàng! Hãy bắt đầu làm bài.", "success");
@@ -121,6 +135,22 @@ const StartQuiz = () => {
     if (quizId) fetchQuiz();
   }, [quizId]);
 
+  useEffect(() => {
+    if (timeLeft === null || submitted || submitting) return;
+    
+    if (timeLeft <= 0) {
+      showToast("Hết thời gian gian làm bài. Đang nộp bài tự động...", "warning");
+      handleSubmit();
+      return;
+    }
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, [timeLeft, submitted, submitting]);
+
   const handleAnswerChange = (questionId, optionId) => {
     setAnswers(prev => ({ ...prev, [questionId]: optionId }));
   };
@@ -134,7 +164,7 @@ const StartQuiz = () => {
     const allQuestions = groups.flatMap(g => g.questions);
     const unanswered = allQuestions.filter(q => !answers[q.questionID]);
 
-    if (unanswered.length > 0) {
+    if (unanswered.length > 0 && timeLeft > 0) {
       const confirmSubmit = window.confirm(`Bạn còn ${unanswered.length} câu chưa trả lời. Bạn có muốn nộp bài không?`);
       if (!confirmSubmit) return;
     }
@@ -165,19 +195,19 @@ const StartQuiz = () => {
 
   if (loading)
     return (
-      <Container className="py-5 text-center">
-        <Spinner animation="border" role="status" />
-        <p className="mt-3">Đang tải quiz...</p>
+      <Container className="loading-container">
+        <Spinner animation="border" className="spinner-border" />
+        <p>Đang tải dữ liệu bài làm...</p>
       </Container>
     );
 
   if (!quiz && error)
     return (
-      <Container>
-        <Button variant="link" onClick={() => navigate("/")} className="back-button">
+      <Container className="py-5 text-center">
+        <button onClick={() => navigate("/")} className="mint-back-btn mb-4">
           <FontAwesomeIcon icon={faArrowLeft} /> Quay lại danh sách quiz
-        </Button>
-        <Alert variant="danger" className="mt-3">
+        </button>
+        <Alert variant="danger" className="mt-3 d-inline-block">
           <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
           {error}
         </Alert>
@@ -200,119 +230,135 @@ const StartQuiz = () => {
           </div>
         )}
 
-        <Button variant="link" onClick={handleBackToList} className="mb-3">
-          <FontAwesomeIcon icon={faArrowLeft} /> Quay lại danh sách quiz
-        </Button>
+        {/* Top Sticky Bar */}
+        <div className="quiz-top-bar">
+          <Container className="top-bar-inner">
+            <button onClick={handleBackToList} className="mint-back-btn">
+              <FontAwesomeIcon icon={faArrowLeft} /> Quay lại
+            </button>
+            
+            {timeLeft !== null && !submitted && (
+              <div className={`quiz-timer ${timeLeft <= 60 ? 'text-danger border-danger' : ''}`}>
+                <FontAwesomeIcon icon={faClock} /> {formatTime(timeLeft)}
+              </div>
+            )}
+          </Container>
+        </div>
 
-        <h1 className="quiz-title mb-3">{quiz.title || "Quiz không có tiêu đề"}</h1>
-        {quiz.description && <p className="quiz-description">{quiz.description}</p>}
-        <Badge bg="info" className="me-2">{groups.length} phần</Badge>
-        <Badge bg="secondary">{getTotalQuestions()} câu hỏi</Badge>
+        <div className="quiz-header text-center">
+          <h1 className="quiz-title">{quiz.title || "Quiz không có tiêu đề"}</h1>
+          {quiz.description && <p className="quiz-description">{quiz.description}</p>}
+          <div className="mt-3">
+            <Badge bg="info" className="me-2">{groups.length} phần</Badge>
+            <Badge bg="secondary">{getTotalQuestions()} câu hỏi</Badge>
+          </div>
+        </div>
 
         {groups.length > 0 ? (
           groups.map((group, groupIdx) => (
-            <Card key={groupIdx} className="mt-4 p-3 shadow-sm quiz-section">
+            <div key={groupIdx} className="quiz-group-box">
               <Row>
                 {/* CỘT TRÁI - HƯỚNG DẪN VÀ TÀI LIỆU */}
-                <Col md={6}>
-                  <div className="question-instruction">
-                    <h5 className="text-primary mb-3">
-                      Phần {groupIdx + 1}
-                      <Badge bg="light" text="dark" className="ms-2">
-                        {group.questions.length} câu
-                      </Badge>
-                    </h5>
-                    {group.instruction && (
-                      <div className="mb-3">
-                        <strong>Hướng dẫn:</strong>
-                        <p className="mt-2">{group.instruction}</p>
-                      </div>
-                    )}
-                    {group.assets?.length > 0 &&
-                      group.assets.map((asset, idx) => renderAsset(asset, idx))}
-                  </div>
+                <Col md={5} className="group-instruction">
+                  <h5 className="mb-3">
+                    Phần {groupIdx + 1}
+                    <Badge bg="light" text="dark" className="ms-2 shadow-sm border">
+                      {group.questions.length} câu
+                    </Badge>
+                  </h5>
+                  {group.instruction && (
+                    <div className="instruction-text">
+                      <strong className="text-primary d-block mb-2">📌 Hướng dẫn:</strong>
+                      {group.instruction}
+                    </div>
+                  )}
+                  {group.assets?.length > 0 &&
+                    group.assets.map((asset, idx) => renderAsset(asset, idx))}
                 </Col>
 
                 {/* CỘT PHẢI - DANH SÁCH CÂU HỎI */}
-                <Col md={6}>
-                  <div className="questions-container">
+                <Col md={7}>
+                  <div className="questions-container pe-2">
                     {group.questions?.map((question, qIdx) => {
                       const qid = question.questionID;
                       return (
-                        <Card key={qid} className="mb-3">
-                          <Card.Body>
-                            <div className="mb-3">
-                              <Badge bg="primary" className="me-2">Câu {qIdx + 1}</Badge>
-                              <span className="fw-bold">{question.content}</span>
-                            </div>
-                            {question.assets?.length > 0 &&
-                              question.assets.map((asset, idx) => renderAsset(asset, idx))}
+                        <div key={qid} className="question-card">
+                          <div className="d-flex align-items-center mb-3">
+                            <Badge bg="primary" className="me-2 px-3 py-2 rounded-pill">Câu {qIdx + 1}</Badge>
+                          </div>
+                          <div className="question-statement">{question.content}</div>
+                          {question.assets?.length > 0 &&
+                            question.assets.map((asset, idx) => renderAsset(asset, idx))}
+                            
+                          <div className="options-grid mt-3">
                             {question.options?.length > 0 ? (
-                              question.options.map(opt => (
-                                <Form.Check
-                                  key={opt.optionID}
-                                  type="radio"
-                                  id={`q_${qid}_opt_${opt.optionID}`}
-                                  label={opt.content}
-                                  name={`question_${qid}`}
-                                  value={opt.optionID}
-                                  checked={answers[qid] === opt.optionID}
-                                  onChange={() => handleAnswerChange(qid, opt.optionID)}
-                                  disabled={submitted}
-                                  className="mb-2"
-                                />
-                              ))
+                              question.options.map((opt, idx) => {
+                                const isSelected = answers[qid] === opt.optionID;
+                                return (
+                                  <div 
+                                    key={opt.optionID} 
+                                    className={`option-card ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => {
+                                      if (!submitted) handleAnswerChange(qid, opt.optionID);
+                                    }}
+                                  >
+                                    <div className="option-letter">{String.fromCharCode(65 + idx)}</div>
+                                    <div className="option-text">{opt.content}</div>
+                                  </div>
+                                );
+                              })
                             ) : (
                               <Alert variant="warning">⚠ Không có lựa chọn nào cho câu hỏi này.</Alert>
                             )}
-                          </Card.Body>
-                        </Card>
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
                 </Col>
               </Row>
-            </Card>
+            </div>
           ))
         ) : (
-          <Alert variant="warning" className="mt-4">
-            <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
-            Quiz này chưa có câu hỏi nào.
+          <Alert variant="warning" className="mt-4 text-center py-4 border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+            <FontAwesomeIcon icon={faExclamationTriangle} size="2x" className="mb-3 text-warning" />
+            <h5>Quiz này chưa có nội dung</h5>
           </Alert>
         )}
 
         {!submitted ? (
-          <div className="text-center mt-4 mb-5">
-            <Button
+          <div className="submit-area mt-4 mb-5 mx-auto" style={{ maxWidth: '600px' }}>
+            <h4 className="fw-bold mb-3 text-dark">Bạn đã hoàn thành bài?</h4>
+            <button
               onClick={handleSubmit}
-              variant="primary"
-              size="lg"
+              className="btn-submit-quiz w-100"
               disabled={submitting || getTotalQuestions() === 0}
             >
               {submitting ? (
                 <>
-                  <Spinner animation="border" size="sm" className="me-2" /> Đang nộp bài...
+                  <Spinner animation="border" size="sm" className="me-2" /> Đang chấm điểm...
                 </>
               ) : (
                 <>
-                  <FontAwesomeIcon icon={faCheckCircle} className="me-2" /> Nộp bài
+                  Nộp Bài Ngay
                 </>
               )}
-            </Button>
+            </button>
           </div>
         ) : (
-          <div className="text-center mt-5 mb-5">
-            <Alert variant="success" className="py-4">
-              <FontAwesomeIcon icon={faCheckCircle} size="3x" className="mb-3 text-success" />
-              <h3>Chúc mừng bạn đã hoàn thành!</h3>
-              <h1 className="fw-bold text-success">{score}/100 điểm</h1>
-            </Alert>
-            <Button variant="outline-primary" onClick={handleRetry} className="me-3">
-              Làm lại quiz
-            </Button>
-            <Button variant="primary" onClick={handleBackToList}>
-              Quay lại danh sách quiz
-            </Button>
+          <div className="result-card mx-auto mt-5 mb-5" style={{ maxWidth: '600px' }}>
+            <h3>Kết quả siêu phàm của bạn!</h3>
+            <div className="score-circle">
+              {score}
+            </div>
+            <div className="d-flex justify-content-center gap-3">
+              <Button variant="outline-success" onClick={handleRetry} style={{ borderRadius: '100px', fontWeight: '800' }}>
+                Làm Lại Quiz
+              </Button>
+              <Button variant="success" onClick={handleBackToList} style={{ borderRadius: '100px', fontWeight: '800' }}>
+                Quay Về Danh Sách
+              </Button>
+            </div>
           </div>
         )}
       </Container>

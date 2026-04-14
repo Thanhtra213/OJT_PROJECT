@@ -74,21 +74,19 @@ const QuizPublish = () => {
   return (
     <Container className="quiz-publish-page py-4">
       {/* Header */}
-      <div className="d-flex align-items-center mb-4">
-        <Button 
-          variant="link" 
+      <div className="d-flex align-items-center mb-5 mt-2">
+        <button 
           onClick={() => navigate(-1)} 
-          className="p-0 me-3"
+          className="mint-back-btn me-4"
         >
-          <FontAwesomeIcon icon={faArrowLeft} size="lg" /> Quay lại
-        </Button>
+          <FontAwesomeIcon icon={faArrowLeft} /> Quay lại
+        </button>
         <div>
-          <h3 className="mb-0 text-primary">
-            <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+          <h2 className="page-header-title mb-0">
             Danh sách Quiz
-          </h3>
-          <p className="text-muted mb-0 mt-1">
-            Chọn quiz để bắt đầu luyện tập
+          </h2>
+          <p className="text-muted mb-0 mt-1 fw-bold">
+            Chọn quiz để kiểm tra trình độ hoặc luyện tập
           </p>
         </div>
       </div>
@@ -137,10 +135,10 @@ const QuizPublish = () => {
                     </Card.Text>
 
                     {/* Footer Info */}
-                    <div className="d-flex justify-content-between align-items-center text-muted small border-top pt-3">
+                    <div className="d-flex justify-content-between align-items-center info-footer">
                       <div className="d-flex align-items-center">
                         <FontAwesomeIcon icon={faListOl} className="me-2" />
-                        <span>{totalQuestions} câu hỏi</span>
+                        <span>{totalQuestions} câu</span>
                       </div>
                       {quiz.duration && (
                         <div className="d-flex align-items-center">
@@ -169,16 +167,18 @@ const QuizPublish = () => {
           })}
         </Row>
       ) : (
-        <Card className="text-center py-5">
-          <Card.Body>
-            <FontAwesomeIcon 
-              icon={faFileAlt} 
-              size="4x" 
-              className="text-muted mb-3" 
-            />
-            <h5 className="text-muted">Chưa có quiz nào</h5>
+        <Card className="text-center py-5 border-0 shadow-sm" style={{ borderRadius: '24px' }}>
+          <Card.Body className="py-5">
+            <div style={{ background: '#f8fafc', width: '80px', height: '80px', borderRadius: '50%', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FontAwesomeIcon 
+                icon={faFileAlt} 
+                size="2x" 
+                className="text-muted" 
+              />
+            </div>
+            <h4 className="mt-4 fw-bold text-dark">Chưa có quiz nào</h4>
             <p className="text-muted mb-0">
-              Hiện tại chưa có quiz nào được publish. Vui lòng quay lại sau!
+              Hiện tại chưa có bài kiểm tra hoặc bài luyện tập nào được xuất bản.
             </p>
           </Card.Body>
         </Card>
