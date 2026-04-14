@@ -15,6 +15,14 @@ const LEVEL_CLASS = { 0: "beginner", 1: "pre-intermediate", 2: "intermediate", 3
 
 const lvText = l => LEVEL_TEXT[l] ?? "Beginner";
 const lvClass = l => LEVEL_CLASS[l] ?? "beginner";
+const parseError = (error) => {
+  const data = error?.response?.data;
+  return (typeof data === "string" && data.trim())
+    || data?.message
+    || data?.error
+    || error?.message
+    || "Đã có lỗi xảy ra.";
+};
 
 // ─── component ────────────────────────────────────────────────────────────────
 const HomePage = ({ onShowAuthModal }) => {
@@ -40,7 +48,7 @@ const HomePage = ({ onShowAuthModal }) => {
             ch.videos?.forEach(vid => {
               if (vid.isPreview === 1 || vid.isPreview === true) {
                 freeVids.push({
-                  id: vid.videoID || vid.videoId || vid.id, 
+                  id: vid.videoID || vid.videoId || vid.id,
                   courseId: course.courseID || course.courseId || course.id,
                   title: vid.videoName || vid.title || "Video",
                   desc: "Bài học miễn phí — xem ngay, không cần đăng ký",
@@ -74,7 +82,7 @@ const HomePage = ({ onShowAuthModal }) => {
               else if (vUrl.includes("youtu.be/")) ytId = vUrl.split("youtu.be/")[1].split("?")[0];
               else if (vUrl.includes("youtube.com/embed/")) ytId = vUrl.split("embed/")[1].split("?")[0];
               else if (vUrl.includes("youtube.com/shorts/")) ytId = vUrl.split("shorts/")[1].split("?")[0];
-              
+
               if (ytId) {
                 thumb = `https://i3.ytimg.com/vi/${ytId}/hqdefault.jpg`;
               } else if (vUrl.includes("drive.google.com/file/d/")) {
@@ -90,7 +98,7 @@ const HomePage = ({ onShowAuthModal }) => {
               } else if (vUrl.startsWith("http")) {
                 // Bất kỳ link lạ nào không phải YT/Drive, thử ngàm vào thẻ video
                 thumb = vUrl;
-                p.isVideo = true; 
+                p.isVideo = true;
               } else {
                 thumb = 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80';
               }
@@ -131,40 +139,33 @@ const HomePage = ({ onShowAuthModal }) => {
       ════════════════════════════════════════════ */}
       <section className="hp-hero">
         <div className="hero-inner">
-          {/* Badge */}
-          <div className="hero-badge">
-            <BrainCircuit size={13} />
-            Nền tảng học tiếng Anh với AI
+
+          {/* Cột trái */}
+          <div className="hero-text-col">
+            <div className="hero-badge"><BrainCircuit size={13} /> Nền tảng học tiếng Anh với AI</div>
+            <h1>Thành thạo tiếng Anh<br /><em>nhanh hơn gấp 3 lần</em></h1>
+            <p className="hero-sub">Lộ trình cá nhân hóa, phản hồi AI tức thì, hơn 1&nbsp;000 bài học từ Beginner đến Expert — tất cả trong một nền tảng.</p>
+            <div className="hero-actions">
+              <button className="btn-primary" onClick={() => openAuth('register')}><Play size={16} fill="currentColor" /> Bắt đầu miễn phí</button>
+              <button className="btn-ghost" onClick={() => openAuth('login')}>Đăng nhập</button>
+            </div>
+            <div className="hero-stats">
+              <div className="stat"><strong>2M+</strong><span>Học viên</span></div>
+              <div className="stat"><strong>4.9 ★</strong><span>Đánh giá</span></div>
+              <div className="stat"><strong>1K+</strong><span>Bài học</span></div>
+            </div>
           </div>
 
-          {/* Headline */}
-          <h1>
-            Thành thạo tiếng Anh<br />
-            <em>nhanh hơn gấp 3 lần</em>
-          </h1>
-
-          {/* Sub */}
-          <p className="hero-sub">
-            Lộ trình cá nhân hóa, phản hồi AI tức thì, hơn 1&nbsp;000 bài học
-            từ Beginner đến Expert — tất cả trong một nền tảng.
-          </p>
-
-          {/* CTA */}
-          <div className="hero-actions">
-            <button className="btn-primary" onClick={() => openAuth('register')}>
-              <Play size={16} fill="currentColor" /> Bắt đầu miễn phí
-            </button>
-            <button className="btn-ghost" onClick={() => openAuth('login')}>
-              Đăng nhập
-            </button>
+          {/* Cột phải */}
+          <div className="hero-visual">
+            <div className="hero-img-frame" />
+            <div className="hero-float-card">
+              <div className="float-icon">🏆</div>
+              <div className="float-text"><strong>1,235 Khóa học</strong><span>Cập nhật liên tục</span></div>
+            </div>
+            <div className="hero-float-card-2"><strong>4.8 ★</strong><span>Đánh giá</span></div>
           </div>
 
-          {/* Stats */}
-          <div className="hero-stats">
-            <div className="stat"><strong>2M+</strong><span>Học viên</span></div>
-            <div className="stat"><strong>4.9 ★</strong><span>Đánh giá</span></div>
-            <div className="stat"><strong>1K+</strong><span>Bài học</span></div>
-          </div>
         </div>
       </section>
 
@@ -216,13 +217,13 @@ const HomePage = ({ onShowAuthModal }) => {
                 onClick={() => navigate(`/course/${v.courseId}?videoId=${v.id}`)}>
                 <div className="thumb">
                   {v.isVideo ? (
-                    <video src={`${v.thumb}#t=0.001`} preload="metadata" playsInline muted 
-                      style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block', backgroundColor: '#e5e7eb'}} 
+                    <video src={`${v.thumb}#t=0.001`} preload="metadata" playsInline muted
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', backgroundColor: '#e5e7eb' }}
                       onError={(e) => { e.target.onerror = null; e.target.outerHTML = `<img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80" style="width:100%;height:100%;object-fit:cover;" />` }}
                     />
                   ) : (
-                    <img src={v.thumb} alt={v.title} loading="lazy" 
-                      onError={(e) => { e.target.onerror = null; e.target.src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80"}} 
+                    <img src={v.thumb} alt={v.title} loading="lazy"
+                      onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=600&h=340&fit=crop&q=80" }}
                     />
                   )}
                   <span className={`lvl ${v.lvCls}`}>{v.level}</span>
@@ -320,8 +321,10 @@ const HomePage = ({ onShowAuthModal }) => {
         ════════════════════════════════════════════ */}
         <section className="hp-cta">
           <div className="cta-banner">
-            <h2>Bắt đầu hành trình của bạn ngay hôm nay</h2>
-            <p>Tham gia cùng hơn 2 triệu học viên. Dùng thử miễn phí, không cần thẻ tín dụng.</p>
+            <div className="cta-text">
+              <h2>Bắt đầu hành trình của bạn<br /><span>ngay hôm nay</span></h2>
+              <p>Tham gia cùng hơn 2 triệu học viên. Dùng thử miễn phí, không cần thẻ tín dụng.</p>
+            </div>
             <button className="cta-btn" onClick={() => openAuth('register')}>
               <Play size={16} fill="currentColor" /> Đăng ký miễn phí — từ 199k/tháng
             </button>
@@ -330,9 +333,6 @@ const HomePage = ({ onShowAuthModal }) => {
 
       </div>{/* /wrap */}
 
-      {/* ════════════════════════════════════════════
-          FLOATING AI CHAT
-      ════════════════════════════════════════════ */}
       {!showAIChat && (
         <button className="ai-fab" onClick={() => setShowAIChat(true)} title="Chat với EMT AI">
           <Bot size={20} />

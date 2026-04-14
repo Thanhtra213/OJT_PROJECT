@@ -363,15 +363,15 @@ const Header = () => {
         window.location.href = targetUrl;
       }, 1000);
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.message ||
-        "Đăng nhập thất bại!";
-      setLoginErrorMessage(errorMsg);
-      // Đã loại bỏ toast error theo yêu cầu
-      // showToastNotification(`❌ ${errorMsg}`, "danger");
-    }
+  const errorMsg =
+    (typeof err.response?.data === "string" && err.response.data)  // ← plain text
+    || err.response?.data?.message
+    || err.response?.data?.error
+    || err.message
+    || "Đăng nhập thất bại!";
+  setLoginErrorMessage(errorMsg);
+  showToastNotification(`❌ ${errorMsg}`, "danger");
+}
   };
 
   const handleRegisterSubmit = async (e) => {
@@ -621,7 +621,6 @@ const Header = () => {
 
                   <Dropdown.Menu>
                     <Dropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</Dropdown.Item>
-                    <Dropdown.Item onClick={() => navigate("/profile")}>Cài đặt</Dropdown.Item>
                     
                     {/* Link điều hướng cho Admin / Teacher */}
                     {user.role === "ADMIN" && (
