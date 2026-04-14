@@ -70,13 +70,22 @@ namespace EasyEnglish_API.Services.Profile
 
             if (req.Dob.HasValue)
             {
-                if (req.Dob.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
-                    throw new ArgumentException("Ngày sinh không hợp lệ (lớn hơn hiện tại)");
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var dob = req.Dob.Value;
 
-                if (req.Dob.Value.Year < 1900)
-                    throw new ArgumentException("Ngày sinh không hợp lệ");
+                if (dob >= today)
+                    throw new ArgumentException("Ngày sinh phải nhỏ hơn ngày hiện tại");
 
-                detail.Dob = req.Dob.Value;
+                var age = today.Year - dob.Year;
+                if (dob > today.AddYears(-age)) age--; 
+
+                if (age < 0 || age > 120)
+                    throw new ArgumentException("Ngày sinh không hợp lệ (tuổi phải từ 0 đến 120)");
+
+                if (dob.Year < 1900)
+                    throw new ArgumentException("Ngày sinh quá xa trong quá khứ");
+
+                detail.Dob = dob;
             }
             if (!string.IsNullOrWhiteSpace(req.Address))
             {

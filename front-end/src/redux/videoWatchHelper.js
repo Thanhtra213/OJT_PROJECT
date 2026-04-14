@@ -1,4 +1,3 @@
-
 const getUserHistoryKey = () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -34,7 +33,6 @@ export const updateVideoHistory = (videoData, currentTimeSec = 0, durationSec = 
     } catch { history = []; }
 
     // ✅ Lưu giây thực, KHÔNG convert sang phút ở đây
-    // Home.js sẽ format khi hiển thị
     const progressPercent = Math.round((currentTimeSec / durationSec) * 100);
     const finalProgress = progressPercent >= 95 ? 100 : Math.min(progressPercent, 100);
 
@@ -44,17 +42,17 @@ export const updateVideoHistory = (videoData, currentTimeSec = 0, durationSec = 
       courseName: videoData.courseName || "Course",
       lessonID: videoData.lessonID,
       lessonTitle: videoData.lessonTitle || videoData.title || "Video",
-      durationSec: Math.round(durationSec),       // ✅ Lưu giây
-      currentTimeSec: Math.round(currentTimeSec), // ✅ Lưu giây
-      watchedSec: finalProgress >= 100            // ✅ Lưu giây
+      durationSec: Math.round(durationSec),       // ✅ Lưu giây (chính xác)
+      currentTimeSec: Math.round(currentTimeSec), // ✅ Lưu giây (chính xác)
+      watchedSec: finalProgress >= 100            // ✅ Lưu giây (chính xác)
         ? Math.round(durationSec)
         : Math.round(currentTimeSec),
       progress: finalProgress,
       lastWatched: new Date().toISOString(),
 
-      // Legacy fields - giữ để không break code cũ, nhưng tính đúng
-      duration: Math.round(durationSec / 60),       // phút (cho code cũ)
-      watchedMinutes: finalProgress >= 100           // phút (cho code cũ)
+      // Legacy fields — giữ để không break code cũ
+      duration: Math.round(durationSec / 60),
+      watchedMinutes: finalProgress >= 100
         ? Math.round(durationSec / 60)
         : Math.round(currentTimeSec / 60),
       currentTime: Math.round(currentTimeSec),
@@ -121,7 +119,6 @@ export const migrateVideoHistory = (accountId) => {
   const newKey = `videoWatchHistory_${accountId}`;
   const oldKey = 'videoWatchHistory';
 
-  // Nếu key mới chưa có data nhưng key cũ có → migrate
   const oldData = localStorage.getItem(oldKey);
   const newData = localStorage.getItem(newKey);
 
@@ -129,7 +126,6 @@ export const migrateVideoHistory = (accountId) => {
     localStorage.setItem(newKey, oldData);
     console.log(`✅ Migrated history to ${newKey}`);
   }
-  // Xóa key cũ để không bị share nữa
   localStorage.removeItem(oldKey);
 };
 
@@ -152,6 +148,8 @@ export const markVideoAsCompleted = (lessonID) => {
       };
       const historyKey = getUserHistoryKey();
       localStorage.setItem(historyKey, JSON.stringify(history));
+      // ✅ FIX: Dispatch event để UI tự cập nhật
+      window.dispatchEvent(new Event("videoHistoryUpdated"));
       return true;
     }
     return false;
@@ -164,6 +162,8 @@ export const markVideoAsCompleted = (lessonID) => {
 export const clearVideoHistory = () => {
   try {
     localStorage.removeItem(getUserHistoryKey());
+    // ✅ FIX: Dispatch event để Home.js tự cập nhật UI mà không cần F5
+    window.dispatchEvent(new Event("videoHistoryUpdated"));
     return true;
   } catch (error) {
     console.error('❌ Lỗi khi xóa lịch sử:', error);
@@ -179,6 +179,8 @@ export const removeVideoFromHistory = (courseID, lessonID) => {
         (item.lessonID === lessonID || item.id === lessonID))
     );
     localStorage.setItem(getUserHistoryKey(), JSON.stringify(newHistory));
+    // ✅ FIX: Dispatch event để UI tự cập nhật
+    window.dispatchEvent(new Event("videoHistoryUpdated"));
     return true;
   } catch (error) {
     console.error('❌ Lỗi khi xóa video:', error);

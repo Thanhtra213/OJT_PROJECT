@@ -11,11 +11,11 @@ import { FaPlayCircle, FaBook, FaQuestionCircle, FaLock, FaArrowLeft, FaCheckCir
 import "./CourseDetail.scss";
 
 const LEVELS = {
-  1: { label: "Beginner", color: "#f97316", bg: "#fff7ed", text: "#c2410c" },
-  2: { label: "Intermediate", color: "#ec4899", bg: "#fdf2f8", text: "#be185d" },
-  3: { label: "Intermediate", color: "#10b981", bg: "#ecfdf5", text: "#065f46" },
-  4: { label: "Advanced", color: "#8b5cf6", bg: "#f5f3ff", text: "#5b21b6" },
-  5: { label: "Expert", color: "#3b82f6", bg: "#eff6ff", text: "#1d4ed8" },
+  1: { label: "Beginner",     color: "#f97316", bg: "#fff7ed",  text: "#c2410c" },
+  2: { label: "Intermediate", color: "#ec4899", bg: "#fdf2f8",  text: "#be185d" },
+  3: { label: "Intermediate", color: "#10b981", bg: "#ecfdf5",  text: "#065f46" },
+  4: { label: "Advanced",     color: "#8b5cf6", bg: "#f5f3ff",  text: "#5b21b6" },
+  5: { label: "Expert",       color: "#3b82f6", bg: "#eff6ff",  text: "#1d4ed8" },
 };
 const getLevel = (n) => LEVELS[Number(n)] || LEVELS[1];
 
@@ -24,61 +24,65 @@ const CourseDetail = () => {
   const navigate = useNavigate();
 
   // ── Refs ──────────────────────────────────────────────────────────────────
-  const videoRef = useRef(null);
-  const iframeRef = useRef(null);
-  const progressIntervalRef = useRef(null);
-  const selectedVideoRef = useRef(null);
-  const currentTimeRef = useRef(0);
-  const videoDurationRef = useRef(0);
-  const courseRef = useRef(null);
-  const pendingResumeRef = useRef(0);
-  const bannerTimerRef = useRef(null);
+  const videoRef               = useRef(null);
+  const iframeRef              = useRef(null);
+  const progressIntervalRef    = useRef(null);
+  const selectedVideoRef       = useRef(null);
+  const currentTimeRef         = useRef(0);
+  const videoDurationRef       = useRef(0);
+  const courseRef              = useRef(null);
+  const pendingResumeRef       = useRef(0);
+  const bannerTimerRef         = useRef(null);
 
   // GDrive iframe tick
-  const iframePlayingRef = useRef(false);
-  const iframeTickRef = useRef(null);
-  const tickStartTimeRef = useRef(0);
-  const tickStartOffset = useRef(0);
-  const iframeHasPlayedOnce = useRef(false);
+  const iframePlayingRef       = useRef(false);
+  const iframeTickRef          = useRef(null);
+  const tickStartTimeRef       = useRef(0);
+  const tickStartOffset        = useRef(0);
+  const iframeHasPlayedOnce    = useRef(false);
 
   // YouTube IFrame Player API
-  const ytPlayerRef = useRef(null);
-  const ytTickRef = useRef(null);
-  const ytTickCount = useRef(0);
-  const ytInitTimer = useRef(null);
+  const ytPlayerRef            = useRef(null);
+  const ytTickRef              = useRef(null);
+  const ytTickCount            = useRef(0);
+  const ytInitTimer            = useRef(null);
 
   // ── States ────────────────────────────────────────────────────────────────
-  const [showResumeBanner, setShowResumeBanner] = useState(false);
-  const [resumeBannerTime, setResumeBannerTime] = useState(0);
-  const [activeTab, setActiveTab] = useState("video");
-  const [course, setCourse] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedVideo, setSelectedVideo] = useState(null);
-  const [hasMembership, setHasMembership] = useState(false);
-  const [videoError, setVideoError] = useState(null);
-  const [loadingVideo, setLoadingVideo] = useState(false);
-  const [videoProgress, setVideoProgress] = useState(0);
-  const [videoDuration, setVideoDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [quizzes, setQuizzes] = useState([]);
-  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
-  const [quizError, setQuizError] = useState(null);
-  const [flashcardSets, setFlashcardSets] = useState([]);
-  const [loadingFlashcards, setLoadingFlashcards] = useState(false);
-  const [flashcardError, setFlashcardError] = useState(null);
-  const [courseRating, setCourseRating] = useState(null);
-  const [courseFeedbacks, setCourseFeedbacks] = useState([]);
-  const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
+  const [showResumeBanner, setShowResumeBanner]     = useState(false);
+  const [resumeBannerTime, setResumeBannerTime]     = useState(0);
+  const [activeTab, setActiveTab]                   = useState("video");
+  const [course, setCourse]                         = useState(null);
+  const [isLoading, setIsLoading]                   = useState(true);
+  const [selectedVideo, setSelectedVideo]           = useState(null);
+  const [hasMembership, setHasMembership]           = useState(false);
+  const [videoError, setVideoError]                 = useState(null);
+  const [loadingVideo, setLoadingVideo]             = useState(false);
+  const [videoProgress, setVideoProgress]           = useState(0);
+  const [videoDuration, setVideoDuration]           = useState(0);
+  const [currentTime, setCurrentTime]               = useState(0);
+  const [quizzes, setQuizzes]                       = useState([]);
+  const [loadingQuizzes, setLoadingQuizzes]         = useState(false);
+  const [quizError, setQuizError]                   = useState(null);
+  const [flashcardSets, setFlashcardSets]           = useState([]);
+  const [loadingFlashcards, setLoadingFlashcards]   = useState(false);
+  const [flashcardError, setFlashcardError]         = useState(null);
+  const [courseRating, setCourseRating]             = useState(null);
+  const [courseFeedbacks, setCourseFeedbacks]       = useState([]);
+  const [loadingFeedbacks, setLoadingFeedbacks]     = useState(false);
+
+  // GDrive duration input
+  const [gdriveDurationInput, setGdriveDurationInput] = useState('');
+  const [gdriveConfirmed, setGdriveConfirmed]         = useState(false);
 
   // ── URL helpers ───────────────────────────────────────────────────────────
-  const isYouTubeUrl = (url) => url && (url.includes('youtube.com') || url.includes('youtu.be'));
+  const isYouTubeUrl     = (url) => url && (url.includes('youtube.com') || url.includes('youtu.be'));
   const isGoogleDriveUrl = (url) => url && (url.includes('drive.google.com') || url.includes('drive.usercontent.google.com'));
 
   const extractYouTubeId = (url) => {
     if (!url) return null;
-    const m1 = url.match(/[?&]v=([^&]+)/); if (m1) return m1[1];
+    const m1 = url.match(/[?&]v=([^&]+)/);    if (m1) return m1[1];
     const m2 = url.match(/youtu\.be\/([^?]+)/); if (m2) return m2[1];
-    const m3 = url.match(/\/embed\/([^?]+)/); if (m3) return m3[1];
+    const m3 = url.match(/\/embed\/([^?]+)/);  if (m3) return m3[1];
     return null;
   };
 
@@ -90,10 +94,9 @@ const CourseDetail = () => {
     }
     if (isGoogleDriveUrl(url)) {
       let fileId = null;
-      const m1 = url.match(/[?&]id=([^&]+)/); if (m1) fileId = m1[1];
-      const m2 = url.match(/\/file\/d\/([^\/]+)/); if (m2) fileId = m2[1];
-      const m3 = url.match(/open\?id=([^&]+)/); if (m3) fileId = m3[1];
-      // Phục hồi lại thành iframe do Native <video> bị chặn bởi Google Drive
+      const m1 = url.match(/[?&]id=([^&]+)/);        if (m1) fileId = m1[1];
+      const m2 = url.match(/\/file\/d\/([^\/]+)/);   if (m2) fileId = m2[1];
+      const m3 = url.match(/open\?id=([^&]+)/);      if (m3) fileId = m3[1];
       if (fileId) return { type: 'iframe', url: `https://drive.google.com/file/d/${fileId}/preview`, platform: 'gdrive' };
     }
     return { type: 'video', url, platform: 'direct' };
@@ -101,7 +104,7 @@ const CourseDetail = () => {
 
   // ── Save progress ─────────────────────────────────────────────────────────
   const saveVideoProgressLocal = (forceCurSec, forceDurSec) => {
-    const video = selectedVideoRef.current;
+    const video    = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj) return;
 
@@ -114,14 +117,14 @@ const CourseDetail = () => {
           const c = ytPlayerRef.current.getCurrentTime();
           const d = ytPlayerRef.current.getDuration();
           if (!isNaN(c) && c >= 0) curSec = curSec ?? c;
-          if (!isNaN(d) && d > 0) durSec = durSec ?? d;
-        } catch { }
+          if (!isNaN(d) && d > 0)  durSec = durSec ?? d;
+        } catch {}
       }
       if (video.videoType === 'video' && videoRef.current) {
         const elCur = videoRef.current.currentTime;
         const elDur = videoRef.current.duration;
         if (!isNaN(elCur) && elCur >= 0) curSec = curSec ?? elCur;
-        if (!isNaN(elDur) && elDur > 0) durSec = durSec ?? elDur;
+        if (!isNaN(elDur) && elDur > 0)  durSec = durSec ?? elDur;
       }
       if (curSec === undefined) curSec = currentTimeRef.current || 0;
       if (durSec === undefined) durSec = videoDurationRef.current || 0;
@@ -131,12 +134,12 @@ const CourseDetail = () => {
 
     if (durSec && durSec > 0) {
       updateVideoHistory({
-        courseID: parseInt(id),
-        courseName: courseObj.courseName,
-        lessonID: video.videoID,
+        courseID:    parseInt(id),
+        courseName:  courseObj.courseName,
+        lessonID:    video.videoID,
         lessonTitle: video.videoName,
-        videoURL: video.videoURL,
-        platform: video.platform,
+        videoURL:    video.videoURL,
+        platform:    video.platform,
       }, curSec, durSec);
       window.dispatchEvent(new Event("videoHistoryUpdated"));
 
@@ -149,6 +152,7 @@ const CourseDetail = () => {
         Math.round(durSec),
       );
     } else {
+      // Không có duration — vẫn lưu vị trí để giữ lịch sử xem
       saveProgressToDB(
         video.videoID,
         Math.round(curSec),
@@ -156,6 +160,18 @@ const CourseDetail = () => {
         Math.round(curSec),
         undefined,
       );
+      // Vẫn cập nhật lịch sử với cur làm fallback duration
+      if (curSec > 0) {
+        updateVideoHistory({
+          courseID:    parseInt(id),
+          courseName:  courseObj.courseName,
+          lessonID:    video.videoID,
+          lessonTitle: video.videoName,
+          videoURL:    video.videoURL,
+          platform:    video.platform,
+        }, curSec, curSec);
+        window.dispatchEvent(new Event("videoHistoryUpdated"));
+      }
     }
   };
 
@@ -174,12 +190,10 @@ const CourseDetail = () => {
 
     const initPlayer = () => {
       if (ytInitTimer.current) { clearTimeout(ytInitTimer.current); ytInitTimer.current = null; }
-
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch { }
+        try { ytPlayerRef.current.destroy(); } catch {}
         ytPlayerRef.current = null;
       }
-
       ytInitTimer.current = setTimeout(() => {
         const el = document.getElementById('yt-player-div');
         if (!el) {
@@ -218,8 +232,8 @@ const CourseDetail = () => {
               stopYtTick(true);
             } else if (e.data === S.ENDED) {
               stopYtTick(false);
-              const dur = videoDurationRef.current;
-              const video = selectedVideoRef.current;
+              const dur     = videoDurationRef.current;
+              const video   = selectedVideoRef.current;
               const courseObj = courseRef.current;
               if (!video || !courseObj || dur <= 0) return;
               updateVideoHistory({
@@ -252,7 +266,7 @@ const CourseDetail = () => {
       if (ytInitTimer.current) { clearTimeout(ytInitTimer.current); ytInitTimer.current = null; }
       stopYtTick(false);
       if (ytPlayerRef.current) {
-        try { ytPlayerRef.current.destroy(); } catch { }
+        try { ytPlayerRef.current.destroy(); } catch {}
         ytPlayerRef.current = null;
       }
     };
@@ -268,7 +282,7 @@ const CourseDetail = () => {
       try {
         const cur = ytPlayerRef.current.getCurrentTime() || 0;
         const dur = ytPlayerRef.current.getDuration() || videoDurationRef.current;
-        currentTimeRef.current = cur;
+        currentTimeRef.current  = cur;
         videoDurationRef.current = dur;
         setCurrentTime(cur);
         if (dur > 0) setVideoProgress(Math.min(100, Math.round((cur / dur) * 100)));
@@ -279,7 +293,7 @@ const CourseDetail = () => {
             saveProgressToDB(video.videoID, Math.round(cur), false, Math.round(cur), Math.round(dur));
           }
         }
-      } catch { }
+      } catch {}
     }, 1_000);
   };
 
@@ -290,15 +304,13 @@ const CourseDetail = () => {
 
   // ── GDrive iframe tick ────────────────────────────────────────────────────
   const startIframeTick = () => {
+    if (!iframePlayingRef.current) return;
     if (iframeTickRef.current) return;
     iframePlayingRef.current = true;
     tickStartTimeRef.current = Date.now();
 
-    // Đối với GDrive iframe, bộ phát luôn tự động reset về 0 mỗi khi load lại.
-    // Nên nếu đây là lần bấm Play đầu tiên, ta ép bộ đếm thời gian phía dưới cũng về 0s
-    // để đồng bộ chạy khớp với hình ảnh video.
     if (!iframeHasPlayedOnce.current) {
-      tickStartOffset.current = 0;
+      tickStartOffset.current    = 0;
       iframeHasPlayedOnce.current = true;
     } else {
       tickStartOffset.current = currentTimeRef.current;
@@ -309,7 +321,7 @@ const CourseDetail = () => {
       if (document.hidden || !iframePlayingRef.current) return;
 
       const elapsed = Math.floor((Date.now() - tickStartTimeRef.current) / 1000);
-      const cur = tickStartOffset.current + elapsed;
+      const cur     = tickStartOffset.current + elapsed;
       currentTimeRef.current = cur;
       setCurrentTime(cur);
 
@@ -318,14 +330,29 @@ const CourseDetail = () => {
 
       lastSaveCount += 1;
       if (lastSaveCount % 10 === 0) {
-        const video = selectedVideoRef.current;
+        const video    = selectedVideoRef.current;
         const courseObj = courseRef.current;
-        if (video) {
-          saveProgressToDB(video.videoID, Math.round(cur), false, Math.round(cur), dur > 0 ? Math.round(dur) : undefined);
-          if (dur > 0 && courseObj) {
-            updateVideoHistory({ courseID: parseInt(id), courseName: courseObj.courseName, lessonID: video.videoID, lessonTitle: video.videoName, videoURL: video.videoURL, platform: video.platform }, cur, dur);
-            window.dispatchEvent(new Event("videoHistoryUpdated"));
-          }
+        if (video && courseObj) {
+          // ✅ Lưu DB dù có hay không có duration
+          const durToSave = dur > 0 ? Math.round(dur) : undefined;
+          saveProgressToDB(
+            video.videoID,
+            Math.round(cur),
+            false,
+            Math.round(cur),
+            durToSave,
+          );
+
+          // ✅ Luôn cập nhật lịch sử — dùng cur làm fallback nếu chưa có duration
+          updateVideoHistory({
+            courseID:    parseInt(id),
+            courseName:  courseObj.courseName,
+            lessonID:    video.videoID,
+            lessonTitle: video.videoName,
+            videoURL:    video.videoURL,
+            platform:    video.platform,
+          }, cur, dur > 0 ? dur : cur);
+          window.dispatchEvent(new Event("videoHistoryUpdated"));
         }
       }
     }, 1_000);
@@ -338,9 +365,43 @@ const CourseDetail = () => {
     saveVideoProgressLocal();
   };
 
+  // ── Confirm GDrive duration ───────────────────────────────────────────────
+  const handleConfirmGdriveDuration = () => {
+  const input = gdriveDurationInput.trim();
+
+  let totalSeconds = 0;
+
+  if (input.includes(":")) {
+    const [m, s] = input.split(":");
+    const mins = parseInt(m, 10);
+    const secs = parseInt(s, 10);
+
+    if (isNaN(mins) || isNaN(secs) || secs >= 60) {
+      alert("Sai định dạng mm:ss");
+      return;
+    }
+
+    totalSeconds = mins * 60 + secs;
+  } else {
+    const mins = parseFloat(input);
+
+    if (isNaN(mins) || mins <= 0) {
+      alert("Nhập số hợp lệ");
+      return;
+    }
+
+    totalSeconds = Math.round(mins * 60);
+  }
+
+  videoDurationRef.current = totalSeconds;
+  setVideoDuration(totalSeconds);
+  setGdriveConfirmed(true);
+};
+
   // ── Select video ──────────────────────────────────────────────────────────
   const handleVideoSelect = async (videoId, videoName, chapterName) => {
     if (selectedVideoRef.current) {
+      iframePlayingRef.current = false;
       const snapCur = videoRef.current && !isNaN(videoRef.current.currentTime)
         ? videoRef.current.currentTime : currentTimeRef.current;
       const snapDur = videoRef.current && !isNaN(videoRef.current.duration) && videoRef.current.duration > 0
@@ -358,26 +419,28 @@ const CourseDetail = () => {
     setShowResumeBanner(false);
 
     // Reset tất cả
-    currentTimeRef.current = 0;
-    videoDurationRef.current = 0;
-    pendingResumeRef.current = 0;
-    iframeHasPlayedOnce.current = false;
+    currentTimeRef.current       = 0;
+    videoDurationRef.current     = 0;
+    pendingResumeRef.current     = 0;
+    iframeHasPlayedOnce.current  = false;
     setCurrentTime(0);
     setVideoDuration(0);
     setVideoProgress(0);
+    setGdriveDurationInput('');
+    setGdriveConfirmed(false);
 
     try {
       const videoData = await getVideoById(videoId);
-      const canWatch = videoData.canWatch || videoData.isPreview;
+      const canWatch  = videoData.canWatch || videoData.isPreview;
 
       if (canWatch) {
         const videoInfo = getDirectVideoUrl(videoData.videoURL);
-        const newVideo = {
-          videoID: videoId,
+        const newVideo  = {
+          videoID:    videoId,
           videoName,
-          videoURL: videoInfo.url,
-          videoType: videoInfo.type,
-          platform: videoInfo.platform,
+          videoURL:   videoInfo.url,
+          videoType:  videoInfo.type,
+          platform:   videoInfo.platform,
           canWatch,
           chapterName,
         };
@@ -387,11 +450,11 @@ const CourseDetail = () => {
         const dbProgress = await getVideoProgressFromDB(videoId);
         if (dbProgress) {
           const totalDurSec = dbProgress.totalDurationSec || 0;
-          const lastPosSec = dbProgress.lastPositionSec || 0;
+          const lastPosSec  = dbProgress.lastPositionSec  || 0;
 
-          pendingResumeRef.current = lastPosSec;
-          currentTimeRef.current = lastPosSec;
-          videoDurationRef.current = totalDurSec;
+          pendingResumeRef.current  = lastPosSec;
+          currentTimeRef.current    = lastPosSec;
+          videoDurationRef.current  = totalDurSec;
           setCurrentTime(lastPosSec);
           setVideoDuration(totalDurSec);
 
@@ -401,15 +464,20 @@ const CourseDetail = () => {
               : 0;
           setVideoProgress(prog);
 
-          // ✅ FIX: Hiển thị banner cho TẤT CẢ platform (không chỉ gdrive)
+          // Hiển thị banner cho tất cả platform
           if (lastPosSec > 5) {
             setResumeBannerTime(lastPosSec);
             setShowResumeBanner(true);
             if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
             bannerTimerRef.current = setTimeout(() => setShowResumeBanner(false), 9000);
           }
+
+          // Nếu GDrive có duration từ DB → set sẵn, đánh dấu confirmed
+          if (videoInfo.platform === 'gdrive' && totalDurSec > 0) {
+            setGdriveConfirmed(true);
+          }
         } else {
-          currentTimeRef.current = 0;
+          currentTimeRef.current  = 0;
           videoDurationRef.current = 0;
           pendingResumeRef.current = 0;
           setVideoProgress(0);
@@ -417,10 +485,9 @@ const CourseDetail = () => {
           setVideoDuration(0);
         }
 
-        // GDrive: đợi user click (blur trick) để start tick
-        // (xóa startIframeTick tự động để không bị đếm tốn tiến độ ảo)
-
-        startProgressTracking(newVideo);
+        if (newVideo.videoType === 'video') {
+  startProgressTracking(newVideo);
+}
       } else {
         setVideoError("Bạn cần đăng ký gói thành viên để xem video này.");
         setSelectedVideo(null);
@@ -463,7 +530,7 @@ const CourseDetail = () => {
   };
 
   const handleVideoEnded = () => {
-    const video = selectedVideoRef.current;
+    const video    = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj || !videoRef.current) return;
     const dur = videoRef.current.duration;
@@ -502,13 +569,13 @@ const CourseDetail = () => {
 
   // ── Mark completed ────────────────────────────────────────────────────────
   const markVideoAsCompleted = () => {
-    const video = selectedVideoRef.current;
+    const video    = selectedVideoRef.current;
     const courseObj = courseRef.current;
     if (!video || !courseObj) return;
 
     let durSec = 0;
     if (video.platform === 'youtube' && ytPlayerRef.current) {
-      try { durSec = ytPlayerRef.current.getDuration() || 0; } catch { }
+      try { durSec = ytPlayerRef.current.getDuration() || 0; } catch {}
     }
     if (!durSec && video.videoType === 'video' && videoRef.current) {
       const d = videoRef.current.duration;
@@ -548,10 +615,10 @@ const CourseDetail = () => {
         setHasMembership(membershipData.hasMembership || false);
         setCourse(courseData);
         courseRef.current = courseData;
-        try { const rating = await getCourseRating(id); setCourseRating(rating); } catch { }
+        try { const rating = await getCourseRating(id); setCourseRating(rating); } catch {}
 
-        const searchParams = new URLSearchParams(window.location.search);
-        const targetVideoId = searchParams.get('videoId');
+        const searchParams   = new URLSearchParams(window.location.search);
+        const targetVideoId  = searchParams.get('videoId');
 
         if (targetVideoId && courseData.chapters?.length > 0) {
           for (const chapter of courseData.chapters) {
@@ -585,12 +652,13 @@ const CourseDetail = () => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-  // ── Visibility change ───────────────────────────────────────────────────
+
+  // ── Visibility change ─────────────────────────────────────────────────────
   const gdriveWasPlaying = useRef(false);
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.hidden) {
-        gdriveWasPlaying.current = iframePlayingRef.current || !!iframeTickRef.current;
+        gdriveWasPlaying.current = iframePlayingRef.current;
         stopYtTick(true);
         stopIframeTick();
       } else {
@@ -600,12 +668,10 @@ const CourseDetail = () => {
       }
     };
     const onBlur = () => {
-      setTimeout(() => {
-        if (document.activeElement && iframeRef.current && document.activeElement === iframeRef.current) {
-          if (!iframeTickRef.current) startIframeTick();
-        }
-      }, 50);
-    };
+  // 👉 chỉ stop, KHÔNG auto start
+  iframePlayingRef.current = false;
+  stopIframeTick();
+};
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("blur", onBlur);
     return () => {
@@ -666,19 +732,21 @@ const CourseDetail = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "quiz") handleLoadQuizzes();
+    if (activeTab === "quiz")      handleLoadQuizzes();
     if (activeTab === "flashcard") handleLoadFlashcards();
-    if (activeTab === "feedback") handleLoadFeedbacks();
+    if (activeTab === "feedback")  handleLoadFeedbacks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  // ── Helpers ───────────────────────────────────────────────────────────────
   const formatTime = (s) => {
     if (!s || isNaN(s) || s < 0) return "0:00";
-    const m = Math.floor(s / 60);
+    const m  = Math.floor(s / 60);
     const sc = Math.floor(s % 60);
     return `${m}:${sc.toString().padStart(2, '0')}`;
   };
 
+  // ── Early returns ─────────────────────────────────────────────────────────
   if (isLoading) return (
     <div className="page-loading-container">
       <Spinner animation="border" /><p>Đang tải khóa học...</p>
@@ -692,8 +760,9 @@ const CourseDetail = () => {
   );
 
   const totalVideos = course.chapters?.reduce((s, ch) => s + (ch.videos?.length || 0), 0) || 0;
-  const lv = getLevel(course.courseLevel);
+  const lv          = getLevel(course.courseLevel);
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="course-detail-page">
       <Container fluid="xl">
@@ -704,11 +773,10 @@ const CourseDetail = () => {
         <Row className="g-4">
           <Col lg={8} className="main-content-col">
 
-            {/* ── Player ── */}
-            {/* ✅ FIX: video-player-wrapper có position:relative, banner nằm ngoài video-container */}
-            <div className="video-player-wrapper" style={{ position: 'relative' }}>
+            {/* ── Player area ── */}
+            <div className="video-player-wrapper">
 
-              {/* ✅ FIX: Banner đặt ở đây — ngoài video-container, hiển thị cho mọi platform */}
+              {/* Resume banner — ngoài video, hiển thị cho mọi platform */}
               {showResumeBanner && !loadingVideo && (
                 <div className="resume-banner">
                   <span>⏱</span>
@@ -749,12 +817,14 @@ const CourseDetail = () => {
                       <div id="yt-player-div" style={{ width: '100%', height: '100%' }} />
                     </div>
                   ) : selectedVideo.videoType === 'iframe' ? (
-                    // ✅ FIX: Xóa banner cũ bên trong iframe-wrapper (đã chuyển lên trên)
                     <div className="iframe-wrapper">
                       <iframe
                         ref={iframeRef}
                         src={selectedVideo.videoURL}
                         title={selectedVideo.videoName}
+                        onClick={() => {
+    iframePlayingRef.current = true;
+    startIframeTick();}}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -780,6 +850,44 @@ const CourseDetail = () => {
                 </div>
               )}
             </div>
+
+            {/* ── GDrive duration input — hiển thị ngay dưới player ── */}
+            {selectedVideo?.platform === 'gdrive' && !loadingVideo && !gdriveConfirmed && (
+              <div className="gdrive-duration-box">
+                <span className="gdrive-duration-box__warn">⚠️ Google Drive không hỗ trợ đọc thời lượng tự động.</span>
+                <span className="gdrive-duration-box__label">Nhập thời lượng video (phút) để theo dõi tiến độ:</span>
+                <input
+  className="gdrive-duration-box__input"
+  type="text"   // ✅ đổi ở đây
+  placeholder="VD: 6:58"
+  value={gdriveDurationInput}
+  onChange={e => setGdriveDurationInput(e.target.value)}
+  onKeyDown={e => e.key === 'Enter' && handleConfirmGdriveDuration()}
+/>
+                <button
+                  className="gdrive-duration-box__btn"
+                  onClick={handleConfirmGdriveDuration}
+                >
+                  Xác nhận
+                </button>
+              </div>
+            )}
+
+            {/* Đã xác nhận — hiển thị nhỏ để user có thể đổi lại */}
+            {selectedVideo?.platform === 'gdrive' && !loadingVideo && gdriveConfirmed && (
+              <div className="gdrive-duration-confirmed">
+                <span>✅ Thời lượng: <strong>{formatTime(videoDurationRef.current)}</strong></span>
+                <button
+                  className="gdrive-duration-confirmed__edit"
+                  onClick={() => {
+                    setGdriveConfirmed(false);
+                    setGdriveDurationInput(videoDuration > 0 ? String(Math.round(videoDuration / 60)) : '');
+                  }}
+                >
+                  Sửa
+                </button>
+              </div>
+            )}
 
             {/* ── Tabs ── */}
             <div className="course-content-tabs">
@@ -842,7 +950,7 @@ const CourseDetail = () => {
                           </div>
                           <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
                             <small style={{ color: "#9ca3af", fontSize: ".76rem", fontWeight: 600 }}>
-                              {formatTime(currentTime)} / {videoDuration > 0 ? formatTime(videoDuration) : "0:00"}
+                              {formatTime(currentTime)} / {videoDuration > 0 ? formatTime(videoDuration) : "--:--"}
                             </small>
                             <small style={{ color: "#00a87c", fontWeight: 700, fontSize: ".76rem" }}>{videoProgress}%</small>
                           </div>
@@ -936,7 +1044,7 @@ const CourseDetail = () => {
             </div>
           </Col>
 
-          {/* ── Playlist ── */}
+          {/* ── Playlist sidebar ── */}
           <Col lg={4}>
             <div className="course-playlist-card">
               <div className="card-header">
@@ -951,10 +1059,10 @@ const CourseDetail = () => {
                     <Accordion.Body>
                       <ul className="video-list">
                         {chapter.videos?.map(video => {
-                          const vid = video.videoId ?? video.videoID;
-                          const canWatch = video.isPreview || hasMembership;
-                          const isPlaying = selectedVideo?.videoID === video.videoID;
-                          const saved = getVideoProgress(video.videoID);
+                          const vid        = video.videoId ?? video.videoID;
+                          const canWatch   = video.isPreview || hasMembership;
+                          const isPlaying  = selectedVideo?.videoID === video.videoID;
+                          const saved      = getVideoProgress(video.videoID);
                           const hasWatched = saved && saved.progress > 0;
                           const isCompleted = saved && saved.progress >= 100;
                           return (

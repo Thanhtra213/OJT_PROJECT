@@ -9,8 +9,8 @@
 
     public enum FlashcardActionType : byte
     {
-        Learn = 1,     // xem / học card
-        Mastered = 2  // đánh dấu thuộc
+        Learn = 1,     
+        Mastered = 2  
     }
 }
 

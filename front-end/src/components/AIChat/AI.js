@@ -8,7 +8,6 @@ import './AI.scss';
 // Để sử dụng Gemini API, hãy cấu hình API key qua biến môi trường hoặc import từ file cấu hình bảo mật (KHÔNG để key trực tiếp trong code public)
 // Ví dụ: const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY; // Thêm key vào biến môi trường hoặc backend, không commit key thật lên repo!
-console.log(GEMINI_API_KEY)
 // Sử dụng Gemini 2.5 Flash - model mới nhất, stable, miễn phí
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.REACT_APP_GEMINI_API_KEY}`;
 
