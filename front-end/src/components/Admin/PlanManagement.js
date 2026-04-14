@@ -50,9 +50,25 @@ export function PlanManagement() {
 
   const validatePlan = () => {
     if (!newPlan.planCode || !newPlan.name) {
-      Swal.fire("Lỗi!", "Vui lòng nhập mã và tên gói", "error");
+      Swal.fire("Lỗi!", "Vui lòng nhập đầy đủ mã và tên gói", "error");
       return false;
     }
+
+    //KIỂM TRA TRÙNG MÃ GÓI
+    const isDuplicate = plans.some(p => {
+      // Nếu đang Sửa (Edit), thì bỏ qua chính gói đang được sửa
+      if (showEditModal && editingPlan && p.planID === editingPlan.planID) {
+        return false;
+      }
+      // So sánh không phân biệt hoa/thường (VD: "PRO" và "pro" sẽ bị coi là trùng)
+      return p.planCode?.toLowerCase() === newPlan.planCode.trim().toLowerCase();
+    });
+
+    if (isDuplicate) {
+      Swal.fire("Lỗi Trùng Lặp!", "Mã gói này đã tồn tại trên hệ thống. Vui lòng nhập mã khác!", "error");
+      return false;
+    }
+
     if (newPlan.price < 0) {
       Swal.fire("Lỗi!", "Giá gói không được là số âm", "error");
       return false;
@@ -65,7 +81,7 @@ export function PlanManagement() {
   };
 
   const handleCreatePlan = async () => {
-    if (!validatePlan()) return;
+    if (!validatePlan()) return; // Nếu lỗi validation, dừng ngay lập tức (Modal vẫn mở)
     try {
       await createPlan(newPlan);
       Swal.fire("Thành công!", "Tạo gói hội viên thành công!", "success");
@@ -90,7 +106,7 @@ export function PlanManagement() {
   };
 
   const handleUpdatePlan = async () => {
-    if (!validatePlan()) return;
+    if (!validatePlan()) return; // Nếu lỗi validation, dừng ngay lập tức (Modal vẫn mở)
     try {
       await updatePlan(editingPlan.planID, newPlan);
       Swal.fire("Thành công!", "Cập nhật gói hội viên thành công!", "success");
@@ -150,7 +166,6 @@ export function PlanManagement() {
 
   return (
     <div className="management-card">
-      {/* ✅ FIX LỖI THÔNG BÁO BỊ ĐÈ: Ép z-index của SweetAlert2 lên cao nhất */}
       <style>{`
         .swal2-container {
           z-index: 10000 !important;
@@ -250,12 +265,13 @@ export function PlanManagement() {
             <div className="modal-body-custom">
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
                 <div style={{ flex: 1, minWidth: '200px' }}>
-                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mã gói (VD: MONTHLY)</label>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mã gói</label>
                   <input 
                     type="text" 
-                    placeholder="Nhập mã gói..." 
+                    placeholder="VD: PRO, monthly..." 
                     value={newPlan.planCode} 
-                    onChange={e => setNewPlan({ ...newPlan, planCode: e.target.value.toUpperCase() })} 
+                    // cho phép viết hoa, thường
+                    onChange={e => setNewPlan({ ...newPlan, planCode: e.target.value })} 
                     className="form-input"
                   />
                 </div>
@@ -279,7 +295,7 @@ export function PlanManagement() {
                     placeholder="Nhập giá tiền..." 
                     value={newPlan.price === 0 ? '' : newPlan.price.toLocaleString('vi-VN')} 
                     onChange={e => {
-                      const rawValue = e.target.value.replace(/\D/g, ''); // Ngăn nhập số âm, chữ cái
+                      const rawValue = e.target.value.replace(/\D/g, ''); 
                       setNewPlan({ ...newPlan, price: rawValue ? Number(rawValue) : 0 });
                     }} 
                     className="form-input"

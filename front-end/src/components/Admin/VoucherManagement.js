@@ -63,12 +63,24 @@ export function VoucherManagement() {
       return;
     }
 
+    // KIEM TRA TRUNG LAP MA VOUCHER (FRONTEND)
+    const isDuplicate = vouchers.some(v => {
+      const existingCode = v.code || v.Code || "";
+      // So sanh khong phan biet hoa thuong
+      return existingCode.toLowerCase() === formData.code.trim().toLowerCase();
+    });
+
+    if (isDuplicate) {
+      showPopup("Lỗi Trùng Lặp: Mã giảm giá này đã tồn tại. Vui lòng nhập mã khác!", "error");
+      return;
+    }
+
     if (formData.expiresAt < todayDate) {
       showPopup("Lỗi: Ngày hết hạn phải từ ngày hôm nay trở đi!", "error");
       return;
     }
 
-    // ✅ FIX LỖI DATABASE NULL: Ép định dạng JSON chuẩn xác 100% để C# đọc được
+    // EP DINH DANG JSON CHUAN XAC CHO BACKEND
     const payload = {
       code: formData.code.trim(),
       discountAmount: Number(formData.discountAmount),
@@ -87,7 +99,7 @@ export function VoucherManagement() {
     }
   };
 
-  // ✅ LOGIC BẬT/TẮT THEO ĐÚNG BACKEND C#
+  // LOGIC BAT/TAT THEO BACKEND C#
   const handleToggle = async (voucher) => {
     const vId = getSafeId(voucher);
     if (!vId) return;
@@ -96,7 +108,7 @@ export function VoucherManagement() {
 
     Swal.fire({
       title: `Xác nhận ${actionText}?`,
-      text: `Bạn có chắc muốn ${actionText} mã "${voucher.code}" không?`,
+      text: `Bạn có chắc muốn ${actionText} mã "${voucher.code || voucher.Code}" không?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Đồng ý",
@@ -208,7 +220,6 @@ export function VoucherManagement() {
                   </span>
                 </td>
                 <td style={{ textAlign: 'right' }}>
-                  {/* Thay thế nút Edit/Delete bằng nút Bật/Tắt theo đúng Backend */}
                   <button 
                     onClick={() => handleToggle(v)} 
                     className="action-button" 
@@ -243,9 +254,10 @@ export function VoucherManagement() {
                   <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mã Code</label>
                   <input 
                     type="text" 
-                    placeholder="VD: KHUYENMAI20..." 
+                    placeholder="VD: KHUYENMAI20, khuyenmai20..." 
                     value={formData.code} 
-                    onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })} 
+                    // BO HAM toUpperCase() DE CHO PHEP GO CHU THUONG
+                    onChange={e => setFormData({ ...formData, code: e.target.value })} 
                     className="form-input"
                   />
                 </div>

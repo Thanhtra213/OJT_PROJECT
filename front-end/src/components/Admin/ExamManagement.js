@@ -6,7 +6,7 @@ import {
   deleteQuiz, 
   updateQuiz 
 } from "../../middleware/admin/quizManagementAPI";
-import { Eye, Trash2, Plus, BookOpen, BarChart3, Edit2, X, RefreshCw } from "lucide-react";
+import { Eye, Trash2, Plus, BookOpen, BarChart3, Edit2, Target } from "lucide-react";
 import "./admin-dashboard-styles.scss";
 
 export function ExamManagement() {
@@ -53,13 +53,22 @@ export function ExamManagement() {
   const [systemExamResults, setSystemExamResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
 
+  // Placement Test Modal
+  const [showPlacementModal, setShowPlacementModal] = useState(false);
+  const [placementQuiz, setPlacementQuiz] = useState(null);
+  const [placementData, setPlacementData] = useState({
+    isPlacementTest: false,
+    targetLevel: ""
+  });
+  const [savingPlacement, setSavingPlacement] = useState(false);
+
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
       const data = await getAllQuizzes();
       setQuizzes(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("❌ Error fetching quizzes:", err);
+      console.error("Error fetching quizzes:", err);
       showPopup(err.response?.data?.message || err.message || "Không thể tải danh sách quiz", "error");
     } finally {
       setLoading(false);
@@ -89,7 +98,7 @@ export function ExamManagement() {
       setSystemExamResults(Array.isArray(data) ? data : []);
       setShowResultsModal(true);
     } catch (err) {
-      console.error("❌ Error fetching system exam results:", err);
+      console.error("Error fetching system exam results:", err);
       showPopup(err.message || "Không thể tải kết quả system exam", "error");
     } finally {
       setLoadingResults(false);
@@ -120,7 +129,7 @@ export function ExamManagement() {
       });
       showPopup("Tạo quiz thành công!", "success");
     } catch (err) {
-      console.error("❌ Create quiz error:", err);
+      console.error("Create quiz error:", err);
       showPopup(err.response?.data?.message || err.message, "error");
     } finally {
       setCreating(false);
@@ -162,7 +171,7 @@ export function ExamManagement() {
       setUpdatingQuiz(null);
       showPopup("Cập nhật quiz thành công!", "success");
     } catch (err) {
-      console.error("❌ Update quiz error:", err);
+      console.error("Update quiz error:", err);
       showPopup(err.response?.data?.message || err.message, "error");
     } finally {
       setUpdating(false);
@@ -180,10 +189,57 @@ export function ExamManagement() {
       setDeleteTarget(null);
       showPopup("Xóa quiz thành công!", "success");
     } catch (err) {
-      console.error("❌ Delete quiz error:", err);
+      console.error("Delete quiz error:", err);
       showPopup(err.response?.data?.message || err.message, "error");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  // Xu ly mo Modal Placement Test
+  const handleOpenPlacementModal = (quiz) => {
+    setPlacementQuiz(quiz);
+    setPlacementData({
+      isPlacementTest: quiz.isPlacementTest || false,
+      targetLevel: quiz.targetLevel || ""
+    });
+    setShowPlacementModal(true);
+  };
+
+  // Xu ly luu Placement Test call API Admin
+  const handleSavePlacementTest = async () => {
+    try {
+      setSavingPlacement(true);
+      const token = localStorage.getItem("accessToken");
+      const API_URL = process.env.REACT_APP_API_URL;
+      const quizId = placementQuiz.quizID || placementQuiz.quizId;
+
+      const response = await fetch(`${API_URL}/api/placementtest/admin/mark/${quizId}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+        body: JSON.stringify({
+          isPlacementTest: placementData.isPlacementTest,
+          targetLevel: placementData.targetLevel
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || "Lỗi khi thiết lập Placement Test");
+      }
+
+      showPopup("Thiết lập Placement Test thành công!", "success");
+      setShowPlacementModal(false);
+      fetchQuizzes(); 
+    } catch (err) {
+      console.error("Lỗi:", err);
+      showPopup(err.message, "error");
+    } finally {
+      setSavingPlacement(false);
     }
   };
 
@@ -202,11 +258,11 @@ export function ExamManagement() {
   const getQuizTypeColors = (type) => {
     const numType = typeof type === "string" ? parseInt(type, 10) : type;
     switch (numType) {
-      case 1: return { bg: 'rgba(59,130,246,0.12)', color: '#3b82f6' }; // Blue
-      case 2: return { bg: 'rgba(236,72,153,0.12)', color: '#ec4899' }; // Pink
-      case 3: return { bg: 'rgba(245,158,11,0.12)', color: '#f59e0b' }; // Amber
-      case 4: return { bg: 'rgba(107,114,128,0.12)', color: '#6b7280' }; // Gray
-      case 5: return { bg: 'rgba(0,200,150,0.12)', color: 'var(--primary)' }; // Mint
+      case 1: return { bg: 'rgba(59,130,246,0.12)', color: '#3b82f6' }; 
+      case 2: return { bg: 'rgba(236,72,153,0.12)', color: '#ec4899' }; 
+      case 3: return { bg: 'rgba(245,158,11,0.12)', color: '#f59e0b' }; 
+      case 4: return { bg: 'rgba(107,114,128,0.12)', color: '#6b7280' }; 
+      case 5: return { bg: 'rgba(0,200,150,0.12)', color: 'var(--primary)' }; 
       default: return { bg: 'rgba(107,114,128,0.12)', color: '#6b7280' };
     }
   };
@@ -226,7 +282,7 @@ export function ExamManagement() {
       {toast.show && (
         <div style={{
           position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
-          background: toast.type === 'success' ? 'var(--mint)' : '#ec4899',
+          background: toast.type === 'success' ? 'var(--primary)' : '#ec4899',
           color: '#fff', padding: '12px 24px', borderRadius: '99px',
           fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
         }}>
@@ -287,7 +343,14 @@ export function ExamManagement() {
                 return (
                   <tr key={quizId}>
                     <td className="fw-800" style={{ color: 'var(--primary)' }}>#{quizId}</td>
-                    <td className="fw-800 td-title">{quiz.title}</td>
+                    <td className="fw-800 td-title">
+                      {quiz.title}
+                      {quiz.isPlacementTest && (
+                        <span style={{ marginLeft: '8px', fontSize: '0.7rem', background: '#8b5cf6', color: '#fff', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                          Placement Test
+                        </span>
+                      )}
+                    </td>
                     <td>
                       <p className="td-sub mb-0" style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {quiz.description || "—"}
@@ -329,6 +392,14 @@ export function ExamManagement() {
                       </button>
                       <button
                         className="action-button"
+                        title="Thiết lập Placement Test"
+                        onClick={() => handleOpenPlacementModal(quiz)}
+                        style={{ color: '#8b5cf6', marginLeft: '4px' }}
+                      >
+                        <Target size={18} />
+                      </button>
+                      <button
+                        className="action-button"
                         title="Xóa quiz"
                         onClick={() => {
                           setDeleteTarget(quiz);
@@ -356,17 +427,12 @@ export function ExamManagement() {
         </table>
       </div>
 
-      {/* ════════════════════════════════════════════
-          MODAL: TẠO QUIZ MỚI
-      ════════════════════════════════════════════ */}
+      {/* MODAL: TẠO QUIZ MỚI */}
       {showCreateModal && (
         <div className="management-modal-overlay" onClick={() => !creating && setShowCreateModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Tạo Quiz Mới</h3>
-              {/* <button className="action-button" onClick={() => setShowCreateModal(false)} disabled={creating}>
-                <X size={20} />
-              </button> */}
             </div>
             
             <div className="modal-body-custom">
@@ -432,17 +498,12 @@ export function ExamManagement() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════
-          MODAL: CẬP NHẬT QUIZ
-      ════════════════════════════════════════════ */}
+      {/* MODAL: CẬP NHẬT QUIZ */}
       {showUpdateModal && (
         <div className="management-modal-overlay" onClick={() => !updating && setShowUpdateModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title">Cập nhật Quiz</h3>
-              {/* <button className="action-button" onClick={() => setShowUpdateModal(false)} disabled={updating}>
-                <X size={20} />
-              </button> */}
             </div>
             
             <div className="modal-body-custom">
@@ -509,17 +570,12 @@ export function ExamManagement() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════
-          MODAL: XÓA QUIZ (XÁC NHẬN)
-      ════════════════════════════════════════════ */}
+      {/* MODAL: XÓA QUIZ (XÁC NHẬN) */}
       {showDeleteModal && (
         <div className="management-modal-overlay" onClick={() => !deleting && setShowDeleteModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title" style={{ color: '#ec4899' }}>⚠️ Xác nhận xóa</h3>
-              {/* <button className="action-button" onClick={() => setShowDeleteModal(false)} disabled={deleting}>
-                <X size={20} />
-              </button> */}
+              <h3 className="modal-title" style={{ color: '#ec4899' }}>Xác nhận xóa</h3>
             </div>
             
             <div className="modal-body-custom">
@@ -542,9 +598,67 @@ export function ExamManagement() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════
-          MODAL: KẾT QUẢ SYSTEM EXAM
-      ════════════════════════════════════════════ */}
+      {/* MODAL: THIẾT LẬP PLACEMENT TEST */}
+      {showPlacementModal && (
+        <div className="management-modal-overlay" onClick={() => !savingPlacement && setShowPlacementModal(false)}>
+          <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3 className="modal-title" style={{ color: '#8b5cf6' }}>Thiết lập Placement Test</h3>
+            </div>
+            
+            <div className="modal-body-custom">
+              <div style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                <p style={{ margin: 0, fontWeight: 700, color: '#6d28d9' }}>Quiz: {placementQuiz?.title}</p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                <input
+                  type="checkbox"
+                  id="is-placement-switch"
+                  checked={placementData.isPlacementTest}
+                  onChange={(e) => setPlacementData({ ...placementData, isPlacementTest: e.target.checked })}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#8b5cf6' }}
+                />
+                <label htmlFor="is-placement-switch" style={{ fontWeight: 800, color: 'var(--text-dark)', cursor: 'pointer' }}>
+                  Đặt làm Placement Test (Bài kiểm tra đầu vào)
+                </label>
+              </div>
+
+              {placementData.isPlacementTest && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Target Level (Trình độ mục tiêu)</label>
+                  <input
+                    type="text"
+                    placeholder="VD: A1, A2, IELTS 5.0..."
+                    value={placementData.targetLevel}
+                    onChange={(e) => setPlacementData({ ...placementData, targetLevel: e.target.value })}
+                    className="form-input"
+                  />
+                  <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '0.5rem', fontWeight: 600 }}>
+                    Nhập trình độ mà người dùng sẽ đạt được hoặc hướng tới khi làm bài test này.
+                  </small>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-foot">
+              <button onClick={() => setShowPlacementModal(false)} className="secondary-button" disabled={savingPlacement} style={{ marginRight: '1rem' }}>
+                Hủy
+              </button>
+              <button 
+                onClick={handleSavePlacementTest} 
+                className="primary-button" 
+                style={{ background: '#8b5cf6', borderColor: '#8b5cf6', boxShadow: '0 4px 15px rgba(139,92,246,0.3)' }} 
+                disabled={savingPlacement}
+              >
+                {savingPlacement ? "Đang lưu..." : "Lưu thiết lập"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: KẾT QUẢ SYSTEM EXAM */}
       {showResultsModal && (
         <div className="management-modal-overlay" onClick={() => setShowResultsModal(false)}>
           <div className="management-modal-content" style={{ maxWidth: '900px' }} onClick={(e) => e.stopPropagation()}>
@@ -552,9 +666,6 @@ export function ExamManagement() {
               <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <BarChart3 size={24} style={{ color: 'var(--primary)' }} /> System Exam Results
               </h3>
-              {/* <button className="action-button" onClick={() => setShowResultsModal(false)}>
-                <X size={20} />
-              </button> */}
             </div>
             
             <div className="modal-body-custom" style={{ maxHeight: '65vh', overflowY: 'auto', paddingRight: '10px' }}>
