@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AIChat from "../AIChat/AI";
 import { getVideoProgressFromDB } from "../../middleware/videoProgressAPI";
+import { getUserHistoryKey } from "../../redux/videoWatchHelper";
 import { Container, Row, Col, Card, Badge, Modal, Button } from "react-bootstrap";
 import "./Home.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -148,30 +149,6 @@ const Home = () => {
     } catch { setLessonHistory([]); }
   };
 
-  const loadDbHistory = async () => {
-    try {
-      const localHistory = JSON.parse(localStorage.getItem("videoWatchHistory") || "[]");
-      if (!localHistory.length) return;
-
-      const enriched = await Promise.all(
-        localHistory.map(async (item) => {
-          try {
-            const dbData = await getVideoProgressFromDB(item.lessonID);
-            if (dbData && (dbData.isCompleted || dbData.watchDurationSec > 0)) {
-              const dur = dbData.watchDurationSec || 0;
-              const pos = dbData.lastPositionSec || 0;
-              const progress = dbData.isCompleted
-                ? 100
-                : dur > 0 ? Math.min(99, Math.round((pos / dur) * 100)) : item.progress;
-              return { ...item, progress, isCompleted: dbData.isCompleted };
-            }
-            return item;
-          } catch { return item; }
-        })
-      );
-      setDbLessonHistory(enriched);
-    } catch { }
-  };
 
   const loadStats = () => {
     try {
@@ -204,7 +181,7 @@ const Home = () => {
   // Kết hợp: localStorage (metadata: tên, khóa học) + DB (progress thực)
   const loadDbHistory = async () => {
     try {
-      const historyKey = getHistoryKey();
+      const historyKey = getUserHistoryKey();
       const localRaw = localStorage.getItem(historyKey);
       const localHistory = localRaw ? JSON.parse(localRaw) : [];
       const localMap = {};
