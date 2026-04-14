@@ -25,5 +25,6 @@ namespace EasyEnglish_API.Services.Flashcard
 
         Task<bool> EnsureTeacherOwnsCourse(int courseId, int userId);
         Task<bool> EnsureTeacherOwnsSet(int setId, int userId);
+        Task<ImportFlashcardResponse> ImportItemsFromFileAsync(int setId, IFormFile file);
     }
 }

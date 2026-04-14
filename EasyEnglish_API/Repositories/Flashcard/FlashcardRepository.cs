@@ -131,5 +131,15 @@ namespace EasyEnglish_API.Repositories.Flashcard
 
             return await EnsureTeacherOwnsCourseAsync(set.CourseId.Value, userId);
         }
+
+        public async Task<int> BulkCreateItemsAsync(List<FlashcardItem> items)
+        {
+            if (items == null || items.Count == 0)
+                return 0;
+
+            await _db.FlashcardItems.AddRangeAsync(items);
+            await _db.SaveChangesAsync();
+            return items.Count;
+        }
     }
 }

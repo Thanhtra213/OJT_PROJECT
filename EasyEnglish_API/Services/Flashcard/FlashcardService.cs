@@ -175,5 +175,107 @@ namespace EasyEnglish_API.Services.Flashcard
 
             return updatedSet;
         }
+
+        public async Task<ImportFlashcardResponse> ImportItemsFromFileAsync(int setId, IFormFile file)
+        {
+            var result = new ImportFlashcardResponse();
+            var items = new List<FlashcardItem>();
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            using var stream = file.OpenReadStream();
+
+            if (ext == ".xlsx")
+            {
+                // --- Đọc file Excel ---
+                using var workbook = new ClosedXML.Excel.XLWorkbook(stream);
+                var ws = workbook.Worksheet(1);
+                var rows = ws.RangeUsed()?.RowsUsed().Skip(1); // Bỏ header row
+
+                if (rows == null)
+                {
+                    result.Errors.Add("File Excel rỗng hoặc không có dữ liệu.");
+                    return result;
+                }
+
+                int rowNum = 2;
+                foreach (var row in rows)
+                {
+                    var front = row.Cell(1).GetString().Trim();
+                    var back = row.Cell(2).GetString().Trim();
+                    var ipa = row.Cell(3).GetString().Trim();
+                    var example = row.Cell(4).GetString().Trim();
+
+                    if (string.IsNullOrEmpty(front) || string.IsNullOrEmpty(back))
+                    {
+                        result.Errors.Add($"Dòng {rowNum}: Thiếu FrontText hoặc BackText — bỏ qua.");
+                        result.SkippedCount++;
+                        rowNum++;
+                        continue;
+                    }
+
+                    items.Add(new FlashcardItem
+                    {
+                        SetId = setId,
+                        FrontText = front,
+                        BackText = back,
+                        IPA = string.IsNullOrEmpty(ipa) ? null : ipa,
+                        Example = string.IsNullOrEmpty(example) ? null : example,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    rowNum++;
+                }
+            }
+            else if (ext == ".csv")
+            {
+                // --- Đọc file CSV ---
+                using var reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+                using var csv = new CsvHelper.CsvReader(reader, new CsvHelper.Configuration.CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    MissingFieldFound = null,
+                    HeaderValidated = null
+                });
+
+                await csv.ReadAsync();
+                csv.ReadHeader();
+
+                int rowNum = 2;
+                while (await csv.ReadAsync())
+                {
+                    var front = csv.TryGetField<string>(0, out var f) ? f?.Trim() : null;
+                    var back = csv.TryGetField<string>(1, out var b) ? b?.Trim() : null;
+                    var ipa = csv.TryGetField<string>(2, out var i) ? i?.Trim() : null;
+                    var example = csv.TryGetField<string>(3, out var e) ? e?.Trim() : null;
+
+                    if (string.IsNullOrEmpty(front) || string.IsNullOrEmpty(back))
+                    {
+                        result.Errors.Add($"Dòng {rowNum}: Thiếu FrontText hoặc BackText — bỏ qua.");
+                        result.SkippedCount++;
+                        rowNum++;
+                        continue;
+                    }
+
+                    items.Add(new FlashcardItem
+                    {
+                        SetId = setId,
+                        FrontText = front,
+                        BackText = back!,
+                        IPA = string.IsNullOrEmpty(ipa) ? null : ipa,
+                        Example = string.IsNullOrEmpty(example) ? null : example,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    rowNum++;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Chỉ hỗ trợ file .xlsx hoặc .csv");
+            }
+
+            if (items.Count > 0)
+                result.ImportedCount = await _flashcardRepository.BulkCreateItemsAsync(items);
+
+            return result;
+        }
     }
 }

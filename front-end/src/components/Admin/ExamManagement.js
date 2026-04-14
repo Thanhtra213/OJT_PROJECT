@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2"; 
 import { 
   getAllQuizzes, 
   createQuiz, 
@@ -15,24 +17,20 @@ export function ExamManagement() {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Toast Notification
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
   const showPopup = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 3000);
   };
 
-  // Create Quiz Modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newQuiz, setNewQuiz] = useState({
-    courseID: 0,
     title: "",
     description: "",
     quizType: 1,
   });
   const [creating, setCreating] = useState(false);
 
-  // Update Quiz Modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updatingQuiz, setUpdatingQuiz] = useState(null);
   const [updateData, setUpdateData] = useState({
@@ -43,17 +41,14 @@ export function ExamManagement() {
   });
   const [updating, setUpdating] = useState(false);
 
-  // Delete Modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // System Exam Results Modal
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [systemExamResults, setSystemExamResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
 
-  // Placement Test Modal
   const [showPlacementModal, setShowPlacementModal] = useState(false);
   const [placementQuiz, setPlacementQuiz] = useState(null);
   const [placementData, setPlacementData] = useState({
@@ -69,7 +64,7 @@ export function ExamManagement() {
       setQuizzes(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching quizzes:", err);
-      showPopup(err.response?.data?.message || err.message || "Không thể tải danh sách quiz", "error");
+      showPopup(err.response?.data?.message || err.message || "Không thể tải danh sách bài kiểm tra", "error");
     } finally {
       setLoading(false);
     }
@@ -81,8 +76,7 @@ export function ExamManagement() {
       const token = localStorage.getItem("accessToken");
       const API_URL = process.env.REACT_APP_API_URL;
 
-      const response = await fetch(`${API_URL}/api/admin/score-management/system-exams`, {
-        method: "GET",
+      const res = await axios.get(`${API_URL}/api/admin/score-management/system-exams`, {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -90,16 +84,11 @@ export function ExamManagement() {
         }
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setSystemExamResults(Array.isArray(data) ? data : []);
+      setSystemExamResults(Array.isArray(res.data) ? res.data : []);
       setShowResultsModal(true);
     } catch (err) {
       console.error("Error fetching system exam results:", err);
-      showPopup(err.message || "Không thể tải kết quả system exam", "error");
+      showPopup(err.response?.data?.message || err.message || "Không thể tải kết quả", "error");
     } finally {
       setLoadingResults(false);
     }
@@ -112,25 +101,63 @@ export function ExamManagement() {
 
   const handleCreateQuiz = async () => {
     if (!newQuiz.title.trim()) {
-      showPopup("Vui lòng nhập tên quiz!", "error");
+      showPopup("Vui lòng nhập tên bài kiểm tra!", "error");
       return;
     }
 
     try {
       setCreating(true);
-      await createQuiz(newQuiz);
+
+      // Payload da duoc loai bo hoan toan CourseID
+      const payload = {
+        title: newQuiz.title.trim(),
+        description: newQuiz.description.trim(),
+        quizType: Number(newQuiz.quizType),
+        isActive: true
+      };
+
+      await createQuiz(payload);
       await fetchQuizzes();
       setShowCreateModal(false);
       setNewQuiz({
-        courseID: 0,
         title: "",
         description: "",
         quizType: 1,
       });
-      showPopup("Tạo quiz thành công!", "success");
+      showPopup("Tạo bài kiểm tra thành công!", "success");
     } catch (err) {
       console.error("Create quiz error:", err);
-      showPopup(err.response?.data?.message || err.message, "error");
+      
+      let errorDetails = "";
+      if (err.response && err.response.data) {
+          const data = err.response.data;
+          if (data.errors) {
+              errorDetails = Object.entries(data.errors)
+                  .map(([key, msgs]) => `- <b>${key}</b>: ${msgs.join(", ")}`)
+                  .join("<br/>");
+          } else {
+              errorDetails = data.message || JSON.stringify(data);
+          }
+      } else {
+          errorDetails = err.message;
+      }
+
+      Swal.fire({
+          icon: 'error',
+          title: 'Tạo thất bại',
+          html: `
+            <div style="text-align: left; font-size: 14px; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; color: #dc2626;">
+              ${errorDetails}
+            </div>
+            <p style="font-size: 14px; text-align: left; font-weight: 600;">Gợi ý sửa lỗi:</p>
+            <ul style="font-size: 13px; text-align: left; padding-left: 20px;">
+              <li>Mở file CreateQuizRequest (DTO) trong Visual Studio.</li>
+              <li>Kiểm tra các trường bắt buộc, hãy đảm bảo C# không còn [Required] cho CourseId nữa.</li>
+            </ul>
+          `,
+          confirmButtonColor: '#8b5cf6',
+          confirmButtonText: 'Đã hiểu'
+      });
     } finally {
       setCreating(false);
     }
@@ -149,7 +176,7 @@ export function ExamManagement() {
 
   const handleUpdateQuiz = async () => {
     if (!updateData.title.trim()) {
-      showPopup("Vui lòng nhập tên quiz!", "error");
+      showPopup("Vui lòng nhập tên bài kiểm tra!", "error");
       return;
     }
 
@@ -160,7 +187,7 @@ export function ExamManagement() {
       const payload = {
         title: updateData.title,
         description: updateData.description,
-        quizType: updateData.quizType,
+        quizType: updateData.quizType.toString(),
         isActive: updateData.isActive,
         groups: updatingQuiz.groups || updatingQuiz.questionGroups || []
       };
@@ -169,7 +196,7 @@ export function ExamManagement() {
       await fetchQuizzes();
       setShowUpdateModal(false);
       setUpdatingQuiz(null);
-      showPopup("Cập nhật quiz thành công!", "success");
+      showPopup("Cập nhật thành công!", "success");
     } catch (err) {
       console.error("Update quiz error:", err);
       showPopup(err.response?.data?.message || err.message, "error");
@@ -187,7 +214,7 @@ export function ExamManagement() {
       await fetchQuizzes();
       setShowDeleteModal(false);
       setDeleteTarget(null);
-      showPopup("Xóa quiz thành công!", "success");
+      showPopup("Xóa thành công!", "success");
     } catch (err) {
       console.error("Delete quiz error:", err);
       showPopup(err.response?.data?.message || err.message, "error");
@@ -196,48 +223,73 @@ export function ExamManagement() {
     }
   };
 
-  // Xu ly mo Modal Placement Test
   const handleOpenPlacementModal = (quiz) => {
     setPlacementQuiz(quiz);
     setPlacementData({
-      isPlacementTest: quiz.isPlacementTest || false,
-      targetLevel: quiz.targetLevel || ""
+      isPlacementTest: quiz.isPlacementTest || quiz.IsPlacementTest || false,
+      targetLevel: quiz.targetLevel || quiz.TargetLevel || ""
     });
     setShowPlacementModal(true);
   };
 
-  // Xu ly luu Placement Test call API Admin
   const handleSavePlacementTest = async () => {
+    const parsedLevel = parseInt(placementData.targetLevel, 10);
+
+    if (placementData.isPlacementTest && isNaN(parsedLevel)) {
+      showPopup("Vui lòng nhập định dạng số nguyên cho Trình độ mục tiêu!", "error");
+      return;
+    }
+
     try {
       setSavingPlacement(true);
       const token = localStorage.getItem("accessToken");
       const API_URL = process.env.REACT_APP_API_URL;
       const quizId = placementQuiz.quizID || placementQuiz.quizId;
 
-      const response = await fetch(`${API_URL}/api/placementtest/admin/mark/${quizId}`, {
-        method: "POST",
+      const payload = {
+        isPlacementTest: placementData.isPlacementTest === true,
+        targetLevel: placementData.isPlacementTest ? parsedLevel : null
+      };
+
+      await axios.post(`${API_URL}/api/PlacementTest/admin/mark/${quizId}`, payload, {
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
           "ngrok-skip-browser-warning": "true"
-        },
-        body: JSON.stringify({
-          isPlacementTest: placementData.isPlacementTest,
-          targetLevel: placementData.targetLevel
-        })
+        }
       });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || "Lỗi khi thiết lập Placement Test");
+      setQuizzes(prevQuizzes => prevQuizzes.map(q => {
+        if ((q.quizID || q.quizId) === quizId) {
+          return {
+            ...q,
+            isPlacementTest: payload.isPlacementTest,
+            targetLevel: payload.targetLevel,
+            IsPlacementTest: payload.isPlacementTest,
+            TargetLevel: payload.targetLevel
+          };
+        }
+        return q;
+      }));
+
+      showPopup("Thiết lập đánh giá đầu vào thành công!", "success");
+      setShowPlacementModal(false);
+    } catch (err) {
+      console.error("Placement error:", err);
+      let errorMsg = "Lỗi khi thiết lập";
+      
+      if (err.response && err.response.data) {
+          const errData = err.response.data;
+          errorMsg = errData.message || errorMsg;
+          if (errData.errors) {
+              const firstKey = Object.keys(errData.errors)[0];
+              errorMsg = errData.errors[firstKey][0];
+          }
+      } else if (err.message) {
+          errorMsg = err.message;
       }
 
-      showPopup("Thiết lập Placement Test thành công!", "success");
-      setShowPlacementModal(false);
-      fetchQuizzes(); 
-    } catch (err) {
-      console.error("Lỗi:", err);
-      showPopup(err.message, "error");
+      showPopup(errorMsg, "error");
     } finally {
       setSavingPlacement(false);
     }
@@ -271,17 +323,20 @@ export function ExamManagement() {
     return (
       <div className="admin-loading-spinner">
         <div className="admin-spinner"></div>
-        <p>Đang tải danh sách quiz...</p>
+        <p>Đang tải danh sách bài kiểm tra...</p>
       </div>
     );
   }
 
   return (
     <div className="management-card">
-      {/* Toast Notification */}
+      <style>{`
+        .swal2-container { z-index: 100000 !important; }
+      `}</style>
+
       {toast.show && (
         <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+          position: 'fixed', top: '20px', right: '20px', zIndex: 99999,
           background: toast.type === 'success' ? 'var(--primary)' : '#ec4899',
           color: '#fff', padding: '12px 24px', borderRadius: '99px',
           fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
@@ -290,7 +345,6 @@ export function ExamManagement() {
         </div>
       )}
 
-      {/* Header */}
       <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý Quiz/Exam</h2>
@@ -300,7 +354,6 @@ export function ExamManagement() {
         </div>
       </div>
 
-      {/* Toolbar */}
       <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         <button className="secondary-button" onClick={fetchSystemExamResults} disabled={loadingResults}>
           {loadingResults ? (
@@ -315,22 +368,20 @@ export function ExamManagement() {
 
         <button onClick={() => setShowCreateModal(true)} className="primary-button">
           <Plus size={18} />
-          <span>Tạo Quiz Mới</span>
+          <span>Tạo Bài Kiểm Tra</span>
         </button>
       </div>
 
-      {/* Table Data */}
       <div className="management-table-wrapper">
         <table className="management-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tên Quiz</th>
-              <th>Mô tả</th>
-              <th>Loại</th>
-              <th style={{ textAlign: 'center' }}>Course ID</th>
+              <th style={{ textAlign: 'center' }}>ID</th>
+              <th style={{ textAlign: 'center' }}>Tên Bài Kiểm Tra</th>
+              <th style={{ textAlign: 'center' }}>Mô tả</th>
+              <th style={{ textAlign: 'center' }}>Loại</th>
               <th style={{ textAlign: 'center' }}>Trạng thái</th>
-              <th style={{ textAlign: 'right' }}>Thao tác</th>
+              <th style={{ textAlign: 'center' }}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -339,30 +390,30 @@ export function ExamManagement() {
                 const quizId = quiz.quizID || quiz.quizId;
                 const quizType = quiz.quizType ?? 0;
                 const typeColors = getQuizTypeColors(quizType);
+                const isPlacement = quiz.isPlacementTest || quiz.IsPlacementTest;
 
                 return (
                   <tr key={quizId}>
-                    <td className="fw-800" style={{ color: 'var(--primary)' }}>#{quizId}</td>
-                    <td className="fw-800 td-title">
+                    <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{quizId}</td>
+                    <td className="fw-800 td-title" style={{ textAlign: 'center' }}>
                       {quiz.title}
-                      {quiz.isPlacementTest && (
-                        <span style={{ marginLeft: '8px', fontSize: '0.7rem', background: '#8b5cf6', color: '#fff', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                          Placement Test
-                        </span>
+                      {isPlacement && (
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ fontSize: '0.7rem', background: '#8b5cf6', color: '#fff', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', display: 'inline-block' }}>
+                            Placement Test
+                          </span>
+                        </div>
                       )}
                     </td>
-                    <td>
-                      <p className="td-sub mb-0" style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <td style={{ textAlign: 'center' }}>
+                      <p className="td-sub mb-0" style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 auto' }}>
                         {quiz.description || "—"}
                       </p>
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'center' }}>
                       <span className="status-badge" style={{ backgroundColor: typeColors.bg, color: typeColors.color }}>
                         {getQuizTypeName(quizType)}
                       </span>
-                    </td>
-                    <td className="fw-700" style={{ textAlign: 'center' }}>
-                      {quiz.courseID || "—"}
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <span 
@@ -375,50 +426,52 @@ export function ExamManagement() {
                         {quiz.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        className="action-button"
-                        title="Xem chi tiết"
-                        onClick={() => navigate(`/admin/examdetail/${quizId}`)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                      <button
-                        className="action-button"
-                        title="Sửa quiz"
-                        onClick={() => handleOpenUpdateModal(quiz)}
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        className="action-button"
-                        title="Thiết lập Placement Test"
-                        onClick={() => handleOpenPlacementModal(quiz)}
-                        style={{ color: '#8b5cf6', marginLeft: '4px' }}
-                      >
-                        <Target size={18} />
-                      </button>
-                      <button
-                        className="action-button"
-                        title="Xóa quiz"
-                        onClick={() => {
-                          setDeleteTarget(quiz);
-                          setShowDeleteModal(true);
-                        }}
-                        style={{ color: '#ec4899', marginLeft: '4px' }}
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                    <td style={{ textAlign: 'center' }}>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
+                        <button
+                          className="action-button"
+                          title="Xem chi tiết"
+                          onClick={() => navigate(`/admin/examdetail/${quizId}`)}
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button
+                          className="action-button"
+                          title="Sửa bài kiểm tra"
+                          onClick={() => handleOpenUpdateModal(quiz)}
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                        <button
+                          className="action-button"
+                          title="Thiết lập Placement Test"
+                          onClick={() => handleOpenPlacementModal(quiz)}
+                          style={{ color: '#8b5cf6' }}
+                        >
+                          <Target size={18} />
+                        </button>
+                        <button
+                          className="action-button"
+                          title="Xóa bài kiểm tra"
+                          onClick={() => {
+                            setDeleteTarget(quiz);
+                            setShowDeleteModal(true);
+                          }}
+                          style={{ color: '#ec4899' }}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan="7">
+                <td colSpan="6">
                   <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                     <BookOpen size={48} style={{ color: 'var(--text-muted)' }} />
-                    <span>Chưa có quiz nào. Nhấn "Tạo Quiz Mới" để bắt đầu!</span>
+                    <span>Chưa có bài kiểm tra nào. Nhấn "Tạo Bài Kiểm Tra" để bắt đầu!</span>
                   </div>
                 </td>
               </tr>
@@ -427,17 +480,16 @@ export function ExamManagement() {
         </table>
       </div>
 
-      {/* MODAL: TẠO QUIZ MỚI */}
       {showCreateModal && (
         <div className="management-modal-overlay" onClick={() => !creating && setShowCreateModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title">Tạo Quiz Mới</h3>
+              <h3 className="modal-title">Tạo Bài Kiểm Tra</h3>
             </div>
             
             <div className="modal-body-custom">
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên Quiz *</label>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên Bài Kiểm Tra *</label>
                 <input
                   type="text"
                   placeholder="Nhập tên bài kiểm tra..."
@@ -472,18 +524,6 @@ export function ExamManagement() {
                   <option value={5}>Speaking</option>
                 </select>
               </div>
-
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Course ID (Mã khóa học)</label>
-                <input
-                  type="number"
-                  placeholder="Nhập mã khóa học (hoặc để 0)..."
-                  value={newQuiz.courseID}
-                  onChange={(e) => setNewQuiz({ ...newQuiz, courseID: parseInt(e.target.value) || 0 })}
-                  className="form-input"
-                />
-                <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '0.5rem', fontWeight: 600 }}>Để 0 nếu quiz không thuộc khóa học nào.</small>
-              </div>
             </div>
 
             <div className="modal-foot">
@@ -491,24 +531,23 @@ export function ExamManagement() {
                 Hủy
               </button>
               <button onClick={handleCreateQuiz} className="primary-button" disabled={creating || !newQuiz.title.trim()}>
-                {creating ? "Đang tạo..." : "Tạo Quiz"}
+                {creating ? "Đang tạo..." : "Xác nhận"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL: CẬP NHẬT QUIZ */}
       {showUpdateModal && (
         <div className="management-modal-overlay" onClick={() => !updating && setShowUpdateModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title">Cập nhật Quiz</h3>
+              <h3 className="modal-title">Cập nhật Bài Kiểm Tra</h3>
             </div>
             
             <div className="modal-body-custom">
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên Quiz *</label>
+                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên Bài Kiểm Tra *</label>
                 <input
                   type="text"
                   placeholder="Nhập tên bài kiểm tra..."
@@ -553,7 +592,7 @@ export function ExamManagement() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
                 />
                 <label htmlFor="quiz-active-switch" style={{ fontWeight: 800, color: 'var(--text-dark)', cursor: 'pointer' }}>
-                  Quiz đang hoạt động
+                  Cho phép hoạt động
                 </label>
               </div>
             </div>
@@ -563,14 +602,13 @@ export function ExamManagement() {
                 Hủy
               </button>
               <button onClick={handleUpdateQuiz} className="primary-button" disabled={updating || !updateData.title.trim()}>
-                {updating ? "Đang cập nhật..." : "Cập nhật"}
+                {updating ? "Đang cập nhật..." : "Xác nhận"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL: XÓA QUIZ (XÁC NHẬN) */}
       {showDeleteModal && (
         <div className="management-modal-overlay" onClick={() => !deleting && setShowDeleteModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -580,9 +618,9 @@ export function ExamManagement() {
             
             <div className="modal-body-custom">
               <div style={{ background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.3)', padding: '1.5rem', borderRadius: '12px', color: '#be185d' }}>
-                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700 }}>Bạn có chắc chắn muốn xóa quiz này?</p>
+                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700 }}>Bạn có chắc chắn muốn xóa bài kiểm tra này?</p>
                 <p style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: 900 }}>"{deleteTarget?.title}"</p>
-                <p style={{ margin: '0', fontSize: '0.9rem', fontWeight: 600 }}>Tất cả groups và câu hỏi sẽ bị xóa vĩnh viễn! Hành động này không thể hoàn tác!</p>
+                <p style={{ margin: '0', fontSize: '0.9rem', fontWeight: 600 }}>Tất cả nhóm và câu hỏi bên trong sẽ bị xóa vĩnh viễn! Hành động này không thể hoàn tác!</p>
               </div>
             </div>
 
@@ -598,17 +636,16 @@ export function ExamManagement() {
         </div>
       )}
 
-      {/* MODAL: THIẾT LẬP PLACEMENT TEST */}
       {showPlacementModal && (
         <div className="management-modal-overlay" onClick={() => !savingPlacement && setShowPlacementModal(false)}>
           <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
-              <h3 className="modal-title" style={{ color: '#8b5cf6' }}>Thiết lập Placement Test</h3>
+              <h3 className="modal-title" style={{ color: '#8b5cf6' }}>Thiết lập Bài Đánh Giá</h3>
             </div>
             
             <div className="modal-body-custom">
               <div style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
-                <p style={{ margin: 0, fontWeight: 700, color: '#6d28d9' }}>Quiz: {placementQuiz?.title}</p>
+                <p style={{ margin: 0, fontWeight: 700, color: '#6d28d9' }}>Bài kiểm tra: {placementQuiz?.title}</p>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -620,22 +657,25 @@ export function ExamManagement() {
                   style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#8b5cf6' }}
                 />
                 <label htmlFor="is-placement-switch" style={{ fontWeight: 800, color: 'var(--text-dark)', cursor: 'pointer' }}>
-                  Đặt làm Placement Test (Bài kiểm tra đầu vào)
+                  Sử dụng làm bài kiểm tra đầu vào (Placement Test)
                 </label>
               </div>
 
               {placementData.isPlacementTest && (
                 <div style={{ marginBottom: '1.25rem' }}>
-                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Target Level (Trình độ mục tiêu)</label>
+                  <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Trình độ mục tiêu (Target Level)</label>
                   <input
                     type="text"
-                    placeholder="VD: A1, A2, IELTS 5.0..."
+                    placeholder="Nhập ID cấp độ..."
                     value={placementData.targetLevel}
-                    onChange={(e) => setPlacementData({ ...placementData, targetLevel: e.target.value })}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setPlacementData({ ...placementData, targetLevel: val });
+                    }}
                     className="form-input"
                   />
                   <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '0.5rem', fontWeight: 600 }}>
-                    Nhập trình độ mà người dùng sẽ đạt được hoặc hướng tới khi làm bài test này.
+                    Nhập trình độ mục tiêu bằng số (Ví dụ: ID của khóa học được đề xuất).
                   </small>
                 </div>
               )}
@@ -651,20 +691,19 @@ export function ExamManagement() {
                 style={{ background: '#8b5cf6', borderColor: '#8b5cf6', boxShadow: '0 4px 15px rgba(139,92,246,0.3)' }} 
                 disabled={savingPlacement}
               >
-                {savingPlacement ? "Đang lưu..." : "Lưu thiết lập"}
+                {savingPlacement ? "Đang lưu..." : "Xác nhận"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL: KẾT QUẢ SYSTEM EXAM */}
       {showResultsModal && (
         <div className="management-modal-overlay" onClick={() => setShowResultsModal(false)}>
           <div className="management-modal-content" style={{ maxWidth: '900px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <BarChart3 size={24} style={{ color: 'var(--primary)' }} /> System Exam Results
+                <BarChart3 size={24} style={{ color: 'var(--primary)' }} /> Lịch sử làm bài thi
               </h3>
             </div>
             
@@ -677,26 +716,26 @@ export function ExamManagement() {
                   <table className="management-table">
                     <thead>
                       <tr>
-                        <th>Attempt ID</th>
-                        <th>Quiz ID</th>
-                        <th>Quiz Title</th>
-                        <th style={{ textAlign: 'center' }}>User ID</th>
-                        <th>User Name</th>
-                        <th style={{ textAlign: 'center' }}>Score</th>
-                        <th>Attempt Date</th>
+                        <th style={{ textAlign: 'center' }}>Mã lượt thi</th>
+                        <th style={{ textAlign: 'center' }}>Mã bài</th>
+                        <th style={{ textAlign: 'center' }}>Tên bài kiểm tra</th>
+                        <th style={{ textAlign: 'center' }}>Mã HV</th>
+                        <th style={{ textAlign: 'center' }}>Học viên</th>
+                        <th style={{ textAlign: 'center' }}>Điểm</th>
+                        <th style={{ textAlign: 'center' }}>Ngày nộp</th>
                       </tr>
                     </thead>
                     <tbody>
                       {systemExamResults.map((result, index) => (
                         <tr key={`${result.attemptId}-${index}`}>
-                          <td className="fw-800" style={{ color: 'var(--text-muted)' }}>#{result.attemptId}</td>
-                          <td className="fw-800" style={{ color: 'var(--primary)' }}>#{result.quizId}</td>
-                          <td>
-                            <p className="td-title fw-800 mb-0">{result.quizTitle}</p>
-                            <p className="td-sub mb-0">{result.courseName}</p>
+                          <td className="fw-800" style={{ color: 'var(--text-muted)', textAlign: 'center' }}>#{result.attemptId}</td>
+                          <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{result.quizId}</td>
+                          <td style={{ textAlign: 'center' }}>
+                            <p className="td-title fw-800 mb-0" style={{ margin: '0 auto' }}>{result.quizTitle}</p>
+                            <p className="td-sub mb-0" style={{ margin: '0 auto' }}>{result.courseName}</p>
                           </td>
                           <td className="fw-700" style={{ textAlign: 'center' }}>{result.userId}</td>
-                          <td className="fw-800">{result.userName}</td>
+                          <td className="fw-800" style={{ textAlign: 'center' }}>{result.userName}</td>
                           <td style={{ textAlign: 'center' }}>
                             <span 
                               className="status-badge" 
@@ -709,7 +748,7 @@ export function ExamManagement() {
                               {result.score} đ
                             </span>
                           </td>
-                          <td className="fw-600">{new Date(result.attemptDate).toLocaleString('vi-VN')}</td>
+                          <td className="fw-600" style={{ textAlign: 'center' }}>{new Date(result.attemptDate).toLocaleString('vi-VN')}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -718,7 +757,7 @@ export function ExamManagement() {
               ) : (
                 <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                   <BarChart3 size={48} style={{ color: 'var(--text-muted)' }} />
-                  <span>Chưa có kết quả System Exam nào được ghi nhận.</span>
+                  <span>Chưa có dữ liệu nào được ghi nhận.</span>
                 </div>
               )}
             </div>

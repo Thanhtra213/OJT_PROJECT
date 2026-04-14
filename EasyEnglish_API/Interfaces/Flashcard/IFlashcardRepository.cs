@@ -23,5 +23,7 @@ namespace EasyEnglish_API.Interfaces.Flashcard
 
         Task<bool> EnsureTeacherOwnsCourseAsync(int courseId, int userId);
         Task<bool> EnsureTeacherOwnsSetAsync(int setId, int userId);
+
+        Task<int> BulkCreateItemsAsync(List<FlashcardItem> items);
     }
 }
