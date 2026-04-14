@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import BookLogoModern from "./BookLogoModern";
 import { Container, Row, Col, Modal, Button } from "react-bootstrap";
+import { FaFacebookF } from "react-icons/fa";
 import "./Footer.scss";
 
 const Footer = () => {
@@ -63,10 +64,17 @@ const Footer = () => {
                 mục tiêu học tập một cách hiệu quả nhất.
               </p>
               <div className="social-icons">
-                <a href="#facebook"><i className="fab fa-facebook-f"></i></a>
-                <a href="#twitter"><i className="fab fa-twitter"></i></a>
-                <a href="#instagram"><i className="fab fa-instagram"></i></a>
-                <a href="#linkedin"><i className="fab fa-linkedin-in"></i></a>
+                <a 
+                  href="https://www.facebook.com/share/18HQycnDhy/?mibextid=wwXIfr" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="facebook-link-custom"
+                >
+                  <div className="icon-circle">
+                    <FaFacebookF />
+                  </div>
+                  <span className="link-text">Easy English</span>
+                </a>
               </div>
             </Col>
 
