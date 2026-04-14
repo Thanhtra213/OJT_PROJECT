@@ -10,9 +10,8 @@ import {
   updateFlashcardItem,
   deleteFlashcardItem,
 } from "../../middleware/admin/adminFlashcardAPI";
-import { Plus, Edit, Trash, Eye, ArrowLeft, Upload, BookOpen, XCircle, Search } from "lucide-react";
+import { Plus, Edit, Trash, Eye, ArrowLeft, Upload, BookOpen, XCircle } from "lucide-react";
 import Swal from "sweetalert2";
-import * as XLSX from "xlsx";
 import "./admin-dashboard-styles.scss";
 
 export function FlashcardManagement() {
@@ -22,10 +21,6 @@ export function FlashcardManagement() {
   const [selectedSet, setSelectedSet] = useState(null);
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
-
-  // State tim kiem
-  const [searchSet, setSearchSet] = useState("");
-  const [searchItem, setSearchItem] = useState("");
 
   const [showSetModal, setShowSetModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
@@ -118,7 +113,6 @@ export function FlashcardManagement() {
   const handleViewSet = async (set) => {
     const id = set.setID || set.setId;
     setSelectedSet(set);
-    setSearchItem(""); // Reset search khi vao set moi
     try {
       setLoadingItems(true);
       const data = await getFlashcardSet(id);
@@ -188,52 +182,42 @@ export function FlashcardManagement() {
     });
   };
 
+  // LOGIC DOC VA PREVIEW FILE TRUOC KHI IMPORT (Sử dụng lại logic cũ đọc mượt mà)
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
     setImportFile(file);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array', cellText: false, cellDates: true });
-        
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
-        
+    // Neu la file CSV, tien hanh doc va preview
+    if (file.name.endsWith('.csv')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
         const parsedItems = [];
-        jsonData.forEach((row, index) => {
-          if (index === 0) return;
-
-          const frontText = row[0] !== undefined ? String(row[0]) : "";
-          const backText = row[1] !== undefined ? String(row[1]) : "";
-          const ipa = row[2] !== undefined ? String(row[2]) : "";
-          const example = row[3] !== undefined ? String(row[3]) : "";
-
-          if (frontText || backText || ipa || example) {
+        
+        for(let i = 1; i < lines.length; i++) {
+          const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
+          if (row[0] || row[1]) {
             parsedItems.push({
-              id: Date.now() + index,
-              frontText: frontText.trim(),
-              backText: backText.trim(),
-              ipa: ipa.trim(),
-              example: example.trim()
+              id: Date.now() + i,
+              frontText: row[0] || "",
+              backText: row[1] || "",
+              ipa: row[2] || "",
+              example: row[3] || ""
             });
           }
-        });
-
+        }
         setPreviewItems(parsedItems);
         setImportStep(2); 
-      } catch (err) {
-        console.error("Lỗi đọc file:", err);
-        showPopup("Không thể đọc file. Định dạng không được hỗ trợ.", "error");
-        setImportFile(null);
-      }
-    };
-    reader.readAsArrayBuffer(file);
+      };
+      reader.readAsText(file);
+    } else {
+      // Neu la file Excel, bo qua preview vi JS thuan khong the doc duoc XLSX
+      setPreviewItems([]);
+      setImportStep(1);
+    }
   };
 
   const handlePreviewChange = (index, field, value) => {
@@ -247,36 +231,38 @@ export function FlashcardManagement() {
     setPreviewItems(newItems);
   };
 
+  // Ham kiem tra xem tat ca cac the da duoc nhap du Mat truoc va Mat sau chua
   const isPreviewDataValid = () => {
     if (previewItems.length === 0) return false;
     
-    const hasEmptyField = previewItems.some(item => 
+    const hasInvalidItem = previewItems.some(item => 
       !item.frontText || item.frontText.trim() === "" || 
-      !item.backText || item.backText.trim() === "" ||
-      !item.ipa || item.ipa.trim() === "" ||
-      !item.example || item.example.trim() === ""
+      !item.backText || item.backText.trim() === ""
     );
 
-    return !hasEmptyField; 
+    return !hasInvalidItem;
   };
 
   const handleImportSubmit = async () => {
-    if (!isPreviewDataValid()) {
-      return showPopup("Có dữ liệu bị trống. Vui lòng điền ĐẦY ĐỦ tất cả các cột cho mọi thẻ!", "error");
+    let finalFile = importFile;
+
+    // Neu dang o che do preview CSV, dong goi lai thanh file CSV moi tu du lieu da edit
+    if (importStep === 2 && previewItems.length > 0) {
+      // FIX LỖI FONT CHỮ: Chèn BOM (\uFEFF) vao dau file de Backend nhan dien dung UTF-8
+      let csvContent = "\uFEFFFrontText,BackText,IPA,Example\n";
+      previewItems.forEach(item => {
+        const escape = (str) => {
+          let clean = str ? String(str).replace(/"/g, '""') : "";
+          return clean.includes(',') || clean.includes('"') || clean.includes('\n') ? `"${clean}"` : clean;
+        };
+        csvContent += `${escape(item.frontText)},${escape(item.backText)},${escape(item.ipa)},${escape(item.example)}\n`;
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      finalFile = new File([blob], "import_edited.csv", { type: "text/csv" });
     }
 
-    let csvContent = "\uFEFFFrontText,BackText,IPA,Example\n";
-    previewItems.forEach(item => {
-      const escape = (str) => {
-        let clean = str ? str.replace(/"/g, '""') : "";
-        return clean.includes(',') || clean.includes('"') || clean.includes('\n') ? `"${clean}"` : clean;
-      };
-      csvContent += `${escape(item.frontText)},${escape(item.backText)},${escape(item.ipa)},${escape(item.example)}\n`;
-    });
+    if (!finalFile) return showPopup("Lỗi dữ liệu file", "error");
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const finalFile = new File([blob], "import_edited.csv", { type: "text/csv" });
-
     try {
       setIsImporting(true);
       const setId = selectedSet.setID || selectedSet.setId;
@@ -298,11 +284,13 @@ export function FlashcardManagement() {
 
       Swal.fire("Thành công!", "Import dữ liệu flashcard thành công!", "success");
       
+      // Reset trang thai
       setShowImportModal(false);
       setImportStep(1);
       setImportFile(null);
       setPreviewItems([]);
       
+      // Load lai danh sach the
       handleViewSet(selectedSet);
     } catch (err) {
       console.error("Loi import:", err);
@@ -323,18 +311,6 @@ export function FlashcardManagement() {
       setIsImporting(false);
     }
   };
-
-  // Tinh toan du lieu sau khi loc
-  const filteredSets = sets.filter(s => 
-    (s.title || "").toLowerCase().includes(searchSet.toLowerCase()) || 
-    (s.description || "").toLowerCase().includes(searchSet.toLowerCase())
-  );
-
-  const filteredItems = items.filter(item => 
-    (item.frontText || "").toLowerCase().includes(searchItem.toLowerCase()) || 
-    (item.backText || "").toLowerCase().includes(searchItem.toLowerCase()) ||
-    (item.ipa || "").toLowerCase().includes(searchItem.toLowerCase())
-  );
 
   if (loading) {
     return (
@@ -363,6 +339,7 @@ export function FlashcardManagement() {
         </div>
       )}
 
+      {/* VIEW: DANH SACH ITEM TRONG SET */}
       {selectedSet ? (
         <>
           <div className="management-card-header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -375,20 +352,9 @@ export function FlashcardManagement() {
             </div>
           </div>
 
-          <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: '250px', maxWidth: '350px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <input
-                type="text"
-                placeholder="Tìm kiếm thẻ (Từ vựng, Định nghĩa, IPA)..."
-                value={searchItem}
-                onChange={(e) => setSearchItem(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: '38px', marginBottom: 0, width: '100%' }}
-              />
-            </div>
+          <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flexGrow: 1 }}></div>
-            <button onClick={() => { setImportStep(1); setPreviewItems([]); setImportFile(null); setShowImportModal(true); }} className="secondary-button" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
+            <button onClick={() => setShowImportModal(true)} className="secondary-button" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
               <Upload size={18} />
               <span>Import File</span>
             </button>
@@ -413,8 +379,8 @@ export function FlashcardManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredItems.length > 0 ? (
-                    filteredItems.map((item) => {
+                  {items.length > 0 ? (
+                    items.map((item) => {
                       const itemId = item.itemID || item.itemId;
                       return (
                         <tr key={itemId}>
@@ -450,7 +416,7 @@ export function FlashcardManagement() {
                       <td colSpan="5">
                         <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                           <BookOpen size={48} style={{ color: 'var(--text-muted)' }} />
-                          <span>Không tìm thấy thẻ nào phù hợp.</span>
+                          <span>Chưa có thẻ nào trong bộ này. Nhấn Thêm mới hoặc Import File!</span>
                         </div>
                       </td>
                     </tr>
@@ -461,6 +427,7 @@ export function FlashcardManagement() {
           </div>
         </>
       ) : (
+        /* VIEW: DANH SACH CAC SET */
         <>
           <div className="management-card-header">
             <div>
@@ -469,18 +436,7 @@ export function FlashcardManagement() {
             </div>
           </div>
 
-          <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: '250px', maxWidth: '350px' }}>
-              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <input
-                type="text"
-                placeholder="Tìm kiếm bộ thẻ theo tên, mô tả..."
-                value={searchSet}
-                onChange={(e) => setSearchSet(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: '38px', marginBottom: 0, width: '100%' }}
-              />
-            </div>
+          <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ flexGrow: 1 }}></div>
             <button onClick={() => handleOpenSetModal()} className="primary-button">
               <Plus size={18} />
@@ -492,18 +448,20 @@ export function FlashcardManagement() {
             <table className="management-table">
               <thead>
                 <tr>
+                  <th style={{ textAlign: 'center' }}>ID</th>
                   <th style={{ textAlign: 'center' }}>Tên bộ thẻ</th>
                   <th style={{ textAlign: 'center' }}>Mô tả</th>
                   <th style={{ textAlign: 'center' }}>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredSets.length > 0 ? (
-                  filteredSets.map((s) => {
+                {sets.length > 0 ? (
+                  sets.map((s) => {
                     const setId = s.setID || s.setId;
                     return (
                       <tr key={setId}>
-                        <td className="fw-800 td-title" style={{ textAlign: 'center', color: 'var(--primary)' }}>{s.title}</td>
+                        <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{setId}</td>
+                        <td className="fw-800 td-title" style={{ textAlign: 'center' }}>{s.title}</td>
                         <td style={{ textAlign: 'center' }}>
                           <p className="td-sub mb-0" style={{ maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 auto' }}>
                             {s.description || "—"}
@@ -527,10 +485,10 @@ export function FlashcardManagement() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="3">
+                    <td colSpan="4">
                       <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                         <BookOpen size={48} style={{ color: 'var(--text-muted)' }} />
-                        <span>Không tìm thấy bộ thẻ nào phù hợp.</span>
+                        <span>Chưa có bộ thẻ nào.</span>
                       </div>
                     </td>
                   </tr>
@@ -541,6 +499,7 @@ export function FlashcardManagement() {
         </>
       )}
 
+      {/* MODAL TAO SUA SET */}
       {showSetModal && (
         <div className="management-modal-overlay" onClick={() => setShowSetModal(false)}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
@@ -581,6 +540,7 @@ export function FlashcardManagement() {
         </div>
       )}
 
+      {/* MODAL TAO SUA ITEM */}
       {showItemModal && (
         <div className="management-modal-overlay" onClick={() => setShowItemModal(false)}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
@@ -643,6 +603,7 @@ export function FlashcardManagement() {
         </div>
       )}
 
+      {/* MODAL IMPORT FILE NÂNG CẤP (CÓ PREVIEW EDIT) */}
       {showImportModal && (
         <div className="management-modal-overlay" onClick={() => !isImporting && setShowImportModal(false)}>
           <div className="management-modal-content" style={{ maxWidth: importStep === 2 ? '1000px' : '500px' }} onClick={e => e.stopPropagation()}>
@@ -657,10 +618,11 @@ export function FlashcardManagement() {
                 <>
                   <div style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
                     <p style={{ margin: 0, fontWeight: 700, color: '#6d28d9', fontSize: '0.9rem' }}>
-                      Định dạng hỗ trợ: .CSV, .XLSX (Excel)
+                      Gợi ý định dạng file (.CSV):
                     </p>
                     <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-dark)' }}>
-                      Tất cả các file đều sẽ được trích xuất dữ liệu để bạn có thể xem trước và sửa lỗi trực tiếp trên màn hình trước khi đẩy vào bộ thẻ.
+                      File cần có tiêu đề các cột là: <b>FrontText, BackText, IPA, Example</b> giống như file mẫu. 
+                      Hệ thống sẽ cho phép bạn xem trước và sửa lỗi trực tiếp trên màn hình trước khi đẩy vào bộ thẻ.
                     </p>
                   </div>
 
@@ -683,9 +645,9 @@ export function FlashcardManagement() {
                     <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: '#f9fafb' }}>
                       <tr>
                         <th style={{ textAlign: 'center', width: '20%' }}>Mặt trước *</th>
-                        <th style={{ textAlign: 'center', width: '20%' }}>Phiên âm *</th>
+                        <th style={{ textAlign: 'center', width: '20%' }}>Phiên âm</th>
                         <th style={{ textAlign: 'center', width: '25%' }}>Mặt sau *</th>
-                        <th style={{ textAlign: 'center', width: '30%' }}>Ví dụ *</th>
+                        <th style={{ textAlign: 'center', width: '30%' }}>Ví dụ</th>
                         <th style={{ textAlign: 'center', width: '5%' }}>Xóa</th>
                       </tr>
                     </thead>
@@ -705,11 +667,10 @@ export function FlashcardManagement() {
                           <td style={{ padding: '8px' }}>
                             <input 
                               type="text" 
-                              className={`form-input ${!item.ipa.trim() ? 'error-input' : ''}`}
+                              className="form-input" 
                               value={item.ipa} 
                               onChange={(e) => handlePreviewChange(index, 'ipa', e.target.value)} 
                               style={{ padding: '6px', fontSize: '0.85rem' }}
-                              placeholder="Bắt buộc"
                             />
                           </td>
                           <td style={{ padding: '8px' }}>
@@ -725,11 +686,10 @@ export function FlashcardManagement() {
                           <td style={{ padding: '8px' }}>
                             <input 
                               type="text" 
-                              className={`form-input ${!item.example.trim() ? 'error-input' : ''}`}
+                              className="form-input" 
                               value={item.example} 
                               onChange={(e) => handlePreviewChange(index, 'example', e.target.value)} 
                               style={{ padding: '6px', fontSize: '0.85rem' }}
-                              placeholder="Bắt buộc"
                             />
                           </td>
                           <td style={{ textAlign: 'center', padding: '8px' }}>
@@ -755,17 +715,17 @@ export function FlashcardManagement() {
                 Hủy bỏ
               </button>
               <button 
-                onClick={handleImportSubmit} 
+                onClick={importStep === 1 && importFile?.name.endsWith('.csv') ? () => setImportStep(2) : handleImportSubmit} 
                 className="primary-button" 
                 style={{ 
-                  background: isPreviewDataValid() ? '#8b5cf6' : '#d1d5db', 
-                  borderColor: isPreviewDataValid() ? '#8b5cf6' : '#d1d5db', 
-                  boxShadow: isPreviewDataValid() ? '0 4px 15px rgba(139,92,246,0.3)' : 'none',
-                  cursor: isPreviewDataValid() ? 'pointer' : 'not-allowed'
+                  background: (importStep === 1 || isPreviewDataValid()) ? '#8b5cf6' : '#d1d5db', 
+                  borderColor: (importStep === 1 || isPreviewDataValid()) ? '#8b5cf6' : '#d1d5db', 
+                  boxShadow: (importStep === 1 || isPreviewDataValid()) ? '0 4px 15px rgba(139,92,246,0.3)' : 'none',
+                  cursor: (importStep === 1 || isPreviewDataValid()) ? 'pointer' : 'not-allowed'
                 }} 
                 disabled={isImporting || !importFile || (importStep === 2 && !isPreviewDataValid())}
               >
-                {isImporting ? "Đang lưu..." : "Lưu tất cả vào Bộ thẻ"}
+                {isImporting ? "Đang lưu..." : (importStep === 1 && importFile?.name.endsWith('.csv') ? "Tiếp tục" : "Lưu tất cả vào Bộ thẻ")}
               </button>
             </div>
           </div>
