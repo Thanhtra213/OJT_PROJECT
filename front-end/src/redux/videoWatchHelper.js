@@ -2,8 +2,8 @@
 const getUserHistoryKey = () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const userId = user.accountID || user.userId || user.id 
-      || localStorage.getItem("userID") 
+    const userId = user.accountID || user.userId || user.id
+      || localStorage.getItem("userID")
       || localStorage.getItem("accountID");
     return userId ? `videoWatchHistory_${userId}` : "videoWatchHistory";
   } catch {
@@ -44,8 +44,6 @@ export const updateVideoHistory = (videoData, currentTimeSec = 0, durationSec = 
       courseName: videoData.courseName || "Course",
       lessonID: videoData.lessonID,
       lessonTitle: videoData.lessonTitle || videoData.title || "Video",
-      videoURL: videoData.videoURL,
-      platform: videoData.platform,
       durationSec: Math.round(durationSec),       // ✅ Lưu giây
       currentTimeSec: Math.round(currentTimeSec), // ✅ Lưu giây
       watchedSec: finalProgress >= 100            // ✅ Lưu giây
@@ -64,7 +62,7 @@ export const updateVideoHistory = (videoData, currentTimeSec = 0, durationSec = 
 
     const existingIndex = history.findIndex(
       item => item.courseID === videoData.courseID &&
-              (item.lessonID === videoData.lessonID || item.id === videoData.lessonID)
+        (item.lessonID === videoData.lessonID || item.id === videoData.lessonID)
     );
 
     if (existingIndex >= 0) {
@@ -122,11 +120,11 @@ export const migrateVideoHistory = (accountId) => {
   if (!accountId) return;
   const newKey = `videoWatchHistory_${accountId}`;
   const oldKey = 'videoWatchHistory';
-  
+
   // Nếu key mới chưa có data nhưng key cũ có → migrate
   const oldData = localStorage.getItem(oldKey);
   const newData = localStorage.getItem(newKey);
-  
+
   if (oldData && !newData) {
     localStorage.setItem(newKey, oldData);
     console.log(`✅ Migrated history to ${newKey}`);
@@ -178,7 +176,7 @@ export const removeVideoFromHistory = (courseID, lessonID) => {
     const history = getVideoHistory();
     const newHistory = history.filter(
       item => !(item.courseID === courseID &&
-                (item.lessonID === lessonID || item.id === lessonID))
+        (item.lessonID === lessonID || item.id === lessonID))
     );
     localStorage.setItem(getUserHistoryKey(), JSON.stringify(newHistory));
     return true;

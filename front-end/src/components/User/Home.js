@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AIChat from "../AIChat/AI";
 import { getVideoProgressFromDB } from "../../middleware/videoProgressAPI";
 import { getUserHistoryKey } from "../../redux/videoWatchHelper";
-import { Container, Row, Col, Card, Badge, Modal, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Badge, Modal, Button, Table } from "react-bootstrap";
 import "./Home.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ import {
   faLock, faGraduationCap, faLayerGroup, faMicrophone,
   faHeadphones, faPencilAlt, faFileAlt, faComments,
   faTrash, faPlay, faVideo, faUsers,
-  faChevronRight, faEdit, faEllipsisV, faRocket, faStar
+  faChevronRight, faEdit, faEllipsisV, faRocket, faStar, faHistory
 } from "@fortawesome/free-solid-svg-icons";
 
 // ══════════════════════════════════════════════════════════════════
@@ -105,6 +105,8 @@ const Home = () => {
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [courses, setCourses] = useState([]);
   const [dbLessonHistory, setDbLessonHistory] = useState([]);
+  const [attempts, setAttempts] = useState([]);
+  const [showAttemptModal, setShowAttemptModal] = useState(false);
 
   // Review states
   const [reviewList, setReviewList] = useState([]);
@@ -226,6 +228,16 @@ const Home = () => {
     } catch { setStreakDays(0); setStatsData(emptyData.stats); }
   };
 
+  const loadAttempts = async () => {
+    try {
+      const r = await fetch(`${process.env.REACT_APP_API_URL}/api/attempts`, { headers: getAuthHeaders() });
+      if (r.ok) {
+        const d = await r.json();
+        setAttempts(Array.isArray(d) ? d : []);
+      } else setAttempts([]);
+    } catch { setAttempts([]); }
+  };
+
   const handleClearHistory = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem video?")) {
       localStorage.removeItem(getUserHistoryKey());
@@ -260,6 +272,7 @@ const Home = () => {
           setMembershipInfo(md);
           loadHistory();
           loadStats();
+          await loadAttempts();
           await loadDbHistory();
         } else {
           setHasMembership(false);
@@ -370,6 +383,38 @@ const Home = () => {
                 </div>
               </div>
             </Container>
+          </div>
+
+          {/* Attempt Modal */}
+          <Modal show={showAttemptModal} onHide={() => setShowAttemptModal(false)} size="lg" centered>
+            <Modal.Header closeButton><Modal.Title style={{ fontWeight: 800, color: "#111827" }}>Lịch sử làm bài chi tiết</Modal.Title></Modal.Header>
+            <Modal.Body>
+              {attempts.length === 0 ? (
+                <div className="text-center py-3" style={{ color: "#9ca3af", fontWeight: 600 }}>Chưa có bài làm nào.</div>
+              ) : (
+                <div className="table-responsive">
+                  <Table hover bordered>
+                    <thead><tr><th>ID</th><th>Quiz</th><th>Nộp lúc</th><th>Điểm</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                      {attempts.map(a => (
+                        <tr key={a.attemptID}>
+                          <td>#{a.attemptID}</td><td>{a.quizTitle || "—"}</td><td>{fmtVN(a.submittedAt)}</td>
+                          <td><Badge bg={(a.autoScore ?? 0) >= 80 ? "success" : (a.autoScore ?? 0) >= 50 ? "warning" : "danger"}>{a.autoScore ?? 0}</Badge></td>
+                          <td><Badge bg={a.status === "SUBMITTED" ? "primary" : "secondary"}>{a.status || "SUBMITTED"}</Badge></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <button style={mintBtn({ padding: ".5rem 1.5rem", fontSize: ".9rem", background: "#e5e7eb", color: "#374151" })} onClick={() => setShowAttemptModal(false)}>Đóng</button>
+            </Modal.Footer>
+          </Modal>
+
+          <div className="history-fab" onClick={() => setShowAttemptModal(true)} style={{ position: "fixed", bottom: "100px", right: "30px", background: "#f59e0b", color: "#fff", width: "50px", height: "50px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 15px rgba(245,158,11,.4)", zIndex: 1000, transition: "all .2s" }} title="Lịch sử làm bài">
+            <FontAwesomeIcon icon={faHistory} />
           </div>
 
           <Container>
@@ -1049,6 +1094,26 @@ const Home = () => {
           </span>
         </button>
       )}
+
+      {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
+      {!showAIChat && (
+        <button className="ai-fab-btn" onClick={() => setShowAIChat(true)} title="Chat với AI">
+          <span className="ai-fab-label">AI
+            <svg width="14" height="14" viewBox="0 0 15 15" style={{ marginLeft: "2px", verticalAlign: "middle", position: "relative", top: "-1px" }}>
+              <polygon points="7.5,1.5 9.3,5.6 14,5.8 10.5,8.6 11.7,12.8 7.5,10.4 3.3,12.8 4.5,8.6 1,5.8 5.7,5.6" fill="#f9c74f" stroke="#f9c74f" strokeWidth="0.5" />
+            </svg>
+          </span>
+        </button>
+      )}
+
+      <style>{`
+        .ai-fab-btn{position:fixed;bottom:30px;right:30px;z-index:1100;background:#00c896;color:#fff;border:none;border-radius:50%;width:56px;height:56px;box-shadow:0 8px 32px rgba(0,200,150,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:'Nunito',sans-serif;transition:box-shadow .18s,transform .18s,background .18s;animation:fab-pop 1.2s cubic-bezier(.68,-.55,.27,1.55);}
+        .ai-fab-btn:hover{background:#00a87c;box-shadow:0 12px 40px rgba(0,200,150,.55);transform:translateY(-2px) scale(1.06);}
+        .ai-fab-label{font-weight:900;font-size:1.05rem;display:flex;align-items:center;}
+        @keyframes fab-pop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+        .play-overlay:hover{transform:translate(-50%,-50%) scale(1.15)!important;background:rgba(255,255,255,0.32)!important;}
+        @media(max-width:600px){.ai-fab-btn{right:12px;bottom:12px;}}
+      `}</style>
 
       {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
     </div>
