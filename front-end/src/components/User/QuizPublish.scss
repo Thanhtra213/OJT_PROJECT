@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
-// ── Fresh EdTech Mint & White tokens ─────────────────────────────────────────
+// ── Fresh EdTech Mint & White tokens ──
 $font:         'Nunito', sans-serif;
 $mint:         #00c896;
 $mint-dark:    #00a87c;
@@ -12,114 +12,140 @@ $text-dark:    #111827;
 $text-body:    #374151;
 $text-muted:   #9ca3af;
 $border:       #e5e7eb;
-$shadow-sm:    0 4px 15px rgba(0,0,0,.03);
-$shadow-hover: 0 12px 30px rgba(0,200,150,.12);
+$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
+$shadow-card:  0 4px 24px rgba(0,0,0,.07);
+$shadow-hover: 0 12px 40px rgba(0,200,150,.18);
 $shadow-btn:   0 6px 20px rgba(0,200,150,.35);
 $r-card:       24px;
 $r-pill:       100px;
-$ease:         0.25s cubic-bezier(.4,0,.2,1);
+$ease:         0.22s cubic-bezier(.4,0,.2,1);
 
-// ── QuizPublish page ──────────────────────────────────────────────────────────
+// ── Page ──
 .quiz-publish-page {
   min-height: 80vh;
   font-family: $font;
+  background: $bg;
   color: $text-body;
 
-  .page-header-title {
-    font-weight: 900;
-    font-size: 1.8rem;
-    color: $text-dark;
-  }
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
 
-  /* Premium Card Styles */
-  .hover-card {
-    transition: all $ease; 
-    border: 1.5px solid $border !important;
-    border-radius: $r-card !important; 
-    background: $white !important;
-    box-shadow: $shadow-sm !important;
-    &:hover { 
-      box-shadow: $shadow-hover !important; 
-      border-color: $mint-mid !important; 
-      transform: translateY(-5px); 
+    .back-btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: $white; border: 1.5px solid $border;
+      border-radius: $r-pill; padding: .6rem 1.4rem;
+      font-family: $font; font-weight: 800; font-size: .95rem;
+      color: $text-body; cursor: pointer; text-decoration: none;
+      box-shadow: $shadow-sm; transition: all $ease; align-self: flex-start;
+      margin-bottom: 1.5rem;
+      &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; transform: translateY(-1px); }
+    }
+
+    h3 {
+      font-weight: 900;
+      color: $text-dark;
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
     }
   }
 
-  .quiz-card {
-    border-radius: $r-card; 
+  // Quiz Card
+  .qcard {
+    background: $white;
+    border-radius: $r-card;
+    border: 1.5px solid $border;
     overflow: hidden;
-    padding: 0.5rem;
+    position: relative;
+    box-shadow: $shadow-card;
+    transition: all $ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
 
-    .card-title { 
-      font-size: 1.15rem; 
-      font-weight: 800; 
-      color: $text-dark; 
-      line-height: 1.4; 
-    }
-    .card-text  { 
-      font-size: .95rem; 
-      min-height: 60px; 
-      overflow: hidden;
-      display: -webkit-box; 
-      -webkit-line-clamp: 3; 
-      -webkit-box-orient: vertical; 
-      color: $text-muted; 
-    }
-    
-    .badge {
-      font-family: $font;
-      font-weight: 800;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
+    &:hover {
+      box-shadow: $shadow-hover;
+      border-color: $mint-mid;
+      transform: translateY(-5px);
+      .qcard-head .play-icon { background: $mint-dark; transform: scale(1.1); }
     }
 
-    .info-footer {
-      border-top: 1.5px dashed $border;
-      padding-top: 1rem;
-      margin-top: 1rem;
-      svg { color: $mint-dark; }
-      span { font-weight: 600; color: $text-body; }
-    }
+    .qcard-head {
+      padding: 1.5rem 1.5rem 0.5rem;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
 
-    .btn-primary {
-      background: $mint; 
-      border: none; 
-      border-radius: $r-pill !important;
-      font-family: $font; 
-      font-weight: 800; 
-      padding: .65rem 1.25rem !important;
-      box-shadow: $shadow-btn; 
-      transition: all $ease;
-      &:hover { 
-        background: $mint-dark; 
-        transform: translateY(-2px); 
-        box-shadow: 0 8px 25px rgba(0,168,124,.4); 
+      h4 {
+        font-weight: 800;
+        color: $text-dark;
+        font-size: 1.2rem;
+        line-height: 1.35;
+        margin-bottom: 0.5rem;
+        flex: 1;
+        padding-right: 1rem;
+      }
+
+      .play-icon {
+        width: 40px; height: 40px;
+        background: $mint; color: $white;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        transition: $ease; flex-shrink: 0;
+        box-shadow: $shadow-sm;
       }
     }
-  }
 
-  .mint-back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 800;
-    color: $text-body;
-    background: $white;
-    border: 1.5px solid $border;
-    border-radius: $r-pill;
-    padding: 0.5rem 1.2rem;
-    transition: all $ease;
-    text-decoration: none;
-    box-shadow: $shadow-sm;
-    &:hover {
-      background: $mint-light;
-      color: $mint-dark;
-      border-color: $mint;
-      transform: translateY(-1px);
+    .qcard-body {
+      padding: 0 1.5rem;
+      flex: 1;
+      p {
+        font-size: 0.95rem;
+        color: $text-body;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
     }
-  }
 
-  @media (max-width: 768px) {
-    .quiz-card .card-text { min-height: auto; }
+    .qcard-meta {
+      padding: 0 1.5rem 1rem;
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $text-muted;
+
+      span {
+        display: flex; align-items: center; gap: 0.4rem;
+        svg { color: $mint; }
+      }
+    }
+
+    .qcard-foot {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid $border;
+      background: $bg;
+
+      .brand-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-weight: 800;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+        display: inline-block;
+        
+        &.badge-practice { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+        &.badge-exam { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+        &.badge-assignment { background: #fef9c3; color: #ca8a04; border-color: #fde047; }
+        &.badge-default { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+      }
+    }
   }
 }

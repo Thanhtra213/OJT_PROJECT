@@ -19,20 +19,11 @@ const StartQuiz = () => {
   const [score, setScore] = useState(null);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
-  const [timeLeft, setTimeLeft] = useState(null);
   const hasFetched = useRef(false);
-  const timerRef = useRef(null);
 
   const showToast = (message, type = "error") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 5000);
-  };
-
-  const formatTime = (seconds) => {
-    if (seconds === null) return "";
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   const renderAsset = (asset, idx) => {
@@ -115,11 +106,6 @@ const StartQuiz = () => {
 
         setQuiz(data);
         setGroups(parsedGroups);
-        
-        if (data.duration && data.duration > 0) {
-          setTimeLeft(data.duration * 60);
-        }
-
         const attempt = await startQuiz(quizId);
         setAttemptId(attempt?.attemptId || attempt?.attemptID || attempt);
         showToast("Quiz đã sẵn sàng! Hãy bắt đầu làm bài.", "success");
@@ -135,22 +121,6 @@ const StartQuiz = () => {
     if (quizId) fetchQuiz();
   }, [quizId]);
 
-  useEffect(() => {
-    if (timeLeft === null || submitted || submitting) return;
-    
-    if (timeLeft <= 0) {
-      showToast("Hết thời gian gian làm bài. Đang nộp bài tự động...", "warning");
-      handleSubmit();
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timerRef.current);
-  }, [timeLeft, submitted, submitting]);
-
   const handleAnswerChange = (questionId, optionId) => {
     setAnswers(prev => ({ ...prev, [questionId]: optionId }));
   };
@@ -164,7 +134,7 @@ const StartQuiz = () => {
     const allQuestions = groups.flatMap(g => g.questions);
     const unanswered = allQuestions.filter(q => !answers[q.questionID]);
 
-    if (unanswered.length > 0 && timeLeft > 0) {
+    if (unanswered.length > 0) {
       const confirmSubmit = window.confirm(`Bạn còn ${unanswered.length} câu chưa trả lời. Bạn có muốn nộp bài không?`);
       if (!confirmSubmit) return;
     }
@@ -195,19 +165,19 @@ const StartQuiz = () => {
 
   if (loading)
     return (
-      <Container className="loading-container">
-        <Spinner animation="border" className="spinner-border" />
-        <p>Đang tải dữ liệu bài làm...</p>
+      <Container className="py-5 text-center">
+        <Spinner animation="border" role="status" />
+        <p className="mt-3">Đang tải quiz...</p>
       </Container>
     );
 
   if (!quiz && error)
     return (
-      <Container className="py-5 text-center">
-        <button onClick={() => navigate("/")} className="mint-back-btn mb-4">
+      <Container>
+        <Button variant="link" onClick={() => navigate("/")} className="back-button">
           <FontAwesomeIcon icon={faArrowLeft} /> Quay lại danh sách quiz
-        </button>
-        <Alert variant="danger" className="mt-3 d-inline-block">
+        </Button>
+        <Alert variant="danger" className="mt-3">
           <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
           {error}
         </Alert>
@@ -230,80 +200,69 @@ const StartQuiz = () => {
           </div>
         )}
 
-        {/* Top Sticky Bar */}
-        <div className="quiz-top-bar">
-          <Container className="top-bar-inner">
-            <button onClick={handleBackToList} className="mint-back-btn">
-              <FontAwesomeIcon icon={faArrowLeft} /> Quay lại
-            </button>
-            
-            {timeLeft !== null && !submitted && (
-              <div className={`quiz-timer ${timeLeft <= 60 ? 'text-danger border-danger' : ''}`}>
-                <FontAwesomeIcon icon={faClock} /> {formatTime(timeLeft)}
-              </div>
-            )}
-          </Container>
-        </div>
+        <button className="back-btn" onClick={handleBackToList}>
+          <FontAwesomeIcon icon={faArrowLeft} /> Quay lại bài trước
+        </button>
 
-        <div className="quiz-header text-center">
+        <div className="quiz-header">
           <h1 className="quiz-title">{quiz.title || "Quiz không có tiêu đề"}</h1>
           {quiz.description && <p className="quiz-description">{quiz.description}</p>}
-          <div className="mt-3">
-            <Badge bg="info" className="me-2">{groups.length} phần</Badge>
-            <Badge bg="secondary">{getTotalQuestions()} câu hỏi</Badge>
-          </div>
+          <span className="badge bg-info text-dark me-2">{groups.length} phần</span>
+          <span className="badge bg-secondary">{getTotalQuestions()} câu hỏi</span>
         </div>
 
         {groups.length > 0 ? (
-          groups.map((group, groupIdx) => (
-            <div key={groupIdx} className="quiz-group-box">
-              <Row>
-                {/* CỘT TRÁI - HƯỚNG DẪN VÀ TÀI LIỆU */}
-                <Col md={5} className="group-instruction">
-                  <h5 className="mb-3">
-                    Phần {groupIdx + 1}
-                    <Badge bg="light" text="dark" className="ms-2 shadow-sm border">
-                      {group.questions.length} câu
-                    </Badge>
-                  </h5>
-                  {group.instruction && (
-                    <div className="instruction-text">
-                      <strong className="text-primary d-block mb-2">📌 Hướng dẫn:</strong>
-                      {group.instruction}
-                    </div>
+          groups.map((group, groupIdx) => {
+            const hasLeftCol = group.instruction || (group.assets && group.assets.length > 0);
+            return (
+              <div key={groupIdx} className="quiz-group-box">
+                <Row className="g-0 h-100">
+                  {/* LEFT COLUMN: Instruction & Assets */}
+                  {hasLeftCol && (
+                    <Col md={5} className="qg-left">
+                      <div className="instruction-title">
+                        <span>Phần {groupIdx + 1}</span>
+                        <Badge bg="light" text="dark" style={{fontWeight: 800, border: '1px solid #e5e7eb'}}>
+                          {group.questions?.length || 0} câu
+                        </Badge>
+                      </div>
+                      {group.instruction && <p className="instruction-text">{group.instruction}</p>}
+                      {group.assets?.length > 0 &&
+                        group.assets.map((asset, idx) => (
+                          <div className="asset-box" key={idx}>{renderAsset(asset, idx)}</div>
+                        ))}
+                    </Col>
                   )}
-                  {group.assets?.length > 0 &&
-                    group.assets.map((asset, idx) => renderAsset(asset, idx))}
-                </Col>
 
-                {/* CỘT PHẢI - DANH SÁCH CÂU HỎI */}
-                <Col md={7}>
-                  <div className="questions-container pe-2">
+                  {/* RIGHT COLUMN: Questions List */}
+                  <Col md={hasLeftCol ? 7 : 12} className="qg-right">
                     {group.questions?.map((question, qIdx) => {
                       const qid = question.questionID;
                       return (
-                        <div key={qid} className="question-card">
-                          <div className="d-flex align-items-center mb-3">
-                            <Badge bg="primary" className="me-2 px-3 py-2 rounded-pill">Câu {qIdx + 1}</Badge>
+                        <div key={qid} className="question-block">
+                          <div className="q-title">
+                            <span className="q-num">Câu {qIdx + 1}</span>
+                            <span>{question.content}</span>
                           </div>
-                          <div className="question-statement">{question.content}</div>
+                          
                           {question.assets?.length > 0 &&
-                            question.assets.map((asset, idx) => renderAsset(asset, idx))}
-                            
-                          <div className="options-grid mt-3">
+                            question.assets.map((asset, idx) => (
+                              <div className="asset-box" key={`qasset-${idx}`}>{renderAsset(asset, idx)}</div>
+                            ))}
+
+                          <div className="options-grid">
                             {question.options?.length > 0 ? (
                               question.options.map((opt, idx) => {
                                 const isSelected = answers[qid] === opt.optionID;
                                 return (
                                   <div 
-                                    key={opt.optionID} 
+                                    key={opt.optionID}
                                     className={`option-card ${isSelected ? 'selected' : ''}`}
-                                    onClick={() => {
-                                      if (!submitted) handleAnswerChange(qid, opt.optionID);
-                                    }}
+                                    onClick={() => !submitted && handleAnswerChange(qid, opt.optionID)}
+                                    style={{ opacity: submitted && !isSelected ? 0.6 : 1 }}
                                   >
-                                    <div className="option-letter">{String.fromCharCode(65 + idx)}</div>
-                                    <div className="option-text">{opt.content}</div>
+                                    <div className="opt-letter">{String.fromCharCode(65 + idx)}</div>
+                                    <div className="opt-text">{opt.content}</div>
                                   </div>
                                 );
                               })
@@ -314,50 +273,43 @@ const StartQuiz = () => {
                         </div>
                       );
                     })}
-                  </div>
-                </Col>
-              </Row>
-            </div>
-          ))
+                  </Col>
+                </Row>
+              </div>
+            );
+          })
         ) : (
-          <Alert variant="warning" className="mt-4 text-center py-4 border-0 shadow-sm" style={{ borderRadius: '16px' }}>
-            <FontAwesomeIcon icon={faExclamationTriangle} size="2x" className="mb-3 text-warning" />
-            <h5>Quiz này chưa có nội dung</h5>
+          <Alert variant="warning" className="mt-4">
+            <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
+            Quiz này chưa có câu hỏi nào.
           </Alert>
         )}
 
         {!submitted ? (
-          <div className="submit-area mt-4 mb-5 mx-auto" style={{ maxWidth: '600px' }}>
-            <h4 className="fw-bold mb-3 text-dark">Bạn đã hoàn thành bài?</h4>
+          <div className="action-buttons">
             <button
+              className="submit-button"
               onClick={handleSubmit}
-              className="btn-submit-quiz w-100"
               disabled={submitting || getTotalQuestions() === 0}
             >
               {submitting ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" /> Đang chấm điểm...
-                </>
+                <><Spinner animation="border" size="sm" /> Đang nộp bài...</>
               ) : (
-                <>
-                  Nộp Bài Ngay
-                </>
+                <><FontAwesomeIcon icon={faCheckCircle} /> Nộp bài hoàn tất</>
               )}
             </button>
           </div>
         ) : (
-          <div className="result-card mx-auto mt-5 mb-5" style={{ maxWidth: '600px' }}>
-            <h3>Kết quả siêu phàm của bạn!</h3>
-            <div className="score-circle">
-              {score}
+          <div className="results-section">
+            <div className="icon-wrapper">
+              <FontAwesomeIcon icon={faCheckCircle} />
             </div>
-            <div className="d-flex justify-content-center gap-3">
-              <Button variant="outline-success" onClick={handleRetry} style={{ borderRadius: '100px', fontWeight: '800' }}>
-                Làm Lại Quiz
-              </Button>
-              <Button variant="success" onClick={handleBackToList} style={{ borderRadius: '100px', fontWeight: '800' }}>
-                Quay Về Danh Sách
-              </Button>
+            <h3>Kết quả bài làm</h3>
+            <div className="score-highlight">{score} <span style={{fontSize: '1.5rem', color: '#9ca3af'}}>/100</span></div>
+            <p className="text-muted mb-4">Điểm số của bạn đã được ghi nhận vào hệ thống một cách an toàn.</p>
+            <div className="result-actions">
+              <button className="btn-outline" onClick={handleRetry}>Làm lại</button>
+              <button className="btn-primary" onClick={handleBackToList}>Tiếp tục hành trình</button>
             </div>
           </div>
         )}
