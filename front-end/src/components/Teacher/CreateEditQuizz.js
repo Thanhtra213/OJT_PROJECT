@@ -277,10 +277,10 @@ const CreateEditQuiz = () => {
       <Row className="mb-4 d-flex justify-content-between align-items-center">
         <Col className="header-content">
           <h3><strong><FontAwesomeIcon icon={isEditMode ? faEdit : faPlus} className="me-2" /> {isEditMode ? "Chỉnh sửa Quiz" : "Tạo Quiz mới"}</strong></h3>
-          <p>{isEditMode ? "Cập nhật thông tin và câu hỏi cho Quiz" : "Thiết kế các bài kiểm tra ngắn cho học viên"}</p>
+          <p>{isEditMode ? "Cập nhật thông tin cơ bản cho Quiz" : "Thiết kế các bài kiểm tra ngắn cho học viên"}</p>
         </Col>
         <Col className="text-end header-buttons">
-          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/dashboard")}>
+          <Button variant="outline-primary" className="me-2" onClick={() => navigate("/teacher/dashboard")}>
             <FontAwesomeIcon icon={faTimes} className="me-1" /> Hủy
           </Button>
           <Button variant="primary" onClick={handleSubmit} disabled={loading}>
@@ -393,130 +393,132 @@ const CreateEditQuiz = () => {
             </Form>
           </Card>
 
-          {/* Questions Section */}
-          <Card className="p-4 mb-3">
-            <h5><FontAwesomeIcon icon={faQuestionCircle} className="me-2" /> Câu hỏi Quiz ({quizData.questions?.length || 0})</h5>
-            <p className="text-muted">Thêm các câu hỏi và lựa chọn đáp án đúng</p>
+          {/* Questions Section - Hidden in Edit Mode */}
+          {!isEditMode && (
+            <Card className="p-4 mb-3">
+              <h5><FontAwesomeIcon icon={faQuestionCircle} className="me-2" /> Câu hỏi Quiz ({quizData.questions?.length || 0})</h5>
+              <p className="text-muted">Thêm các câu hỏi và lựa chọn đáp án đúng</p>
 
-            {quizData.questions?.map((q, qIndex) => (
-              <Card key={q.id || qIndex} className="mb-4 question-card shadow-sm border-0">
-                <Card.Body className="p-0">
-                  <div className="question-header d-flex justify-content-between align-items-center p-3 border-bottom">
-                    <div className="d-flex align-items-center">
-                        <span className="question-number me-3">#{qIndex + 1}</span>
-                        <h6 className="mb-0">Cấu hình câu hỏi</h6>
+              {quizData.questions?.map((q, qIndex) => (
+                <Card key={q.id || qIndex} className="mb-4 question-card shadow-sm border-0">
+                  <Card.Body className="p-0">
+                    <div className="question-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                      <div className="d-flex align-items-center">
+                          <span className="question-number me-3">#{qIndex + 1}</span>
+                          <h6 className="mb-0">Cấu hình câu hỏi</h6>
+                      </div>
+                      <Button variant="link" className="text-danger p-0" onClick={() => removeQuestion(qIndex)} title="Xóa câu hỏi">
+                        <FontAwesomeIcon icon={faTrashAlt} />
+                      </Button>
                     </div>
-                    <Button variant="link" className="text-danger p-0" onClick={() => removeQuestion(qIndex)} title="Xóa câu hỏi">
-                      <FontAwesomeIcon icon={faTrashAlt} />
-                    </Button>
-                  </div>
 
-                  <div className="p-3">
-                    <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={q.type || "multiple-choice"} onSelect={(k) => handleQuestionChange(qIndex, "type", k)}>
-                        <Nav.Item>
-                        <Nav.Link eventKey="multiple-choice">
-                            <FontAwesomeIcon icon={faCheckSquare} className="me-2" /> Trắc nghiệm
-                        </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                        <Nav.Link eventKey="essay">
-                            <FontAwesomeIcon icon={faPenNib} className="me-2" /> Tự luận
-                        </Nav.Link>
-                        </Nav.Item>
-                    </Nav>
+                    <div className="p-3">
+                      <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={q.type || "multiple-choice"} onSelect={(k) => handleQuestionChange(qIndex, "type", k)}>
+                          <Nav.Item>
+                          <Nav.Link eventKey="multiple-choice">
+                              <FontAwesomeIcon icon={faCheckSquare} className="me-2" /> Trắc nghiệm
+                          </Nav.Link>
+                          </Nav.Item>
+                          <Nav.Item>
+                          <Nav.Link eventKey="essay">
+                              <FontAwesomeIcon icon={faPenNib} className="me-2" /> Tự luận
+                          </Nav.Link>
+                          </Nav.Item>
+                      </Nav>
 
-                    <Form.Group className="mb-4">
-                        <Form.Label className="fw-bold">Nội dung câu hỏi <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
-                        as="textarea"
-                        rows={3}
-                        className="question-textarea"
-                        placeholder="Nhập nội dung câu hỏi tại đây..."
-                        value={q.text}
-                        onChange={(e) => handleQuestionChange(qIndex, "text", e.target.value)}
-                        required
-                        />
-                    </Form.Group>
+                      <Form.Group className="mb-4">
+                          <Form.Label className="fw-bold">Nội dung câu hỏi <span className="text-danger">*</span></Form.Label>
+                          <Form.Control
+                          as="textarea"
+                          rows={3}
+                          className="question-textarea"
+                          placeholder="Nhập nội dung câu hỏi tại đây..."
+                          value={q.text}
+                          onChange={(e) => handleQuestionChange(qIndex, "text", e.target.value)}
+                          required
+                          />
+                      </Form.Group>
 
-                    {(!q.type || q.type === "multiple-choice") ? (
-                        <div className="multiple-choice-section p-3 bg-light rounded-3">
-                        <Form.Label className="fw-bold mb-3">Các lựa chọn đáp án</Form.Label>
-                        {q.options.map((option, optIndex) => (
-                            <InputGroup key={optIndex} className="mb-3 custom-input-group">
-                            <InputGroup.Text className="bg-white border-end-0">
-                                <Form.Check
-                                type="radio"
-                                name={`correctAnswer-${qIndex}`}
-                                id={`q-${qIndex}-opt-${optIndex}`}
-                                checked={q.correctAnswer === option && option !== ""}
-                                onChange={() => handleQuestionChange(qIndex, "correctAnswer", option)}
-                                aria-label="Đánh dấu là đáp án đúng"
-                                />
-                            </InputGroup.Text>
-                            <Form.Control
-                                type="text"
-                                className="border-start-0"
-                                placeholder={`Nhập nội dung lựa chọn ${optIndex + 1}...`}
-                                value={option}
-                                onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
-                                required
-                            />
-                            {q.options.length > 2 && (
-                                <Button variant="outline-danger" className="border-start-0" onClick={() => removeOption(qIndex, optIndex)}>
-                                <FontAwesomeIcon icon={faTimes} />
-                                </Button>
-                            )}
-                            </InputGroup>
-                        ))}
-                        <Button variant="outline-primary" size="sm" onClick={() => addOption(qIndex)} className="rounded-pill px-3">
-                            <FontAwesomeIcon icon={faPlus} className="me-1" /> Thêm lựa chọn
-                        </Button>
-                        {q.correctAnswer && (
-                            <div className="mt-3 text-success d-flex align-items-center">
-                            <FontAwesomeIcon icon={faCheckSquare} className="me-2" />
-                            <span>Đáp án đúng: <strong>{q.correctAnswer}</strong></span>
-                            </div>
-                        )}
-                        </div>
-                    ) : (
-                        <div className="essay-section p-4 bg-light rounded-3 border-dashed">
-                          <div className="essay-header d-flex align-items-center mb-3">
-                              <div className="essay-icon-container me-3">
-                                  <FontAwesomeIcon icon={faPenNib} className="text-primary" />
-                              </div>
-                              <h6 className="mb-0 fw-bold">Đáp án câu hỏi tự luận</h6>
-                          </div>
-                          
-                          <Form.Group>
-                              <Form.Label className="small text-muted mb-2 italic">Nhập đáp án đúng hoặc nội dung tham khảo để hệ thống đối chiếu (không phân biệt hoa thường)</Form.Label>
+                      {(!q.type || q.type === "multiple-choice") ? (
+                          <div className="multiple-choice-section p-3 bg-light rounded-3">
+                          <Form.Label className="fw-bold mb-3">Các lựa chọn đáp án</Form.Label>
+                          {q.options.map((option, optIndex) => (
+                              <InputGroup key={optIndex} className="mb-3 custom-input-group">
+                              <InputGroup.Text className="bg-white border-end-0">
+                                  <Form.Check
+                                  type="radio"
+                                  name={`correctAnswer-${qIndex}`}
+                                  id={`q-${qIndex}-opt-${optIndex}`}
+                                  checked={q.correctAnswer === option && option !== ""}
+                                  onChange={() => handleQuestionChange(qIndex, "correctAnswer", option)}
+                                  aria-label="Đánh dấu là đáp án đúng"
+                                  />
+                              </InputGroup.Text>
                               <Form.Control
-                                  as="textarea"
-                                  rows={2}
-                                  className="essay-answer-input"
-                                  placeholder="Ví dụ: Rome, Paris, v.v..."
-                                  value={q.options[0] || ""}
-                                  onChange={(e) => handleOptionChange(qIndex, 0, e.target.value)}
+                                  type="text"
+                                  className="border-start-0"
+                                  placeholder={`Nhập nội dung lựa chọn ${optIndex + 1}...`}
+                                  value={option}
+                                  onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
                                   required
                               />
-                          </Form.Group>
-                          
-                          <div className="mt-3 info-box d-flex align-items-start p-2 rounded bg-white border">
-                              <FontAwesomeIcon icon={faLightbulb} className="text-warning me-2 mt-1" />
-                              <small className="text-muted">
-                                  Hệ thống sẽ tự động chấm điểm dựa trên việc so khớp chính xác cụm từ này (không phân biệt chữ hoa/thường).
-                              </small>
+                              {q.options.length > 2 && (
+                                  <Button variant="outline-danger" className="border-start-0" onClick={() => removeOption(qIndex, optIndex)}>
+                                  <FontAwesomeIcon icon={faTimes} />
+                                  </Button>
+                              )}
+                              </InputGroup>
+                          ))}
+                          <Button variant="outline-primary" size="sm" onClick={() => addOption(qIndex)} className="rounded-pill px-3">
+                              <FontAwesomeIcon icon={faPlus} className="me-1" /> Thêm lựa chọn
+                          </Button>
+                          {q.correctAnswer && (
+                              <div className="mt-3 text-success d-flex align-items-center">
+                              <FontAwesomeIcon icon={faCheckSquare} className="me-2" />
+                              <span>Đáp án đúng: <strong>{q.correctAnswer}</strong></span>
+                              </div>
+                          )}
                           </div>
-                        </div>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            ))}
+                      ) : (
+                          <div className="essay-section p-4 bg-light rounded-3 border-dashed">
+                            <div className="essay-header d-flex align-items-center mb-3">
+                                <div className="essay-icon-container me-3">
+                                    <FontAwesomeIcon icon={faPenNib} className="text-primary" />
+                                </div>
+                                <h6 className="mb-0 fw-bold">Đáp án câu hỏi tự luận</h6>
+                            </div>
+                            
+                            <Form.Group>
+                                <Form.Label className="small text-muted mb-2 italic">Nhập đáp án đúng hoặc nội dung tham khảo để hệ thống đối chiếu (không phân biệt hoa thường)</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={2}
+                                    className="essay-answer-input"
+                                    placeholder="Ví dụ: Rome, Paris, v.v..."
+                                    value={q.options[0] || ""}
+                                    onChange={(e) => handleOptionChange(qIndex, 0, e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                            
+                            <div className="mt-3 info-box d-flex align-items-start p-2 rounded bg-white border">
+                                <FontAwesomeIcon icon={faLightbulb} className="text-warning me-2 mt-1" />
+                                <small className="text-muted">
+                                    Hệ thống sẽ tự động chấm điểm dựa trên việc so khớp chính xác cụm từ này (không phân biệt chữ hoa/thường).
+                                </small>
+                            </div>
+                          </div>
+                      )}
+                    </div>
+                  </Card.Body>
+                </Card>
+              ))}
 
-            <Button variant="outline-primary" onClick={addQuestion} className="mt-3 w-100">
-              <FontAwesomeIcon icon={faPlus} className="me-2" /> Thêm câu hỏi mới
-            </Button>
-          </Card>
+              <Button variant="outline-primary" onClick={addQuestion} className="mt-3 w-100">
+                <FontAwesomeIcon icon={faPlus} className="me-2" /> Thêm câu hỏi mới
+              </Button>
+            </Card>
+          )}
         </Col>
 
         <Col md={4}>

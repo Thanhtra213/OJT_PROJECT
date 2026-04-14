@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, Button, Spinner, Form, Alert, Container, Badge, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +19,7 @@ const StartQuiz = () => {
   const [score, setScore] = useState(null);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  const hasFetched = useRef(false);
 
   const showToast = (message, type = "error") => {
     setToast({ show: true, message, type });
@@ -64,6 +65,9 @@ const StartQuiz = () => {
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      if (hasFetched.current) return;
+      hasFetched.current = true;
+
       try {
         const data = await getQuizById(quizId);
         let parsedGroups = [];
@@ -103,7 +107,7 @@ const StartQuiz = () => {
         setQuiz(data);
         setGroups(parsedGroups);
         const attempt = await startQuiz(quizId);
-        setAttemptId(attempt.attemptId || attempt.attemptID);
+        setAttemptId(attempt?.attemptId || attempt?.attemptID || attempt);
         showToast("Quiz đã sẵn sàng! Hãy bắt đầu làm bài.", "success");
       } catch (err) {
         const errorMsg = err.response?.data?.message || err.message || "Không thể tải quiz. Vui lòng thử lại sau!";
@@ -196,80 +200,84 @@ const StartQuiz = () => {
           </div>
         )}
 
-        <Button variant="link" onClick={handleBackToList} className="mb-3">
-          <FontAwesomeIcon icon={faArrowLeft} /> Quay lại danh sách quiz
-        </Button>
+        <button className="back-btn" onClick={handleBackToList}>
+          <FontAwesomeIcon icon={faArrowLeft} /> Quay lại bài trước
+        </button>
 
-        <h1 className="quiz-title mb-3">{quiz.title || "Quiz không có tiêu đề"}</h1>
-        {quiz.description && <p className="quiz-description">{quiz.description}</p>}
-        <Badge bg="info" className="me-2">{groups.length} phần</Badge>
-        <Badge bg="secondary">{getTotalQuestions()} câu hỏi</Badge>
+        <div className="quiz-header">
+          <h1 className="quiz-title">{quiz.title || "Quiz không có tiêu đề"}</h1>
+          {quiz.description && <p className="quiz-description">{quiz.description}</p>}
+          <span className="badge bg-info text-dark me-2">{groups.length} phần</span>
+          <span className="badge bg-secondary">{getTotalQuestions()} câu hỏi</span>
+        </div>
 
         {groups.length > 0 ? (
-          groups.map((group, groupIdx) => (
-            <Card key={groupIdx} className="mt-4 p-3 shadow-sm quiz-section">
-              <Row>
-                {/* CỘT TRÁI - HƯỚNG DẪN VÀ TÀI LIỆU */}
-                <Col md={6}>
-                  <div className="question-instruction">
-                    <h5 className="text-primary mb-3">
-                      Phần {groupIdx + 1}
-                      <Badge bg="light" text="dark" className="ms-2">
-                        {group.questions.length} câu
-                      </Badge>
-                    </h5>
-                    {group.instruction && (
-                      <div className="mb-3">
-                        <strong>Hướng dẫn:</strong>
-                        <p className="mt-2">{group.instruction}</p>
+          groups.map((group, groupIdx) => {
+            const hasLeftCol = group.instruction || (group.assets && group.assets.length > 0);
+            return (
+              <div key={groupIdx} className="quiz-group-box">
+                <Row className="g-0 h-100">
+                  {/* LEFT COLUMN: Instruction & Assets */}
+                  {hasLeftCol && (
+                    <Col md={5} className="qg-left">
+                      <div className="instruction-title">
+                        <span>Phần {groupIdx + 1}</span>
+                        <Badge bg="light" text="dark" style={{fontWeight: 800, border: '1px solid #e5e7eb'}}>
+                          {group.questions?.length || 0} câu
+                        </Badge>
                       </div>
-                    )}
-                    {group.assets?.length > 0 &&
-                      group.assets.map((asset, idx) => renderAsset(asset, idx))}
-                  </div>
-                </Col>
+                      {group.instruction && <p className="instruction-text">{group.instruction}</p>}
+                      {group.assets?.length > 0 &&
+                        group.assets.map((asset, idx) => (
+                          <div className="asset-box" key={idx}>{renderAsset(asset, idx)}</div>
+                        ))}
+                    </Col>
+                  )}
 
-                {/* CỘT PHẢI - DANH SÁCH CÂU HỎI */}
-                <Col md={6}>
-                  <div className="questions-container">
+                  {/* RIGHT COLUMN: Questions List */}
+                  <Col md={hasLeftCol ? 7 : 12} className="qg-right">
                     {group.questions?.map((question, qIdx) => {
                       const qid = question.questionID;
                       return (
-                        <Card key={qid} className="mb-3">
-                          <Card.Body>
-                            <div className="mb-3">
-                              <Badge bg="primary" className="me-2">Câu {qIdx + 1}</Badge>
-                              <span className="fw-bold">{question.content}</span>
-                            </div>
-                            {question.assets?.length > 0 &&
-                              question.assets.map((asset, idx) => renderAsset(asset, idx))}
+                        <div key={qid} className="question-block">
+                          <div className="q-title">
+                            <span className="q-num">Câu {qIdx + 1}</span>
+                            <span>{question.content}</span>
+                          </div>
+                          
+                          {question.assets?.length > 0 &&
+                            question.assets.map((asset, idx) => (
+                              <div className="asset-box" key={`qasset-${idx}`}>{renderAsset(asset, idx)}</div>
+                            ))}
+
+                          <div className="options-grid">
                             {question.options?.length > 0 ? (
-                              question.options.map(opt => (
-                                <Form.Check
-                                  key={opt.optionID}
-                                  type="radio"
-                                  id={`q_${qid}_opt_${opt.optionID}`}
-                                  label={opt.content}
-                                  name={`question_${qid}`}
-                                  value={opt.optionID}
-                                  checked={answers[qid] === opt.optionID}
-                                  onChange={() => handleAnswerChange(qid, opt.optionID)}
-                                  disabled={submitted}
-                                  className="mb-2"
-                                />
-                              ))
+                              question.options.map((opt, idx) => {
+                                const isSelected = answers[qid] === opt.optionID;
+                                return (
+                                  <div 
+                                    key={opt.optionID}
+                                    className={`option-card ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => !submitted && handleAnswerChange(qid, opt.optionID)}
+                                    style={{ opacity: submitted && !isSelected ? 0.6 : 1 }}
+                                  >
+                                    <div className="opt-letter">{String.fromCharCode(65 + idx)}</div>
+                                    <div className="opt-text">{opt.content}</div>
+                                  </div>
+                                );
+                              })
                             ) : (
                               <Alert variant="warning">⚠ Không có lựa chọn nào cho câu hỏi này.</Alert>
                             )}
-                          </Card.Body>
-                        </Card>
+                          </div>
+                        </div>
                       );
                     })}
-                  </div>
-                </Col>
-              </Row>
-            </Card>
-          ))
+                  </Col>
+                </Row>
+              </div>
+            );
+          })
         ) : (
           <Alert variant="warning" className="mt-4">
             <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
@@ -278,37 +286,31 @@ const StartQuiz = () => {
         )}
 
         {!submitted ? (
-          <div className="text-center mt-4 mb-5">
-            <Button
+          <div className="action-buttons">
+            <button
+              className="submit-button"
               onClick={handleSubmit}
-              variant="primary"
-              size="lg"
               disabled={submitting || getTotalQuestions() === 0}
             >
               {submitting ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" /> Đang nộp bài...
-                </>
+                <><Spinner animation="border" size="sm" /> Đang nộp bài...</>
               ) : (
-                <>
-                  <FontAwesomeIcon icon={faCheckCircle} className="me-2" /> Nộp bài
-                </>
+                <><FontAwesomeIcon icon={faCheckCircle} /> Nộp bài hoàn tất</>
               )}
-            </Button>
+            </button>
           </div>
         ) : (
-          <div className="text-center mt-5 mb-5">
-            <Alert variant="success" className="py-4">
-              <FontAwesomeIcon icon={faCheckCircle} size="3x" className="mb-3 text-success" />
-              <h3>Chúc mừng bạn đã hoàn thành!</h3>
-              <h1 className="fw-bold text-success">{score}/100 điểm</h1>
-            </Alert>
-            <Button variant="outline-primary" onClick={handleRetry} className="me-3">
-              Làm lại quiz
-            </Button>
-            <Button variant="primary" onClick={handleBackToList}>
-              Quay lại danh sách quiz
-            </Button>
+          <div className="results-section">
+            <div className="icon-wrapper">
+              <FontAwesomeIcon icon={faCheckCircle} />
+            </div>
+            <h3>Kết quả bài làm</h3>
+            <div className="score-highlight">{score} <span style={{fontSize: '1.5rem', color: '#9ca3af'}}>/100</span></div>
+            <p className="text-muted mb-4">Điểm số của bạn đã được ghi nhận vào hệ thống một cách an toàn.</p>
+            <div className="result-actions">
+              <button className="btn-outline" onClick={handleRetry}>Làm lại</button>
+              <button className="btn-primary" onClick={handleBackToList}>Tiếp tục hành trình</button>
+            </div>
           </div>
         )}
       </Container>

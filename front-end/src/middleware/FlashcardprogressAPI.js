@@ -10,9 +10,8 @@ const getAuthHeader = () => {
 // Gọi khi học 1 flashcard (Mastered / NotYet / Skip)
 // actionType: "Mastered" | "NotYet" | "Skip"
 const ACTION_MAP = {
-    Mastered: 1,
-    NotYet: 2,
-    Skip: 3
+    Mastered: 2, 
+    Learn: 1,
 };
 
 export const learnFlashcard = async ({ itemId, actionType }) => {

@@ -126,14 +126,9 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
       color: $text-muted; font-size: .9rem; flex-grow: 1;
       margin-bottom: 1rem; line-height: 1.55;
     }
+  } // .set-card
+} // .flashcard-list-page
 
-    .card-footer-info {
-      margin-top: auto; padding-top: 1rem;
-      border-top: 1px solid $border;
-      font-size: .88rem; color: $text-muted; font-weight: 600;
-    }
-  }
-}
 
 // ─── Responsive ──────────────────────────────────────────────────────────────
 @media (max-width: 768px) {

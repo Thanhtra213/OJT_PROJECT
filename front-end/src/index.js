@@ -18,7 +18,6 @@ import PaymentSuccessSubscription from "./components/User/PaymentSuccessSubscrip
 import StartQuiz from "./components/User/StartQuiz";
 import FlashcardList from './components/User/FlashcardList';
 import SpeakingPractice from './components/User/SpeakingPractice';
-import ListeningPractice from './components/User/ListeningPractice';
 import QuizPublish from "./components/User/QuizPublish";
 import TeacherInfo from './components/User/TeacherInfo';
 import CourseFeedback from './components/User/CourseFeedback';
@@ -28,7 +27,6 @@ import GameLauncher from "./components/User/Flashcardgame/Gamelauncher";
 // ADMIN ROUTES
 import AdminDashboard from './components/Admin/AdminDashboard'; 
 import ExamDetail from './components/Admin/ExamDetail';
-import AdminCourseDetail from './components/Admin/AdminCourseDetail';
 
 // TEACHER ROUTES
 import TeacherDashboard from "./components/Teacher/Dashboard";
@@ -43,44 +41,10 @@ import TeacherCreateLesson from "./components/Teacher/CreateLesson";
 import TeacherEditLesson from "./components/Teacher/EditLesson";
 
 import { ThemeProvider } from './context/ThemeContext';
-import { Toaster } from "sonner";
 
-const _alert = window.alert;
-window.alert = (msg) => {
-  console.warn("alert bị chặn:", msg);
-};
-
-// 1. Dùng cho trang /home (Đá Admin/Teacher về Dashboard)
 const ProtectedRoute = ({ children }) => {
-  const raw = localStorage.getItem("user");
-  let user = null;
-  try {
-    if (raw && raw !== "undefined" && raw !== "null") {
-      user = JSON.parse(raw);
-    }
-  } catch { user = null; }
-
-  if (!user) return <Navigate to="/" replace />;
-
-  const role = String(user.role || "").toUpperCase();
-  if (role === "ADMIN") return <Navigate to="/admin/dashboard" replace />;
-  if (role === "TEACHER") return <Navigate to="/teacher/dashboard" replace />;
-
-  return children;
-};
-
-// 2. TẠO MỚI: Dùng cho trang Profile (Ai đăng nhập cũng được vào)
-const AnyAuthRoute = ({ children }) => {
-  const raw = localStorage.getItem("user");
-  let user = null;
-  try {
-    if (raw && raw !== "undefined" && raw !== "null") {
-      user = JSON.parse(raw);
-    }
-  } catch { user = null; }
-
-  if (!user) return <Navigate to="/" replace />;
-  return children;
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user ? children : <Navigate to="/" replace />; 
 };
 
 const AdminRoute = ({ children }) => {
@@ -119,12 +83,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <ThemeProvider>
-       <Toaster        
-        position="top-right"
-        richColors
-        duration={3000}
-        closeButton
-      />
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={
@@ -138,10 +96,8 @@ root.render(
           } />
           
           <Route path="writingpractice" element={<WritingPractice />} />
-          <Route path="listeningpractice" element={<ListeningPractice />} />
           <Route path="membership" element={<Membership />} />
           <Route path="/payment/:id" element={<PaymentForm />} />
-          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/flashcards" element={<FlashcardList />} />
           <Route path="/flashcard/:setId" element={<Flashcard />} />
@@ -150,14 +106,15 @@ root.render(
           <Route path="/quiz/start/:quizId" element={<StartQuiz />} />
           <Route path="speakingpractice" element={<SpeakingPractice />} />
           <Route path="/quiz/publish" element={<QuizPublish />} />
+          <Route path="/course/:id/feedback" element={<CourseFeedback />} />
           <Route path="/teacherinfo/:teacherId" element={<TeacherInfo />} />
           <Route path="/flashcard/my-vocab" element={<MyvocabList />} />
           <Route path="/game" element={<GameLauncher />} />
           
           <Route path="profile" element={
-            <AnyAuthRoute>
+            <ProtectedRoute>
               <Profile />
-            </AnyAuthRoute>
+            </ProtectedRoute>
           } />
 
           <Route path="forgotpassword" element={<ForgotPass />} />
@@ -174,11 +131,7 @@ root.render(
               <ExamDetail />
             </AdminRoute>
           } />
-          <Route path="/admin/coursedetail/:id" element={
-            <AdminRoute>
-              <AdminCourseDetail />
-            </AdminRoute>
-          } />
+         
 
           {/* TEACHER ROUTES */}
           <Route path="/teacher/dashboard" element={

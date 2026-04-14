@@ -40,6 +40,8 @@ namespace EasyEnglish_API.Services.Flashcard
             await _progress.LogHistoryAsync(userId, request.ItemId, (byte)request.ActionType);
         }
 
+        
+
         public async Task<List<FlashcardHistoryDto>> GetHistoryAsync(int userId, int? setId)
         {
             return await _progress.GetHistoryAsync(userId, setId);

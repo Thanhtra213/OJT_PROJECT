@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
-// ─── Design Tokens (synced with Home.scss) ────────────────────────────────────
+// ─── Design Tokens ────────────────────────────────────────────────────────────
 $font:         'Nunito', sans-serif;
 $mint:         #00c896;
 $mint-dark:    #00a87c;
@@ -29,7 +29,7 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 .flashcard-learn-page {
-  background: $white;
+  background: $bg;
   min-height: 100vh;
   font-family: $font;
   display: flex;
@@ -47,17 +47,16 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   p { font-size: 1rem; color: $text-body; font-weight: 600; margin-top: 1rem; }
 }
 
-// ─── Header (matches hero gradient from Home) ────────────────────────────────
+// ─── Header ──────────────────────────────────────────────────────────────────
 .flashcard-learn-header {
   background: linear-gradient(135deg, #1557b0 0%, #1a73e8 45%, #0ea5c9 100%);
-  padding: 2rem 2rem 2.5rem;
+  padding: 1.75rem 2rem 2rem;
   position: relative;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  // Decorative blobs (same as Home hero)
   &::before {
     content: '';
     position: absolute; top: -70px; right: -70px;
@@ -75,11 +74,31 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
     animation: blob-pulse 8s ease-in-out infinite reverse;
   }
 
+  .header-left {
+    display: flex; flex-direction: column; gap: .25rem;
+    position: relative; z-index: 2;
+
+    .set-subtitle {
+      font-size: .78rem; font-weight: 700; color: rgba(255,255,255,.65);
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+
+    .set-description {
+      font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.6);
+      margin-top: .1rem;
+    }
+  }
+
   .set-title {
-    font-size: 1.5rem; font-weight: 900; color: $white;
-    margin: 0; flex: 1; text-align: center; padding: 0 2.5rem;
+    font-size: 1.45rem; font-weight: 900; color: $white;
+    margin: 0;
     letter-spacing: -.02em;
     text-shadow: 0 2px 12px rgba(0,0,0,.15);
+    position: relative; z-index: 2;
+  }
+
+  .header-right {
+    display: flex; align-items: center; gap: .75rem;
     position: relative; z-index: 2;
   }
 
@@ -91,7 +110,7 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
     width: 42px; height: 42px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem; color: $white; cursor: pointer;
-    transition: all $ease; position: relative; z-index: 2;
+    transition: all $ease;
     &:hover {
       background: rgba(255,255,255,.3);
       transform: scale(1.08);
@@ -104,38 +123,99 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   50%     { transform: scale(1.12); opacity: .35; }
 }
 
+// ─── Stats Strip (below header) ──────────────────────────────────────────────
+.flashcard-stats-strip {
+  background: $white;
+  border-bottom: 1.5px solid $border;
+  padding: .875rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+
+  .stat-item {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 2rem;
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute; right: 0; top: 15%; height: 70%;
+      width: 1.5px; background: $border;
+    }
+
+    .stat-value {
+      font-size: 1.35rem; font-weight: 900; color: $text-dark;
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-size: .7rem; font-weight: 700; color: $text-muted;
+      letter-spacing: .06em; text-transform: uppercase; margin-top: .15rem;
+    }
+
+    &.stat-mastered .stat-value { color: $card-green; }
+    &.stat-saved    .stat-value { color: $card-blue; }
+    &.stat-remain   .stat-value { color: $card-amber; }
+  }
+}
+
 // ─── Main Container ──────────────────────────────────────────────────────────
 .flashcard-learn-container {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; padding: 2rem 2rem;
-  width: 100%; max-width: 800px; margin: 0 auto;
+  width: 100%; max-width: 900px; margin: 0 auto;
 }
 
 // ─── Progress ────────────────────────────────────────────────────────────────
 .progress-section {
-  width: 100%; margin-bottom: 2rem;
-  background: $white;
-  border: 1.5px solid $border;
-  border-radius: $r-card;
-  padding: 1.25rem 1.5rem;
-  box-shadow: $shadow-card;
+  width: 100%; margin-bottom: 1.75rem;
+
+  .progress-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: .6rem;
+  }
 
   .progress-text {
-    text-align: center; font-size: .88rem; font-weight: 700;
-    color: $text-body; margin-bottom: .75rem;
+    font-size: .82rem; font-weight: 700; color: $text-body;
   }
+
+  .progress-percent {
+    font-size: .82rem; font-weight: 800; color: $mint-dark;
+  }
+
   .progress-bar-background {
-    background: $mint-light; border-radius: 99px; height: 9px; overflow: hidden;
+    background: $mint-light; border-radius: 99px; height: 8px; overflow: hidden;
     .progress-bar-fill {
-      background: $mint; height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, $mint 0%, $mint-dark 100%);
+      height: 100%; border-radius: 99px;
       transition: width .5s ease-in-out;
+    }
+  }
+
+  .progress-dots {
+    display: flex; gap: 4px; margin-top: .6rem; flex-wrap: wrap;
+
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: $border; transition: background $ease;
+      &.done    { background: $mint; }
+      &.current { background: $hero-blue; transform: scale(1.3); }
     }
   }
 }
 
+// ─── Two-column layout ───────────────────────────────────────────────────────
+.flashcard-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
 // ─── 3D Flashcard ────────────────────────────────────────────────────────────
 .flashcard-scene {
-  width: 100%; height: 400px; perspective: 1000px; margin-bottom: 2rem;
+  width: 100%; height: 380px; perspective: 1000px;
 }
 
 .flashcard-item {
@@ -149,13 +229,14 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   position: absolute; width: 100%; height: 100%;
   backface-visibility: hidden; border-radius: $r-card;
   display: flex; align-items: center; justify-content: center;
-  text-align: center; padding: 2rem;
+  text-align: center; padding: 2.5rem;
 }
 
 .flashcard-front {
   background: $white;
   border: 2px solid $border;
   box-shadow: $shadow-card;
+  transition: box-shadow $ease;
 
   &:hover { box-shadow: $shadow-hover; }
 
@@ -164,13 +245,22 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
     justify-content: center; align-items: center;
     height: 100%; width: 100%; position: relative;
 
+    .flip-hint {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      font-size: .7rem; font-weight: 700; color: $text-muted;
+      letter-spacing: .06em; text-transform: uppercase;
+      background: $bg; border: 1.5px solid $border;
+      padding: .25rem .85rem; border-radius: $r-pill;
+    }
+
     .word {
       font-size: 3rem; font-weight: 900; color: $text-dark;
       margin-bottom: .5rem; letter-spacing: -.03em;
     }
     .phonetic {
-      font-size: 1.25rem; color: $text-muted; font-weight: 600;
+      font-size: 1.1rem; color: $text-muted; font-weight: 600;
       margin-bottom: 3rem;
+      background: $bg; padding: .25rem 1rem; border-radius: $r-pill;
     }
     .speak-button {
       position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
@@ -194,6 +284,15 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   box-shadow: 0 8px 32px rgba(21,87,176,.25);
 
   .flashcard-content {
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
+
+    .back-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.65);
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      padding: .25rem .85rem; border-radius: $r-pill;
+    }
+
     .meaning {
       font-size: 2.5rem; font-weight: 900; letter-spacing: -.025em;
       text-shadow: 0 2px 8px rgba(0,0,0,.12);
@@ -201,18 +300,29 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   }
 }
 
-// ─── Card Area with Nav Arrows ───────────────────────────────────────────────
+// ─── Nav arrows below card ───────────────────────────────────────────────────
 .main-card-area {
-  display: flex; align-items: center; justify-content: center;
-  gap: 1rem; width: 100%; margin-bottom: 2rem;
+  display: flex; flex-direction: column; gap: 1rem;
+
+  .card-nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 .25rem;
+  }
+
+  .card-counter-pill {
+    font-size: .85rem; font-weight: 800; color: $text-body;
+    background: $white; border: 1.5px solid $border;
+    padding: .35rem 1rem; border-radius: $r-pill;
+    box-shadow: $shadow-sm;
+  }
 }
 
 .nav-arrow-button {
-  background: $white; border: 2px solid $border; border-radius: 50%;
-  width: 50px; height: 50px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.2rem; color: $text-muted; cursor: pointer;
-  transition: all $ease; flex-shrink: 0; box-shadow: $shadow-card;
+  background: $white; border: 2px solid $border; border-radius: $r-pill;
+  height: 42px; padding: 0 1.1rem;
+  display: flex; align-items: center; gap: .4rem;
+  font-size: .82rem; font-weight: 800; color: $text-muted;
+  cursor: pointer; transition: all $ease; box-shadow: $shadow-card;
 
   &:hover {
     border-color: $mint; color: $mint-dark; background: $mint-light;
@@ -221,38 +331,96 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   &:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
 }
 
-// ─── Badges ──────────────────────────────────────────────────────────────────
-.mastered-star {
-  color: $card-amber;
-  font-size: 1.2rem;
+// ─── Sidebar Panel ───────────────────────────────────────────────────────────
+.flashcard-sidebar {
+  display: flex; flex-direction: column; gap: 1rem;
 }
 
-.mastered-count {
-  color: $card-green; font-weight: 700; font-size: .85rem;
+.sidebar-card {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-card;
+  padding: 1.25rem 1.35rem;
+  box-shadow: $shadow-card;
+
+  .sidebar-card-title {
+    font-size: .72rem; font-weight: 800; color: $text-muted;
+    letter-spacing: .07em; text-transform: uppercase;
+    margin-bottom: 1rem; padding-bottom: .6rem;
+    border-bottom: 1.5px solid $border;
+  }
 }
 
-// ─── Action Buttons ──────────────────────────────────────────────────────────
-.flashcard-action-buttons {
-  display: flex; gap: 12px; justify-content: center;
-  margin-top: 1.25rem; flex-wrap: wrap;
+// Quick actions inside sidebar
+.sidebar-actions {
+  display: flex; flex-direction: column; gap: .65rem;
 
   .action-btn {
-    display: inline-flex; align-items: center;
-    padding: 10px 22px; border-radius: $r-btn;
-    font-size: .9rem; font-weight: 700; font-family: $font;
+    display: flex; align-items: center;
+    padding: .7rem 1rem; border-radius: 12px;
+    font-size: .88rem; font-weight: 700; font-family: $font;
     cursor: pointer; border: 2px solid transparent;
-    transition: all $ease;
+    transition: all $ease; width: 100%; gap: .6rem;
+
+    .action-label { flex: 1; text-align: left; }
+    .action-badge {
+      font-size: .7rem; font-weight: 800;
+      padding: .15rem .55rem; border-radius: $r-pill;
+    }
 
     &.save-btn {
       background: #eff6ff; color: $card-blue; border-color: #bfdbfe;
+      .action-badge { background: #dbeafe; color: $card-blue; }
       &:hover { background: #dbeafe; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,.15); }
-      &.active { background: $card-blue; color: $white; border-color: $card-blue; }
+      &.active { background: $card-blue; color: $white; border-color: $card-blue;
+        .action-badge { background: rgba(255,255,255,.2); color: $white; }
+      }
     }
 
     &.mastered-btn {
       background: #f0fdf4; color: $card-green; border-color: #bbf7d0;
+      .action-badge { background: #dcfce7; color: $card-green; }
       &:hover { background: #dcfce7; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,.15); }
-      &.active { background: $card-green; color: $white; border-color: $card-green; }
+      &.active { background: $card-green; color: $white; border-color: $card-green;
+        .action-badge { background: rgba(255,255,255,.2); color: $white; }
+      }
+    }
+  }
+}
+
+// Word info inside sidebar
+.sidebar-word-info {
+  .info-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: .5rem 0; border-bottom: 1px solid $border;
+    gap: .5rem;
+    &:last-child { border-bottom: none; }
+
+    .info-key {
+      font-size: .78rem; font-weight: 700; color: $text-muted;
+      min-width: 60px;
+    }
+    .info-val {
+      font-size: .85rem; font-weight: 700; color: $text-body;
+      text-align: right;
+    }
+  }
+}
+
+// Keyboard hint card
+.keyboard-hint-card {
+  display: flex; flex-direction: column; gap: .45rem;
+
+  .kb-row {
+    display: flex; align-items: center; gap: .6rem;
+    font-size: .78rem; color: $text-muted; font-weight: 600;
+
+    kbd {
+      background: $bg; border: 1.5px solid $border;
+      border-radius: 6px; padding: .1rem .45rem;
+      font-size: .72rem; font-weight: 800; color: $text-body;
+      font-family: $font; min-width: 28px; text-align: center;
+      box-shadow: 0 2px 0 $border;
     }
   }
 }
@@ -262,54 +430,64 @@ $ease:         0.22s cubic-bezier(.4,0,.2,1);
   text-align: center; font-size: .875rem; font-weight: 700;
   color: $card-green; margin-top: .5rem; min-height: 20px;
   transition: opacity .3s;
+  background: #f0fdf4; border: 1.5px solid #bbf7d0;
+  border-radius: $r-pill; padding: .4rem 1.25rem; display: inline-block;
 }
+
+.status-wrap {
+  display: flex; justify-content: center; width: 100%;
+  margin-top: .5rem; min-height: 36px;
+}
+
+// ─── Badges ──────────────────────────────────────────────────────────────────
+.mastered-star { color: $card-amber; font-size: 1.2rem; }
+.mastered-count { color: $card-green; font-weight: 700; font-size: .85rem; }
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
 .empty-state {
-  display: flex; justify-content: center; align-items: center;
-  height: 400px; width: 100%;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  height: 380px; width: 100%;
   background: $white; border-radius: $r-card;
-  border: 2px solid $border;
-  color: $text-muted; font-size: 1.1rem; font-weight: 600;
-  box-shadow: $shadow-card;
-}
+  border: 2px dashed $border; color: $text-muted;
+  gap: .5rem;
 
-// ─── Navigation Controls (legacy) ────────────────────────────────────────────
-.navigation-controls {
-  display: flex; justify-content: space-between;
-  width: 100%; max-width: 500px; margin-top: auto;
-
-  .btn {
-    display: flex; align-items: center; gap: .5rem;
-    padding: .75rem 1.5rem; font-family: $font;
-    font-size: 1rem; font-weight: 700; border-radius: $r-card;
-    border: 1.5px solid $border; background: $white; color: $text-body;
-    box-shadow: $shadow-card; transition: all $ease; cursor: pointer;
-    &:hover { transform: translateY(-2px); box-shadow: $shadow-hover; }
-    &:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
-    &:last-child {
-      background: $mint; border-color: $mint; color: $white; border-width: 0;
-      box-shadow: $shadow-btn;
-      &:hover { background: $mint-dark; }
-    }
-  }
+  .empty-icon { font-size: 2.5rem; opacity: .35; }
+  p { font-size: 1rem; font-weight: 700; margin: 0; }
+  span { font-size: .85rem; }
 }
 
 // ─── Responsive ──────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .flashcard-learn-header {
-    padding: 1.5rem 1.25rem 2rem;
-    .set-title { font-size: 1.2rem; padding: 0 1rem; }
+    padding: 1.25rem 1.25rem 1.5rem;
+    .set-title { font-size: 1.15rem; }
   }
-  .flashcard-learn-container { padding: 1.5rem 1rem; }
-  .flashcard-scene { height: 320px; }
+
+  .flashcard-stats-strip {
+    padding: .75rem 1rem;
+    .stat-item { padding: 0 1rem; .stat-value { font-size: 1.1rem; } }
+  }
+
+  .flashcard-learn-container { padding: 1.25rem 1rem; }
+
+  .flashcard-layout {
+    grid-template-columns: 1fr;
+    .flashcard-sidebar { order: 2; }
+  }
+
+  .flashcard-scene { height: 300px; }
+
   .flashcard-front .flashcard-content .word { font-size: 2.2rem; }
   .flashcard-back .flashcard-content .meaning { font-size: 2rem; }
-  .nav-arrow-button { width: 44px; height: 44px; font-size: 1rem; }
+
+  .sidebar-actions { flex-direction: row; flex-wrap: wrap;
+    .action-btn { flex: 1; min-width: 140px; }
+  }
+  .keyboard-hint-card { display: none; }
 }
 
 @media (max-width: 576px) {
-  .flashcard-scene { height: 280px; }
+  .flashcard-scene { height: 260px; }
   .flashcard-front .flashcard-content .word { font-size: 1.8rem; }
   .flashcard-back .flashcard-content .meaning { font-size: 1.6rem; }
 }

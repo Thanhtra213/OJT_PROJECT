@@ -40,14 +40,10 @@ const QuizPublish = () => {
 
   const getQuizTypeBadge = (type) => {
     switch (type) {
-      case 0:
-        return <Badge bg="info">Practice</Badge>;
-      case 1:
-        return <Badge bg="danger">Exam</Badge>;
-      case 2:
-        return <Badge bg="warning" text="dark">Assignment</Badge>;
-      default:
-        return <Badge bg="secondary">Quiz</Badge>;
+      case 0: return <span className="brand-badge badge-practice">Practice</span>;
+      case 1: return <span className="brand-badge badge-exam">Exam</span>;
+      case 2: return <span className="brand-badge badge-assignment">Assignment</span>;
+      default: return <span className="brand-badge badge-default">Quiz</span>;
     }
   };
 
@@ -72,26 +68,22 @@ const QuizPublish = () => {
   }
 
   return (
-    <Container className="quiz-publish-page py-4">
-      {/* Header */}
-      <div className="d-flex align-items-center mb-4">
-        <Button 
-          variant="link" 
-          onClick={() => navigate(-1)} 
-          className="p-0 me-3"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} size="lg" /> Quay lại
-        </Button>
-        <div>
-          <h3 className="mb-0 text-primary">
-            <FontAwesomeIcon icon={faFileAlt} className="me-2" />
+    <div className="quiz-publish-page py-4">
+      <Container>
+        {/* Header */}
+        <div className="page-header">
+          <button 
+            className="back-btn" 
+            onClick={() => navigate(-1)} 
+          >
+            <FontAwesomeIcon icon={faArrowLeft} /> Quay lại
+          </button>
+          <h3>
+            <FontAwesomeIcon icon={faFileAlt} className="me-3" style={{color: '#00c896'}}/>
             Danh sách Quiz
           </h3>
-          <p className="text-muted mb-0 mt-1">
-            Chọn quiz để bắt đầu luyện tập
-          </p>
+          <p className="text-muted">Chọn quiz để bắt đầu luyện tập và kiểm tra năng lực của bạn.</p>
         </div>
-      </div>
 
       {error && (
         <Alert variant="danger" dismissible onClose={() => setError("")}>
@@ -108,62 +100,32 @@ const QuizPublish = () => {
             
             return (
               <Col md={6} lg={4} key={quizId} className="mb-4">
-                <Card 
-                  className="quiz-card h-100 shadow-sm hover-card"
+                <div 
+                  className="qcard"
                   onClick={() => navigate(`/quiz/start/${quizId}`)}
-                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                  <Card.Body className="d-flex flex-column">
-                    {/* Header */}
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div className="flex-grow-1">
-                        <h5 className="card-title mb-2 text-primary">
-                          {quiz.title || "Quiz không có tiêu đề"}
-                        </h5>
-                        {getQuizTypeBadge(quiz.quizType)}
-                      </div>
-                      <FontAwesomeIcon 
-                        icon={faPlay} 
-                        className="text-primary" 
-                        size="lg"
-                      />
+                  <div className="qcard-head">
+                    <h4>{quiz.title || "Quiz không có tiêu đề"}</h4>
+                    <div className="play-icon">
+                      <FontAwesomeIcon icon={faPlay} />
                     </div>
+                  </div>
 
-                    {/* Description */}
-                    <Card.Text className="text-muted mb-3 flex-grow-1">
-                      {quiz.description || "Không có mô tả"}
-                    </Card.Text>
+                  <div className="qcard-body">
+                    <p>{quiz.description || "Chưa có mô tả cho quiz này."}</p>
+                  </div>
 
-                    {/* Footer Info */}
-                    <div className="d-flex justify-content-between align-items-center text-muted small border-top pt-3">
-                      <div className="d-flex align-items-center">
-                        <FontAwesomeIcon icon={faListOl} className="me-2" />
-                        <span>{totalQuestions} câu hỏi</span>
-                      </div>
-                      {quiz.duration && (
-                        <div className="d-flex align-items-center">
-                          <FontAwesomeIcon icon={faClock} className="me-2" />
-                          <span>{quiz.duration} phút</span>
-                        </div>
-                      )}
-                    </div>
+                  <div className="qcard-meta">
+                    <span><FontAwesomeIcon icon={faListOl} /> {totalQuestions} câu hỏi</span>
+                    {quiz.duration && (
+                      <span><FontAwesomeIcon icon={faClock} /> {quiz.duration} phút</span>
+                    )}
+                  </div>
 
-                    {/* Start Button */}
-                    <Button 
-                      variant="primary" 
-                      className="w-100 mt-3"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/quiz/start/${quizId}`);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faPlay} className="me-2" />
-                      Bắt đầu làm bài
-                    </Button>
-                  </Card.Body>
-                </Card>
+                  <div className="qcard-foot">
+                    {getQuizTypeBadge(quiz.quizType)}
+                  </div>
+                </div>
               </Col>
             );
           })}
@@ -183,7 +145,8 @@ const QuizPublish = () => {
           </Card.Body>
         </Card>
       )}
-    </Container>
+      </Container>
+    </div>
   );
 };
 
