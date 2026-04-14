@@ -1,49 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
-$font: 'Nunito', sans-serif;
-$mint: #00c896;
-$mint-dark: #00a87c;
-$mint-light: #e6faf4;
-$mint-mid: #b3f0de;
-$white: #ffffff;
-$bg: #f9fafb;
-$text-dark: #111827;
-$text-body: #374151;
-$text-muted: #9ca3af;
-$border: #e5e7eb;
-$shadow-sm: 0 2px 10px rgba(0, 200, 150, .08);
+$font:        'Nunito', sans-serif;
+$mint:        #00c896;
+$mint-dark:   #00a87c;
+$mint-light:  #e6faf4;
+$mint-mid:    #b3f0de;
+$white:       #ffffff;
+$bg:          #f9fafb;
+$text-dark:   #111827;
+$text-body:   #374151;
+$text-muted:  #9ca3af;
+$border:      #e5e7eb;
+$shadow-sm:   0 2px 10px rgba(0, 200, 150, .08);
 $shadow-card: 0 4px 24px rgba(0, 0, 0, .07);
 $shadow-hover: 0 12px 40px rgba(0, 200, 150, .18);
 $r-card: 20px;
 $r-pill: 100px;
-$r-btn: 50px;
-$ease: 0.22s cubic-bezier(.4, 0, .2, 1);
+$r-btn:  50px;
+$ease:   0.22s cubic-bezier(.4, 0, .2, 1);
 
 @keyframes pulse-play {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.25);
-    opacity: .7;
-  }
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.25); opacity: .7; }
 }
 
 @keyframes spin-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0);     }
 }
 
 // ─── Page shell ───────────────────────────────────────────────────────────────
@@ -63,15 +52,8 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   gap: 1rem;
   color: $text-muted;
 
-  .spinner-border {
-    color: $mint !important;
-    width: 3rem;
-    height: 3rem;
-  }
-
-  p {
-    font-weight: 600;
-  }
+  .spinner-border { color: $mint !important; width: 3rem; height: 3rem; }
+  p { font-weight: 600; }
 }
 
 // ─── Back button ─────────────────────────────────────────────────────────────
@@ -100,22 +82,26 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   }
 }
 
-// ─── Video player ─────────────────────────────────────────────────────────────
+// ─── Video player wrapper ─────────────────────────────────────────────────────
+// Dùng padding-top 56.25% để giữ tỉ lệ 16:9
+// Resume banner nằm NGOÀI wrapper (absolute so với wrapper)
 .video-player-wrapper {
   width: 100%;
   padding-top: 56.25%;
   position: relative;
   background: #0f172a;
   border-radius: $r-card;
-  overflow: hidden;
+  overflow: visible; // ← phải là visible để banner không bị clip
   box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0; // gap xử lý bên dưới
   border: 2px solid $mint-mid;
 
   .video-container,
   .player-placeholder {
     position: absolute;
     inset: 0;
+    border-radius: calc($r-card - 2px);
+    overflow: hidden;
   }
 
   iframe,
@@ -136,28 +122,62 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     text-align: center;
     background: linear-gradient(135deg, #0f172a, #1e293b);
 
-    svg,
-    .fa {
-      font-size: 3rem;
-      color: $mint;
-      opacity: .7;
-    }
-
-    p {
-      font-weight: 600;
-      color: rgba(255, 255, 255, .75);
-    }
-
-    &.error {
-
-      svg,
-      .fa {
-        color: #f97316;
-      }
-    }
+    svg, .fa { font-size: 3rem; color: $mint; opacity: .7; }
+    p { font-weight: 600; color: rgba(255, 255, 255, .75); }
+    &.error { svg, .fa { color: #f97316; } }
   }
 }
 
+// ─── Resume banner ────────────────────────────────────────────────────────────
+// Nằm ngoài video-container → absolute so với video-player-wrapper
+.resume-banner {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-family: $font;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .35);
+  animation: slide-down .3s ease;
+  pointer-events: auto;
+
+  &__text { color: #cbd5e1; }
+
+  &__time {
+    color: #34d399;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  &__btn {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: $font;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background $ease;
+
+    &:hover { background: rgba(255, 255, 255, 0.24); }
+  }
+}
+
+// ─── iframe wrapper (bên trong video-container) ───────────────────────────────
 .iframe-wrapper {
   position: relative;
   width: 100%;
@@ -166,47 +186,109 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   iframe {
     width: 100%;
     height: 100%;
+    display: block;
+    border: none;
+  }
+}
+
+// ─── GDrive duration input box ────────────────────────────────────────────────
+.gdrive-duration-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  animation: slide-down .25s ease;
+
+  &__warn {
+    color: #c2410c;
+    font-weight: 800;
+    font-size: .85rem;
+    font-family: $font;
+    width: 100%;
   }
 
-  .resume-banner {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.82);
+  &__label {
+    color: $text-body;
+    font-size: .85rem;
+    font-family: $font;
+    font-weight: 600;
+  }
+
+  &__input {
+    width: 90px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #fed7aa;
+    font-size: .88rem;
+    font-family: $font;
+    font-weight: 700;
+    color: $text-dark;
+    outline: none;
+    transition: border-color $ease;
+
+    &:focus { border-color: #f97316; }
+  }
+
+  &__btn {
+    background: #f97316;
     color: #fff;
-    border-radius: 10px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    white-space: nowrap;
-    font-size: 13px;
-    border: 0.5px solid rgba(255, 255, 255, 0.15);
-    z-index: 10;
-    pointer-events: auto;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-weight: 800;
+    font-family: $font;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background $ease, box-shadow $ease;
 
-    &__text {
-      color: #ccc;
+    &:hover {
+      background: #ea6a0a;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, .35);
     }
+  }
+}
 
-    &__time {
-      color: #4ade80;
-      font-weight: 500;
-    }
+// Đã xác nhận duration
+.gdrive-duration-confirmed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: $mint-light;
+  border: 1.5px solid $mint-mid;
+  border-radius: 14px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-family: $font;
+  font-size: .85rem;
+  color: $mint-dark;
+  font-weight: 600;
+  animation: slide-down .25s ease;
 
-    &__btn {
-      background: rgba(255, 255, 255, 0.15);
+  strong { font-weight: 800; }
+
+  &__edit {
+    background: transparent;
+    border: 1.5px solid $mint;
+    border-radius: 8px;
+    color: $mint-dark;
+    font-family: $font;
+    font-weight: 700;
+    font-size: .78rem;
+    padding: 3px 12px;
+    cursor: pointer;
+    transition: all $ease;
+    margin-left: auto;
+
+    &:hover {
+      background: $mint;
       color: #fff;
-      border: 0.5px solid rgba(255, 255, 255, 0.25);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
     }
   }
 }
@@ -218,6 +300,7 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   box-shadow: $shadow-card;
   border: 1.5px solid $border;
   padding: 0 1.5rem 1.5rem;
+  margin-top: 1.25rem;
   animation: spin-in .3s ease;
 
   .nav-tabs {
@@ -280,16 +363,8 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   border-radius: 16px !important;
   padding: 1rem 1.25rem !important;
 
-  h5 {
-    font-weight: 800;
-    color: $text-dark;
-    font-size: 1rem;
-  }
-
-  .text-muted {
-    color: $text-muted !important;
-    font-size: .85rem;
-  }
+  h5 { font-weight: 800; color: $text-dark; font-size: 1rem; }
+  .text-muted { color: $text-muted !important; font-size: .85rem; }
 
   .btn-success {
     background: $mint;
@@ -297,11 +372,7 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     border-radius: $r-btn;
     font-family: $font;
     font-weight: 700;
-
-    &:hover {
-      background: $mint-dark;
-      box-shadow: 0 4px 14px rgba(0, 200, 150, .35);
-    }
+    &:hover { background: $mint-dark; box-shadow: 0 4px 14px rgba(0, 200, 150, .35); }
   }
 
   .badge.bg-success {
@@ -346,17 +417,8 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     }
 
     .resource-info {
-      strong {
-        display: block;
-        color: $text-dark;
-        font-weight: 800;
-        font-size: .95rem;
-      }
-
-      span {
-        color: $text-muted;
-        font-size: .85rem;
-      }
+      strong { display: block; color: $text-dark; font-weight: 800; font-size: .95rem; }
+      span   { color: $text-muted; font-size: .85rem; }
     }
   }
 }
@@ -374,33 +436,13 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     box-shadow: $shadow-sm;
     transition: all $ease;
 
-    &:hover {
-      border-color: $mint !important;
-      box-shadow: $shadow-hover;
-    }
+    &:hover { border-color: $mint !important; box-shadow: $shadow-hover; }
 
-    .card-body {
-      padding: 1.25rem;
-    }
-
-    strong {
-      font-weight: 800;
-      color: $text-dark;
-    }
-
-    .text-warning {
-      color: #f59e0b !important;
-    }
-
-    .text-muted {
-      color: $text-muted !important;
-    }
-
-    p {
-      color: $text-body;
-      font-size: .95rem;
-      margin: 0;
-    }
+    .card-body { padding: 1.25rem; }
+    strong { font-weight: 800; color: $text-dark; }
+    .text-warning { color: #f59e0b !important; }
+    .text-muted   { color: $text-muted !important; }
+    p { color: $text-body; font-size: .95rem; margin: 0; }
   }
 }
 
@@ -425,48 +467,19 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     background: $white;
     border-bottom: 2px solid $border;
 
-    h5 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: $text-dark;
-    }
-
-    span {
-      font-size: .82rem;
-      font-weight: 700;
-      background: $mint-light;
-      color: $mint-dark;
-      padding: .25rem .8rem;
-      border-radius: $r-pill;
-    }
+    h5   { margin: 0; font-size: 1.05rem; font-weight: 900; color: $text-dark; }
+    span { font-size: .82rem; font-weight: 700; background: $mint-light; color: $mint-dark; padding: .25rem .8rem; border-radius: $r-pill; }
   }
 
   .accordion {
     overflow-y: auto;
     flex-grow: 1;
 
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
+    &::-webkit-scrollbar       { width: 4px; }
+    &::-webkit-scrollbar-track { background: $bg; }
+    &::-webkit-scrollbar-thumb { background: $mint-mid; border-radius: 99px; }
 
-    &::-webkit-scrollbar-track {
-      background: $bg;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $mint-mid;
-      border-radius: 99px;
-    }
-
-    .accordion-item {
-      border: none;
-      border-bottom: 1px solid $border;
-
-      &:last-child {
-        border-bottom: none;
-      }
-    }
+    .accordion-item { border: none; border-bottom: 1px solid $border; &:last-child { border-bottom: none; } }
 
     .accordion-button {
       font-family: $font;
@@ -477,27 +490,13 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
       box-shadow: none;
       padding: .9rem 1.2rem;
 
-      &:not(.collapsed) {
-        background: $mint-light;
-        color: $mint-dark;
-      }
-
-      &:focus {
-        box-shadow: none;
-      }
-
-      &::after {
-        filter: none;
-      }
+      &:not(.collapsed) { background: $mint-light; color: $mint-dark; }
+      &:focus { box-shadow: none; }
+      &::after { filter: none; }
     }
 
-    .chapter-header strong {
-      font-size: .95rem;
-    }
-
-    .accordion-body {
-      padding: 0;
-    }
+    .chapter-header strong { font-size: .95rem; }
+    .accordion-body { padding: 0; }
   }
 }
 
@@ -517,22 +516,9 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
     color: $text-muted;
     transition: all $ease;
 
-    .video-icon {
-      font-size: 1rem;
-      color: $border;
-      flex-shrink: 0;
-    }
-
-    .video-name {
-      flex-grow: 1;
-      line-height: 1.45;
-    }
-
-    .video-badges {
-      display: flex;
-      gap: .3rem;
-      flex-shrink: 0;
-    }
+    .video-icon   { font-size: 1rem; color: $border; flex-shrink: 0; }
+    .video-name   { flex-grow: 1; line-height: 1.45; }
+    .video-badges { display: flex; gap: .3rem; flex-shrink: 0; }
 
     .badge {
       font-family: $font;
@@ -541,39 +527,19 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
       border-radius: $r-pill;
       padding: .3em .75em;
 
-      &.bg-info {
-        background: #e0f2fe !important;
-        color: #0284c7 !important;
-      }
-
-      &.bg-warning {
-        background: #fef9c3 !important;
-        color: #a16207 !important;
-      }
-
-      &.bg-success {
-        background: $mint-light !important;
-        color: $mint-dark !important;
-      }
+      &.bg-info    { background: #e0f2fe !important; color: #0284c7 !important; }
+      &.bg-warning { background: #fef9c3 !important; color: #a16207 !important; }
+      &.bg-success { background: $mint-light !important; color: $mint-dark !important; }
     }
 
     &.watchable {
       cursor: pointer;
       color: $text-body;
-
-      .video-icon {
-        color: $mint;
-      }
-
-      &:hover {
-        background: $mint-light;
-        color: $text-dark;
-      }
+      .video-icon { color: $mint; }
+      &:hover { background: $mint-light; color: $text-dark; }
     }
 
-    &.locked {
-      opacity: .55;
-    }
+    &.locked { opacity: .55; }
 
     &.playing {
       background: $mint-light;
@@ -581,20 +547,13 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
       font-weight: 800;
       border-left: 4px solid $mint;
       padding-left: calc(1.2rem - 4px);
-
-      .video-icon {
-        color: $mint;
-      }
-
-      .playing-icon {
-        color: $mint;
-        animation: pulse-play 1.5s infinite;
-      }
+      .video-icon    { color: $mint; }
+      .playing-icon  { color: $mint; animation: pulse-play 1.5s infinite; }
     }
   }
 }
 
-// ─── Bootstrap button overrides ───────────────────────────────────────────────
+// ─── Bootstrap overrides ──────────────────────────────────────────────────────
 .course-detail-page {
   .btn {
     font-family: $font;
@@ -606,68 +565,24 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
   .btn-primary {
     background: $mint;
     border: none;
-
-    &:hover {
-      background: $mint-dark;
-      box-shadow: 0 6px 20px rgba(0, 200, 150, .35);
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      background: $mint-dark;
-    }
+    &:hover  { background: $mint-dark; box-shadow: 0 6px 20px rgba(0, 200, 150, .35); transform: translateY(-1px); }
+    &:active { background: $mint-dark; }
   }
 
   .btn-outline-primary {
     border: 2px solid $mint;
     color: $mint-dark;
     background: transparent;
-
-    &:hover {
-      background: $mint;
-      color: $white;
-    }
+    &:hover { background: $mint; color: $white; }
   }
 
-  // Nav-tabs color override (fix black text issue)
-  .nav-tabs .nav-link {
-    color: $text-muted !important;
-  }
+  .nav-tabs .nav-link        { color: $text-muted !important; }
+  .nav-tabs .nav-link.active { color: $mint-dark  !important; }
+  .nav-tabs .nav-link:hover  { color: $mint-dark  !important; }
 
-  .nav-tabs .nav-link.active {
-    color: $mint-dark !important;
-  }
-
-  .nav-tabs .nav-link:hover {
-    color: $mint-dark !important;
-  }
-
-  // Alert
-  .alert-info {
-    background: $mint-light;
-    border: 1.5px solid $mint-mid;
-    color: $mint-dark;
-    border-radius: 14px;
-    font-weight: 600;
-  }
-
-  .alert-warning {
-    border-radius: 14px;
-  }
-
-  .alert-danger {
-    border-radius: 14px;
-  }
-
-  // Feedback page button
-  .course-feedback-page .btn-primary[type="submit"] {
-    background: $mint;
-    border: none;
-
-    &:hover {
-      background: $mint-dark;
-    }
-  }
+  .alert-info    { background: $mint-light; border: 1.5px solid $mint-mid; color: $mint-dark; border-radius: 14px; font-weight: 600; }
+  .alert-warning { border-radius: 14px; }
+  .alert-danger  { border-radius: 14px; }
 }
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
@@ -680,15 +595,9 @@ $ease: 0.22s cubic-bezier(.4, 0, .2, 1);
 }
 
 @media (max-width: 576px) {
-  .course-detail-page {
-    padding: 1rem 0 3rem;
-  }
-
-  .course-content-tabs {
-    padding: 0 1rem 1rem;
-  }
-
-  .video-player-wrapper {
-    border-radius: 14px;
-  }
+  .course-detail-page     { padding: 1rem 0 3rem; }
+  .course-content-tabs    { padding: 0 1rem 1rem; }
+  .video-player-wrapper   { border-radius: 14px; }
+  .gdrive-duration-box    { padding: 10px 14px; }
+  .resume-banner          { font-size: 12px; padding: 8px 14px; white-space: normal; }
 }

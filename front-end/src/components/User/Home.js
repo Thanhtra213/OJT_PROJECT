@@ -15,10 +15,30 @@ import {
   faTrophy, faFire, faBookOpen, faCheckCircle, faClock,
   faLock, faGraduationCap, faLayerGroup, faMicrophone,
   faHeadphones, faPencilAlt, faFileAlt, faComments,
-  faTrash, faPlay, faVideo, faUsers,
-  faChevronRight, faEdit, faEllipsisV, faRocket, faStar, faHistory
+  faTrash, faPlay, faVideo,
+  faChevronRight, faRocket, faStar, faHistory
 } from "@fortawesome/free-solid-svg-icons";
 
+
+// DEBUG - xóa sau khi fix
+import * as _CourseAPI from "../../middleware/courseAPI";
+import * as _MembershipAPI from "../../middleware/membershipAPI";
+import * as _ReviewAPI from "../../middleware/practiceReviewAPI";
+import * as _PlacementAPI from "../../middleware/placementTestAPI";
+import * as _VideoAPI from "../../middleware/videoProgressAPI";
+import * as _VideoHelper from "../../redux/videoWatchHelper";
+import * as _AIChat from "../AIChat/AI";
+
+console.table({
+  getCourses: typeof _CourseAPI.getCourses,
+  checkMembership: typeof _MembershipAPI.checkMembership,
+  getReviewList: typeof _ReviewAPI.getReviewList,
+  isSpeakingSubmission: typeof _ReviewAPI.isSpeakingSubmission,
+  getPlacementTests: typeof _PlacementAPI.getPlacementTests,
+  getVideoProgressFromDB: typeof _VideoAPI.getVideoProgressFromDB,
+  getUserHistoryKey: typeof _VideoHelper.getUserHistoryKey,
+  AIChat_default: typeof _AIChat.default,
+});
 // ══════════════════════════════════════════════════════════════════
 // CONSTANTS & HELPERS
 // ══════════════════════════════════════════════════════════════════
@@ -136,6 +156,33 @@ const Home = () => {
     const h = Math.floor(t / 60), mn = t % 60;
     return h > 0 ? (mn > 0 ? `${h} giờ ${mn} phút` : `${h} giờ`) : `${mn} phút`;
   };
+
+  // ✅ FIX: Hàm format thời lượng từ giây (chính xác hơn)
+  const fmtSec = (s) => {
+    if (s == null || isNaN(s) || s <= 0) return "0 phút";
+    const totalSec = Math.max(0, Math.round(Number(s)));
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const sc = totalSec % 60;
+    if (h > 0) return m > 0 ? `${h} giờ ${m} phút` : `${h} giờ`;
+    if (m > 0) return sc > 0 ? `${m} phút ${sc} giây` : `${m} phút`;
+    return `${sc} giây`;
+  };
+
+  // ✅ FIX: Lấy thời lượng chính xác từ entry (ưu tiên durationSec, fallback sang duration phút)
+  const getDuration = (lesson) => {
+    if (lesson.durationSec > 0) return fmtSec(lesson.durationSec);
+    if (lesson.duration > 0) return fmtDur(lesson.duration);
+    return "0 phút";
+  };
+
+  // ✅ FIX: Lấy thời gian đã xem chính xác từ entry (ưu tiên watchedSec, fallback sang watchedMinutes phút)
+  const getWatched = (lesson) => {
+    if (lesson.watchedSec > 0) return fmtSec(lesson.watchedSec);
+    if (lesson.watchedMinutes > 0) return fmtDur(lesson.watchedMinutes);
+    return "0 phút";
+  };
+
   const toHM = fmtDur;
 
   const cleanHistory = () => {
@@ -183,7 +230,10 @@ const Home = () => {
   const loadDbHistory = async () => {
     try {
       const localHistory = JSON.parse(localStorage.getItem(getUserHistoryKey()) || "[]");
-      if (!localHistory.length) return;
+      if (!localHistory.length) {
+        setDbLessonHistory([]);
+        return;
+      }
 
       const enriched = await Promise.all(
         localHistory.map(async (item) => {
@@ -197,14 +247,32 @@ const Home = () => {
                 dbProgress = Math.min(99, Math.round((dbData.lastPositionSec / dbData.totalDurationSec) * 100));
               }
               const finalProgress = Math.max(item.progress || 0, dbProgress);
-              return { ...item, progress: finalProgress, isCompleted: dbData.isCompleted || finalProgress === 100 };
+
+              // ✅ FIX: Ưu tiên dùng durationSec và watchedSec từ DB nếu có
+              const durationSec = dbData.totalDurationSec > 0 ? dbData.totalDurationSec : (item.durationSec || 0);
+              const watchedSec = dbData.isCompleted
+                ? durationSec
+                : (dbData.lastPositionSec > 0 ? dbData.lastPositionSec : (item.watchedSec || 0));
+
+              return {
+                ...item,
+                progress: finalProgress,
+                isCompleted: dbData.isCompleted || finalProgress === 100,
+                durationSec,
+                watchedSec,
+                // Cập nhật legacy fields để đồng bộ
+                duration: durationSec > 0 ? Math.round(durationSec / 60) : item.duration,
+                watchedMinutes: watchedSec > 0 ? Math.round(watchedSec / 60) : item.watchedMinutes,
+              };
             }
             return item;
           } catch { return item; }
         })
       );
       setDbLessonHistory(enriched);
-    } catch { }
+    } catch {
+      setDbLessonHistory([]);
+    }
   };
 
   const loadStats = () => {
@@ -238,11 +306,14 @@ const Home = () => {
     } catch { setAttempts([]); }
   };
 
+  // ✅ FIX: Xóa lịch sử — reset cả dbLessonHistory và dispatch event
   const handleClearHistory = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem video?")) {
       localStorage.removeItem(getUserHistoryKey());
-      loadHistory();
+      setLessonHistory([]);
+      setDbLessonHistory([]);  // ← Reset ngay lập tức, không cần F5
       loadStats();
+      window.dispatchEvent(new Event("videoHistoryUpdated"));
     }
   };
 
@@ -298,15 +369,20 @@ const Home = () => {
     }
   }, [activeTab]);
 
+  // ✅ FIX: Lắng nghe event videoHistoryUpdated — reload cả dbLessonHistory
   useEffect(() => {
-    const h = () => { loadHistory(); loadStats(); };
+    const h = () => {
+      loadHistory();
+      loadStats();
+      loadDbHistory(); // ← Thêm để đồng bộ khi xem video xong
+    };
     window.addEventListener("videoHistoryUpdated", h);
     return () => window.removeEventListener("videoHistoryUpdated", h);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (activeTab === "baihoc") { loadHistory(); loadStats(); }
+    if (activeTab === "baihoc") { loadHistory(); loadStats(); loadDbHistory(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -503,11 +579,13 @@ const Home = () => {
                                   <FontAwesomeIcon icon={faClock} className="me-1" />{fmtDT(lesson.lastWatched)}
                                 </p>
                                 <div className="d-flex justify-content-between mb-1" style={{ fontSize: ".8rem", color: "#374151" }}>
-                                  <span><FontAwesomeIcon icon={faVideo} className="me-1" />Thời lượng: <strong>{fmtDur(lesson.duration)}</strong></span>
+                                  {/* ✅ FIX: Dùng getDuration() để lấy thời lượng chính xác từ giây */}
+                                  <span><FontAwesomeIcon icon={faVideo} className="me-1" />Thời lượng: <strong>{getDuration(lesson)}</strong></span>
                                   <span style={{ fontWeight: 800, color: lesson.progress >= 100 ? "#059669" : "#00a87c" }}>{lesson.progress}%</span>
                                 </div>
                                 <div style={{ fontSize: ".8rem", color: "#374151", marginBottom: "1rem" }}>
-                                  <FontAwesomeIcon icon={faClock} className="me-1" />Đã xem: <strong style={{ color: lesson.progress >= 100 ? "#059669" : "inherit" }}>{fmtDur(lesson.watchedMinutes)}</strong>
+                                  {/* ✅ FIX: Dùng getWatched() để lấy thời gian đã xem chính xác từ giây */}
+                                  <FontAwesomeIcon icon={faClock} className="me-1" />Đã xem: <strong style={{ color: lesson.progress >= 100 ? "#059669" : "inherit" }}>{getWatched(lesson)}</strong>
                                 </div>
                                 {lesson.progress > 0 && lesson.progress < 100 && (
                                   <div style={{ height: "7px", background: "#e6faf4", borderRadius: "99px", marginBottom: "1rem", overflow: "hidden" }}>
@@ -596,8 +674,6 @@ const Home = () => {
                               <p style={{ fontSize: ".82rem", color: "#9ca3af", marginBottom: ".85rem" }}>
                                 Level {course.courseLevel}{course.description ? `: ${course.description}` : ""}
                               </p>
-
-                              {/* Removed info section */}
 
                               {course.teacherID && (
                                 <div
@@ -1001,40 +1077,17 @@ const Home = () => {
                           {placementRecommendation.recommendedCourses.map(course => (
                             <div key={course.courseID}
                               className="p-3 mb-3"
-                              style={{
-                                background: '#f0fdf4',
-                                borderRadius: '12px',
-                                border: '2px solid #bbf7d0',
-                                cursor: 'pointer',
-                                transition: 'all .2s'
-                              }}
-                              onClick={() => {
-                                setShowRecommendationModal(false);
-                                navigate(`/course/${course.courseID}`);
-                              }}
-                              onMouseEnter={e => {
-                                e.currentTarget.style.background = '#dcfce7';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)';
-                              }}
-                              onMouseLeave={e => {
-                                e.currentTarget.style.background = '#f0fdf4';
-                                e.currentTarget.style.transform = '';
-                                e.currentTarget.style.boxShadow = '';
-                              }}
+                              style={{ background: '#f0fdf4', borderRadius: '12px', border: '2px solid #bbf7d0', cursor: 'pointer', transition: 'all .2s' }}
+                              onClick={() => { setShowRecommendationModal(false); navigate(`/course/${course.courseID}`); }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#dcfce7'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = '#f0fdf4'; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
                             >
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <div>
-                                  <h6 style={{ fontWeight: 800, color: '#111827', marginBottom: '.3rem' }}>
-                                    {course.courseName}
-                                  </h6>
-                                  <p style={{ color: '#6b7280', fontSize: '.85rem', marginBottom: 0 }}>
-                                    {course.description}
-                                  </p>
+                                  <h6 style={{ fontWeight: 800, color: '#111827', marginBottom: '.3rem' }}>{course.courseName}</h6>
+                                  <p style={{ color: '#6b7280', fontSize: '.85rem', marginBottom: 0 }}>{course.description}</p>
                                 </div>
-                                <Badge bg="success" style={{ padding: '.4rem .7rem' }}>
-                                  Level {course.courseLevel}
-                                </Badge>
+                                <Badge bg="success" style={{ padding: '.4rem .7rem' }}>Level {course.courseLevel}</Badge>
                               </div>
                               <div className="d-flex align-items-center gap-2" style={{ fontSize: '.8rem', color: '#6b7280' }}>
                                 <FontAwesomeIcon icon={faBookOpen} style={{ color: '#00c896' }} />
@@ -1044,37 +1097,15 @@ const Home = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-3" style={{ color: '#9ca3af' }}>
-                          Chưa có đề xuất khóa học phù hợp
-                        </div>
+                        <div className="text-center py-3" style={{ color: '#9ca3af' }}>Chưa có đề xuất khóa học phù hợp</div>
                       )}
                     </div>
                   </>
                 )}
               </Modal.Body>
               <Modal.Footer>
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowRecommendationModal(false)}
-                  style={{ borderRadius: '10px', fontWeight: 600 }}
-                >
-                  Đóng
-                </Button>
-                <Button
-                  style={{
-                    background: '#00c896',
-                    border: 'none',
-                    borderRadius: '10px',
-                    fontWeight: 600,
-                    padding: '.5rem 1.5rem'
-                  }}
-                  onClick={() => {
-                    setShowRecommendationModal(false);
-                    setActiveTab('khoahoc');
-                  }}
-                >
-                  Xem tất cả khóa học
-                </Button>
+                <Button variant="secondary" onClick={() => setShowRecommendationModal(false)} style={{ borderRadius: '10px', fontWeight: 600 }}>Đóng</Button>
+                <Button style={{ background: '#00c896', border: 'none', borderRadius: '10px', fontWeight: 600, padding: '.5rem 1.5rem' }} onClick={() => { setShowRecommendationModal(false); setActiveTab('khoahoc'); }}>Xem tất cả khóa học</Button>
               </Modal.Footer>
             </Modal>
           </Container>
@@ -1096,15 +1127,6 @@ const Home = () => {
       )}
 
       {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
-      {!showAIChat && (
-        <button className="ai-fab-btn" onClick={() => setShowAIChat(true)} title="Chat với AI">
-          <span className="ai-fab-label">AI
-            <svg width="14" height="14" viewBox="0 0 15 15" style={{ marginLeft: "2px", verticalAlign: "middle", position: "relative", top: "-1px" }}>
-              <polygon points="7.5,1.5 9.3,5.6 14,5.8 10.5,8.6 11.7,12.8 7.5,10.4 3.3,12.8 4.5,8.6 1,5.8 5.7,5.6" fill="#f9c74f" stroke="#f9c74f" strokeWidth="0.5" />
-            </svg>
-          </span>
-        </button>
-      )}
 
       <style>{`
         .ai-fab-btn{position:fixed;bottom:30px;right:30px;z-index:1100;background:#00c896;color:#fff;border:none;border-radius:50%;width:56px;height:56px;box-shadow:0 8px 32px rgba(0,200,150,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:'Nunito',sans-serif;transition:box-shadow .18s,transform .18s,background .18s;animation:fab-pop 1.2s cubic-bezier(.68,-.55,.27,1.55);}
@@ -1114,8 +1136,6 @@ const Home = () => {
         .play-overlay:hover{transform:translate(-50%,-50%) scale(1.15)!important;background:rgba(255,255,255,0.32)!important;}
         @media(max-width:600px){.ai-fab-btn{right:12px;bottom:12px;}}
       `}</style>
-
-      {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
     </div>
   );
 };
