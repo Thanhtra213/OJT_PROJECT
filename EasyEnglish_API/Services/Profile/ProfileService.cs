@@ -70,7 +70,7 @@ namespace EasyEnglish_API.Services.Profile
 
             if (req.Dob.HasValue)
             {
-                if (req.Dob.Value > DateOnly.FromDateTime(DateTime.UtcNow))
+                if (req.Dob.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
                     throw new ArgumentException("Ngày sinh không hợp lệ (lớn hơn hiện tại)");
 
                 if (req.Dob.Value.Year < 1900)

@@ -131,6 +131,7 @@ root.render(
               <ExamDetail />
             </AdminRoute>
           } />
+         
 
           {/* TEACHER ROUTES */}
           <Route path="/teacher/dashboard" element={
