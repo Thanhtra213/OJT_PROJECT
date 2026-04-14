@@ -39,7 +39,6 @@ const CourseDetail = () => {
   const iframeTickRef = useRef(null);
   const tickStartTimeRef = useRef(0);
   const tickStartOffset = useRef(0);
-  const iframeHasPlayedOnce = useRef(false);
 
   // YouTube IFrame Player API
   const ytPlayerRef = useRef(null);
@@ -93,7 +92,6 @@ const CourseDetail = () => {
       const m1 = url.match(/[?&]id=([^&]+)/); if (m1) fileId = m1[1];
       const m2 = url.match(/\/file\/d\/([^\/]+)/); if (m2) fileId = m2[1];
       const m3 = url.match(/open\?id=([^&]+)/); if (m3) fileId = m3[1];
-      // Phục hồi lại thành iframe do Native <video> bị chặn bởi Google Drive
       if (fileId) return { type: 'iframe', url: `https://drive.google.com/file/d/${fileId}/preview`, platform: 'gdrive' };
     }
     return { type: 'video', url, platform: 'direct' };
@@ -135,8 +133,6 @@ const CourseDetail = () => {
         courseName: courseObj.courseName,
         lessonID: video.videoID,
         lessonTitle: video.videoName,
-        videoURL: video.videoURL,
-        platform: video.platform,
       }, curSec, durSec);
       window.dispatchEvent(new Event("videoHistoryUpdated"));
 
@@ -225,7 +221,6 @@ const CourseDetail = () => {
               updateVideoHistory({
                 courseID: parseInt(id), courseName: courseObj.courseName,
                 lessonID: video.videoID, lessonTitle: video.videoName,
-                videoURL: video.videoURL, platform: video.platform,
               }, dur, dur);
               setVideoProgress(100);
               setCurrentTime(dur);
@@ -293,18 +288,10 @@ const CourseDetail = () => {
     if (iframeTickRef.current) return;
     iframePlayingRef.current = true;
     tickStartTimeRef.current = Date.now();
-
-    // Đối với GDrive iframe, bộ phát luôn tự động reset về 0 mỗi khi load lại.
-    // Nên nếu đây là lần bấm Play đầu tiên, ta ép bộ đếm thời gian phía dưới cũng về 0s
-    // để đồng bộ chạy khớp với hình ảnh video.
-    if (!iframeHasPlayedOnce.current) {
-      tickStartOffset.current = 0;
-      iframeHasPlayedOnce.current = true;
-    } else {
-      tickStartOffset.current = currentTimeRef.current;
-    }
+    tickStartOffset.current = currentTimeRef.current;
 
     let lastSaveCount = 0;
+
     iframeTickRef.current = setInterval(() => {
       if (document.hidden || !iframePlayingRef.current) return;
 
@@ -321,9 +308,20 @@ const CourseDetail = () => {
         const video = selectedVideoRef.current;
         const courseObj = courseRef.current;
         if (video) {
-          saveProgressToDB(video.videoID, Math.round(cur), false, Math.round(cur), dur > 0 ? Math.round(dur) : undefined);
+          saveProgressToDB(
+            video.videoID,
+            Math.round(cur),
+            false,
+            Math.round(cur),
+            dur > 0 ? Math.round(dur) : undefined,
+          );
           if (dur > 0 && courseObj) {
-            updateVideoHistory({ courseID: parseInt(id), courseName: courseObj.courseName, lessonID: video.videoID, lessonTitle: video.videoName, videoURL: video.videoURL, platform: video.platform }, cur, dur);
+            updateVideoHistory({
+              courseID: parseInt(id),
+              courseName: courseObj.courseName,
+              lessonID: video.videoID,
+              lessonTitle: video.videoName,
+            }, cur, dur);
             window.dispatchEvent(new Event("videoHistoryUpdated"));
           }
         }
@@ -361,7 +359,8 @@ const CourseDetail = () => {
     currentTimeRef.current = 0;
     videoDurationRef.current = 0;
     pendingResumeRef.current = 0;
-    iframeHasPlayedOnce.current = false;
+    tickStartTimeRef.current = 0;
+    tickStartOffset.current = 0;
     setCurrentTime(0);
     setVideoDuration(0);
     setVideoProgress(0);
@@ -417,8 +416,10 @@ const CourseDetail = () => {
           setVideoDuration(0);
         }
 
-        // GDrive: đợi user click (blur trick) để start tick
-        // (xóa startIframeTick tự động để không bị đếm tốn tiến độ ảo)
+        // GDrive: start tick ngay
+        if (videoInfo.platform === 'gdrive') {
+          startIframeTick();
+        }
 
         startProgressTracking(newVideo);
       } else {
@@ -471,7 +472,6 @@ const CourseDetail = () => {
     updateVideoHistory({
       courseID: parseInt(id), courseName: courseObj.courseName || "Khóa học",
       lessonID: video.videoID, lessonTitle: video.videoName,
-      videoURL: video.videoURL, platform: video.platform,
     }, dur, dur);
     setVideoProgress(100);
     setCurrentTime(dur);
@@ -520,7 +520,6 @@ const CourseDetail = () => {
     updateVideoHistory({
       courseID: parseInt(id), courseName: courseObj.courseName,
       lessonID: video.videoID, lessonTitle: video.videoName,
-      videoURL: video.videoURL, platform: video.platform,
     }, durSec, durSec);
 
     setVideoProgress(100);
@@ -585,33 +584,20 @@ const CourseDetail = () => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-  // ── Visibility change ───────────────────────────────────────────────────
-  const gdriveWasPlaying = useRef(false);
+  // ── Visibility change ─────────────────────────────────────────────────────
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.hidden) {
-        gdriveWasPlaying.current = iframePlayingRef.current || !!iframeTickRef.current;
         stopYtTick(true);
         stopIframeTick();
       } else {
         if (selectedVideoRef.current?.platform === 'gdrive' && !iframeTickRef.current) {
-          if (gdriveWasPlaying.current) startIframeTick();
+          startIframeTick();
         }
       }
     };
-    const onBlur = () => {
-      setTimeout(() => {
-        if (document.activeElement && iframeRef.current && document.activeElement === iframeRef.current) {
-          if (!iframeTickRef.current) startIframeTick();
-        }
-      }, 50);
-    };
     document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("blur", onBlur);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("blur", onBlur);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -836,17 +822,19 @@ const CourseDetail = () => {
                           )}
                         </div>
 
-                        <div style={{ marginTop: ".85rem" }}>
-                          <div style={{ height: "7px", background: "#b3f0de", borderRadius: "99px", overflow: "hidden" }}>
-                            <div style={{ height: "100%", width: `${videoProgress}%`, background: "#00c896", borderRadius: "99px", transition: "width .4s ease" }} />
+                        {videoDuration > 0 && (
+                          <div style={{ marginTop: ".85rem" }}>
+                            <div style={{ height: "7px", background: "#b3f0de", borderRadius: "99px", overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: `${videoProgress}%`, background: "#00c896", borderRadius: "99px", transition: "width .4s ease" }} />
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
+                              <small style={{ color: "#9ca3af", fontSize: ".76rem", fontWeight: 600 }}>
+                                {formatTime(currentTime)} / {formatTime(videoDuration)}
+                              </small>
+                              <small style={{ color: "#00a87c", fontWeight: 700, fontSize: ".76rem" }}>{videoProgress}%</small>
+                            </div>
                           </div>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: ".3rem" }}>
-                            <small style={{ color: "#9ca3af", fontSize: ".76rem", fontWeight: 600 }}>
-                              {formatTime(currentTime)} / {videoDuration > 0 ? formatTime(videoDuration) : "0:00"}
-                            </small>
-                            <small style={{ color: "#00a87c", fontWeight: 700, fontSize: ".76rem" }}>{videoProgress}%</small>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     )}
                   </div>
