@@ -26,6 +26,21 @@
       transition: all 0.2s ease;
     }
 
+    .btn-outline-primary {
+      border: 1px solid #cce3ff;
+      color: #0d6efd;
+      background: var(--teacher-card-bg);
+
+      &:hover,
+      &:focus {
+        background: #f0f7ff;
+        border-color: #0d6efd;
+        color: #0d6efd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+      }
+    }
+
     .btn-outline-secondary {
       border-color: #b3f0de;
       color: #00a87c;

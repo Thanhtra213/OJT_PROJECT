@@ -10,12 +10,14 @@ import {
   Col,
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BookOpen, Layers3, Sparkles } from "lucide-react";
 import {
   createFlashcardSet,
   updateFlashcardSet,
   getFlashcardSetById,
+  createFlashcardItem,
 } from "../../middleware/teacher/flashcardTeacherAPI";
+import ImportFlashcardModal from "./ImportFlashcardModal";
+import { ArrowLeft, BookOpen, Layers3, Sparkles, FileUp } from "lucide-react";
 import { getCourses } from "../../middleware/courseAPI";
 import "./createEditFlashcard.scss";
 
@@ -33,6 +35,9 @@ const CreateEditFlashcardSet = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  const [importedItems, setImportedItems] = useState([]);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -97,12 +102,41 @@ const CreateEditFlashcardSet = () => {
 
     setLoading(true);
     try {
+      let currentSetId = id;
       if (isEditMode) {
         await updateFlashcardSet(id, formData);
         setMessage({ type: "success", text: "Cập nhật thành công!" });
       } else {
-        await createFlashcardSet(formData);
+        const newSet = await createFlashcardSet(formData);
+        // Backend returns the created set, we check for camelCase or PascalCase
+        currentSetId = newSet.setId || newSet.SetId || newSet.SetID || newSet.setID;
         setMessage({ type: "success", text: "Tạo mới thành công!" });
+      }
+
+      // If there are imported items, create them sequentially
+      if (importedItems.length > 0 && currentSetId) {
+        let successCount = 0;
+        for (const item of importedItems) {
+          try {
+            await createFlashcardItem({
+              setID: parseInt(currentSetId, 10),
+              frontText: item.frontText,
+              backText: item.backText,
+              IPA: item.ipa,
+              example: item.example
+            });
+            successCount++;
+          } catch (itemErr) {
+            console.error(`❌ Lỗi tạo item ${item.frontText}:`, itemErr);
+            // Tiếp tục tạo các item khác dù item này lỗi
+          }
+        }
+        setMessage({ 
+          type: "success", 
+          text: `Đã tạo bộ flashcard và nhập ${successCount}/${importedItems.length} thẻ thành công!` 
+        });
+      } else {
+        setMessage({ type: "success", text: isEditMode ? "Cập nhật thành công!" : "Tạo mới thành công!" });
       }
 
       setTimeout(() => navigate(-1), 1200);
@@ -115,6 +149,10 @@ const CreateEditFlashcardSet = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImportSuccess = (items) => {
+    setImportedItems(items);
   };
 
   const selectedCourseName =
@@ -224,6 +262,31 @@ const CreateEditFlashcardSet = () => {
                       )}
                     </Form.Group>
 
+                    {!isEditMode && (
+                      <div className="import-section mb-4 p-3 border rounded bg-light">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <label className="form-label mb-0 fw-bold">Import từ file (XLSX, CSV)</label>
+                          <Button 
+                            variant="outline-primary" 
+                            size="sm" 
+                            onClick={() => setShowImportModal(true)}
+                          >
+                            <FileUp size={16} className="me-1" />
+                            {importedItems.length > 0 ? "Thay đổi file" : "Chọn file"}
+                          </Button>
+                        </div>
+                        {importedItems.length > 0 ? (
+                          <div className="text-success small">
+                            ✅ Đã nạp {importedItems.length} thẻ từ file. Các thẻ này sẽ được tạo cùng với bộ flashcard.
+                          </div>
+                        ) : (
+                          <div className="text-muted small">
+                            Tùy chọn: Nhập danh sách thẻ nhanh chóng từ file Excel hoặc CSV.
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="form-actions">
                       <Button type="submit" className="btn-save" disabled={loading}>
                         {isEditMode ? "Lưu thay đổi" : "Tạo mới"}
@@ -286,6 +349,12 @@ const CreateEditFlashcardSet = () => {
           </Col>
         </Row>
       </Container>
+      
+      <ImportFlashcardModal 
+        show={showImportModal}
+        onHide={() => setShowImportModal(false)}
+        onImportSuccess={handleImportSuccess}
+      />
     </div>
   );
 };

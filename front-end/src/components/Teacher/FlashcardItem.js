@@ -17,6 +17,7 @@ import {
   updateFlashcardItem,
   deleteFlashcardItem,
 } from "../../middleware/teacher/flashcardTeacherAPI";
+import ImportFlashcardModal from "./ImportFlashcardModal";
 import "./FlashcardItem.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -45,6 +46,7 @@ const FlashcardItem = () => {
   });
 
   const [alertMessage, setAlertMessage] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     const fetchSet = async () => {
@@ -122,6 +124,37 @@ const FlashcardItem = () => {
     }
   };
 
+  const handleImportSuccess = async (importedItems) => {
+    if (!importedItems || importedItems.length === 0) return;
+
+    setLoading(true);
+    let successCount = 0;
+    try {
+      for (const item of importedItems) {
+        try {
+          const payload = {
+            setID: parseInt(setId, 10),
+            frontText: item.frontText,
+            backText: item.backText,
+            IPA: item.ipa,
+            example: item.example,
+          };
+          await createFlashcardItem(payload);
+          successCount++;
+        } catch (itemErr) {
+          console.error(`❌ Lỗi tạo thẻ ${item.frontText}:`, itemErr);
+        }
+      }
+      setAlertMessage(`✅ Đã nhập thành công ${successCount} thẻ!`);
+      const updatedSet = await getFlashcardSetById(setId);
+      setSetData(updatedSet);
+    } catch (err) {
+      setAlertMessage(`❌ Lỗi khi nhập (Thành công ${successCount} thẻ): ${err.response?.data || err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container className="flashcard-item-page py-4">
       <div className="flashcard-header d-flex justify-content-between align-items-center mb-3">
@@ -131,10 +164,15 @@ const FlashcardItem = () => {
 
         <h4 className="mb-0">{setData?.title || "Flashcard Set"}</h4>
 
-        <Button variant="primary" onClick={handleShowAdd}>
-          <FontAwesomeIcon icon={faPlus} className="me-2" />
-          Thêm thẻ mới
-        </Button>
+        <div className="d-flex gap-2">
+          <Button variant="outline-primary" onClick={() => setShowImportModal(true)}>
+            Import từ file
+          </Button>
+          <Button variant="primary" onClick={handleShowAdd}>
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            Thêm thẻ mới
+          </Button>
+        </div>
       </div>
 
       {alertMessage && (
@@ -271,6 +309,12 @@ const FlashcardItem = () => {
           </Modal.Footer>
         </Form>
       </Modal>
+
+      <ImportFlashcardModal
+        show={showImportModal}
+        onHide={() => setShowImportModal(false)}
+        onImportSuccess={handleImportSuccess}
+      />
     </Container>
   );
 };
