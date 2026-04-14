@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AIChat from "../AIChat/AI";
 import { getVideoProgressFromDB } from "../../middleware/videoProgressAPI";
 import { getUserHistoryKey } from "../../redux/videoWatchHelper";
-import { Container, Row, Col, Card, Badge, Modal, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Badge, Modal, Button, Table } from "react-bootstrap";
 import "./Home.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
@@ -16,12 +16,41 @@ import {
   faLock, faGraduationCap, faLayerGroup, faMicrophone,
   faHeadphones, faPencilAlt, faFileAlt, faComments,
   faTrash, faPlay, faVideo, faUsers,
-  faChevronRight, faEdit, faEllipsisV, faRocket, faStar
+  faChevronRight, faEdit, faEllipsisV, faRocket, faStar, faHistory
 } from "@fortawesome/free-solid-svg-icons";
 
 // ══════════════════════════════════════════════════════════════════
 // CONSTANTS & HELPERS
 // ══════════════════════════════════════════════════════════════════
+const getCourseImage = (courseId) => {
+  const images = [
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop"
+  ];
+  return images[(Number(courseId) || 0) % images.length];
+};
+
+const getYtThumb = (url) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? `https://img.youtube.com/vi/${match[2]}/mqdefault.jpg` : null;
+};
+
+const getVideoThumbnail = (lesson) => {
+  if (lesson.videoURL && (lesson.platform === 'youtube' || lesson.videoURL.includes('youtube') || lesson.videoURL.includes('youtu.be'))) {
+    const thumb = getYtThumb(lesson.videoURL);
+    if (thumb) return thumb;
+  }
+  return getCourseImage(lesson.courseID);
+};
+
 const LEVELS = {
   1: { label: "Beginner", color: "#f97316", badge: "#fff7ed", text: "#c2410c" },
   2: { label: "Intermediate", color: "#ec4899", badge: "#fdf2f8", text: "#be185d" },
@@ -76,6 +105,8 @@ const Home = () => {
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [courses, setCourses] = useState([]);
   const [dbLessonHistory, setDbLessonHistory] = useState([]);
+  const [attempts, setAttempts] = useState([]);
+  const [showAttemptModal, setShowAttemptModal] = useState(false);
 
   // Review states
   const [reviewList, setReviewList] = useState([]);
@@ -109,7 +140,7 @@ const Home = () => {
 
   const cleanHistory = () => {
     try {
-      const s = localStorage.getItem("videoWatchHistory");
+      const s = localStorage.getItem(getUserHistoryKey());
       if (!s) return;
       const h = JSON.parse(s);
       if (!Array.isArray(h)) return;
@@ -117,7 +148,7 @@ const Home = () => {
         const d = Number(e.duration) || 0, w = Number(e.watchedMinutes) || 0, p = Number(e.progress) || 0;
         return { ...e, duration: Math.round(d), watchedMinutes: Math.round(Math.min(w, d)), progress: p >= 95 ? 100 : Math.min(p, 100) };
       });
-      localStorage.setItem("videoWatchHistory", JSON.stringify(c));
+      localStorage.setItem(getUserHistoryKey(), JSON.stringify(c));
       return c;
     } catch { return undefined; }
   };
@@ -140,7 +171,7 @@ const Home = () => {
   const loadHistory = () => {
     try {
       cleanHistory();
-      const s = localStorage.getItem("videoWatchHistory");
+      const s = localStorage.getItem(getUserHistoryKey());
       if (s) {
         const a = JSON.parse(s);
         (Array.isArray(a) ? a : []).sort((a, b) => new Date(b.lastWatched) - new Date(a.lastWatched));
@@ -149,10 +180,36 @@ const Home = () => {
     } catch { setLessonHistory([]); }
   };
 
+  const loadDbHistory = async () => {
+    try {
+      const localHistory = JSON.parse(localStorage.getItem(getUserHistoryKey()) || "[]");
+      if (!localHistory.length) return;
+
+      const enriched = await Promise.all(
+        localHistory.map(async (item) => {
+          try {
+            const dbData = await getVideoProgressFromDB(item.lessonID);
+            if (dbData && (dbData.isCompleted || dbData.watchDurationSec > 0)) {
+              let dbProgress = 0;
+              if (dbData.isCompleted) {
+                dbProgress = 100;
+              } else if (dbData.totalDurationSec > 0) {
+                dbProgress = Math.min(99, Math.round((dbData.lastPositionSec / dbData.totalDurationSec) * 100));
+              }
+              const finalProgress = Math.max(item.progress || 0, dbProgress);
+              return { ...item, progress: finalProgress, isCompleted: dbData.isCompleted || finalProgress === 100 };
+            }
+            return item;
+          } catch { return item; }
+        })
+      );
+      setDbLessonHistory(enriched);
+    } catch { }
+  };
 
   const loadStats = () => {
     try {
-      const s = localStorage.getItem("videoWatchHistory");
+      const s = localStorage.getItem(getUserHistoryKey());
       if (s) {
         const h = JSON.parse(s);
         const streak = calcStreak(h);
@@ -167,75 +224,23 @@ const Home = () => {
           timeSpent: { time: toHM(wm), times: "Tuần này" },
           weeklyGoal: { lessons: { completed: wk.length, total: 7 }, studyTime: { completed: Math.round(wm), total: 300, unit: "min" } },
         });
-      } else {
-        setStreakDays(0);
-        setStatsData(emptyData.stats);
-      }
-    } catch {
-      setStreakDays(0);
-      setStatsData(emptyData.stats);
-    }
+      } else { setStreakDays(0); setStatsData(emptyData.stats); }
+    } catch { setStreakDays(0); setStatsData(emptyData.stats); }
   };
 
-  // ✅ loadDbHistory: load TẤT CẢ từ DB, KHÔNG phụ thuộc localStorage
-  // Kết hợp: localStorage (metadata: tên, khóa học) + DB (progress thực)
-  const loadDbHistory = async () => {
+  const loadAttempts = async () => {
     try {
-      const historyKey = getUserHistoryKey();
-      const localRaw = localStorage.getItem(historyKey);
-      const localHistory = localRaw ? JSON.parse(localRaw) : [];
-      const localMap = {};
-      if (Array.isArray(localHistory)) {
-        localHistory.forEach(item => {
-          if (item.lessonID) localMap[String(item.lessonID)] = item;
-        });
-      }
-
-      // ✅ Enrich từng item trong localStorage với data DB
-      const enriched = await Promise.all(
-        Object.values(localMap).map(async (item) => {
-          try {
-            const dbData = await getVideoProgressFromDB(item.lessonID);
-            if (!dbData) return item;
-
-            const totalDurSec = dbData.totalDurationSec || 0;
-            const lastPosSec = dbData.lastPositionSec || 0;
-            const watchDurSec = dbData.watchDurationSec || 0;
-
-            // ✅ Duration thực = totalDurationSec từ DB (server lưu khi save)
-            const displayDurSec = totalDurSec || 0;
-
-            const progress = dbData.isCompleted
-              ? 100
-              : totalDurSec > 0 && lastPosSec > 0
-                ? Math.min(99, Math.round((lastPosSec / totalDurSec) * 100))
-                : 0; // ← nếu không biết duration thì hiện 0%, không guess
-
-            return {
-              ...item,
-              progress,
-              durationSec: displayDurSec,
-              watchedSec: dbData.watchDurationSec || 0,
-              lastWatched: dbData.watchedAt || item.lastWatched,
-              isCompleted: dbData.isCompleted,
-            };
-          } catch {
-            return item;
-          }
-        })
-      );
-
-      // Sắp xếp: mới nhất lên đầu
-      enriched.sort((a, b) => new Date(b.lastWatched) - new Date(a.lastWatched));
-      setDbLessonHistory(enriched);
-    } catch (e) {
-      console.error("loadDbHistory error:", e);
-    }
+      const r = await fetch(`${process.env.REACT_APP_API_URL}/api/attempts`, { headers: getAuthHeaders() });
+      if (r.ok) {
+        const d = await r.json();
+        setAttempts(Array.isArray(d) ? d : []);
+      } else setAttempts([]);
+    } catch { setAttempts([]); }
   };
 
   const handleClearHistory = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem video?")) {
-      localStorage.removeItem("videoWatchHistory");
+      localStorage.removeItem(getUserHistoryKey());
       loadHistory();
       loadStats();
     }
@@ -267,6 +272,7 @@ const Home = () => {
           setMembershipInfo(md);
           loadHistory();
           loadStats();
+          await loadAttempts();
           await loadDbHistory();
         } else {
           setHasMembership(false);
@@ -350,6 +356,9 @@ const Home = () => {
         </Container>
       ) : (
         <>
+          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* HERO                                                           */}
+          {/* ═══════════════════════════════════════════════════════════════ */}
           <div className="welcome-section">
             <Container>
               <div className="hero-inner">
@@ -358,17 +367,54 @@ const Home = () => {
                     <FontAwesomeIcon icon={faStar} style={{ color: "#f9c74f" }} />
                     Nền tảng học tập thông minh
                   </div>
-                  <h1>Chào mừng trở lại, <span className="highlight">{user?.name || "User"}!</span></h1>
+                  <h1>
+                    Chào mừng trở lại,{" "}
+                    <span className="highlight">{user?.name || "User"}!</span>
+                  </h1>
                   <p className="welcome-sub">Tiếp tục hành trình học tập của bạn hôm nay nhé 🚀</p>
                 </div>
 
                 <div className="hero-illustration" aria-hidden="true">
-                  <div className="blob-shape b1" /><div className="blob-shape b2" />
-                  <div className="blob-shape b3" /><div className="blob-shape b4" />
+                  <div className="blob-shape b1" />
+                  <div className="blob-shape b2" />
+                  <div className="blob-shape b3" />
+                  <div className="blob-shape b4" />
                   <FontAwesomeIcon icon={faGraduationCap} className="hero-icon" />
                 </div>
               </div>
             </Container>
+          </div>
+
+          {/* Attempt Modal */}
+          <Modal show={showAttemptModal} onHide={() => setShowAttemptModal(false)} size="lg" centered>
+            <Modal.Header closeButton><Modal.Title style={{ fontWeight: 800, color: "#111827" }}>Lịch sử làm bài chi tiết</Modal.Title></Modal.Header>
+            <Modal.Body>
+              {attempts.length === 0 ? (
+                <div className="text-center py-3" style={{ color: "#9ca3af", fontWeight: 600 }}>Chưa có bài làm nào.</div>
+              ) : (
+                <div className="table-responsive">
+                  <Table hover bordered>
+                    <thead><tr><th>ID</th><th>Quiz</th><th>Nộp lúc</th><th>Điểm</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                      {attempts.map(a => (
+                        <tr key={a.attemptID}>
+                          <td>#{a.attemptID}</td><td>{a.quizTitle || "—"}</td><td>{fmtVN(a.submittedAt)}</td>
+                          <td><Badge bg={(a.autoScore ?? 0) >= 80 ? "success" : (a.autoScore ?? 0) >= 50 ? "warning" : "danger"}>{a.autoScore ?? 0}</Badge></td>
+                          <td><Badge bg={a.status === "SUBMITTED" ? "primary" : "secondary"}>{a.status || "SUBMITTED"}</Badge></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <button style={mintBtn({ padding: ".5rem 1.5rem", fontSize: ".9rem", background: "#e5e7eb", color: "#374151" })} onClick={() => setShowAttemptModal(false)}>Đóng</button>
+            </Modal.Footer>
+          </Modal>
+
+          <div className="history-fab" onClick={() => setShowAttemptModal(true)} style={{ position: "fixed", bottom: "100px", right: "30px", background: "#f59e0b", color: "#fff", width: "50px", height: "50px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 15px rgba(245,158,11,.4)", zIndex: 1000, transition: "all .2s" }} title="Lịch sử làm bài">
+            <FontAwesomeIcon icon={faHistory} />
           </div>
 
           <Container>
@@ -429,9 +475,10 @@ const Home = () => {
                               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-7px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,200,150,.18)"; e.currentTarget.style.borderColor = "#00c896"; }}
                               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,.07)"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
                             >
-                              <div style={{ height: "175px", background: "linear-gradient(135deg,#00c896,#1a73e8)", position: "relative", cursor: "pointer" }} onClick={() => navigate(`/course/${lesson.courseID}`)}>
+                              <div style={{ height: "175px", backgroundImage: `url(${getVideoThumbnail(lesson)})`, backgroundSize: "cover", backgroundPosition: "center", position: "relative", cursor: "pointer" }} onClick={() => navigate(`/course/${lesson.courseID}`)}>
+                                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1))" }} />
                                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                  <FontAwesomeIcon icon={faVideo} size="4x" style={{ color: "rgba(255,255,255,.22)" }} />
+                                  <FontAwesomeIcon icon={faVideo} size="4x" style={{ color: "rgba(255,255,255,.22)", zIndex: 1 }} />
                                 </div>
                                 <div className="play-overlay" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "rgba(255,255,255,.22)", backdropFilter: "blur(4px)", border: "2px solid rgba(255,255,255,.7)", borderRadius: "50%", width: "54px", height: "54px", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .22s" }}>
                                   <FontAwesomeIcon icon={faPlay} style={{ color: "#fff", marginLeft: "3px" }} />
@@ -467,7 +514,6 @@ const Home = () => {
                                     <div style={{ height: "100%", width: `${lesson.progress}%`, background: "#00c896", borderRadius: "99px" }} />
                                   </div>
                                 )}
-
                                 <button
                                   style={{
                                     ...mintBtn({ padding: ".6rem 1rem", fontSize: ".88rem", width: "100%", background: lesson.progress >= 100 ? "transparent" : "#00c896", border: lesson.progress >= 100 ? "2px solid #10b981" : "none", color: lesson.progress >= 100 ? "#059669" : "#fff" })
@@ -538,10 +584,9 @@ const Home = () => {
                             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-7px)"; e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,200,150,.18)"; e.currentTarget.style.borderColor = "#00c896"; }}
                             onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,.07)"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
                           >
-                            <div style={{ position: "relative", height: "178px", overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => navigate(`/course/${course.courseID}`)}>
-                              <div className="thumb-overlay" style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg,${lv.color}cc,${lv.color})` }} />
-                              <FontAwesomeIcon icon={faGraduationCap} style={{ fontSize: "3.5rem", color: "rgba(255,255,255,.25)", position: "relative", zIndex: 1 }} />
-                              <div style={{ position: "absolute", top: "14px", right: "14px", background: lv.badge, color: lv.text, fontWeight: 800, fontSize: ".76rem", padding: "5px 15px", borderRadius: "100px", boxShadow: "0 2px 10px rgba(0,0,0,.1)", zIndex: 2, border: `1px solid ${lv.color}30` }}>
+                            <div style={{ position: "relative", height: "178px", overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backgroundImage: `url(${getCourseImage(course.courseID)})`, backgroundSize: "cover", backgroundPosition: "center" }} onClick={() => navigate(`/course/${course.courseID}`)}>
+                              <div className="thumb-overlay" style={{ position: "absolute", inset: 0, background: `linear-gradient(to top, rgba(0,0,0,0.4), transparent)` }} />
+                              <div style={{ position: "absolute", top: "14px", left: "14px", background: lv.badge, color: lv.text, fontWeight: 800, fontSize: ".76rem", padding: "5px 15px", borderRadius: "100px", boxShadow: "0 2px 10px rgba(0,0,0,.1)", zIndex: 2 }}>
                                 {lv.label}
                               </div>
                             </div>
@@ -552,13 +597,7 @@ const Home = () => {
                                 Level {course.courseLevel}{course.description ? `: ${course.description}` : ""}
                               </p>
 
-                              <div style={{ display: "flex", gap: "1.1rem", marginBottom: ".9rem" }}>
-                                {[{ icon: faUsers, label: "0 học viên" }, { icon: faBookOpen, label: "0 bài học" }].map((m, i) => (
-                                  <div key={i} style={{ display: "flex", alignItems: "center", gap: ".35rem", fontSize: ".8rem", color: "#374151" }}>
-                                    <FontAwesomeIcon icon={m.icon} style={{ color: "#00c896", fontSize: ".82rem" }} /><span>{m.label}</span>
-                                  </div>
-                                ))}
-                              </div>
+                              {/* Removed info section */}
 
                               {course.teacherID && (
                                 <div
@@ -587,15 +626,6 @@ const Home = () => {
                                 >
                                   Xem chi tiết
                                 </button>
-                                {[{ icon: faEdit, danger: false }, { icon: faTrash, danger: true }, { icon: faEllipsisV, danger: false }].map(({ icon, danger }, i) => (
-                                  <button key={i}
-                                    style={{ width: "38px", height: "38px", borderRadius: "12px", border: "1.5px solid #e5e7eb", background: "transparent", color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all .22s", fontSize: ".85rem" }}
-                                    onMouseEnter={e => { e.currentTarget.style.borderColor = danger ? "#ef4444" : "#00c896"; e.currentTarget.style.color = danger ? "#ef4444" : "#00a87c"; e.currentTarget.style.background = danger ? "#fef2f2" : "#e6faf4"; }}
-                                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.color = "#9ca3af"; e.currentTarget.style.background = "transparent"; }}
-                                  >
-                                    <FontAwesomeIcon icon={icon} />
-                                  </button>
-                                ))}
                               </div>
                             </div>
                           </div>
@@ -660,7 +690,9 @@ const Home = () => {
                         try {
                           const d = await getReviewDetail(sub.submissionId);
                           setReviewDetail({ ...d, _meta: sub, _type: type });
-                        } catch { setReviewDetail({ _error: true, _meta: sub, _type: type }); }
+                        } catch {
+                          setReviewDetail({ _error: true, _meta: sub, _type: type });
+                        }
                       };
 
                       const renderCard = (list, type) => {
@@ -682,6 +714,7 @@ const Home = () => {
                                     <small className="text-muted">{list.length} bài đã nộp</small>
                                   </div>
                                 </div>
+
                                 {list.length === 0 ? (
                                   <div className="text-center py-4" style={{ color: '#9ca3af' }}>
                                     <FontAwesomeIcon icon={icon} size="2x" className="mb-2" />
@@ -716,6 +749,7 @@ const Home = () => {
                                     </div>
                                   ))
                                 )}
+
                                 {list.length > 3 && (
                                   <Button
                                     variant={isSpeak ? 'outline-danger' : 'outline-warning'}
@@ -1047,6 +1081,9 @@ const Home = () => {
         </>
       )}
 
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* AI FAB BUTTON                                                  */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
       {!showAIChat && (
         <button className="ai-fab-btn" onClick={() => setShowAIChat(true)} title="Chat với AI">
           <span className="ai-fab-label">
@@ -1057,6 +1094,26 @@ const Home = () => {
           </span>
         </button>
       )}
+
+      {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
+      {!showAIChat && (
+        <button className="ai-fab-btn" onClick={() => setShowAIChat(true)} title="Chat với AI">
+          <span className="ai-fab-label">AI
+            <svg width="14" height="14" viewBox="0 0 15 15" style={{ marginLeft: "2px", verticalAlign: "middle", position: "relative", top: "-1px" }}>
+              <polygon points="7.5,1.5 9.3,5.6 14,5.8 10.5,8.6 11.7,12.8 7.5,10.4 3.3,12.8 4.5,8.6 1,5.8 5.7,5.6" fill="#f9c74f" stroke="#f9c74f" strokeWidth="0.5" />
+            </svg>
+          </span>
+        </button>
+      )}
+
+      <style>{`
+        .ai-fab-btn{position:fixed;bottom:30px;right:30px;z-index:1100;background:#00c896;color:#fff;border:none;border-radius:50%;width:56px;height:56px;box-shadow:0 8px 32px rgba(0,200,150,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:'Nunito',sans-serif;transition:box-shadow .18s,transform .18s,background .18s;animation:fab-pop 1.2s cubic-bezier(.68,-.55,.27,1.55);}
+        .ai-fab-btn:hover{background:#00a87c;box-shadow:0 12px 40px rgba(0,200,150,.55);transform:translateY(-2px) scale(1.06);}
+        .ai-fab-label{font-weight:900;font-size:1.05rem;display:flex;align-items:center;}
+        @keyframes fab-pop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1);opacity:1}}
+        .play-overlay:hover{transform:translate(-50%,-50%) scale(1.15)!important;background:rgba(255,255,255,0.32)!important;}
+        @media(max-width:600px){.ai-fab-btn{right:12px;bottom:12px;}}
+      `}</style>
 
       {showAIChat && <AIChat isVisible={showAIChat} onClose={() => setShowAIChat(false)} />}
     </div>
