@@ -49,7 +49,7 @@ api.interceptors.response.use(
     }
 
     // Modal Error Handling (Global Modal cho mọi lỗi ngoài 401 được xử lý Auth)
-    if (error.response?.status !== 401) {
+    if (error.response?.status !== 401 && !error.config?.skipGlobalModal) {
       let title = "Đã xảy ra lỗi!";
       let text = "Hệ thống đang gặp sự cố. Vui lòng thử lại sau.";
 

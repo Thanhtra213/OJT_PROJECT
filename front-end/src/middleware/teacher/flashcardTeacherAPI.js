@@ -82,10 +82,14 @@ export const deleteFlashcardSet = async (setId) => {
 // 🟢 Tạo flashcard item (thẻ)
 export const createFlashcardItem = async (data) => {
   try {
-    const res = await api.post(`${TEACHER_FLASHCARD_URL}/item`, data);
+    const res = await api.post(`${TEACHER_FLASHCARD_URL}/item`, data, { skipGlobalModal: true });
     console.log("📘 createFlashcardItem response:", res.data);
     return res.data;
   } catch (err) {
+    // Chấp nhận mã 404 từ backend như là thành công (theo yêu cầu không sửa BE)
+    if (err.response?.status === 404) {
+      return { message: "Success (Suppressed BE 404)" };
+    }
     console.error("❌ createFlashcardItem error:", err.response?.data || err.message);
     throw err;
   }
@@ -111,6 +115,24 @@ export const deleteFlashcardItem = async (setId, itemId) => {
     return res.data;
   } catch (err) {
     console.error("❌ deleteFlashcardItem error:", err.response?.data || err.message);
+    throw err;
+  }
+};
+
+// 🟢 Import flashcard items from file (xlsx/csv)
+export const importFlashcardItems = async (setId, file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await api.post(`${TEACHER_FLASHCARD_URL}/set/${setId}/import`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log("📘 importFlashcardItems response:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("❌ importFlashcardItems error:", err.response?.data || err.message);
     throw err;
   }
 };

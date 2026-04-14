@@ -1,0 +1,165 @@
+@import "./createEditFlashcard.scss";
+
+.import-upload-zone {
+  border: 2px dashed $flash-primary-border;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background-color: $flash-primary-soft;
+  border-radius: 20px;
+  padding: 3rem 1.5rem;
+  
+  &:hover {
+    border-color: $flash-primary;
+    background-color: rgba(0, 200, 150, 0.08);
+    transform: scale(1.01);
+  }
+  
+  svg {
+    color: $flash-primary;
+    margin-bottom: 1.25rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 200, 150, 0.2));
+  }
+  
+  h5 {
+    color: $flash-text;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: $flash-muted;
+    font-size: 0.95rem;
+  }
+}
+
+.import-preview-zone {
+  h6 {
+    font-weight: 800;
+    color: $flash-text;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.1rem;
+  }
+
+  .table-container {
+    border: 1px solid $flash-border;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table {
+    font-size: 0.925rem;
+    margin-bottom: 0;
+    
+    thead {
+      background-color: $flash-surface-soft;
+      
+      th {
+        font-weight: 700;
+        color: $flash-text;
+        border-bottom: 1px solid $flash-border;
+        padding: 1rem;
+        background: #f9fafb;
+      }
+    }
+
+    tbody {
+      tr {
+        vertical-align: middle;
+        transition: background 0.2s ease;
+        
+        &:hover {
+          background-color: $flash-primary-soft;
+        }
+      }
+      
+      td {
+        padding: 0.75rem;
+        border-bottom: 1px solid $flash-border;
+      }
+    }
+
+    .form-control-sm {
+      border: 1px solid transparent;
+      background-color: transparent;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+      
+      &:focus {
+        border-color: $flash-primary;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.1);
+      }
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+        border-color: $flash-primary-border;
+      }
+    }
+
+    .btn-link.text-danger {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+
+      &:hover {
+        background-color: #fef2f2;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.modal-content {
+  border-radius: 24px;
+  border: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  .modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid $flash-border;
+    
+    .modal-title {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: $flash-text;
+    }
+  }
+  
+  .modal-body {
+    padding: 2rem;
+  }
+  
+  .modal-footer {
+    padding: 1.25rem 2rem;
+    border-top: 1px solid $flash-border;
+    background: #f9fafb;
+    
+    .btn {
+      padding: 0.6rem 1.5rem;
+      font-weight: 700;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-primary {
+      border: 1px solid $flash-primary-border;
+      color: $flash-primary;
+      
+      &:hover {
+        background-color: $flash-primary;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 200, 150, 0.2);
+      }
+    }
+  }
+}
