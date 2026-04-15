@@ -153,10 +153,12 @@ const ExamDetail = () => {
         questionOrder: q.questionOrder || i + 1,
         scoreWeight: q.scoreWeight || 1.0,
         metaJson: q.metaJson || null,
-        options: (q.options || []).map(o => ({
-          content: o.content || o || "",
-          isCorrect: !!o.isCorrect
-        })),
+        options: (q.questionType || 1) === 1 
+        ? (q.options || []).map(o => ({
+            content: o.content || o || "",
+            isCorrect: !!o.isCorrect
+          }))
+        : [],
         assets: (q.assets || []).map(a => ({
           assetType: a.assetType || 0,
           url: a.url || "",

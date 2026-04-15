@@ -27,24 +27,46 @@ export const createGroupWithQuestions = async (quizId, groupData) => {
     });
 
     console.log("✅ Group created:", group);
+    const groupId = group.groupId ?? group.groupID ?? group.id;
+if (!groupId) {
+  console.error("❌ Không lấy được groupId:", group);
+  throw new Error("groupId is undefined after createGroup");
+}
 
     // 2. Thêm assets cho group (nếu có)
     if (groupData.assets && groupData.assets.length > 0) {
       for (const asset of groupData.assets) {
-        await createGroupAsset(group.groupID, asset);
+        await createGroupAsset(groupId, asset);
       }
     }
 
     // 3. Thêm câu hỏi vào group
     if (groupData.questions && groupData.questions.length > 0) {
       for (const questionData of groupData.questions) {
-        const question = await createQuestion(group.groupID, {
+        console.log("📤 FINAL options:", questionData.options);
+        const question = await createQuestion(groupId, {
           content: questionData.content,
           questionType: questionData.questionType || 1,
           questionOrder: questionData.questionOrder || 1,
           scoreWeight: questionData.scoreWeight || 1.0,
-          metaJson: questionData.metaJson || null,
+          metaJson:
+  (questionData.questionType === 2 || questionData.questionType === 3) &&
+  questionData.options?.length > 0
+    ? JSON.stringify({
+        answer:
+          questionData.options[0]?.content ||
+          questionData.options[0]?.Content ||
+          ""
+      })
+    : null,
         });
+        // Trong quizHelpers.js, trước khi gọi createQuestion
+console.log("📤 Sending question payload:", {
+  content: questionData.content,
+  questionType: questionData.questionType,
+  metaJson: questionData.metaJson,
+  options: questionData.options,
+});
 
         console.log("✅ Question created:", question);
         const questionId =
@@ -62,14 +84,32 @@ export const createGroupWithQuestions = async (quizId, groupData) => {
         }
 
         // 5. Thêm options cho câu hỏi
-        if (questionData.options && questionData.options.length > 0) {
-          for (const optionData of questionData.options) {
-            await createOption(questionId, {
-              content: optionData.content,
-              isCorrect: optionData.isCorrect || false,
-            });
-          }
-        }
+const questionType = questionData.questionType || 1;
+// ✅ FIX CHUẨN
+if (
+  (questionType === 1 || questionType === 2 || questionType === 3) &&
+  Array.isArray(questionData.options) &&
+  questionData.options.length > 0
+){  for (const optionData of questionData.options) {
+
+    const content =
+  typeof optionData === "string"
+    ? optionData
+    : optionData.content || optionData.Content || "";
+
+const isCorrect =
+  typeof optionData === "object"
+    ? optionData.isCorrect ?? optionData.IsCorrect ?? false
+    : false;
+
+    if (!content.trim()) continue; // tránh gửi rỗng
+
+    await createOption(questionId, {
+      content,
+      isCorrect,
+    });
+  }
+}
       }
     }
 
@@ -86,8 +126,18 @@ export const createGroupWithQuestions = async (quizId, groupData) => {
 export const addQuestionsToGroup = async (groupId, questions) => {
   try {
     const createdQuestions = [];
+    
 
     for (const questionData of questions) {
+      console.log("📤 FINAL options:", questionData.options);
+      console.log("📤 RAW questionData trước khi gửi:", JSON.stringify(questionData, null, 2));
+      // Trong quizHelpers.js, trước khi gọi createQuestion
+console.log("📤 Sending question payload:", {
+  content: questionData.content,
+  questionType: questionData.questionType,
+  metaJson: questionData.metaJson,
+  options: questionData.options,
+});
       // 1. Tạo câu hỏi
       const question = await createQuestion(groupId, {
         content: questionData.content,
@@ -114,18 +164,35 @@ export const addQuestionsToGroup = async (groupId, questions) => {
       }
 
       // 3. Thêm options
-      if (questionData.options && questionData.options.length > 0) {
-        for (const optionData of questionData.options) {
-          await createOption(questionId, {
-            content: optionData.content,
-            isCorrect: optionData.isCorrect || false,
-          });
-        }
-      }
+if (questionData.options && questionData.options.length > 0) {
+  // ✅ Chỉ tạo option cho MCQ (type 1), KHÔNG tạo cho Fill-blank (2) và Essay (3)
+  const questionType = questionData.questionType || 1;
+if (Array.isArray(questionData.options)) {
+  for (const optionData of questionData.options || []) {
+
+    const content =
+      typeof optionData === "string"
+        ? optionData
+        : optionData.content || "";
+
+    const isCorrect =
+      typeof optionData === "object"
+        ? optionData.isCorrect || false
+        : false;
+
+    if (!content.trim()) continue; // tránh gửi rỗng
+
+    await createOption(questionId, {
+      content,
+      isCorrect,
+    });
+  }
+}
+}
 
       createdQuestions.push(question);
     }
-
+    
     return createdQuestions;
   } catch (error) {
     console.error("❌ Error adding questions to group:", error);

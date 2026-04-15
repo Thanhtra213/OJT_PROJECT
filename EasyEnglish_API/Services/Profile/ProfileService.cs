@@ -49,17 +49,14 @@ namespace EasyEnglish_API.Services.Profile
 
         public async Task UpdateDetailAsync(int userId, UpdateUserDetailRequest req)
         {
-            // ❗ check null request
             if (req == null)
                 throw new ArgumentNullException(nameof(req), "Request không được null");
 
             var detail = await _repo.GetUserDetailAsync(userId);
 
-            // ❗ check user tồn tại
             if (detail == null)
                 throw new KeyNotFoundException("Account not found");
 
-            // ❗ validate FullName
             if (!string.IsNullOrWhiteSpace(req.FullName))
             {
                 if (req.FullName.Length > 100)

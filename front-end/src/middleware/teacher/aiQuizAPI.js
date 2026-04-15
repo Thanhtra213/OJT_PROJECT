@@ -74,21 +74,50 @@ export const parseAIQuizResponse = (aiResponse) => {
   }
 };
 
-export const convertAIQuestionsToImportFormat = (aiQuestions) => {
-  return aiQuestions.map((q) => {
-    // Tìm đáp án đúng
-    const correctIndex = q.Options?.findIndex(opt => opt.IsCorrect || opt.isCorrect) || 0;
-    
+export const convertAIQuestionsToImportFormat = (questions) => {
+  return questions.map((q) => {
+    const qType = q.QuestionType || q.questionType || 1;
+    const rawOptions = q.Options || q.options || [];
+
+    // ✅ MCQ
+    if (qType === 1) {
+      const correctIndex = rawOptions.findIndex(
+        (o) => o.IsCorrect === true || o.isCorrect === true
+      );
+
+      return {
+        content: q.Content || q.content || "",
+        questionType: 1,
+        options: rawOptions.map((o) => ({
+          content: o.Content || o.content || "",
+          isCorrect: o.IsCorrect ?? o.isCorrect ?? false,
+        })),
+        correctIndex: correctIndex >= 0 ? correctIndex : 0,
+        scoreWeight: q.ScoreWeight || q.scoreWeight || 1,
+      };
+    }
+
+    // ✅ TYPE 2 & 3
+    const answerOpt = rawOptions[0];
+    const answerText =
+      typeof answerOpt === "string"
+        ? answerOpt
+        : answerOpt?.Content || answerOpt?.content || "";
+
     return {
       content: q.Content || q.content || "",
-      options: (q.Options || q.options || []).map(opt => opt.Content || opt.content || ""),
-      correctIndex: correctIndex >= 0 ? correctIndex : 0,
-      scoreWeight: 1.00,
-      questionType: q.QuestionType || q.questionType || 1,
+      questionType: qType, // 🔥 GIỮ NGUYÊN
+      options: [
+        {
+          content: answerText,
+          isCorrect: true,
+        },
+      ],
+      correctIndex: 0,
+      scoreWeight: q.ScoreWeight || q.scoreWeight || 1,
     };
   });
 };
-
 export default {
   generateAIQuiz,
   parseAIQuizResponse,

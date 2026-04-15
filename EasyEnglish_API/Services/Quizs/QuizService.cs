@@ -39,14 +39,15 @@ namespace EasyEnglish_API.Services
                     QuestionID = qs.QuestionId,
                     Content = qs.Content,
                     QuestionType = qs.QuestionType,
-                    Options = qs.QuestionType == 1
-                        ? qs.Options.Select(o => new OptionDto
-                        {
-                            OptionID = o.OptionId,
-                            Content = o.Content,
-                            IsCorrect = o.IsCorrect
-                        }).ToList()
-                        : new List<OptionDto>()
+
+                    Options = qs.Options.Select(o => new OptionDto
+                    {
+                        OptionID = o.OptionId,
+                        Content = o.Content,
+                        IsCorrect = o.IsCorrect
+                    }).ToList(),
+
+                    MetaJson = qs.MetaJson
                 }).ToList()
             }).ToList();
 

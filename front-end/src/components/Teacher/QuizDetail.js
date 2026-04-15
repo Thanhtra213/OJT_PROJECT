@@ -102,7 +102,13 @@ const QuizDetail = () => {
     onConfirm: null,
     variant: "danger",
   });
-
+  const updateCorrectAnswer = (groupIndex, questionIndex, value) => {
+    setGroups(prev => {
+      const updated = [...prev];
+      updated[groupIndex].questions[questionIndex].correctAnswer = value;
+      return updated;
+    });
+  };
   const addToast = (message, variant = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, variant }]);
@@ -148,13 +154,41 @@ const QuizDetail = () => {
 
       if (data.groups && Array.isArray(data.groups) && data.groups.length > 0) {
         parsedGroups = data.groups.map((group) => ({
-          groupID: group.groupID || group.groupId,
-          groupOrder: group.groupOrder || 1,
-          groupType: group.groupType || 1,
-          instruction: group.instruction || "",
-          assets: group.assets || [],
-          questions: group.questions || [],
-        }));
+  groupID: group.groupID || group.groupId,
+  groupOrder: group.groupOrder || 1,
+  groupType: group.groupType || 1,
+  instruction: group.instruction || "",
+  assets: group.assets || [],
+
+  questions: (group.questions || []).map(q => {
+    let correctAnswer = "";
+
+    console.log("DEBUG QUESTION:", q);
+
+    // ✅ CASE 1: có options (MCQ)
+    if (q.options && q.options.length > 0) {
+      correctAnswer =
+        q.options.find(o => o.isCorrect || o.IsCorrect)?.content ||
+        q.options[0]?.content ||
+        "";
+    }
+
+    // ✅ CASE 2: không có options → lấy từ metaJson
+    else if (q.metaJson) {
+      try {
+        const meta = JSON.parse(q.metaJson);
+        correctAnswer = meta.answer || meta.answers?.[0] || "";
+      } catch (e) {
+        console.error("❌ parse metaJson lỗi:", q.metaJson);
+      }
+    }
+
+    return {
+      ...q,
+      correctAnswer
+    };
+  })
+}));
         console.log("✅ Parsed from data.groups");
       } else if (
         data.questionGroups &&
@@ -167,7 +201,32 @@ const QuizDetail = () => {
           groupType: group.groupType || 1,
           instruction: group.instruction || "",
           assets: group.assets || [],
-          questions: group.questions || [],
+          questions: (group.questions || []).map(q => {
+            let correctAnswer = "";
+
+            // ✅ Nếu có options (MCQ)
+            if (q.options && q.options.length > 0) {
+              correctAnswer =
+                q.options.find(o => o.isCorrect || o.IsCorrect)?.content ||
+                q.options[0]?.content ||
+                "";
+            }
+
+            // ✅ Nếu không có options → lấy từ metaJson (case của mày)
+            else if (q.metaJson) {
+              try {
+                const meta = JSON.parse(q.metaJson);
+                correctAnswer = meta.answer || meta.answers?.[0] || "";
+              } catch (e) {
+                console.error("❌ lỗi parse metaJson:", q.metaJson);
+              }
+            }
+
+            return {
+              ...q,
+              correctAnswer
+            };
+          })
         }));
         console.log("✅ Parsed from data.questionGroups");
       } else if (data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
@@ -218,158 +277,121 @@ const QuizDetail = () => {
     try {
       setAiLoading(true);
       console.log("🤖 Calling AI with prompt:", aiPrompt);
-      const aiResponse = await generateAIQuiz(aiPrompt);
 
+      const aiResponse = await generateAIQuiz(aiPrompt);
       if (aiResponse.error) throw new Error(aiResponse.error);
 
       const parsedQuiz = parseAIQuizResponse(aiResponse);
       console.log("📦 Parsed AI quiz:", parsedQuiz);
 
       if (!parsedQuiz.questions?.length) {
-        throw new Error("AI không tạo được câu hỏi. Vui lòng thử prompt khác.");
+        throw new Error("AI không tạo được câu hỏi.");
       }
 
       const convertedQuestions = convertAIQuestionsToImportFormat(parsedQuiz.questions);
       console.log("🧩 Converted questions:", convertedQuestions);
 
+      // ===== HELPER CHUNG =====
+      const buildMetaJson = (qType, options, correctIndex = 0) => {
+        if (qType !== 2 && qType !== 3) return null;
+
+        const rawOpt = options[0] || "";
+        const raw = typeof rawOpt === "object"
+          ? (rawOpt.content || rawOpt.Content || "")
+          : rawOpt;
+
+        const answers = raw.includes("/")
+          ? raw.split("/").map(x => x.trim())
+          : [raw.trim()];
+
+        return JSON.stringify({
+          answer: answers[0],
+          answers
+        });
+      };
+      const buildOptions = (qType, options, correctIndex = 0) => {
+        return (options || []).map((opt, idx) => ({
+          content: typeof opt === "string" ? opt : (opt.content || opt.Content || ""),
+          isCorrect: typeof opt === "object"
+            ? (opt.isCorrect ?? opt.IsCorrect ?? idx === correctIndex)
+            : idx === correctIndex,
+        }));
+      };
+
+      // =========================
+
       if (groups.length === 0) {
         console.log("⚙️ No groups, creating new group...");
 
-        const questionsToAdd = convertedQuestions.map((q, i) => ({
-          content: q.content,
-          questionType: q.questionType || 1,
-          questionOrder: i + 1,
-          scoreWeight: q.scoreWeight,
-          metaJson: q.questionType === 2 
-            ? JSON.stringify({ answer: q.options[q.correctIndex] || q.options[0] }) 
-            : null,
-          options: q.options.map((opt, idx) => ({
-            content: opt,
-            isCorrect: idx === q.correctIndex,
-          })),
-          assets: [],
-        }));
+        const questionsToAdd = convertedQuestions.map((q, i) => {
+          const qType = q.questionType || 1;
+          const options = Array.isArray(q.options) ? q.options : [];
+
+          return {
+            content: q.content || "",
+            questionType: qType,
+            questionOrder: i + 1,
+            scoreWeight: q.scoreWeight || 1,
+
+            metaJson: buildMetaJson(qType, options, q.correctIndex),
+
+            options: buildOptions(qType, options, q.correctIndex),
+
+            assets: [],
+          };
+        });
+        console.log("FINAL QUESTION BEFORE API:", questionsToAdd);
 
         await createGroupWithQuestions(quizId, {
-          instruction: parsedQuiz.description || parsedQuiz.title || "AI Generated Group",
+          instruction: parsedQuiz.description || parsedQuiz.title || "AI Generated",
           groupType: 1,
           groupOrder: 1,
           questions: questionsToAdd,
           assets: [],
         });
 
-        const newAnswersMap = {};
-        convertedQuestions.forEach((q, i) => {
-          newAnswersMap[`0-${i}`] = q.correctIndex;
-        });
-        setCorrectAnswersMap(newAnswersMap);
-        localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(newAnswersMap));
-
         await fetchQuiz();
         setShowAIModal(false);
         setAiPrompt("");
-        setAiSelectedGroupIndex(null);
-        addToast(`AI đã tạo ${convertedQuestions.length} câu hỏi trong Group 1!`, "success");
+        addToast("AI đã tạo câu hỏi!", "success");
         return;
       }
 
-      if (
-        aiSelectedGroupIndex === null ||
-        aiSelectedGroupIndex < 0 ||
-        aiSelectedGroupIndex >= groups.length
-      ) {
-        throw new Error("Vui lòng chọn group hợp lệ!");
-      }
-
+      // ===== ADD VÀO GROUP =====
       const group = groups[aiSelectedGroupIndex];
-      if (!group.groupID) {
-        throw new Error("Group ID not found");
-      }
-
       const currentCount = group.questions?.length || 0;
 
-      const questionsToAdd = convertedQuestions.map((q, i) => ({
-        content: q.content,
-        questionType: q.questionType || 1,
-        questionOrder: currentCount + i + 1,
-        scoreWeight: q.scoreWeight,
-        metaJson: q.questionType === 2 
-          ? JSON.stringify({ answer: q.options[q.correctIndex] || q.options[0] }) 
-          : null,
-        options: q.options.map((opt, idx) => ({
-          content: opt,
-          isCorrect: idx === q.correctIndex,
-        })),
-        assets: [],
-      }));
+      const questionsToAdd = convertedQuestions.map((q, i) => {
+        const qType = q.questionType || 1;
+        const options = Array.isArray(q.options) ? q.options : [];
+
+        return {
+          content: q.content || "",
+          questionType: qType,
+          questionOrder: currentCount + i + 1,
+          scoreWeight: q.scoreWeight || 1,
+
+          metaJson: buildMetaJson(qType, options, q.correctIndex),
+
+          options: buildOptions(qType, options, q.correctIndex),
+
+          assets: [],
+        };
+      });
 
       await addQuestionsToGroup(group.groupID, questionsToAdd);
-
-      const newAnswersMap = { ...correctAnswersMap };
-      convertedQuestions.forEach((q, i) => {
-        newAnswersMap[`${aiSelectedGroupIndex}-${currentCount + i}`] = q.correctIndex;
-      });
-      setCorrectAnswersMap(newAnswersMap);
-      localStorage.setItem(`quiz_${quizId}_answers`, JSON.stringify(newAnswersMap));
 
       await fetchQuiz();
       setShowAIModal(false);
       setAiPrompt("");
-      setAiSelectedGroupIndex(null);
-      addToast(`AI đã tạo ${convertedQuestions.length} câu hỏi!`, "success");
+      addToast("AI đã thêm câu hỏi!", "success");
+
     } catch (err) {
       console.error("❌ AI error:", err);
       setErrorMessage("❌ " + err.message);
       setShowErrorModal(true);
     } finally {
       setAiLoading(false);
-    }
-  };
-
-  const handleSaveGroup = async () => {
-    if (!newGroupInstruction.trim()) {
-      addToast("❌ Vui lòng nhập instruction cho group!", "danger");
-      return;
-    }
-
-    try {
-      setUploading(true);
-
-      if (editingGroupIndex !== null) {
-        const group = groups[editingGroupIndex];
-
-        if (!group.groupID) {
-          throw new Error("Group ID not found");
-        }
-
-        await updateQuizGroup(group.groupID, {
-          instruction: newGroupInstruction.trim(),
-          groupType: group.groupType || 1,
-          groupOrder: group.groupOrder || editingGroupIndex + 1,
-        });
-
-        addToast("Đã cập nhật group!", "success");
-      } else {
-        await createGroupWithQuestions(quizId, {
-          instruction: newGroupInstruction.trim(),
-          groupType: 1,
-          groupOrder: groups.length + 1,
-          questions: [],
-          assets: [],
-        });
-
-        addToast("Đã thêm group mới!", "success");
-      }
-
-      await fetchQuiz();
-      setShowGroupModal(false);
-      setNewGroupInstruction("");
-      setEditingGroupIndex(null);
-    } catch (err) {
-      console.error("❌ Save group error:", err);
-      addToast("❌ Lỗi: " + (err.response?.data?.message || err.message), "danger");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -448,7 +470,48 @@ const QuizDetail = () => {
       e.target.value = "";
     }
   };
+  const handleSaveGroup = async () => {
+    if (!newGroupInstruction.trim()) {
+      addToast("❌ Vui lòng nhập instruction cho group!", "danger");
+      return;
+    }
 
+    try {
+      setUploading(true);
+
+      if (editingGroupIndex !== null) {
+        const group = groups[editingGroupIndex];
+
+        await updateQuizGroup(group.groupID, {
+          instruction: newGroupInstruction.trim(),
+          groupType: group.groupType || 1,
+          groupOrder: group.groupOrder || editingGroupIndex + 1,
+        });
+
+        addToast("Đã cập nhật group!", "success");
+      } else {
+        await createGroupWithQuestions(quizId, {
+          instruction: newGroupInstruction.trim(),
+          groupType: 1,
+          groupOrder: groups.length + 1,
+          questions: [],
+          assets: [],
+        });
+
+        addToast("Đã thêm group mới!", "success");
+      }
+
+      await fetchQuiz();
+      setShowGroupModal(false);
+      setNewGroupInstruction("");
+      setEditingGroupIndex(null);
+    } catch (err) {
+      console.error("❌ Save group error:", err);
+      addToast("❌ Lỗi: " + (err.response?.data?.message || err.message), "danger");
+    } finally {
+      setUploading(false);
+    }
+  };
   const handleAddTextAsset = async () => {
     if (!textAssetContent.trim()) {
       addToast("❌ Vui lòng nhập nội dung text!", "danger");
@@ -556,14 +619,14 @@ const QuizDetail = () => {
   const updateQuestion = (index, field, value) => {
     const updated = [...importQuestions];
     updated[index][field] = value;
-    
+
     // Đồng bộ: Nếu là tự luận, thu gọn options về 1
     if (field === "type" && value === 2) {
       const currentAns = updated[index].options[0] || "";
       updated[index].options = [currentAns];
       updated[index].correctIndex = 0;
     }
-    
+
     setImportQuestions(updated);
   };
 
@@ -607,23 +670,23 @@ const QuizDetail = () => {
         return;
       }
       if (q.type === 1) {
-          if (q.options.some((opt) => !opt.trim())) {
-            setErrorMessage(`Câu hỏi ${i + 1} có đáp án trống!`);
-            setShowErrorModal(true);
-            return;
-          }
+        if (q.options.some((opt) => !opt.trim())) {
+          setErrorMessage(`Câu hỏi ${i + 1} có đáp án trống!`);
+          setShowErrorModal(true);
+          return;
+        }
       } else if (q.type === 2) {
-          if (!q.options[0] || !q.options[0].trim()) {
-            setErrorMessage(`Câu hỏi ${i + 1} chưa có đáp án đúng!`);
-            setShowErrorModal(true);
-            return;
-          }
+        if (!q.correctAnswer || !q.correctAnswer.trim()) {
+          setErrorMessage(`Câu hỏi ${i + 1} chưa có đáp án đúng!`);
+          setShowErrorModal(true);
+          return;
+        }
       } else {
-          if (!q.options[0]?.trim()) {
-            setErrorMessage(`Câu hỏi ${i + 1} chưa có đáp án đúng!`);
-            setShowErrorModal(true);
-            return;
-          }
+        if (!q.correctAnswer?.trim()) {
+          setErrorMessage(`Câu hỏi ${i + 1} chưa có đáp án đúng!`);
+          setShowErrorModal(true);
+          return;
+        }
       }
     }
 
@@ -638,14 +701,14 @@ const QuizDetail = () => {
         questionType: q.type || 1,
         questionOrder: currentQuestionCount + index + 1,
         scoreWeight: q.scoreWeight || 1.0,
-        metaJson: (q.type || 1) === 2 
-          ? JSON.stringify({ answer: q.options[0].trim() }) 
+        metaJson: (q.type || 1) === 2
+          ? JSON.stringify({ answer: q.options[0].trim() })
           : null,
-        options: q.type === 1 
+        options: q.type === 1
           ? q.options.map((opt, optIndex) => ({
-              content: opt.trim(),
-              isCorrect: optIndex === q.correctIndex,
-            }))
+            content: opt.trim(),
+            isCorrect: optIndex === q.correctIndex,
+          }))
           : [{ content: q.options[0].trim(), isCorrect: true }],
         assets: [],
       }));
@@ -653,12 +716,12 @@ const QuizDetail = () => {
       if (!group.groupID) {
         // Nếu là virtual group (chưa có group thực sự trong DB), tạo group mới kèm câu hỏi
         await createGroupWithQuestions(quizId, {
-            instruction: group.instruction || "Trả lời các câu hỏi sau",
-            groupType: 1,
-            groupOrder: group.groupOrder || 1,
-            questions: questionsToAdd,
-            assets: [],
-          });
+          instruction: group.instruction || "Trả lời các câu hỏi sau",
+          groupType: 1,
+          groupOrder: group.groupOrder || 1,
+          questions: questionsToAdd,
+          assets: [],
+        });
       } else {
         await addQuestionsToGroup(group.groupID, questionsToAdd);
       }
@@ -708,17 +771,17 @@ const QuizDetail = () => {
       return;
     }
     if (editingQuestion.type === 1) {
-        if (editingQuestion.options.some((opt) => !opt.trim())) {
-            setErrorMessage("Có đáp án trống!");
-            setShowErrorModal(true);
-            return;
-        }
+      if (editingQuestion.options.some((opt) => !opt.trim())) {
+        setErrorMessage("Có đáp án trống!");
+        setShowErrorModal(true);
+        return;
+      }
     } else {
-        if (!editingQuestion.options[0]?.trim()) {
-            setErrorMessage("Vui lòng nhập đáp án đúng!");
-            setShowErrorModal(true);
-            return;
-        }
+      if (!editingQuestion.options[0]?.trim()) {
+        setErrorMessage("Vui lòng nhập đáp án đúng!");
+        setShowErrorModal(true);
+        return;
+      }
     }
 
     try {
@@ -730,17 +793,17 @@ const QuizDetail = () => {
         throw new Error("Question ID not found");
       }
 
-      const formattedOptions = editingQuestion.type === 1 
+      const formattedOptions = editingQuestion.type === 1
         ? editingQuestion.options.map((opt, optIndex) => ({
-            optionID: question.options?.[optIndex]?.optionID || null,
-            content: opt,
-            isCorrect: optIndex === editingQuestion.correctIndex,
-          }))
+          optionID: question.options?.[optIndex]?.optionID || null,
+          content: opt,
+          isCorrect: optIndex === editingQuestion.correctIndex,
+        }))
         : [{
-            optionID: question.options?.[0]?.optionID || null,
-            content: editingQuestion.options[0],
-            isCorrect: true,
-          }];
+          optionID: question.options?.[0]?.optionID || null,
+          content: editingQuestion.options[0],
+          isCorrect: true,
+        }];
 
       await updateQuestionWithOptions(
         question.questionID,
@@ -749,8 +812,8 @@ const QuizDetail = () => {
           questionType: editingQuestion.type,
           questionOrder: question.questionOrder,
           scoreWeight: editingQuestion.scoreWeight,
-          metaJson: editingQuestion.type === 2 
-            ? JSON.stringify({ answer: editingQuestion.options[0].trim() }) 
+          metaJson: editingQuestion.type === 2
+            ? JSON.stringify({ answer: editingQuestion.options[0].trim() })
             : null,
           options: formattedOptions,
         },
@@ -1069,10 +1132,10 @@ const QuizDetail = () => {
                                 {asset.assetType === 1
                                   ? "Audio"
                                   : asset.assetType === 2
-                                  ? "Image"
-                                  : asset.assetType === 3
-                                  ? "Text"
-                                  : "Video"}
+                                    ? "Image"
+                                    : asset.assetType === 3
+                                      ? "Text"
+                                      : "Video"}
                               </Badge>
 
                               <div className="quiz-asset-actions">
@@ -1115,6 +1178,16 @@ const QuizDetail = () => {
                 {group.questions && group.questions.length > 0 ? (
                   group.questions.map((question, qIdx) => {
                     const qOptions = question.options || question.choices || [];
+                    // Thêm tạm vào trong map của questions, trước phần render
+                    console.log("🔍 Question data:", {
+                      questionType: question.questionType,
+                      metaJson: question.metaJson,
+                      MetaJson: question.MetaJson,
+                      options: question.options,
+                      choices: question.choices,
+                      raw: question
+                    });
+
 
                     return (
                       <Card key={qIdx} className="quiz-question-card mb-3">
@@ -1174,7 +1247,7 @@ const QuizDetail = () => {
                                         const meta = typeof metaSource === 'string' ? JSON.parse(metaSource) : metaSource;
                                         const ans = meta?.answer || meta?.Answer || (meta?.answers && meta.answers.join(", "));
                                         if (ans) return ans;
-                                      } catch (e) {}
+                                      } catch (e) { }
                                     }
                                     const firstOpt = (question.options || question.choices || [])[0];
                                     return firstOpt?.content || firstOpt?.Content || firstOpt || "Chưa có đáp án";
@@ -1196,12 +1269,12 @@ const QuizDetail = () => {
                                         key={optIdx}
                                         className={`d-flex align-items-center border-0 py-2 px-3 ${isCorrect ? "bg-success bg-opacity-10 text-success fw-bold" : "text-muted"}`}
                                       >
-                                        <div 
-                                          className={`me-3 d-flex align-items-center justify-content-center fw-bold`} 
-                                          style={{ 
-                                            width: "24px", 
-                                            height: "24px", 
-                                            borderRadius: "50%", 
+                                        <div
+                                          className={`me-3 d-flex align-items-center justify-content-center fw-bold`}
+                                          style={{
+                                            width: "24px",
+                                            height: "24px",
+                                            borderRadius: "50%",
                                             backgroundColor: isCorrect ? "#00c896" : "#f1f3f5",
                                             color: isCorrect ? "white" : "#adb5bd",
                                             fontSize: "0.75rem"
@@ -1431,12 +1504,12 @@ const QuizDetail = () => {
 
               <Card.Body>
                 <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={q.type || 1} onSelect={(k) => updateQuestion(qIndex, "type", parseInt(k))}>
-                    <Nav.Item>
-                        <Nav.Link eventKey={1}>Trắc nghiệm</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey={2}>Tự luận</Nav.Link>
-                    </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey={1}>Trắc nghiệm</Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey={2}>Tự luận</Nav.Link>
+                  </Nav.Item>
                 </Nav>
 
                 <Form.Group className="mb-3">
@@ -1515,11 +1588,11 @@ const QuizDetail = () => {
                       as="textarea"
                       rows={2}
                       placeholder="Nhập đáp án đúng/tham khảo..."
-                      value={q.options[0] || ""}
-                      onChange={(e) => updateOption(qIndex, 0, e.target.value)}
+                      value={q.correctAnswer || ""}
+                      onChange={(e) => updateCorrectAnswer(qIndex, e.target.value)}
                     />
                     <Form.Text className="text-muted">
-                        Học viên cần điền chính xác cụm từ này (không phân biệt hoa thường).
+                      Học viên cần điền chính xác cụm từ này (không phân biệt hoa thường).
                     </Form.Text>
                   </Form.Group>
                 )}
@@ -1562,137 +1635,137 @@ const QuizDetail = () => {
         <Modal.Body>
           {editingQuestion && (
             <div>
-                <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={editingQuestion.type || 1} onSelect={(k) => setEditingQuestion({ ...editingQuestion, type: parseInt(k) })}>
-                    <Nav.Item>
-                        <Nav.Link eventKey={1}>Trắc nghiệm</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey={2}>Tự luận</Nav.Link>
-                    </Nav.Item>
-                </Nav>
+              <Nav variant="pills" className="custom-question-tabs mb-3" activeKey={editingQuestion.type || 1} onSelect={(k) => setEditingQuestion({ ...editingQuestion, type: parseInt(k) })}>
+                <Nav.Item>
+                  <Nav.Link eventKey={1}>Trắc nghiệm</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey={2}>Tự luận</Nav.Link>
+                </Nav.Item>
+              </Nav>
 
+              <Form.Group className="mb-3">
+                <Form.Label>Nội dung</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  value={editingQuestion.content}
+                  onChange={(e) =>
+                    setEditingQuestion({ ...editingQuestion, content: e.target.value })
+                  }
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Điểm</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  value={editingQuestion.scoreWeight}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      scoreWeight: parseFloat(e.target.value) || 1,
+                    })
+                  }
+                  style={{ width: "100px" }}
+                />
+              </Form.Group>
+
+              {editingQuestion.type === 1 ? (
+                <>
+                  <Form.Label>Đáp án</Form.Label>
+                  {editingQuestion.options.map((opt, optIndex) => (
+                    <Row key={optIndex} className="mb-2 align-items-center">
+                      <Col xs={1}>
+                        <Form.Check
+                          type="radio"
+                          name="correct-edit"
+                          checked={editingQuestion.correctIndex === optIndex}
+                          onChange={() =>
+                            setEditingQuestion({ ...editingQuestion, correctIndex: optIndex })
+                          }
+                        />
+                      </Col>
+                      <Col xs={1} className="text-center">
+                        <strong>{String.fromCharCode(65 + optIndex)}.</strong>
+                      </Col>
+                      <Col xs={9}>
+                        <Form.Control
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const newOptions = [...editingQuestion.options];
+                            newOptions[optIndex] = e.target.value;
+                            setEditingQuestion({ ...editingQuestion, options: newOptions });
+                          }}
+                        />
+                      </Col>
+                      <Col xs={1}>
+                        {editingQuestion.options.length > 2 && (
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="text-danger p-0"
+                            onClick={() => {
+                              if (editingQuestion.options.length > 2) {
+                                const newOptions = editingQuestion.options.filter(
+                                  (_, i) => i !== optIndex
+                                );
+                                const newCorrectIndex =
+                                  editingQuestion.correctIndex >= newOptions.length
+                                    ? newOptions.length - 1
+                                    : editingQuestion.correctIndex;
+
+                                setEditingQuestion({
+                                  ...editingQuestion,
+                                  options: newOptions,
+                                  correctIndex: newCorrectIndex,
+                                });
+                              }
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
+                      </Col>
+                    </Row>
+                  ))}
+
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() =>
+                      setEditingQuestion({
+                        ...editingQuestion,
+                        options: [...editingQuestion.options, ""],
+                      })
+                    }
+                  >
+                    <Plus size={16} className="me-1" />
+                    Thêm đáp án
+                  </Button>
+                </>
+              ) : (
                 <Form.Group className="mb-3">
-                    <Form.Label>Nội dung</Form.Label>
-                    <Form.Control
+                  <Form.Label>Đáp án đúng cho câu hỏi tự luận</Form.Label>
+                  <Form.Control
                     as="textarea"
                     rows={2}
-                    value={editingQuestion.content}
-                    onChange={(e) =>
-                        setEditingQuestion({ ...editingQuestion, content: e.target.value })
-                    }
-                    />
+                    placeholder="Nhập đáp án đúng/tham khảo..."
+                    value={editingQuestion.options[0] || ""}
+                    onChange={(e) => {
+                      const newOptions = [...editingQuestion.options];
+                      newOptions[0] = e.target.value;
+                      setEditingQuestion({ ...editingQuestion, options: newOptions });
+                    }}
+                  />
+                  <Form.Text className="text-muted">
+                    Học viên cần điền chính xác cụm từ này (không phân biệt hoa thường).
+                  </Form.Text>
                 </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Điểm</Form.Label>
-                    <Form.Control
-                    type="number"
-                    min="1"
-                    step="0.01"
-                    value={editingQuestion.scoreWeight}
-                    onChange={(e) =>
-                        setEditingQuestion({
-                        ...editingQuestion,
-                        scoreWeight: parseFloat(e.target.value) || 1,
-                        })
-                    }
-                    style={{ width: "100px" }}
-                    />
-                </Form.Group>
-
-                {editingQuestion.type === 1 ? (
-                    <>
-                    <Form.Label>Đáp án</Form.Label>
-                    {editingQuestion.options.map((opt, optIndex) => (
-                        <Row key={optIndex} className="mb-2 align-items-center">
-                        <Col xs={1}>
-                            <Form.Check
-                            type="radio"
-                            name="correct-edit"
-                            checked={editingQuestion.correctIndex === optIndex}
-                            onChange={() =>
-                                setEditingQuestion({ ...editingQuestion, correctIndex: optIndex })
-                            }
-                            />
-                        </Col>
-                        <Col xs={1} className="text-center">
-                            <strong>{String.fromCharCode(65 + optIndex)}.</strong>
-                        </Col>
-                        <Col xs={9}>
-                            <Form.Control
-                            type="text"
-                            value={opt}
-                            onChange={(e) => {
-                                const newOptions = [...editingQuestion.options];
-                                newOptions[optIndex] = e.target.value;
-                                setEditingQuestion({ ...editingQuestion, options: newOptions });
-                            }}
-                            />
-                        </Col>
-                        <Col xs={1}>
-                            {editingQuestion.options.length > 2 && (
-                            <Button
-                                variant="link"
-                                size="sm"
-                                className="text-danger p-0"
-                                onClick={() => {
-                                if (editingQuestion.options.length > 2) {
-                                    const newOptions = editingQuestion.options.filter(
-                                    (_, i) => i !== optIndex
-                                    );
-                                    const newCorrectIndex =
-                                    editingQuestion.correctIndex >= newOptions.length
-                                        ? newOptions.length - 1
-                                        : editingQuestion.correctIndex;
-
-                                    setEditingQuestion({
-                                    ...editingQuestion,
-                                    options: newOptions,
-                                    correctIndex: newCorrectIndex,
-                                    });
-                                }
-                                }}
-                            >
-                                <Trash2 size={16} />
-                            </Button>
-                            )}
-                        </Col>
-                        </Row>
-                    ))}
-
-                    <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() =>
-                        setEditingQuestion({
-                            ...editingQuestion,
-                            options: [...editingQuestion.options, ""],
-                        })
-                        }
-                    >
-                        <Plus size={16} className="me-1" />
-                        Thêm đáp án
-                    </Button>
-                    </>
-                ) : (
-                    <Form.Group className="mb-3">
-                        <Form.Label>Đáp án đúng cho câu hỏi tự luận</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            rows={2}
-                            placeholder="Nhập đáp án đúng/tham khảo..."
-                            value={editingQuestion.options[0] || ""}
-                            onChange={(e) => {
-                                const newOptions = [...editingQuestion.options];
-                                newOptions[0] = e.target.value;
-                                setEditingQuestion({ ...editingQuestion, options: newOptions });
-                            }}
-                        />
-                        <Form.Text className="text-muted">
-                            Học viên cần điền chính xác cụm từ này (không phân biệt hoa thường).
-                        </Form.Text>
-                    </Form.Group>
-                )}
+              )}
             </div>
           )}
         </Modal.Body>
@@ -1871,10 +1944,10 @@ const QuizDetail = () => {
                 {toast.variant === "success"
                   ? "✅ Thành công"
                   : toast.variant === "danger"
-                  ? "❌ Lỗi"
-                  : toast.variant === "warning"
-                  ? "⚠️ Cảnh báo"
-                  : "ℹ️ Thông báo"}
+                    ? "❌ Lỗi"
+                    : toast.variant === "warning"
+                      ? "⚠️ Cảnh báo"
+                      : "ℹ️ Thông báo"}
               </strong>
             </Toast.Header>
             <Toast.Body
