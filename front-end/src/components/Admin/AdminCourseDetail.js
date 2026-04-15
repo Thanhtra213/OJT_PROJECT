@@ -202,7 +202,7 @@ export default function AdminCourseDetail() {
              <span className="status-badge" style={{ backgroundColor: isCourseActive ? 'var(--primary-light)' : 'rgba(245,158,11,0.12)', color: isCourseActive ? 'var(--primary)' : '#f59e0b', fontSize: '0.9rem', padding: '8px 16px' }}>
                 {isCourseActive ? "Đang hoạt động" : "Đã ẩn"}
              </span>
-             <p style={{ marginTop: "10px", fontWeight: 800, color: "var(--text-muted)", fontSize: "0.9rem" }}>Mã KH: <span style={{ color: "var(--primary)" }}>#{course.courseID || course.id}</span></p>
+             <p style={{ marginTop: "10px", fontWeight: 800, color: "var(--text-muted)", fontSize: "0.9rem" }}>Mã KH: <span style={{ color: "var(--primary)" }}>{course.courseID || course.courseId}</span></p>
           </div>
         </div>
       </div>

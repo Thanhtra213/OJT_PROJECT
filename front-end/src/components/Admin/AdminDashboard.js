@@ -16,7 +16,7 @@ import { ReviewManagement } from "./ReviewManagement";
 import { ExamManagement } from "./ExamManagement";
 import { FlashcardManagement } from "./FlashcardManagement";
 import { PlanManagement } from "./PlanManagement";
-import { VoucherManagement } from "./VoucherManagement"; // Đã thêm import Voucher
+import { VoucherManagement } from "./VoucherManagement";
 
 import { getDashboardOverview } from "../../middleware/admin/dashboardAdminAPI";
 import { getAllUsers, getStudents, getTeachers } from "../../middleware/admin/userManagementAPI";
@@ -65,6 +65,15 @@ export function AdminDashboard({ onClose }) {
     loadTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearchTransactions();
+    }, 500); // Chờ 0.5s sau khi người dùng ngừng gõ mới tìm kiếm
+
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKeyword]); 
 
   const loadAdminData = async () => {
     try {
@@ -204,7 +213,7 @@ export function AdminDashboard({ onClose }) {
     { id: "reviews", icon: Star, label: "Đánh giá" },
     { id: "exams", icon: Award, label: "Kiểm tra" },
     { id: "plans", icon: Ticket, label: "Gói hội viên" },
-    { id: "vouchers", icon: Tag, label: "Mã giảm giá" }, // Đã thêm mục Mã giảm giá
+    { id: "vouchers", icon: Tag, label: "Mã giảm giá" }, 
   ];
 
   const renderContent = () => {
@@ -374,6 +383,7 @@ export function AdminDashboard({ onClose }) {
     }
 
     if (activeMenu === "transactions") {
+      
       return (
         <div className="management-card">
           <div className="management-card-header">
@@ -386,14 +396,15 @@ export function AdminDashboard({ onClose }) {
           <div className="management-header">
             <div className="search-bar">
               <Search size={18} style={{ color: SYS_COLORS.muted }} />
+              
               <input
                 type="text"
                 placeholder="Tìm Order ID, email..."
                 className="search-input"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearchTransactions()}
               />
+
             </div>
             <button className="secondary-button" onClick={loadTransactions}>Làm mới</button>
           </div>
@@ -414,7 +425,7 @@ export function AdminDashboard({ onClose }) {
               <tbody>
                 {transactions.length > 0 ? transactions.map((t) => (
                   <tr key={t.orderID}>
-                    <td className="fw-800" style={{color: SYS_COLORS.mint}}>#{t.orderID}</td>
+                    <td className="fw-800" style={{color: SYS_COLORS.mint}}>{t.orderID}</td>
                     <td>
                       <p className="td-title fw-800 mb-0">{t.buyerUsername || 'N/A'}</p>
                       <p className="td-sub mb-0">{t.buyerEmail || 'N/A'}</p>
@@ -442,20 +453,24 @@ export function AdminDashboard({ onClose }) {
             </table>
           </div>
 
-          {showDetailModal && selectedTransaction && (
+         {showDetailModal && selectedTransaction && (
             <div className="management-modal-overlay" onClick={() => setShowDetailModal(false)}>
               <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-head">
-                  <h3 className="modal-title">Chi tiết giao dịch #{selectedTransaction.orderID}</h3>
+                  <h3 className="modal-title">Chi tiết giao dịch {selectedTransaction.orderID}</h3>
                 </div>
                 <div className="modal-body-custom">
                   <div className="info-row">
                     <span className="info-label">Người mua:</span>
-                    <span className="info-val">{selectedTransaction.buyer?.username} ({selectedTransaction.buyer?.email})</span>
+                    <span className="info-val">
+                      {selectedTransaction.buyerUsername || 'N/A'} ({selectedTransaction.buyerEmail || 'N/A'})
+                    </span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Gói hội viên:</span>
-                    <span className="info-val">{selectedTransaction.plan?.name} - {formatCurrency(selectedTransaction.plan?.price || 0)}</span>
+                    <span className="info-val">
+                      {selectedTransaction.planName || 'N/A'} - {formatCurrency(selectedTransaction.amount || 0)}
+                    </span>
                   </div>
                   <div className="info-row">
                     <span className="info-label">Trạng thái:</span>
@@ -463,7 +478,15 @@ export function AdminDashboard({ onClose }) {
                   </div>
                   <div className="info-row">
                     <span className="info-label">Thanh toán lúc:</span>
-                    <span className="info-val">{selectedTransaction.paidAt ? formatDateTime(selectedTransaction.paidAt) : "Chưa thanh toán"}</span>
+                    <span className="info-val">
+                      {selectedTransaction.paidAt ? formatDateTime(selectedTransaction.paidAt) : "Chưa thanh toán"}
+                    </span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Ngày tạo giao dịch:</span>
+                    <span className="info-val">
+                      {selectedTransaction.createdAt ? formatDateTime(selectedTransaction.createdAt) : "N/A"}
+                    </span>
                   </div>
                 </div>
                 <div className="modal-foot">
@@ -484,7 +507,7 @@ export function AdminDashboard({ onClose }) {
       case "flashcard": return <FlashcardManagement />;
       case "exams": return <ExamManagement />;
       case "plans": return <PlanManagement />;
-      case "vouchers": return <VoucherManagement />; // Đã liên kết component Voucher
+      case "vouchers": return <VoucherManagement />; 
       default: return null;
     }
   };

@@ -10,7 +10,7 @@ import {
   updateFlashcardItem,
   deleteFlashcardItem,
 } from "../../middleware/admin/adminFlashcardAPI";
-import { Plus, Edit, Trash, Eye, ArrowLeft, Upload, BookOpen, XCircle } from "lucide-react";
+import { Plus, Edit, Trash, Eye, ArrowLeft, Upload, BookOpen, XCircle, Search } from "lucide-react";
 import Swal from "sweetalert2";
 import "./admin-dashboard-styles.scss";
 
@@ -22,10 +22,12 @@ export function FlashcardManagement() {
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
 
+  const [searchSetQuery, setSearchSetQuery] = useState("");
+  const [searchItemQuery, setSearchItemQuery] = useState("");
+
   const [showSetModal, setShowSetModal] = useState(false);
   const [showItemModal, setShowItemModal] = useState(false);
   
-  // Quan ly Modal Import
   const [showImportModal, setShowImportModal] = useState(false);
   const [importStep, setImportStep] = useState(1); 
   const [previewItems, setPreviewItems] = useState([]);
@@ -113,6 +115,7 @@ export function FlashcardManagement() {
   const handleViewSet = async (set) => {
     const id = set.setID || set.setId;
     setSelectedSet(set);
+    setSearchItemQuery("");
     try {
       setLoadingItems(true);
       const data = await getFlashcardSet(id);
@@ -182,14 +185,12 @@ export function FlashcardManagement() {
     });
   };
 
-  // LOGIC DOC VA PREVIEW FILE TRUOC KHI IMPORT (Sử dụng lại logic cũ đọc mượt mà)
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
     setImportFile(file);
 
-    // Neu la file CSV, tien hanh doc va preview
     if (file.name.endsWith('.csv')) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -214,7 +215,6 @@ export function FlashcardManagement() {
       };
       reader.readAsText(file);
     } else {
-      // Neu la file Excel, bo qua preview vi JS thuan khong the doc duoc XLSX
       setPreviewItems([]);
       setImportStep(1);
     }
@@ -231,7 +231,6 @@ export function FlashcardManagement() {
     setPreviewItems(newItems);
   };
 
-  // Ham kiem tra xem tat ca cac the da duoc nhap du Mat truoc va Mat sau chua
   const isPreviewDataValid = () => {
     if (previewItems.length === 0) return false;
     
@@ -246,9 +245,7 @@ export function FlashcardManagement() {
   const handleImportSubmit = async () => {
     let finalFile = importFile;
 
-    // Neu dang o che do preview CSV, dong goi lai thanh file CSV moi tu du lieu da edit
     if (importStep === 2 && previewItems.length > 0) {
-      // FIX LỖI FONT CHỮ: Chèn BOM (\uFEFF) vao dau file de Backend nhan dien dung UTF-8
       let csvContent = "\uFEFFFrontText,BackText,IPA,Example\n";
       previewItems.forEach(item => {
         const escape = (str) => {
@@ -284,13 +281,11 @@ export function FlashcardManagement() {
 
       Swal.fire("Thành công!", "Import dữ liệu flashcard thành công!", "success");
       
-      // Reset trang thai
       setShowImportModal(false);
       setImportStep(1);
       setImportFile(null);
       setPreviewItems([]);
       
-      // Load lai danh sach the
       handleViewSet(selectedSet);
     } catch (err) {
       console.error("Loi import:", err);
@@ -311,6 +306,16 @@ export function FlashcardManagement() {
       setIsImporting(false);
     }
   };
+
+  const filteredSets = sets.filter(s => 
+    (s.title || "").toLowerCase().includes(searchSetQuery.toLowerCase()) || 
+    (s.description || "").toLowerCase().includes(searchSetQuery.toLowerCase())
+  );
+
+  const filteredItems = items.filter(item => 
+    (item.frontText || "").toLowerCase().includes(searchItemQuery.toLowerCase()) || 
+    (item.backText || "").toLowerCase().includes(searchItemQuery.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -339,11 +344,10 @@ export function FlashcardManagement() {
         </div>
       )}
 
-      {/* VIEW: DANH SACH ITEM TRONG SET */}
       {selectedSet ? (
         <>
           <div className="management-card-header" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={() => setSelectedSet(null)} className="secondary-button" style={{ padding: '8px' }}>
+            <button onClick={() => { setSelectedSet(null); setSearchItemQuery(""); }} className="secondary-button" style={{ padding: '8px' }}>
               <ArrowLeft size={18} />
             </button>
             <div>
@@ -353,6 +357,16 @@ export function FlashcardManagement() {
           </div>
 
           <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div className="search-bar" style={{ flexGrow: 1, minWidth: '280px', maxWidth: '400px' }}>
+              <Search size={18} style={{ color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Tìm theo từ vựng, định nghĩa..."
+                className="search-input"
+                value={searchItemQuery}
+                onChange={(e) => setSearchItemQuery(e.target.value)}
+              />
+            </div>
             <div style={{ flexGrow: 1 }}></div>
             <button onClick={() => setShowImportModal(true)} className="secondary-button" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }}>
               <Upload size={18} />
@@ -379,8 +393,8 @@ export function FlashcardManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.length > 0 ? (
-                    items.map((item) => {
+                  {filteredItems.length > 0 ? (
+                    filteredItems.map((item) => {
                       const itemId = item.itemID || item.itemId;
                       return (
                         <tr key={itemId}>
@@ -416,7 +430,7 @@ export function FlashcardManagement() {
                       <td colSpan="5">
                         <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                           <BookOpen size={48} style={{ color: 'var(--text-muted)' }} />
-                          <span>Chưa có thẻ nào trong bộ này. Nhấn Thêm mới hoặc Import File!</span>
+                          <span>Chưa có thẻ nào trong bộ này hoặc không tìm thấy. Nhấn Thêm mới hoặc Import File!</span>
                         </div>
                       </td>
                     </tr>
@@ -427,7 +441,6 @@ export function FlashcardManagement() {
           </div>
         </>
       ) : (
-        /* VIEW: DANH SACH CAC SET */
         <>
           <div className="management-card-header">
             <div>
@@ -437,6 +450,16 @@ export function FlashcardManagement() {
           </div>
 
           <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div className="search-bar" style={{ flexGrow: 1, minWidth: '280px', maxWidth: '400px' }}>
+              <Search size={18} style={{ color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Tìm theo tên bộ thẻ, mô tả..."
+                className="search-input"
+                value={searchSetQuery}
+                onChange={(e) => setSearchSetQuery(e.target.value)}
+              />
+            </div>
             <div style={{ flexGrow: 1 }}></div>
             <button onClick={() => handleOpenSetModal()} className="primary-button">
               <Plus size={18} />
@@ -455,12 +478,12 @@ export function FlashcardManagement() {
                 </tr>
               </thead>
               <tbody>
-                {sets.length > 0 ? (
-                  sets.map((s) => {
+                {filteredSets.length > 0 ? (
+                  filteredSets.map((s) => {
                     const setId = s.setID || s.setId;
                     return (
                       <tr key={setId}>
-                        <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{setId}</td>
+                        <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>{setId}</td>
                         <td className="fw-800 td-title" style={{ textAlign: 'center' }}>{s.title}</td>
                         <td style={{ textAlign: 'center' }}>
                           <p className="td-sub mb-0" style={{ maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: '0 auto' }}>
@@ -488,7 +511,7 @@ export function FlashcardManagement() {
                     <td colSpan="4">
                       <div className="admin-empty-data" style={{ padding: '3rem 0', flexDirection: 'column', gap: '1rem' }}>
                         <BookOpen size={48} style={{ color: 'var(--text-muted)' }} />
-                        <span>Chưa có bộ thẻ nào.</span>
+                        <span>Chưa có bộ thẻ nào hoặc không tìm thấy kết quả.</span>
                       </div>
                     </td>
                   </tr>
@@ -499,7 +522,6 @@ export function FlashcardManagement() {
         </>
       )}
 
-      {/* MODAL TAO SUA SET */}
       {showSetModal && (
         <div className="management-modal-overlay" onClick={() => setShowSetModal(false)}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
@@ -540,7 +562,6 @@ export function FlashcardManagement() {
         </div>
       )}
 
-      {/* MODAL TAO SUA ITEM */}
       {showItemModal && (
         <div className="management-modal-overlay" onClick={() => setShowItemModal(false)}>
           <div className="management-modal-content" onClick={e => e.stopPropagation()}>
@@ -603,7 +624,6 @@ export function FlashcardManagement() {
         </div>
       )}
 
-      {/* MODAL IMPORT FILE NÂNG CẤP (CÓ PREVIEW EDIT) */}
       {showImportModal && (
         <div className="management-modal-overlay" onClick={() => !isImporting && setShowImportModal(false)}>
           <div className="management-modal-content" style={{ maxWidth: importStep === 2 ? '1000px' : '500px' }} onClick={e => e.stopPropagation()}>

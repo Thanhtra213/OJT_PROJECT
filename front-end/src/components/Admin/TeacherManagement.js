@@ -1,23 +1,14 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Power, PowerOff, Search } from "lucide-react";
+import { Power, PowerOff, Search } from "lucide-react";
 import Swal from "sweetalert2";
-import { getTeachers, searchUsers, lockUser, unlockUser, createUser } from "../../middleware/admin/userManagementAPI";
+import { getTeachers, searchUsers, lockUser, unlockUser } from "../../middleware/admin/userManagementAPI";
 import "./admin-dashboard-styles.scss"; 
 
 export function TeacherManagement() {
     const [teachers, setTeachers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
-    const [showCreateModal, setShowCreateModal] = useState(false);
     const [toast, setToast] = useState({ show: false, message: "", type: "success" });
-
-    const [newTeacher, setNewTeacher] = useState({
-        email: "",
-        username: "",
-        password: "",
-        role: "TEACHER",
-        description: "",
-    });
 
     const showPopup = (message, type = "success") => {
         setToast({ show: true, message, type });
@@ -58,7 +49,7 @@ export function TeacherManagement() {
         }
     };
 
-    // 🛡️ XỬ LÝ KHÓA/MỞ KHÓA BẰNG SWEETALERT2
+    // XỬ LÝ KHÓA/MỞ KHÓA BẰNG SWEETALERT2
     const handleToggleTeacher = (accountID, isActive) => {
         if (!accountID || (typeof accountID === 'number' && accountID < 1)) {
             Swal.fire('Lỗi Dữ Liệu!', 'Không tìm thấy ID của tài khoản này.', 'error');
@@ -133,27 +124,6 @@ export function TeacherManagement() {
         }
     };
 
-    const handleCreateTeacher = async () => {
-        if (!newTeacher.email || !newTeacher.username || !newTeacher.password) {
-            showPopup("Vui lòng điền đầy đủ thông tin", "error");
-            return;
-        }
-        try {
-            await createUser(newTeacher);
-            Swal.fire('Thành công!', 'Tạo giảng viên thành công!', 'success');
-            setShowCreateModal(false);
-            loadTeachers();
-            setNewTeacher({ email: "", username: "", password: "", role: "TEACHER", description: "" });
-        } catch (error) {
-            Swal.fire('Lỗi!', error.message || "Không thể tạo giảng viên", 'error');
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setNewTeacher(prev => ({ ...prev, [name]: value }));
-    };
-
     const filteredTeachers = teachers.filter(teacher =>
         (teacher.username && teacher.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (teacher.email && teacher.email.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -172,7 +142,7 @@ export function TeacherManagement() {
         <div className="management-card">
             {toast.show && (
                 <div style={{
-                    position: 'fixed', top: '20px', right: '20px', zIndex: 9999,
+                    position: 'fixed', top: '20px', right: '20px', zIndex: 999999,
                     background: toast.type === 'success' ? 'var(--mint)' : '#ec4899',
                     color: '#fff', padding: '12px 24px', borderRadius: '99px',
                     fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
@@ -201,12 +171,6 @@ export function TeacherManagement() {
                         onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
                         className="search-input"
                     />
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => setShowCreateModal(true)} className="primary-button">
-                        <UserPlus size={18} />
-                        <span>Thêm giảng viên</span>
-                    </button>
                 </div>
             </div>
 
@@ -268,72 +232,6 @@ export function TeacherManagement() {
                     </tbody>
                 </table>
             </div>
-
-            {/* MODAL THÊM GIẢNG VIÊN */}
-            {showCreateModal && (
-                <div className="management-modal-overlay" onClick={() => setShowCreateModal(false)}>
-                    <div className="management-modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="modal-head">
-                            <h3 className="modal-title">Tạo giảng viên mới</h3>
-                        </div>
-                        
-                        <div className="modal-body-custom">
-                            <div style={{ marginBottom: '1.25rem' }}>
-                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên đăng nhập</label>
-                                <input 
-                                    type="text" 
-                                    placeholder="Nhập tên đăng nhập..." 
-                                    name="username" 
-                                    value={newTeacher.username} 
-                                    onChange={handleInputChange} 
-                                    className="form-input" 
-                                />
-                            </div>
-                            
-                            <div style={{ marginBottom: '1.25rem' }}>
-                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Email</label>
-                                <input 
-                                    type="email" 
-                                    placeholder="Nhập địa chỉ email..." 
-                                    name="email" 
-                                    value={newTeacher.email} 
-                                    onChange={handleInputChange} 
-                                    className="form-input" 
-                                />
-                            </div>
-
-                            <div style={{ marginBottom: '1.25rem' }}>
-                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mật khẩu</label>
-                                <input 
-                                    type="password" 
-                                    placeholder="Tạo mật khẩu..." 
-                                    name="password" 
-                                    value={newTeacher.password} 
-                                    onChange={handleInputChange} 
-                                    className="form-input" 
-                                />
-                            </div>
-
-                            <div>
-                                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mô tả ngắn</label>
-                                <textarea 
-                                    placeholder="Giới thiệu nhanh về giảng viên..." 
-                                    name="description" 
-                                    value={newTeacher.description} 
-                                    onChange={handleInputChange} 
-                                    className="form-textarea" 
-                                    rows="3"
-                                ></textarea>
-                            </div>
-                        </div>
-
-                        <div className="modal-foot">
-                            <button className="secondary-button" style={{ marginRight: '1rem' }} onClick={() => setShowCreateModal(false)}>Hủy</button>
-                            <button className="primary-button" onClick={handleCreateTeacher}>Tạo giảng viên</button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

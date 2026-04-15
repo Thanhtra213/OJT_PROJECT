@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Power, PowerOff, Search } from "lucide-react";
+import { Power, PowerOff, Search } from "lucide-react";
 import Swal from "sweetalert2";
 import {
   getAllUsers,
   searchUsers,
   lockUser,
   unlockUser,
-  createUser,
 } from "../../middleware/admin/userManagementAPI";
 import "./admin-dashboard-styles.scss"; 
 
@@ -17,17 +16,8 @@ export function UserManagement() {
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const [showCreateUser, setShowCreateUser] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: "",
-    username: "",
-    password: "",
-    role: "STUDENT",
-  });
-
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
-  // ✅ Lấy thông tin tài khoản đang đăng nhập
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const currentUserId = currentUser.accountId || currentUser.accountID || currentUser.id;
 
@@ -40,6 +30,15 @@ export function UserManagement() {
     loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearch();
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   const formatUserData = (u) => {
     return {
@@ -89,7 +88,6 @@ export function UserManagement() {
           
           Swal.fire('Thành công!', 'Cập nhật trạng thái thành công.', 'success')
             .then(() => {
-              // ✅ Load lại trang để dashboard cập nhật số liệu mới nhất
               window.location.reload(); 
             });
         } catch (error) {
@@ -111,20 +109,6 @@ export function UserManagement() {
     } finally { setIsLoading(false); }
   };
 
-  const handleCreateUser = async () => {
-    if (!newUser.email || !newUser.username || !newUser.password) {
-      showPopup("Vui lòng điền đầy đủ thông tin.", "error");
-      return;
-    }
-    try {
-      await createUser(newUser);
-      Swal.fire('Thành công!', 'Tạo người dùng thành công!', 'success').then(() => window.location.reload());
-    } catch (error) {
-      Swal.fire('Lỗi!', "Không thể tạo người dùng", 'error');
-    }
-  };
-
-  // ✅ Hàm lọc: Ẩn chính mình khỏi danh sách
   const filteredUsers = users.filter((user) => {
     if (String(user.accountID) === String(currentUserId)) return false;
 
@@ -143,7 +127,7 @@ export function UserManagement() {
   return (
     <div className="management-card">
       {toast.show && (
-        <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, background: toast.type === 'success' ? 'var(--mint)' : '#ec4899', color: '#fff', padding: '12px 24px', borderRadius: '99px', fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+        <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 999999, background: toast.type === 'success' ? 'var(--mint)' : '#ec4899', color: '#fff', padding: '12px 24px', borderRadius: '99px', fontWeight: 800, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
           {toast.message}
         </div>
       )}
@@ -151,7 +135,6 @@ export function UserManagement() {
       <div className="management-card-header">
         <div>
           <h2 className="card-title">Quản lý người dùng</h2>
-          {/* ✅ Cập nhật dòng hiển thị thống kê */}
           <p className="card-description">
             Hiển thị {filteredUsers.length} trên tổng số {users.length > 0 ? users.length - 1 : 0} tài khoản
           </p>
@@ -161,7 +144,13 @@ export function UserManagement() {
       <div className="management-header" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         <div className="search-bar" style={{ flexGrow: 1, minWidth: '280px', maxWidth: '400px' }}>
           <Search size={18} style={{ color: 'var(--text-muted)' }} />
-          <input type="text" placeholder="Tìm theo tên, email..." className="search-input" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} />
+          <input 
+            type="text" 
+            placeholder="Tìm theo tên, email..." 
+            className="search-input" 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+          />
         </div>
         
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -176,7 +165,6 @@ export function UserManagement() {
             <option value="active">Hoạt động</option>
             <option value="inactive">Đã khóa</option>
           </select>
-          <button onClick={() => setShowCreateUser(true)} className="primary-button"><UserPlus size={18} /><span>Tạo mới</span></button>
         </div>
       </div>
 
@@ -207,7 +195,6 @@ export function UserManagement() {
                     </span>
                   </td>
                   <td style={{ textAlign: 'center' }}>
-                    {/* ✅ Cho phép khóa tất cả mọi người (trừ bản thân đã bị lọc ở trên) */}
                     <button
                       className="action-button"
                       title={user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
@@ -225,40 +212,6 @@ export function UserManagement() {
           </tbody>
         </table>
       </div>
-
-      {showCreateUser && (
-        <div className="management-modal-overlay" onClick={() => setShowCreateUser(false)}>
-          <div className="management-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head"><h3 className="modal-title">Tạo người dùng mới</h3></div>
-            <div className="modal-body-custom">
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Tên đăng nhập</label>
-                <input type="text" placeholder="Nhập tên đăng nhập..." value={newUser.username} onChange={(e) => setNewUser({ ...newUser, username: e.target.value })} className="form-input" />
-              </div>
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Địa chỉ Email</label>
-                <input type="email" placeholder="Nhập email..." value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} className="form-input" />
-              </div>
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Mật khẩu</label>
-                <input type="password" placeholder="Nhập mật khẩu..." value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="form-input" />
-              </div>
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.5rem', fontSize: '0.85rem', textTransform: 'uppercase' }}>Phân quyền</label>
-                <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })} className="form-input">
-                  <option value="STUDENT">Học viên (Student)</option>
-                  <option value="TEACHER">Giảng viên (Teacher)</option>
-                  <option value="ADMIN">Quản trị viên (Admin)</option>
-                </select>
-              </div>
-            </div>
-            <div className="modal-foot">
-              <button onClick={() => setShowCreateUser(false)} className="secondary-button" style={{ marginRight: '1rem' }}>Hủy</button>
-              <button onClick={handleCreateUser} className="primary-button">Tạo tài khoản</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
