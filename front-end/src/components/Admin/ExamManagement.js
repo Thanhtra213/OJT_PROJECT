@@ -394,7 +394,7 @@ export function ExamManagement() {
 
                 return (
                   <tr key={quizId}>
-                    <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{quizId}</td>
+                    <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>{quizId}</td>
                     <td className="fw-800 td-title" style={{ textAlign: 'center' }}>
                       {quiz.title}
                       {isPlacement && (
@@ -728,8 +728,8 @@ export function ExamManagement() {
                     <tbody>
                       {systemExamResults.map((result, index) => (
                         <tr key={`${result.attemptId}-${index}`}>
-                          <td className="fw-800" style={{ color: 'var(--text-muted)', textAlign: 'center' }}>#{result.attemptId}</td>
-                          <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>#{result.quizId}</td>
+                          <td className="fw-800" style={{ color: 'var(--text-muted)', textAlign: 'center' }}>{result.attemptId}</td>
+                          <td className="fw-800" style={{ color: 'var(--primary)', textAlign: 'center' }}>{result.quizId}</td>
                           <td style={{ textAlign: 'center' }}>
                             <p className="td-title fw-800 mb-0" style={{ margin: '0 auto' }}>{result.quizTitle}</p>
                             <p className="td-sub mb-0" style={{ margin: '0 auto' }}>{result.courseName}</p>

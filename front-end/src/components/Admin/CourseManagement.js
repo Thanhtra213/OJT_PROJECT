@@ -160,7 +160,7 @@ export function CourseManagement() {
               filteredCourses.map((course) => (
                 <tr key={course.courseID}>
                   <td className="fw-800" style={{ color: "var(--primary)" }}>
-                    {course.courseID ? `#${course.courseID}` : ""}
+                    {course.courseID ? `${course.courseID}` : ""}
                   </td>
                   <td>
                     <p className="td-title fw-800 mb-0">{course.courseName}</p>
@@ -233,7 +233,7 @@ export function CourseManagement() {
                   <div className="info-row">
                     <span className="info-label">Mã khóa học:</span>
                     <span className="info-val" style={{ color: "var(--primary)" }}>
-                      #{selectedCourse.courseID || selectedCourse.id || selectedCourse._fallbackId || ""}
+                      {selectedCourse.courseID || selectedCourse.id || selectedCourse._fallbackId || ""}
                     </span>
                   </div>
                   <div className="info-row">
