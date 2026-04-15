@@ -304,7 +304,6 @@ const CourseDetail = () => {
 
   // ── GDrive iframe tick ────────────────────────────────────────────────────
   const startIframeTick = () => {
-    if (!iframePlayingRef.current) return;
     if (iframeTickRef.current) return;
     iframePlayingRef.current = true;
     tickStartTimeRef.current = Date.now();
@@ -367,41 +366,31 @@ const CourseDetail = () => {
 
   // ── Confirm GDrive duration ───────────────────────────────────────────────
   const handleConfirmGdriveDuration = () => {
-  const input = gdriveDurationInput.trim();
+    const input = gdriveDurationInput.trim();
+    let totalSeconds = 0;
 
-  let totalSeconds = 0;
-
-  if (input.includes(":")) {
-    const [m, s] = input.split(":");
-    const mins = parseInt(m, 10);
-    const secs = parseInt(s, 10);
-
-    if (isNaN(mins) || isNaN(secs) || secs >= 60) {
-      alert("Sai định dạng mm:ss");
-      return;
+    if (input.includes(':')) {
+      const [m, s] = input.split(':');
+      const mins = parseInt(m, 10);
+      const secs = parseInt(s, 10);
+      if (isNaN(mins) || isNaN(secs) || secs >= 60) { alert('Sai định dạng, hãy nhập mm:ss (VD: 6:58)'); return; }
+      totalSeconds = mins * 60 + secs;
+    } else {
+      const mins = parseFloat(input);
+      if (isNaN(mins) || mins <= 0) { alert('Vui lòng nhập số phút hợp lệ! (VD: 6.5 hoặc 6:58)'); return; }
+      totalSeconds = Math.round(mins * 60);
     }
 
-    totalSeconds = mins * 60 + secs;
-  } else {
-    const mins = parseFloat(input);
-
-    if (isNaN(mins) || mins <= 0) {
-      alert("Nhập số hợp lệ");
-      return;
-    }
-
-    totalSeconds = Math.round(mins * 60);
-  }
-
-  videoDurationRef.current = totalSeconds;
-  setVideoDuration(totalSeconds);
-  setGdriveConfirmed(true);
-};
+    videoDurationRef.current = totalSeconds;
+    setVideoDuration(totalSeconds);
+    setGdriveConfirmed(true);
+    const cur = currentTimeRef.current;
+    if (cur > 0) setVideoProgress(Math.min(100, Math.round((cur / totalSeconds) * 100)));
+  };
 
   // ── Select video ──────────────────────────────────────────────────────────
   const handleVideoSelect = async (videoId, videoName, chapterName) => {
     if (selectedVideoRef.current) {
-      iframePlayingRef.current = false;
       const snapCur = videoRef.current && !isNaN(videoRef.current.currentTime)
         ? videoRef.current.currentTime : currentTimeRef.current;
       const snapDur = videoRef.current && !isNaN(videoRef.current.duration) && videoRef.current.duration > 0
@@ -485,9 +474,7 @@ const CourseDetail = () => {
           setVideoDuration(0);
         }
 
-        if (newVideo.videoType === 'video') {
-  startProgressTracking(newVideo);
-}
+        startProgressTracking(newVideo);
       } else {
         setVideoError("Bạn cần đăng ký gói thành viên để xem video này.");
         setSelectedVideo(null);
@@ -658,7 +645,7 @@ const CourseDetail = () => {
   useEffect(() => {
     const onVisibilityChange = () => {
       if (document.hidden) {
-        gdriveWasPlaying.current = iframePlayingRef.current;
+        gdriveWasPlaying.current = iframePlayingRef.current || !!iframeTickRef.current;
         stopYtTick(true);
         stopIframeTick();
       } else {
@@ -668,10 +655,10 @@ const CourseDetail = () => {
       }
     };
     const onBlur = () => {
-  // 👉 chỉ stop, KHÔNG auto start
-  iframePlayingRef.current = false;
-  stopIframeTick();
-};
+      // Chỉ stop — KHÔNG auto start để tránh đếm tiến độ ảo khi user chưa play
+      iframePlayingRef.current = false;
+      stopIframeTick();
+    };
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("blur", onBlur);
     return () => {
@@ -822,9 +809,7 @@ const CourseDetail = () => {
                         ref={iframeRef}
                         src={selectedVideo.videoURL}
                         title={selectedVideo.videoName}
-                        onClick={() => {
-    iframePlayingRef.current = true;
-    startIframeTick();}}
+                        onClick={() => { iframePlayingRef.current = true; startIframeTick(); }}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -857,13 +842,13 @@ const CourseDetail = () => {
                 <span className="gdrive-duration-box__warn">⚠️ Google Drive không hỗ trợ đọc thời lượng tự động.</span>
                 <span className="gdrive-duration-box__label">Nhập thời lượng video (phút) để theo dõi tiến độ:</span>
                 <input
-  className="gdrive-duration-box__input"
-  type="text"   // ✅ đổi ở đây
-  placeholder="VD: 6:58"
-  value={gdriveDurationInput}
-  onChange={e => setGdriveDurationInput(e.target.value)}
-  onKeyDown={e => e.key === 'Enter' && handleConfirmGdriveDuration()}
-/>
+                  className="gdrive-duration-box__input"
+                  type="text"
+                  placeholder="VD: 6:58 hoặc 6.5"
+                  value={gdriveDurationInput}
+                  onChange={e => setGdriveDurationInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleConfirmGdriveDuration()}
+                />
                 <button
                   className="gdrive-duration-box__btn"
                   onClick={handleConfirmGdriveDuration}
