@@ -351,26 +351,71 @@ const WritingPractice = () => {
                 </div>
               ) : (
                 <div className="feedback-empty">
-                  <div className="empty-icon">☕</div>
+                  <div className="empty-icon"></div>
                   <p>Sau khi nộp bài, kết quả chi tiết từ AI sẽ hiển thị tại đây.</p>
                 </div>
               )}
             </div>
 
             {feedback && (
-              <div className="card info-card animation-fade-in">
-                <div className="card-header">
-                  <AlertCircle size={18} />
-                  <h3>Chi tiết nhận xét</h3>
-                </div>
-                <div className="feedback-text-area">
-                  <p className="text-sm text-gray-600 line-clamp-6">
-                    {typeof feedback.feedback === 'string' ? feedback.feedback : "Xem nhận xét chi tiết bên dưới."}
-                  </p>
-                  <button className="btn-link">Xem đầy đủ <ChevronRight size={14} /></button>
-                </div>
-              </div>
-            )}
+  <div className="card info-card animation-fade-in">
+    <div className="card-header">
+      <AlertCircle size={18} />
+      <h3>Chi tiết nhận xét</h3>
+    </div>
+    <div className="feedback-text-area">
+      {/* Overall */}
+      {feedback.feedback?.overall && (
+        <p className="text-sm text-gray-600 mb-2">
+          <strong>Tổng quan:</strong> {feedback.feedback.overall}
+        </p>
+      )}
+
+      {/* Task Response */}
+      {feedback.feedback?.taskResponse && (
+        <div className="mb-2">
+          <strong>Task Response:</strong>
+          <p>{feedback.feedback.taskResponse.comment}</p>
+          {feedback.feedback.taskResponse.suggestions?.map((s, i) => (
+            <p key={i} className="text-green-600">💡 {s}</p>
+          ))}
+        </div>
+      )}
+
+      {/* Coherence */}
+      {feedback.feedback?.coherence && (
+        <div className="mb-2">
+          <strong>Coherence:</strong>
+          <p>{feedback.feedback.coherence.comment}</p>
+        </div>
+      )}
+
+      {/* Lexical - weakPhrases */}
+      {feedback.feedback?.lexical?.weakPhrases?.length > 0 && (
+        <div className="mb-2">
+          <strong>Từ vựng cần cải thiện:</strong>
+          {feedback.feedback.lexical.weakPhrases.map((p, i) => (
+            <p key={i}>❌ <em>{p.original}</em> → ✅ <em>{p.suggestion}</em></p>
+          ))}
+        </div>
+      )}
+
+      {/* Grammar - errors */}
+      {feedback.feedback?.grammar?.errors?.length > 0 && (
+        <div className="mb-2">
+          <strong>Lỗi ngữ pháp:</strong>
+          {feedback.feedback.grammar.errors.map((e, i) => (
+            <div key={i} className="mb-1">
+              <p>❌ {e.original}</p>
+              <p>✅ {e.correction}</p>
+              <p className="text-gray-500 text-xs">{e.explanation}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
           </aside>
         </div>
       </main>
