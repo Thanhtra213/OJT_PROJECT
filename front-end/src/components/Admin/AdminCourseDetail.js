@@ -15,10 +15,12 @@ export default function AdminCourseDetail() {
   const [flashcards, setFlashcards] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
 
-  const [expandedFC, setExpandedFC] = useState(null);
+  // SỬA: Chuyển state sang dạng object để lưu trạng thái mở của NHIỀU item cùng lúc
+  const [expandedFCs, setExpandedFCs] = useState({});
   const [detailedFCs, setDetailedFCs] = useState({}); 
 
-  const [expandedQuiz, setExpandedQuiz] = useState(null);
+  // SỬA: Chuyển state sang dạng object để lưu trạng thái mở của NHIỀU item cùng lúc
+  const [expandedQuizzes, setExpandedQuizzes] = useState({});
   const [detailedQuizzes, setDetailedQuizzes] = useState({}); 
 
   useEffect(() => {
@@ -79,12 +81,10 @@ export default function AdminCourseDetail() {
   const handleToggleFlashcard = async (setId) => {
     if (!setId) return;
 
-    if (expandedFC === setId) {
-      setExpandedFC(null); 
-      return;
-    }
-    setExpandedFC(setId); 
+    // SỬA: Đảo ngược trạng thái mở/đóng của riêng thẻ này
+    setExpandedFCs(prev => ({ ...prev, [setId]: !prev[setId] }));
     
+    // Nếu chưa load chi tiết thì mới gọi API
     if (!detailedFCs[setId]) {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/flashcard/set/${setId}`, { headers: getHeaders() });
@@ -110,12 +110,10 @@ export default function AdminCourseDetail() {
   const handleToggleQuiz = async (quizId) => {
     if (!quizId) return;
 
-    if (expandedQuiz === quizId) {
-      setExpandedQuiz(null); 
-      return;
-    }
-    setExpandedQuiz(quizId); 
+    // SỬA: Đảo ngược trạng thái mở/đóng của riêng quiz này
+    setExpandedQuizzes(prev => ({ ...prev, [quizId]: !prev[quizId] }));
 
+    // Nếu chưa load chi tiết thì mới gọi API
     if (!detailedQuizzes[quizId]) {
       try {
         let data;
@@ -185,7 +183,8 @@ export default function AdminCourseDetail() {
   }
 
   return (
-    <div className="management-card" style={{ padding: "0", margin: "1.5rem 2rem" }}>
+    // SỬA: Thêm overflow: "hidden" và borderRadius: "20px" để background con không đè lên viền góc bo
+    <div className="management-card" style={{ padding: "0", margin: "1.5rem 2rem", overflow: "hidden", borderRadius: "20px" }}>
       <div style={{ padding: "2rem", borderBottom: "1px solid var(--border)", backgroundColor: "var(--bg-page)" }}>
         <button className="secondary-button" style={{ marginBottom: "1.5rem", border: "none", background: "transparent", padding: "0", fontWeight: "bold", color: "var(--primary)", cursor: "pointer" }} onClick={handleGoBack}>
           Quay lại danh sách
@@ -280,7 +279,8 @@ export default function AdminCourseDetail() {
               <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 {flashcards.map((fc) => {
                   const fcId = fc.setId || fc.setID || fc.flashcardSetId || fc.FlashcardSetId || fc.id || fc.Id;
-                  const isExpanded = expandedFC === fcId;
+                  // SỬA: Check theo object state
+                  const isExpanded = !!expandedFCs[fcId];
                   const cardsList = detailedFCs[fcId] || [];
 
                   return (
@@ -341,7 +341,8 @@ export default function AdminCourseDetail() {
               <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 {quizzes.map((quiz) => {
                   const qId = quiz.quizId || quiz.quizID || quiz.QuizId || quiz.QuizID || quiz.id || quiz.Id;
-                  const isExpanded = expandedQuiz === qId;
+                  // SỬA: Check theo object state
+                  const isExpanded = !!expandedQuizzes[qId];
                   const groupsList = detailedQuizzes[qId] || [];
 
                   return (

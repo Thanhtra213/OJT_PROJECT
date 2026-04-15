@@ -232,7 +232,7 @@ export function AdminDashboard({ onClose }) {
                   <Award size={22} />
                 </div>
               </div>
-              <div className="admin-stat-value">{stats?.totalMembers || 0}</div>
+              <div className="admin-stat-value">{stats?.activeMembers || 0}</div>
               <p className="admin-stat-footer">Đang trong thời hạn</p>
             </div>
 
