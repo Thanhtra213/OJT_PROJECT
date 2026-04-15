@@ -307,6 +307,81 @@ const WritingPractice = () => {
                 )}
               </div>
             </div>
+
+            {feedback && (
+              <div className="card info-card feedback-detail-card animation-fade-in">
+                <div className="card-header">
+                  <AlertCircle size={18} />
+                  <h3>Chi tiết nhận xét</h3>
+                </div>
+                <div className="feedback-text-area">
+                  {/* Overall */}
+                  {feedback.feedback?.overall && (
+                    <div className="feedback-section-item">
+                      <strong>Tổng quan:</strong>
+                      <p>{feedback.feedback.overall}</p>
+                    </div>
+                  )}
+
+                  <div className="feedback-sections-grid">
+                    {/* Task Response */}
+                    {feedback.feedback?.taskResponse && (
+                      <div className="feedback-section-item">
+                        <strong>Task Response:</strong>
+                        <p>{feedback.feedback.taskResponse.comment}</p>
+                        {feedback.feedback.taskResponse.suggestions?.map((s, i) => (
+                          <p key={i} className="suggestion-item">💡 {s}</p>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Coherence */}
+                    {feedback.feedback?.coherence && (
+                      <div className="feedback-section-item">
+                        <strong>Coherence:</strong>
+                        <p>{feedback.feedback.coherence.comment}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="feedback-lists-grid">
+                    {/* Lexical - weakPhrases */}
+                    {feedback.feedback?.lexical?.weakPhrases?.length > 0 && (
+                      <div className="feedback-section-item">
+                        <strong>Từ vựng cần cải thiện:</strong>
+                        <div className="correction-list">
+                          {feedback.feedback.lexical.weakPhrases.map((p, i) => (
+                            <div key={i} className="correction-item">
+                              <span className="wrong">❌ <em>{p.original}</em></span>
+                              <ChevronRight size={14} className="arrow" />
+                              <span className="right">✅ <em>{p.suggestion}</em></span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Grammar - errors */}
+                    {feedback.feedback?.grammar?.errors?.length > 0 && (
+                      <div className="feedback-section-item">
+                        <strong>Lỗi ngữ pháp:</strong>
+                        <div className="error-list">
+                          {feedback.feedback.grammar.errors.map((e, i) => (
+                            <div key={i} className="error-item">
+                              <div className="error-comparison">
+                                <span className="wrong">❌ {e.original}</span>
+                                <span className="right">✅ {e.correction}</span>
+                              </div>
+                              <p className="explanation">{e.explanation}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Sidebar Right: Feedback */}
@@ -357,65 +432,6 @@ const WritingPractice = () => {
               )}
             </div>
 
-            {feedback && (
-  <div className="card info-card animation-fade-in">
-    <div className="card-header">
-      <AlertCircle size={18} />
-      <h3>Chi tiết nhận xét</h3>
-    </div>
-    <div className="feedback-text-area">
-      {/* Overall */}
-      {feedback.feedback?.overall && (
-        <p className="text-sm text-gray-600 mb-2">
-          <strong>Tổng quan:</strong> {feedback.feedback.overall}
-        </p>
-      )}
-
-      {/* Task Response */}
-      {feedback.feedback?.taskResponse && (
-        <div className="mb-2">
-          <strong>Task Response:</strong>
-          <p>{feedback.feedback.taskResponse.comment}</p>
-          {feedback.feedback.taskResponse.suggestions?.map((s, i) => (
-            <p key={i} className="text-green-600">💡 {s}</p>
-          ))}
-        </div>
-      )}
-
-      {/* Coherence */}
-      {feedback.feedback?.coherence && (
-        <div className="mb-2">
-          <strong>Coherence:</strong>
-          <p>{feedback.feedback.coherence.comment}</p>
-        </div>
-      )}
-
-      {/* Lexical - weakPhrases */}
-      {feedback.feedback?.lexical?.weakPhrases?.length > 0 && (
-        <div className="mb-2">
-          <strong>Từ vựng cần cải thiện:</strong>
-          {feedback.feedback.lexical.weakPhrases.map((p, i) => (
-            <p key={i}>❌ <em>{p.original}</em> → ✅ <em>{p.suggestion}</em></p>
-          ))}
-        </div>
-      )}
-
-      {/* Grammar - errors */}
-      {feedback.feedback?.grammar?.errors?.length > 0 && (
-        <div className="mb-2">
-          <strong>Lỗi ngữ pháp:</strong>
-          {feedback.feedback.grammar.errors.map((e, i) => (
-            <div key={i} className="mb-1">
-              <p>❌ {e.original}</p>
-              <p>✅ {e.correction}</p>
-              <p className="text-gray-500 text-xs">{e.explanation}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-)}
           </aside>
         </div>
       </main>

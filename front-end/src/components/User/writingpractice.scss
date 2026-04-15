@@ -453,21 +453,95 @@ $transit:        all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feedback-text-area {
-  padding: 1.25rem;
-  
-  .btn-link {
-    background: transparent;
-    border: none;
-    color: $primary;
-    font-size: 0.8rem;
-    font-weight: 700;
+  padding: 1.5rem;
+
+  .feedback-section-item {
+    margin-bottom: 1.5rem;
+    &:last-child { margin-bottom: 0; }
+
+    strong {
+      display: block;
+      font-size: 0.95rem;
+      color: $text-main;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: $text-muted;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .suggestion-item {
+      color: $primary-dark;
+      background: $primary-light;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      font-weight: 500;
+      font-size: 0.85rem;
+    }
+  }
+
+  .feedback-sections-grid, .feedback-lists-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid $border-color;
+  }
+
+  .correction-list, .error-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .correction-item {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 0;
-    margin-top: 10px;
-    cursor: pointer;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: $text-main;
+    
+    .arrow { color: $text-light; }
+    .wrong { color: #ef4444; }
+    .right { color: $primary-dark; font-weight: 600; }
   }
+
+  .error-item {
+    background: #f8fafc;
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid $border-color;
+
+    .error-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+
+      .wrong { color: #ef4444; text-decoration: line-through; opacity: 0.8; }
+      .right { color: $primary-dark; font-weight: 700; }
+    }
+
+    .explanation {
+      font-size: 0.75rem;
+      color: $text-muted;
+      font-style: italic;
+      margin: 0;
+      padding-top: 0.5rem;
+      border-top: 1px dotted #e2e8f0;
+    }
+  }
+}
+
+.feedback-detail-card {
+  margin-top: 1.5rem;
 }
 
 // ── Buttons ──────────────────────────────────────────────────────
