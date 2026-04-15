@@ -35,13 +35,13 @@ export const generateWriting = async () => {
 export const submitWriting = async (promptId, answerText, sendToTeacher = false) => {
   try {
     const body = { 
-      PromptId: promptId, 
-      AnswerText: answerText, 
-      SendToTeacher: sendToTeacher,
-      Category: "Writing"
+      promptId,
+      answerText,
+      sendToTeacher
     };
+
     const res = await api.post("/submit", body, { headers: getAuthHeaders() });
-    return res.data; // { score, taskResponse, coherence, lexicalResource, grammar, feedback, attemptId }
+    return res.data;
   } catch (err) {
     console.error("Submit writing error:", err);
     throw new Error(parseError(err));

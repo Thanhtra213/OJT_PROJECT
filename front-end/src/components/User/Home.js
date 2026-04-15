@@ -157,7 +157,6 @@ const Home = () => {
     return h > 0 ? (mn > 0 ? `${h} giờ ${mn} phút` : `${h} giờ`) : `${mn} phút`;
   };
 
-  // ✅ FIX: Hàm format thời lượng từ giây (chính xác hơn)
   const fmtSec = (s) => {
     if (s == null || isNaN(s) || s <= 0) return "0 phút";
     const totalSec = Math.max(0, Math.round(Number(s)));
@@ -169,14 +168,12 @@ const Home = () => {
     return `${sc} giây`;
   };
 
-  // ✅ FIX: Lấy thời lượng chính xác từ entry (ưu tiên durationSec, fallback sang duration phút)
   const getDuration = (lesson) => {
     if (lesson.durationSec > 0) return fmtSec(lesson.durationSec);
     if (lesson.duration > 0) return fmtDur(lesson.duration);
     return "0 phút";
   };
 
-  // ✅ FIX: Lấy thời gian đã xem chính xác từ entry (ưu tiên watchedSec, fallback sang watchedMinutes phút)
   const getWatched = (lesson) => {
     if (lesson.watchedSec > 0) return fmtSec(lesson.watchedSec);
     if (lesson.watchedMinutes > 0) return fmtDur(lesson.watchedMinutes);
@@ -227,6 +224,8 @@ const Home = () => {
     } catch { setLessonHistory([]); }
   };
 
+  // ✅ FIX: loadDbHistory — sau khi enrich từ DB, sync ngược lại localStorage
+  // để progress/watchedSec/durationSec luôn nhất quán giữa hai nơi.
   const loadDbHistory = async () => {
     try {
       const localHistory = JSON.parse(localStorage.getItem(getUserHistoryKey()) || "[]");
@@ -246,9 +245,17 @@ const Home = () => {
               } else if (dbData.totalDurationSec > 0) {
                 dbProgress = Math.min(99, Math.round((dbData.lastPositionSec / dbData.totalDurationSec) * 100));
               }
-              const finalProgress = Math.max(item.progress || 0, dbProgress);
 
-              // ✅ FIX: Ưu tiên dùng durationSec và watchedSec từ DB nếu có
+              // ✅ FIX: Lấy progress cao nhất giữa localStorage và DB
+              // nhưng nếu DB có lastPositionSec thực tế thì ưu tiên tính lại từ DB
+              const finalProgress = dbData.isCompleted
+                ? 100
+                : dbData.totalDurationSec > 0 && dbData.lastPositionSec > 0
+                  // DB có đủ dữ liệu → dùng DB làm nguồn chính xác
+                  ? dbProgress
+                  // DB thiếu duration → giữ progress cao hơn từ localStorage
+                  : Math.max(item.progress || 0, dbProgress);
+
               const durationSec = dbData.totalDurationSec > 0 ? dbData.totalDurationSec : (item.durationSec || 0);
               const watchedSec = dbData.isCompleted
                 ? durationSec
@@ -260,7 +267,6 @@ const Home = () => {
                 isCompleted: dbData.isCompleted || finalProgress === 100,
                 durationSec,
                 watchedSec,
-                // Cập nhật legacy fields để đồng bộ
                 duration: durationSec > 0 ? Math.round(durationSec / 60) : item.duration,
                 watchedMinutes: watchedSec > 0 ? Math.round(watchedSec / 60) : item.watchedMinutes,
               };
@@ -269,6 +275,27 @@ const Home = () => {
           } catch { return item; }
         })
       );
+
+      // ✅ FIX: Sync enriched data ngược lại localStorage để tránh stale progress
+      try {
+        const updated = localHistory.map(item => {
+          const found = enriched.find(e => e.lessonID === item.lessonID);
+          if (!found) return item;
+          return {
+            ...item,
+            progress: found.progress,
+            isCompleted: found.isCompleted,
+            durationSec: found.durationSec,
+            watchedSec: found.watchedSec,
+            duration: found.duration,
+            watchedMinutes: found.watchedMinutes,
+          };
+        });
+        localStorage.setItem(getUserHistoryKey(), JSON.stringify(updated));
+      } catch (syncErr) {
+        console.warn("Không thể sync history về localStorage:", syncErr);
+      }
+
       setDbLessonHistory(enriched);
     } catch {
       setDbLessonHistory([]);
@@ -306,12 +333,11 @@ const Home = () => {
     } catch { setAttempts([]); }
   };
 
-  // ✅ FIX: Xóa lịch sử — reset cả dbLessonHistory và dispatch event
   const handleClearHistory = () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem video?")) {
       localStorage.removeItem(getUserHistoryKey());
       setLessonHistory([]);
-      setDbLessonHistory([]);  // ← Reset ngay lập tức, không cần F5
+      setDbLessonHistory([]);
       loadStats();
       window.dispatchEvent(new Event("videoHistoryUpdated"));
     }
@@ -374,7 +400,7 @@ const Home = () => {
     const h = () => {
       loadHistory();
       loadStats();
-      loadDbHistory(); // ← Thêm để đồng bộ khi xem video xong
+      loadDbHistory();
     };
     window.addEventListener("videoHistoryUpdated", h);
     return () => window.removeEventListener("videoHistoryUpdated", h);
@@ -579,12 +605,10 @@ const Home = () => {
                                   <FontAwesomeIcon icon={faClock} className="me-1" />{fmtDT(lesson.lastWatched)}
                                 </p>
                                 <div className="d-flex justify-content-between mb-1" style={{ fontSize: ".8rem", color: "#374151" }}>
-                                  {/* ✅ FIX: Dùng getDuration() để lấy thời lượng chính xác từ giây */}
                                   <span><FontAwesomeIcon icon={faVideo} className="me-1" />Thời lượng: <strong>{getDuration(lesson)}</strong></span>
                                   <span style={{ fontWeight: 800, color: lesson.progress >= 100 ? "#059669" : "#00a87c" }}>{lesson.progress}%</span>
                                 </div>
                                 <div style={{ fontSize: ".8rem", color: "#374151", marginBottom: "1rem" }}>
-                                  {/* ✅ FIX: Dùng getWatched() để lấy thời gian đã xem chính xác từ giây */}
                                   <FontAwesomeIcon icon={faClock} className="me-1" />Đã xem: <strong style={{ color: lesson.progress >= 100 ? "#059669" : "inherit" }}>{getWatched(lesson)}</strong>
                                 </div>
                                 {lesson.progress > 0 && lesson.progress < 100 && (
