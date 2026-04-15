@@ -1,235 +1,583 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
-// ── Fresh EdTech Mint & White tokens ──
-$font:         'Nunito', sans-serif;
-$mint:         #00c896;
-$mint-dark:    #00a87c;
-$mint-light:   #e6faf4;
-$mint-mid:     #b3f0de;
-$white:        #ffffff;
-$bg:           #f9fafb;
-$text-dark:    #111827;
-$text-body:    #374151;
-$text-muted:   #9ca3af;
-$border:       #e5e7eb;
-$shadow-sm:    0 2px 10px rgba(0,200,150,.08);
-$shadow-card:  0 4px 24px rgba(0,0,0,.06);
-$shadow-hover: 0 12px 40px rgba(0,200,150,.15);
-$shadow-btn:   0 6px 20px rgba(0,200,150,.35);
-$r-card:       24px;
-$r-pill:       100px;
-$ease:         0.22s cubic-bezier(.4,0,.2,1);
+$font:       'Nunito', sans-serif;
+$mint:       #00c896;
+$mint-dark:  #00a87c;
+$mint-light: #e6faf4;
+$mint-mid:   #b3f0de;
+$white:      #ffffff;
+$bg:         #f9fafb;
+$text-dark:  #111827;
+$text-body:  #374151;
+$text-muted: #9ca3af;
+$border:     #e5e7eb;
+$red:        #ef4444;
+$red-light:  #fef2f2;
+$red-mid:    #fecaca;
+$green:      #22c55e;
+$green-light:#f0fdf4;
+$green-mid:  #bbf7d0;
+$shadow-card: 0 4px 24px rgba(0,0,0,.07);
+$r-card:     20px;
+$r-pill:     100px;
+$ease:       0.22s cubic-bezier(.4,0,.2,1);
 
-// ── Page ──
+@keyframes spin-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  0%   { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 .start-quiz-page {
-  background: $bg;
   min-height: 100vh;
+  background: $bg;
   font-family: $font;
-  padding: 2rem 0;
+  padding: 2rem 0 5rem;
+  animation: spin-in .3s ease;
+}
+
+// ─── Back button ─────────────────────────────────────────────────────────────
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $r-pill;
+  padding: .5rem 1.2rem;
+  font-family: $font;
+  font-weight: 700;
+  font-size: .9rem;
   color: $text-body;
+  cursor: pointer;
+  transition: all $ease;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,200,150,.08);
 
-  // Back button
-  .back-btn {
-    display: inline-flex; align-items: center; gap: .5rem;
-    background: $white; border: 1.5px solid $border;
-    border-radius: $r-pill; padding: .6rem 1.4rem;
-    font-family: $font; font-weight: 800; font-size: .95rem;
-    color: $text-body; cursor: pointer; text-decoration: none;
-    box-shadow: $shadow-sm; transition: all $ease; align-self: flex-start;
-    margin-bottom: 2rem;
-    &:hover { border-color: $mint; color: $mint-dark; background: $mint-light; transform: translateY(-1px); }
+  &:hover {
+    border-color: $mint;
+    color: $mint-dark;
+    background: $mint-light;
+  }
+}
+
+// ─── Quiz header ──────────────────────────────────────────────────────────────
+.quiz-header {
+  background: $white;
+  border-radius: $r-card;
+  border: 1.5px solid $border;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: $shadow-card;
+
+  .quiz-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: $text-dark;
+    line-height: 1.3;
   }
 
-  // Quiz header
-  .quiz-header {
-    margin-bottom: 2rem;
-    .quiz-title {
-      font-weight: 900; font-size: 2.2rem; color: $text-dark;
-      letter-spacing: -1px; margin-bottom: .8rem;
-    }
-    .quiz-description {
-      color: $text-muted; font-size: 1.05rem; max-width: 800px; margin-bottom: 1.5rem;
-    }
-    .badge {
-      font-family: $font; font-weight: 700; padding: .5rem .8rem; font-size: .85rem; border-radius: 8px;
-    }
+  .quiz-description {
+    color: $text-body;
+    margin-top: .5rem;
+    margin-bottom: .75rem;
+    font-size: .97rem;
+    line-height: 1.6;
   }
+}
 
-  // Group Box
-  .quiz-group-box {
-    background: $white;
-    border-radius: $r-card;
-    border: 1.5px solid $border;
-    box-shadow: $shadow-card;
-    margin-bottom: 2.5rem;
-    overflow: hidden;
-    
-    .qg-left {
-      background: #f8fafc;
-      padding: 2rem;
-      border-right: 1.5px solid $border;
-      height: 100%;
+// Placement badge
+.placement-badge {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-family: $font;
+  font-weight: 800;
+  font-size: .78rem;
+  padding: 4px 14px;
+  border-radius: $r-pill;
+  white-space: nowrap;
+}
 
-      .instruction-title {
-        font-weight: 800; color: $mint-dark;
-        font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px;
-        margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;
-      }
-      
-      .instruction-text {
-        font-size: 1.05rem; color: $text-body; line-height: 1.6;
-        margin-bottom: 1.5rem;
-      }
+// ─── Group box ────────────────────────────────────────────────────────────────
+.quiz-group-box {
+  background: $white;
+  border-radius: $r-card;
+  border: 1.5px solid $border;
+  box-shadow: $shadow-card;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
 
-      .asset-box {
-        margin-bottom: 1rem;
-        audio, video { width: 100%; max-width: 100%; border-radius: 12px; }
-        img { border-radius: 12px; box-shadow: $shadow-sm; }
-        p { font-size: .95rem; line-height: 1.6; background: $white; padding: 1rem; border-radius: 12px; border: 1px solid $border;}
-      }
-    }
+  .qg-left {
+    background: #f8fafc;
+    border-right: 1.5px solid $border;
+    padding: 1.5rem;
 
-    .qg-right {
-      padding: 2rem;
-    }
-  }
-
-  // Question Block
-  .question-block {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px dashed $border;
-    &:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
-    .q-title {
-      font-size: 1.15rem; font-weight: 800; color: $text-dark; margin-bottom: 1.5rem; line-height: 1.5;
-      display: flex; gap: 1rem; align-items: flex-start;
-      .q-num {
-        background: $mint-light; color: $mint-dark; padding: .4rem .8rem;
-        border-radius: 8px; font-size: .9rem; white-space: nowrap;
-      }
-    }
-
-    .options-grid {
-      display: flex; flex-direction: column; gap: .8rem;
-    }
-
-    .option-card {
-      border: 2px solid $border;
-      border-radius: 16px;
-      padding: .8rem 1rem;
+    .instruction-title {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      font-weight: 900;
+      font-size: 1rem;
+      color: $mint-dark;
+      margin-bottom: .75rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid $mint-mid;
+    }
+
+    .instruction-text {
+      color: $text-body;
+      font-size: .9rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    .asset-box {
+      margin-top: .5rem;
+    }
+  }
+
+  .qg-right {
+    padding: 1.5rem;
+  }
+}
+
+// ─── Question block ───────────────────────────────────────────────────────────
+.question-block {
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  margin-bottom: 1.1rem;
+  border: 1.5px solid $border;
+  transition: border-color $ease, background $ease;
+
+  &:last-child { margin-bottom: 0; }
+
+  // After submit — correct/wrong tint
+  &.q-correct {
+    border-color: $green-mid;
+    background: $green-light;
+  }
+  &.q-wrong {
+    border-color: $red-mid;
+    background: $red-light;
+  }
+
+  .q-title {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: .85rem;
+    font-size: .95rem;
+    color: $text-dark;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .q-num {
+    background: $mint-light;
+    color: $mint-dark;
+    font-weight: 800;
+    font-size: .75rem;
+    padding: 2px 10px;
+    border-radius: $r-pill;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  // Badge đúng/sai bên cạnh title
+  .q-result-badge {
+    font-size: .76rem;
+    font-weight: 800;
+    padding: 2px 10px;
+    border-radius: $r-pill;
+    flex-shrink: 0;
+    margin-top: 2px;
+
+    &.badge-correct {
+      background: $green-light;
+      color: darken($green, 10%);
+      border: 1px solid $green-mid;
+    }
+    &.badge-wrong {
+      background: $red-light;
+      color: darken($red, 5%);
+      border: 1px solid $red-mid;
+    }
+  }
+
+  // Hint đáp án đúng (fill-in-blank)
+  .correct-answer-hint {
+    margin-top: .6rem;
+    padding: .5rem .85rem;
+    background: $green-light;
+    border: 1px solid $green-mid;
+    border-radius: 10px;
+    font-size: .85rem;
+    color: darken($green, 12%);
+    font-weight: 600;
+  }
+}
+
+// ─── Options grid ─────────────────────────────────────────────────────────────
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: .65rem;
+  margin-top: .5rem;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem 1rem;
+  border: 1.5px solid $border;
+  border-radius: 12px;
+  background: $white;
+  cursor: pointer;
+  transition: all $ease;
+  user-select: none;
+
+  &:hover:not(.opt-correct):not(.opt-wrong):not(.opt-correct-answer) {
+    border-color: $mint;
+    background: $mint-light;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,200,150,.12);
+  }
+
+  // Đang chọn (chưa submit)
+  &.selected {
+    border-color: $mint;
+    background: $mint-light;
+    box-shadow: 0 0 0 3px rgba(0,200,150,.15);
+  }
+
+  // ✅ Chọn đúng
+  &.opt-correct {
+    border-color: $green;
+    background: $green-light;
+    box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+    cursor: default;
+
+    .opt-letter {
+      background: $green;
+      color: $white;
+    }
+  }
+
+  // ❌ Chọn sai
+  &.opt-wrong {
+    border-color: $red;
+    background: $red-light;
+    box-shadow: 0 0 0 3px rgba(239,68,68,.15);
+    cursor: default;
+
+    .opt-letter {
+      background: $red;
+      color: $white;
+    }
+  }
+
+  // ✅ Đây là đáp án đúng (user chọn sai nên highlight đáp án đúng)
+  &.opt-correct-answer {
+    border-color: $green;
+    background: $green-light;
+    border-style: dashed;
+    cursor: default;
+
+    .opt-letter {
+      background: $green;
+      color: $white;
+    }
+  }
+
+  .opt-letter {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: $text-body;
+    font-weight: 800;
+    font-size: .82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all $ease;
+  }
+
+  .opt-text {
+    font-size: .9rem;
+    color: $text-dark;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
+// ─── Action buttons ───────────────────────────────────────────────────────────
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+
+  .submit-button {
+    background: $mint;
+    color: $white;
+    border: none;
+    border-radius: $r-pill;
+    padding: .85rem 2.5rem;
+    font-family: $font;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all $ease;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    box-shadow: 0 6px 20px rgba(0,200,150,.3);
+
+    &:hover:not(:disabled) {
+      background: $mint-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,200,150,.4);
+    }
+
+    &:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}
+
+// ─── Results section ──────────────────────────────────────────────────────────
+.results-section {
+  text-align: center;
+  background: $white;
+  border-radius: $r-card;
+  border: 1.5px solid $border;
+  padding: 2.5rem 2rem;
+  margin-top: 2rem;
+  box-shadow: $shadow-card;
+  animation: pop-in .4s ease;
+
+  .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    background: $mint-light;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.75rem;
+    color: $mint;
+    border: 3px solid $mint-mid;
+  }
+
+  h3 {
+    font-weight: 900;
+    color: $text-dark;
+    font-size: 1.4rem;
+    margin-bottom: .5rem;
+  }
+
+  .score-highlight {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: $mint-dark;
+    line-height: 1;
+    margin-bottom: .75rem;
+  }
+
+  // Breakdown đúng/sai
+  .score-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+
+    .breakdown-item {
+      font-size: .85rem;
+      font-weight: 800;
+      padding: .35rem 1rem;
+      border-radius: $r-pill;
+
+      &.correct {
+        background: $green-light;
+        color: darken($green, 10%);
+        border: 1px solid $green-mid;
+      }
+      &.wrong {
+        background: $red-light;
+        color: darken($red, 5%);
+        border: 1px solid $red-mid;
+      }
+      &.essay {
+        background: #fef9c3;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+    }
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid $mint;
+      color: $mint-dark;
+      border-radius: $r-pill;
+      padding: .65rem 1.75rem;
+      font-family: $font;
+      font-weight: 800;
       cursor: pointer;
       transition: all $ease;
-      background: $white;
+      font-size: .92rem;
 
-      .opt-letter {
-        width: 32px; height: 32px; 
-        border-radius: 8px;
-        background: $bg; color: $text-muted;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; margin-right: 1rem; transition: $ease;
-        border: 1px solid $border;
-      }
+      &:hover { background: $mint; color: $white; }
+    }
 
-      .opt-text {
-        font-weight: 600; color: $text-body; font-size: 1rem; transition: $ease; flex: 1;
-      }
+    .btn-primary {
+      background: $mint;
+      border: none;
+      color: $white;
+      border-radius: $r-pill;
+      padding: .65rem 1.75rem;
+      font-family: $font;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all $ease;
+      font-size: .92rem;
+      box-shadow: 0 4px 14px rgba(0,200,150,.3);
 
-      &:hover {
-        border-color: $mint-mid; background: #f0fdf9;
-        .opt-letter { background: $mint-light; color: $mint-dark; border-color: $mint-mid; }
-      }
+      &:hover { background: $mint-dark; transform: translateY(-1px); }
+    }
+  }
+}
 
-      &.selected {
-        border-color: $mint; background: $mint-light;
-        .opt-letter { background: $mint; color: $white; border-color: $mint; }
-        .opt-text { color: $mint-dark; }
-      }
+// ─── Placement Test Result ────────────────────────────────────────────────────
+.placement-result {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  border: 1.5px solid #c4b5fd;
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin: 1.25rem 0;
+  text-align: left;
+
+  .placement-level {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid #ddd6fe;
+
+    .level-label {
+      font-size: .82rem;
+      font-weight: 700;
+      color: #6b7280;
+    }
+
+    .level-name {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: $white;
+      font-weight: 900;
+      font-size: .95rem;
+      padding: 4px 18px;
+      border-radius: $r-pill;
+    }
+
+    .level-score {
+      font-size: .85rem;
+      font-weight: 700;
+      color: #7c3aed;
+      margin-left: auto;
     }
   }
 
-  // Action Buttons
-  .action-buttons {
-    text-align: center; margin-top: 3rem; margin-bottom: 5rem;
-    .submit-button {
-      background: $mint; border: none; border-radius: $r-pill;
-      padding: 1rem 3rem; font-family: $font;
-      font-weight: 900; font-size: 1.2rem; color: $white;
-      box-shadow: $shadow-btn; transition: all $ease; cursor: pointer;
-      display: inline-flex; align-items: center; gap: .5rem;
-      &:hover:not(:disabled) { background: $mint-dark; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,168,124,.4); }
-      &:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
-    }
+  .recommended-title {
+    font-weight: 900;
+    font-size: 1rem;
+    color: $text-dark;
+    margin-bottom: .85rem;
   }
 
-  // Result Section
-  .results-section {
-    max-width: 600px;
-    margin: 3rem auto;
-    text-align: center;
+  .course-cards {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+
+  .rec-course-card {
     background: $white;
-    padding: 3rem 2rem;
-    border-radius: $r-card;
-    box-shadow: $shadow-card;
-    border: 2px solid $mint-mid;
-    animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+    border: 1.5px solid #ddd6fe;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all $ease;
 
-    .icon-wrapper {
-      width: 100px; height: 100px;
-      background: $mint-light; color: $mint;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.5rem;
-      svg { font-size: 3rem; }
+    &:hover {
+      border-color: #8b5cf6;
+      box-shadow: 0 4px 16px rgba(139,92,246,.18);
+      transform: translateY(-2px);
     }
 
-    h3 { font-weight: 900; color: $text-dark; font-size: 1.8rem; margin-bottom: .5rem; }
-    .score-highlight {
-      font-size: 3.5rem; font-weight: 900; color: $mint-dark; margin: 1rem 0;
-      text-shadow: 0 4px 12px rgba(0,200,150,.2);
+    .rec-course-name {
+      font-weight: 800;
+      color: $text-dark;
+      font-size: .95rem;
+      margin-bottom: .25rem;
     }
-    
-    .result-actions {
-      display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;
-      .btn-outline {
-        background: $white; border: 2px solid $border; border-radius: $r-pill;
-        padding: .8rem 1.5rem; font-weight: 800; color: $text-body; transition: $ease;
-        &:hover { background: $bg; border-color: $text-muted; }
-      }
-      .btn-primary {
-        background: $mint; border: none; border-radius: $r-pill;
-        padding: .8rem 1.5rem; font-weight: 800; color: $white; transition: $ease;
-        box-shadow: $shadow-btn;
-        &:hover { background: $mint-dark; transform: translateY(-2px); }
-      }
+
+    .rec-course-desc {
+      font-size: .83rem;
+      color: $text-muted;
+      margin-bottom: .5rem;
+    }
+
+    .rec-course-btn {
+      font-size: .82rem;
+      font-weight: 800;
+      color: #7c3aed;
     }
   }
+}
 
-  // Loading
-  .loading-container {
-    text-align: center; padding: 5rem 0;
-    .spinner { width: 50px; height: 50px; border: 4px solid $mint-light; border-top-color: $mint; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem; }
-    p { color: $text-muted; font-weight: 700; font-size: 1.1rem; }
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .options-grid {
+    grid-template-columns: 1fr;
   }
 
-  // Toast
-  .toast-notification {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    z-index: 9999; min-width: 300px;
-    .alert { border-radius: 16px; font-family: $font; font-weight: 700; border: none; box-shadow: $shadow-hover; }
+  .qg-left {
+    border-right: none !important;
+    border-bottom: 1.5px solid $border;
   }
 
-  @keyframes spin { 0%{ transform:rotate(0deg) } 100%{ transform:rotate(360deg) } }
-  @keyframes popIn { 0%{opacity:0;transform:scale(.9)} 100%{opacity:1;transform:scale(1)} }
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-    .quiz-group-box .qg-left { border-right: none; border-bottom: 1.5px solid $border; padding: 1.5rem; }
-    .quiz-group-box .qg-right { padding: 1.5rem; }
-    .action-buttons .submit-button { width: 100%; padding: 1rem; }
-    .results-section .score-highlight { font-size: 2.8rem; }
-    .results-section .result-actions { flex-direction: column; }
+  .results-section {
+    padding: 2rem 1rem;
   }
+
+  .quiz-header {
+    padding: 1rem 1.25rem;
+    .quiz-title { font-size: 1.3rem; }
+  }
+}
+
+@media (max-width: 576px) {
+  .start-quiz-page { padding: 1rem 0 4rem; }
+  .score-highlight  { font-size: 2.8rem; }
 }
