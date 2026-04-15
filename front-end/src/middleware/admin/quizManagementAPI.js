@@ -83,7 +83,7 @@ export const updateQuiz = async (quizId, updateData) => {
         }))
       }))
     };
-    
+
     console.log("🔄 updateQuiz payload:", JSON.stringify(formattedData, null, 2));
     const res = await api.put(`/${quizId}`, formattedData, { headers: getAuthHeaders() });
     console.log("🔄 updateQuiz response:", res.data);
@@ -322,12 +322,12 @@ export const importQuizGroups = async (quizId, importData) => {
   try {
     console.log("📤 Starting importQuizGroups for quiz:", quizId);
     console.log("📦 Import data:", JSON.stringify(importData, null, 2));
-    
+
     // ✅ BƯỚC 1: Lấy tất cả groups hiện tại của quiz
     const currentQuiz = await getQuizById(quizId);
     const existingGroups = currentQuiz.groups || [];
     console.log(`🗑️ Found ${existingGroups.length} existing groups, deleting all...`);
-    
+
     // ✅ BƯỚC 2: Xóa hết tất cả groups cũ
     for (const group of existingGroups) {
       if (group.groupID) {
@@ -339,52 +339,58 @@ export const importQuizGroups = async (quizId, importData) => {
         }
       }
     }
-    
+
     console.log("✅ All old groups deleted, now creating new groups...");
-    
+
     // ✅ BƯỚC 3: Tạo mới tất cả groups từ importData
     const results = { groups: [], questions: [], options: [], assets: [] };
-    
+
     for (const groupData of importData.groups || []) {
       // Tạo group mới (không update, luôn tạo mới)
       const groupResult = await createGroup(quizId, groupData);
       results.groups.push(groupResult);
       const groupId = groupResult.groupID || groupResult.groupId;
       console.log(`✅ Created new group ${groupId}: ${groupData.instruction}`);
-      
+
       // Tạo group assets
       for (const assetData of groupData.assets || []) {
         const assetResult = await createGroupAsset(groupId, assetData);
         results.assets.push(assetResult);
       }
-      
+
       // Tạo questions
       for (const questionData of groupData.questions || []) {
         const questionResult = await createQuestion(groupId, questionData);
         results.questions.push(questionResult);
         const questionId = questionResult.questionID || questionResult.questionId;
-        
+
         // Tạo question assets
         for (const assetData of questionData.assets || []) {
           const assetResult = await createQuestionAsset(questionId, assetData);
           results.assets.push(assetResult);
         }
-        
+
         // Tạo options
+        // ✅ Fix trong importQuizGroups — phần tạo options
         for (const optionData of questionData.options || []) {
+          const qType = questionData.questionType || 1;
+
+          // Chỉ tạo option cho MCQ (type 1)
+          if (qType !== 1) continue;
+
           const optionResult = await createOption(questionId, optionData);
           results.options.push(optionResult);
         }
       }
     }
-    
+
     console.log("✅ importQuizGroups completed:", {
       groupsCreated: results.groups.length,
       questionsCreated: results.questions.length,
       optionsCreated: results.options.length,
       assetsCreated: results.assets.length
     });
-    
+
     return results;
   } catch (err) {
     console.error("❌ importQuizGroups error:", err.response?.data || err.message);
@@ -399,27 +405,27 @@ export default {
   getQuizById,
   updateQuiz,
   deleteQuiz,
-  
+
   // Group
   createGroup,
   updateGroup,
   deleteGroup,
-  
+
   // Question
   createQuestion,
   updateQuestion,
   deleteQuestion,
-  
+
   // Option
   createOption,
   updateOption,
   deleteOption,
-  
+
   // Asset
   createGroupAsset,
   createQuestionAsset,
   deleteAsset,
-  
+
   // Batch
   importQuizGroups,
 };

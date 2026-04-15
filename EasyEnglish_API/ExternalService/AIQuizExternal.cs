@@ -1,8 +1,14 @@
-﻿using System.Net.Http;
-using System.Text;
-using System.Text.Json;
+﻿using ClosedXML.Excel;
+using Deepgram.Models.Agent.v2.WebSocket;
+using DocumentFormat.OpenXml.Presentation;
+using EasyEnglish_API.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.ComponentModel;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace EasyEnglish_API.ExternalService
 {
@@ -21,55 +27,68 @@ namespace EasyEnglish_API.ExternalService
 
         public async Task<string> GenerateQuizAsync(string teacherPrompt)
         {
-            var prompt = $@"
-You are an IELTS exam generator.
+            var prompt = $$"""
+You are an English exam generator.
+Teacher request: {{teacherPrompt}}
 
-Teacher request: {teacherPrompt}
+CRITICAL RULES - FOLLOW EXACTLY:
+- If teacher asks for MCQ/multiple choice → ALL questions MUST be QuestionType 1
+- If teacher asks for fill in the blank → ALL questions MUST be QuestionType 2  
+- If teacher asks for sentence rewriting/transformation → ALL questions MUST be QuestionType 3
+- NEVER mix types unless teacher explicitly asks for mixed questions
 
-Generate a realistic IELTS-style quiz.
+Question types:
+1 = Multiple Choice (MCQ)
+2 = Fill in the blank
+3 = Sentence Transformation
 
-Requirements:
-- Mix 3 types of questions:
-  1 = Multiple Choice (MCQ)
-  2 = Fill in the blank
-  3 = Essay
-- At least 5 questions
-- Content must be natural, not generic
-- Do NOT reuse template text
+For QuestionType 1 (MCQ):
+- Options array MUST have 3 or 4 items
+- Exactly ONE option has IsCorrect: true
+- Example:
+[
+  {"Content":"Paris","IsCorrect":true},
+  {"Content":"London","IsCorrect":false},
+  {"Content":"Berlin","IsCorrect":false}
+]
 
-Output MUST be valid JSON only. Do NOT wrap it in markdown code blocks or backticks.
+For QuestionType 2:
+- Content must contain ______
+- Options has exactly 1 correct answer
+- Example:
+[
+  {"Content":"is playing","IsCorrect":true}
+]
 
-JSON structure:
+For QuestionType 3:
+- Content has original sentence + cue
+- Options has exactly 1 full rewritten sentence
+- Example:
+[
+  {"Content":"It is said that she sings well.","IsCorrect":true}
+]
 
-Title: string  
-Description: string  
-Questions: array of objects where each object has:
-- QuestionType (number: 1,2,3)
-- Content (string)
-- Options (array)
+STRICT VALIDATION:
+- NEVER return empty Options
+- ALWAYS include at least 1 option
 
-Rules:
-- MCQ (type 1): must have 3–4 options, only ONE correct
-- Fill blank (type 2): only ONE option, correct answer (can have multiple answers separated by '/')
-- Essay (type 3): Options must be empty []
+Output MUST be valid JSON only.
 
-Example of structure (DO NOT COPY CONTENT):
-
-{{""Title"": ""..."",
-  ""Description"": ""..."",
-  ""Questions"": [
-    {{
-      ""QuestionType"": 1,
-      ""Content"": ""..."",
-      ""Options"": [
-        {{ ""Content"": ""..."", ""IsCorrect"": true }},
-        {{ ""Content"": ""..."", ""IsCorrect"": false }}
+{
+  "Title": "...",
+  "Description": "...",
+  "Questions": [
+    {
+      "QuestionType": 1,
+      "Content": "...",
+      "Options": [
+        {"Content":"...","IsCorrect":true},
+        {"Content":"...","IsCorrect":false}
       ]
-    }}
+    }
   ]
-}}
-";
-
+}
+""";
             var payload = new
             {
                 contents = new[]
@@ -91,16 +110,41 @@ Example of structure (DO NOT COPY CONTENT):
             );
 
             var response = await _http.PostAsync(
-                $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
+                $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}",
                 content
             );
 
             var raw = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation("Gemini raw response: {Raw}", raw);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Gemini API error {response.StatusCode}: {raw}");
 
             using var doc = JsonDocument.Parse(raw);
+            var root = doc.RootElement;
 
-            var result = doc.RootElement
-                .GetProperty("candidates")[0]
+            if (root.TryGetProperty("promptFeedback", out var feedback))
+            {
+                var blockReason = feedback.TryGetProperty("blockReason", out var br)
+                    ? br.GetString() : "unknown";
+                throw new Exception($"Gemini blocked the request. Reason: {blockReason}");
+            }
+
+            if (!root.TryGetProperty("candidates", out var candidates)
+                || candidates.GetArrayLength() == 0)
+            {
+                throw new Exception($"Gemini returned no candidates. Response: {raw}");
+            }
+
+            var firstCandidate = candidates[0];
+            if (firstCandidate.TryGetProperty("finishReason", out var finishReason))
+            {
+                var reason = finishReason.GetString();
+                if (reason == "SAFETY" || reason == "RECITATION" || reason == "OTHER")
+                    throw new Exception($"Gemini stopped generating. Reason: {reason}");
+            }
+
+            var result = firstCandidate
                 .GetProperty("content")
                 .GetProperty("parts")[0]
                 .GetProperty("text")

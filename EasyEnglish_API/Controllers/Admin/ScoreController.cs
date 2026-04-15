@@ -30,8 +30,6 @@ namespace EasyEnglish_API.Controllers.Admin
                 return BadRequest(ex.Message);
             }
         }
-
-        // 3️⃣ Xem điểm user (phân loại)
         [HttpGet("user/{userId:int}")]
         public async Task<IActionResult> GetUserScores(int userId)
         {
@@ -47,7 +45,6 @@ namespace EasyEnglish_API.Controllers.Admin
             }
         }
 
-        // 4️⃣ Điểm theo khóa học
         [HttpGet("by-course/{courseId:int}")]
         public async Task<IActionResult> GetScoresByCourse(int courseId)
         {
@@ -63,7 +60,6 @@ namespace EasyEnglish_API.Controllers.Admin
             }
         }
 
-        // 5️⃣ Tất cả điểm system exam (group by quiz)
         [HttpGet("system-exams/all")]
         public async Task<IActionResult> GetAllSystemExamScores()
         {

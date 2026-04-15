@@ -29,6 +29,8 @@ namespace EasyEnglish_API.DTOs.Quizs
         public string Content { get; set; } = string.Empty;
         public List<OptionDto> Options { get; set; } = new();
         public byte QuestionType { get; internal set; }
+        public decimal ScoreWeight { get; set; }  
+        public string? MetaJson { get; set; }
 
         public List<AssetDto>? Assets { get; set; }
     }
