@@ -27,6 +27,7 @@ import GameLauncher from "./components/User/Flashcardgame/Gamelauncher";
 // ADMIN ROUTES
 import AdminDashboard from './components/Admin/AdminDashboard'; 
 import ExamDetail from './components/Admin/ExamDetail';
+import AdminCourseDetail from './components/Admin/AdminCourseDetail';
 
 // TEACHER ROUTES
 import TeacherDashboard from "./components/Teacher/Dashboard";
@@ -129,6 +130,11 @@ root.render(
           <Route path="/admin/examdetail/:quizId" element={
             <AdminRoute>
               <ExamDetail />
+            </AdminRoute>
+          } />
+          <Route path="/admin/coursedetail/:id" element={
+            <AdminRoute>
+              <AdminCourseDetail />
             </AdminRoute>
           } />
          
