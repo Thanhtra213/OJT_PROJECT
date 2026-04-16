@@ -11,22 +11,22 @@ const StartQuiz = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
 
-  const [quiz, setQuiz]               = useState(null);
-  const [groups, setGroups]           = useState([]);
-  const [attemptId, setAttemptId]     = useState(null);
-  const [answers, setAnswers]         = useState({});
-  const [loading, setLoading]         = useState(true);
-  const [submitting, setSubmitting]   = useState(false);
-  const [submitted, setSubmitted]     = useState(false);
-  const [score, setScore]             = useState(null);
-  const [results, setResults]         = useState([]);   // ← kết quả từng câu
-  const [error, setError]             = useState(null);
-  const [toast, setToast]             = useState({ show: false, message: "", type: "" });
+  const [quiz, setQuiz] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [attemptId, setAttemptId] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState(null);
+  const [results, setResults] = useState([]);   // ← kết quả từng câu
+  const [error, setError] = useState(null);
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
   // Placement test
-  const [isPlacementTest, setIsPlacementTest]       = useState(false);
-  const [recommendation, setRecommendation]         = useState(null);
-  const [loadingRecommend, setLoadingRecommend]     = useState(false);
+  const [isPlacementTest, setIsPlacementTest] = useState(false);
+  const [recommendation, setRecommendation] = useState(null);
+  const [loadingRecommend, setLoadingRecommend] = useState(false);
 
   const hasFetched = useRef(false);
 
@@ -130,12 +130,15 @@ const StartQuiz = () => {
     setAnswers(prev => ({ ...prev, [questionId]: optionId }));
   };
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!attemptId) { showToast("Không tìm thấy attempt ID!", "error"); return; }
+    if (!attemptId) {
+      showToast("Không tìm thấy attempt ID!", "error");
+      return;
+    }
 
     const allQuestions = groups.flatMap(g => g.questions);
-    const unanswered   = allQuestions.filter(q => !answers[q.questionID]);
+    const unanswered = allQuestions.filter(q => !answers[q.questionID]);
+
     if (unanswered.length > 0) {
       const ok = window.confirm(`Bạn còn ${unanswered.length} câu chưa trả lời. Vẫn nộp bài?`);
       if (!ok) return;
@@ -143,31 +146,32 @@ const StartQuiz = () => {
 
     try {
       setSubmitting(true);
-      const formatted = Object.entries(answers).map(([q, o]) => ({
-        QuestionID: Number(q),
-        OptionID: Number(o),
-      }));
+
+      // ✅ FIX: support cả trắc nghiệm + tự luận
+      const formatted = Object.entries(answers).map(([q, val]) => {
+        if (typeof val === "number") {
+          return {
+            QuestionID: Number(q),
+            OptionID: val
+          };
+        } else {
+          return {
+            QuestionID: Number(q),
+            AnswerText: val
+          };
+        }
+      });
+
       const result = await submitQuiz(attemptId, formatted);
+
       const finalScore = result.totalScore ?? result.autoScore ?? 0;
 
       setScore(finalScore);
-      // ✅ Lưu results để hiện đáp án đúng/sai
       setResults(Array.isArray(result.results) ? result.results : []);
       setSubmitted(true);
+
       showToast(`Đã nộp bài! Bạn đạt ${finalScore} điểm.`, "success");
 
-      // ✅ Nếu là placement test → gọi recommend
-      if (isPlacementTest) {
-        setLoadingRecommend(true);
-        try {
-          const rec = await getPlacementRecommendation(attemptId);
-          setRecommendation(rec);
-        } catch {
-          // Không block nếu recommend lỗi
-        } finally {
-          setLoadingRecommend(false);
-        }
-      }
     } catch (err) {
       const msg = err.response?.data?.message || err.message || "Gửi bài thất bại.";
       setError(msg);
@@ -177,16 +181,14 @@ const StartQuiz = () => {
     }
   };
 
-  const handleRetry       = () => window.location.reload();
-  const handleBackToList  = () => navigate(-1);
+  const handleRetry = () => window.location.reload();
+  const handleBackToList = () => navigate(-1);
   const getTotalQuestions = () => groups.reduce((s, g) => s + (g.questions?.length || 0), 0);
 
-  // ── Helper: lấy result của 1 question sau khi submit ──────────────────────
   const getQuestionResult = (questionID) =>
     results.find(r => r.questionId === questionID || r.questionID === questionID);
 
-  // ── Option state sau khi submit ───────────────────────────────────────────
-  // Returns: 'correct' | 'wrong' | 'correct-answer' | null
+
   const getOptionState = (questionID, optionID) => {
     if (!submitted) return null;
     const res = getQuestionResult(questionID);
@@ -197,7 +199,7 @@ const StartQuiz = () => {
       o => o.optionId === optionID || o.OptionId === optionID
     );
 
-    if (isSelected && res.isCorrect)  return 'correct';       // chọn đúng
+    if (isSelected && res.isCorrect) return 'correct';       // chọn đúng
     if (isSelected && !res.isCorrect) return 'wrong';         // chọn sai
     if (!isSelected && isCorrectOption) return 'correct-answer'; // đây là đáp án đúng
     return null;
@@ -292,24 +294,29 @@ const StartQuiz = () => {
                       return (
                         <div
                           key={qid}
-                          className={`question-block ${
-                            submitted
-                              ? qResult?.isCorrect === true  ? 'q-correct'
-                              : qResult?.isCorrect === false ? 'q-wrong'
+                          className={`question-block ${submitted
+                              ? qResult?.isCorrect === true ? 'q-correct'
+                                : qResult?.isCorrect === false ? 'q-wrong'
+                                  : ''
                               : ''
-                            : ''
-                          }`}
+                            }`}
                         >
                           {/* Question title + result badge */}
                           <div className="q-title">
                             <span className="q-num">Câu {qIdx + 1}</span>
                             <span>{question.content}</span>
                             {submitted && qResult && (
-                              <span className={`q-result-badge ${qResult.isCorrect ? 'badge-correct' : 'badge-wrong'}`}>
-                                <FontAwesomeIcon icon={qResult.isCorrect ? faCheck : faTimes} />
-                                {qResult.isCorrect ? ' Đúng' : ' Sai'}
-                              </span>
-                            )}
+  qResult.isCorrect === null ? (
+    <span className="q-result-badge badge-pending">
+      Chờ chấm
+    </span>
+  ) : (
+    <span className={`q-result-badge ${qResult.isCorrect ? 'badge-correct' : 'badge-wrong'}`}>
+      <FontAwesomeIcon icon={qResult.isCorrect ? faCheck : faTimes} />
+      {qResult.isCorrect ? ' Đúng' : ' Sai'}
+    </span>
+  )
+)}
                           </div>
 
                           {/* Question assets */}
@@ -320,39 +327,70 @@ const StartQuiz = () => {
                           {/* Options */}
                           <div className="options-grid">
                             {question.options?.length > 0 ? (
+                              // ================= TRẮC NGHIỆM =================
                               question.options.map((opt, idx) => {
                                 const state = getOptionState(qid, opt.optionID);
+
                                 return (
                                   <div
                                     key={opt.optionID}
                                     className={`option-card
-                                      ${answers[qid] === opt.optionID && !submitted ? 'selected' : ''}
-                                      ${state === 'correct'        ? 'opt-correct' : ''}
-                                      ${state === 'wrong'          ? 'opt-wrong' : ''}
-                                      ${state === 'correct-answer' ? 'opt-correct-answer' : ''}
-                                    `}
+            ${answers[qid] === opt.optionID && !submitted ? 'selected' : ''}
+            ${state === 'correct' ? 'opt-correct' : ''}
+            ${state === 'wrong' ? 'opt-wrong' : ''}
+            ${state === 'correct-answer' ? 'opt-correct-answer' : ''}
+          `}
                                     onClick={() => handleAnswerChange(qid, opt.optionID)}
                                     style={{ cursor: submitted ? 'default' : 'pointer' }}
                                   >
                                     <div className="opt-letter">
-                                      {submitted && state === 'correct'        && <FontAwesomeIcon icon={faCheck} />}
-                                      {submitted && state === 'wrong'          && <FontAwesomeIcon icon={faTimes} />}
+                                      {submitted && state === 'correct' && <FontAwesomeIcon icon={faCheck} />}
+                                      {submitted && state === 'wrong' && <FontAwesomeIcon icon={faTimes} />}
                                       {submitted && state === 'correct-answer' && <FontAwesomeIcon icon={faCheck} />}
                                       {(!submitted || !state) && String.fromCharCode(65 + idx)}
                                     </div>
+
                                     <div className="opt-text">{opt.content}</div>
                                   </div>
                                 );
                               })
                             ) : (
-                              <Alert variant="warning">⚠ Không có lựa chọn nào.</Alert>
+                              // ================= TỰ LUẬN =================
+                              <div className="essay-wrapper">
+                                <textarea
+                                  className="essay-input"
+                                  placeholder="Nhập câu trả lời của bạn..."
+                                  value={answers[qid] || ""}
+                                  onChange={(e) =>
+                                    setAnswers(prev => ({
+                                      ...prev,
+                                      [qid]: e.target.value
+                                    }))
+                                  }
+                                  disabled={submitted}
+                                />
+
+                                {/* Hiển thị sau khi submit */}
+                                {submitted && (
+                                  <div className="essay-result">
+                                   Câu trả lời của bạn: <strong>{answers[qid] || "(trống)"}</strong>
+                                  </div>
+                                )}
+
+                                {/* Nếu có đáp án đúng */}
+                                {submitted && qResult?.correctAnswerText && (
+                                  <div className="correct-answer-hint">
+                                    Đáp án mẫu: <strong>{qResult.correctAnswerText}</strong>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
 
                           {/* Hint: đáp án đúng khi sai (text) */}
                           {submitted && qResult?.isCorrect === false && qResult?.correctAnswerText && (
                             <div className="correct-answer-hint">
-                              ✅ Đáp án đúng: <strong>{qResult.correctAnswerText}</strong>
+                              Đáp án đúng: <strong>{qResult.correctAnswerText}</strong>
                             </div>
                           )}
                         </div>

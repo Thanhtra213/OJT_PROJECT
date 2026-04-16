@@ -7,14 +7,13 @@ import "./CourseFeedback.scss";
 
 const CourseFeedback = () => {
     const params = useParams();
-console.log("ALL PARAMS:", params);
-console.log("CURRENT URL:", window.location.pathname);
-const { id } = params; // Try both common parameter names
+    console.log("ALL PARAMS:", params);
+    console.log("CURRENT URL:", window.location.pathname);
+    const { id } = params;
     const navigate = useNavigate();
-    
-    // Use whichever param is defined
+
     const actualCourseId = id;
-    
+
     const [course, setCourse] = useState(null);
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
@@ -26,7 +25,6 @@ const { id } = params; // Try both common parameter names
     const [existingFeedbacks, setExistingFeedbacks] = useState([]);
 
     useEffect(() => {
-        // Early return if no courseId
         if (!actualCourseId) {
             setError("Không tìm thấy mã khóa học trong URL");
             setIsLoading(false);
@@ -37,21 +35,20 @@ const { id } = params; // Try both common parameter names
             try {
                 setIsLoading(true);
                 setError(null);
-                
-                console.log("Loading course with ID:", actualCourseId);
-                
-                const [courseData, feedbackData] = await Promise.all([
-    getCourseById(actualCourseId),
-    getCourseFeedbacks(actualCourseId).catch((err) => {
-        console.warn("Could not load feedbacks:", err);
-        return null;
-    })
-]);
 
-setCourse(courseData);
-// feedbackData là object { feedbacks: [...] }, không phải array
-const feedbackList = feedbackData?.feedbacks || feedbackData || [];
-setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
+                console.log("Loading course with ID:", actualCourseId);
+
+                const [courseData, feedbackData] = await Promise.all([
+                    getCourseById(actualCourseId),
+                    getCourseFeedbacks(actualCourseId).catch((err) => {
+                        console.warn("Could not load feedbacks:", err);
+                        return null;
+                    })
+                ]);
+
+                setCourse(courseData);
+                const feedbackList = feedbackData?.feedbacks || feedbackData || [];
+                setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
             } catch (err) {
                 console.error("Error loading course:", err);
                 setError("Không thể tải thông tin khóa học. Vui lòng kiểm tra lại.");
@@ -65,7 +62,7 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (rating === 0) {
             setError("Vui lòng chọn số sao đánh giá");
             return;
@@ -89,22 +86,26 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
             setSuccess(true);
             setRating(0);
             setComment("");
-            
+
             // Reload feedbacks
             try {
-    const updatedFeedbackData = await getCourseFeedbacks(actualCourseId);
-    const updatedList = updatedFeedbackData?.feedbacks || updatedFeedbackData || [];
-    setExistingFeedbacks(Array.isArray(updatedList) ? updatedList : []);
-} catch (err) {
-    console.warn("Could not reload feedbacks:", err);
-}
+                const updatedFeedbackData = await getCourseFeedbacks(actualCourseId);
+                const updatedList = updatedFeedbackData?.feedbacks || updatedFeedbackData || [];
+                setExistingFeedbacks(Array.isArray(updatedList) ? updatedList : []);
+            } catch (err) {
+                console.warn("Could not reload feedbacks:", err);
+            }
 
             setTimeout(() => {
                 navigate(`/course/${actualCourseId}`);
             }, 2000);
         } catch (err) {
             console.error("Error submitting feedback:", err);
-            setError(err.message || "Không thể gửi đánh giá. Vui lòng thử lại.");
+
+            // Ưu tiên hiện message từ server (plain text hoặc JSON)
+            // err.message sẽ chứa text body nếu courseAPI đã parse đúng (xem hướng dẫn bên dưới)
+            const serverMessage = err?.message || "Không thể gửi đánh giá. Vui lòng thử lại.";
+            setError(serverMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -128,7 +129,6 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
         );
     };
 
-    // Show error if no courseId in URL
     if (!actualCourseId) {
         return (
             <Container className="py-5">
@@ -167,8 +167,8 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
             <Container className="py-5">
                 <Row className="justify-content-center">
                     <Col lg={8}>
-                        <Button 
-                            variant="link" 
+                        <Button
+                            variant="link"
                             className="mb-3 p-0"
                             onClick={() => navigate(`/course/${actualCourseId}`)}
                         >
@@ -257,7 +257,6 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
                             </Card.Body>
                         </Card>
 
-                        {/* Display existing feedbacks */}
                         {existingFeedbacks.length > 0 && (
                             <div className="mt-4">
                                 <h4 className="mb-3">Đánh giá từ học viên khác</h4>
@@ -269,8 +268,8 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
                                                     <strong>{feedback.username || feedback.userName || "Học viên"}</strong>
                                                     <div className="mt-1">
                                                         {[...Array(5)].map((_, i) => (
-                                                            <FaStar 
-                                                                key={i} 
+                                                            <FaStar
+                                                                key={i}
                                                                 className={i < feedback.rating ? "text-warning" : "text-muted"}
                                                                 size={14}
                                                             />
@@ -278,7 +277,8 @@ setExistingFeedbacks(Array.isArray(feedbackList) ? feedbackList : []);
                                                     </div>
                                                 </div>
                                                 <small className="text-muted">
-{feedback.createdAt ? new Date(feedback.createdAt).toLocaleDateString('vi-VN') : ''}                                                </small>
+                                                    {feedback.createdAt ? new Date(feedback.createdAt).toLocaleDateString('vi-VN') : ''}
+                                                </small>
                                             </div>
                                             <p className="mb-0">{feedback.comment}</p>
                                         </Card.Body>

@@ -43,7 +43,7 @@ Return JSON ONLY, no markdown, no extra text:
     }},
     {{
       ""type"": 2,
-      ""content"": ""<Fill in the blank: The caller's name is ______. >>"",
+      ""content"": ""<Fill in the blank: The caller's name is ______. >"",
       ""options"": [],
       ""answer"": ""<correct answer from script>""
     }}
@@ -56,6 +56,7 @@ Rules:
 - type 2 = Fill blank: options = [], answer = correct word/phrase from script
 - All questions must be directly answerable from the script
 - Script must be natural conversation, 200-300 words
+- Script lines must follow format: 'Speaker A: ...' or 'Speaker B: ...'
 ";
 
             var response = await CallGeminiAsync(prompt);
@@ -66,8 +67,13 @@ Rules:
                 var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
 
-                var title = root.TryGetProperty("title", out var t) ? t.GetString() ?? "IELTS Listening - AI Gen" : "IELTS Listening - AI Gen";
-                var script = root.TryGetProperty("script", out var s) ? s.GetString() ?? "" : "";
+                var title = root.TryGetProperty("title", out var t)
+                    ? t.GetString() ?? "IELTS Listening - AI Gen"
+                    : "IELTS Listening - AI Gen";
+
+                var script = root.TryGetProperty("script", out var s)
+                    ? s.GetString() ?? ""
+                    : "";
 
                 var questions = new List<GeneratedListeningQuestion>();
                 if (root.TryGetProperty("questions", out var qs))
@@ -115,7 +121,7 @@ Rules:
             };
 
             var res = await _http.PostAsync(
-                $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}",
+                $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
                 new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
             );
 
@@ -129,7 +135,11 @@ Rules:
             if (!root.TryGetProperty("candidates", out var candidates))
                 throw new Exception($"Invalid Gemini response: {body}");
 
-            return candidates[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString() ?? "{}";
+            return candidates[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString() ?? "{}";
         }
 
         private static string ExtractJson(string raw)

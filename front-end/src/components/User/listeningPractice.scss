@@ -1,0 +1,572 @@
+// listeningpractice.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+// ── Design System Tokens ─────────────────────────────────────────
+$font-primary:   'Plus Jakarta Sans', sans-serif;
+
+// Colors (same as WritingPractice)
+$primary:        #00c896;
+$primary-light:  #e6faf4;
+$primary-dark:   #00a87c;
+$accent:         #6366f1;
+$surface:        #ffffff;
+$background:     #f8fafc;
+$text-main:      #1e293b;
+$text-muted:     #64748b;
+$text-light:     #94a3b8;
+$border-color:   #f1f5f9;
+
+// Shadows
+$shadow-sm:      0 2px 4px rgba(0,0,0,0.02);
+$shadow-md:      0 10px 15px -3px rgba(0,0,0,0.04), 0 4px 6px -2px rgba(0,0,0,0.02);
+$shadow-lg:      0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02);
+$shadow-primary: 0 10px 15px -3px rgba(0,200,150,0.25);
+
+// Transitions
+$transit: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ── Global ───────────────────────────────────────────────────────
+.listening-container {
+  min-height: 100vh;
+  background-color: $background;
+  font-family: $font-primary;
+  color: $text-main;
+  padding: 0 0 40px 0;
+}
+
+// ── Header ───────────────────────────────────────────────────────
+.listening-page-header {
+  background: rgba($surface, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border-color;
+  padding: 1.25rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .title-group {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    .icon-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, $primary, $primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.4rem;
+      box-shadow: $shadow-primary;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      font-size: 0.875rem;
+      color: $text-muted;
+      margin: 2px 0 0 0;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+}
+
+// ── Layout ───────────────────────────────────────────────────────
+.listening-content {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ── Base Card ────────────────────────────────────────────────────
+.card {
+  background: $surface;
+  border-radius: 20px;
+  border: 1px solid $border-color;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+  transition: $transit;
+
+  .card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .header-icon {
+      font-size: 1.1rem;
+      color: $primary;
+    }
+  }
+}
+
+// ── Audio Card ───────────────────────────────────────────────────
+.audio-card {
+  .audio-body {
+    padding: 1.5rem;
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      h2 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin: 0;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: $primary-light;
+        color: $primary-dark;
+      }
+    }
+
+    // Native audio player override
+    audio {
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      outline: none;
+      accent-color: $primary;
+
+      &::-webkit-media-controls-panel {
+        background: $primary-light;
+      }
+    }
+  }
+}
+
+// ── Placeholder (before generate) ────────────────────────────────
+.card-placeholder {
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+
+  .placeholder-icon {
+    font-size: 2.5rem;
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
+
+  .skeleton-group {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    opacity: 0.35;
+  }
+
+  .skeleton-line {
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    &.mid { width: 75%; }
+    &.short { width: 50%; }
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: $text-muted;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 500;
+    max-width: 260px;
+  }
+}
+
+// ── Questions Card ───────────────────────────────────────────────
+.questions-card {
+  .questions-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.question-item {
+  padding: 1.25rem;
+  border: 1px solid $border-color;
+  border-radius: 14px;
+  background: #fafafa;
+  transition: $transit;
+
+  &:hover { border-color: rgba($primary, 0.3); }
+
+  .question-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $text-main;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+
+  // MCQ options
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.875rem;
+      color: $text-muted;
+      cursor: pointer;
+      padding: 0.5rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      transition: $transit;
+
+      input[type="radio"] {
+        accent-color: $primary;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        cursor: pointer;
+      }
+
+      &:hover {
+        background: $primary-light;
+        border-color: rgba($primary, 0.2);
+        color: $primary-dark;
+      }
+
+      &:has(input:checked) {
+        background: $primary-light;
+        border-color: rgba($primary, 0.4);
+        color: $primary-dark;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Fill-in input
+  .fill-input {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: $font-primary;
+    color: $text-main;
+    background: white;
+    outline: none;
+    transition: $transit;
+    box-sizing: border-box;
+
+    &::placeholder { color: $text-light; font-style: italic; }
+
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    }
+  }
+}
+
+// ── Result Card ──────────────────────────────────────────────────
+.result-card {
+  .result-header-bar {
+    padding: 1.75rem 1.5rem;
+    background: $primary-light;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .score-block {
+      .score-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: $primary-dark;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .score-value {
+        font-size: 3rem;
+        font-weight: 900;
+        color: $primary-dark;
+        line-height: 1;
+      }
+    }
+
+    .score-badge {
+      font-size: 2.25rem;
+      opacity: 0.7;
+    }
+  }
+
+  .transcript-section {
+    padding: 1.5rem;
+    border-top: 1px solid $border-color;
+
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: $text-main;
+      margin: 0 0 0.75rem 0;
+    }
+
+    pre {
+      background: #f8fafc;
+      border: 1px solid $border-color;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      font-size: 0.875rem;
+      color: $text-muted;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin: 0;
+      font-family: $font-primary;
+    }
+  }
+
+  .result-list {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: $text-main;
+      margin: 0 0 0.25rem 0;
+    }
+  }
+}
+
+.result-item {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+
+  &.correct {
+    background: #d4edda;
+    border-color: #b8dfc5;
+
+    .result-status { color: #1a7a40; }
+  }
+
+  &.wrong {
+    background: #f8d7da;
+    border-color: #f1b8bc;
+
+    .result-status { color: #a02020; }
+  }
+
+  .result-question {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $text-main;
+    margin-bottom: 0.4rem;
+  }
+
+  .result-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.825rem;
+
+    span { color: $text-muted; }
+
+    .your-answer { color: #a02020; }
+    .correct-answer { color: #1a7a40; font-weight: 600; }
+  }
+}
+
+// ── Footer Actions ───────────────────────────────────────────────
+.listening-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+// ── Buttons ──────────────────────────────────────────────────────
+.btn-primary,
+.btn-generate {
+  background: linear-gradient(135deg, $primary, $primary-dark);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: $shadow-primary;
+  cursor: pointer;
+  transition: $transit;
+  font-family: $font-primary;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 12px 20px -3px rgba(0,200,150,0.4); }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+}
+
+.btn-outline {
+  background: white;
+  color: $text-main;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: $font-primary;
+  transition: $transit;
+
+  &:hover { background: #f8fafc; border-color: $text-light; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-close {
+  background: #f1f5f9;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: $transit;
+
+  &:hover { background: #e2e8f0; color: #ef4444; }
+}
+
+// ── Alert Toast ──────────────────────────────────────────────────
+.alert-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: $shadow-lg;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 5px solid $primary;
+
+  &.error   { border-left-color: #ef4444; }
+  &.success { border-left-color: $primary; }
+  &.info    { border-left-color: $accent; }
+
+  span { font-size: 0.9rem; font-weight: 600; color: $text-main; }
+
+  .toast-close {
+    background: transparent;
+    border: none;
+    color: $text-light;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    margin-left: 0.25rem;
+
+    &:hover { color: $text-main; }
+  }
+}
+
+// ── Loading spinner ───────────────────────────────────────────────
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+// ── Animations ───────────────────────────────────────────────────
+.animation-slide-in  { animation: slideUp 0.4s ease-out; }
+.animation-fade-in   { animation: fadeIn 0.3s ease-out; }
+.animation-scale-up  { animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes shimmer  { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes slideUp  { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp  { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes spin     { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+// ── Responsive ───────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .listening-page-header {
+    padding: 1rem 1.25rem;
+
+    .header-content { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+    .title-group .icon-badge { width: 40px; height: 40px; font-size: 1.1rem; }
+  }
+
+  .listening-content {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+
+  .listening-footer { justify-content: stretch; flex-direction: column; }
+  .btn-primary, .btn-outline { justify-content: center; }
+}

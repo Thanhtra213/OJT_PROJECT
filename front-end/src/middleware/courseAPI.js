@@ -197,7 +197,7 @@ export const submitCourseFeedback = async (feedbackData) => {
       const rawText = await response.text();
       let errorData = {};
       try { errorData = JSON.parse(rawText); } catch(e) {}
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(rawText || `HTTP error! status: ${response.status}`);
     }
 
     return await response.json();
