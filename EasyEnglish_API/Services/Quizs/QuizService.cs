@@ -160,8 +160,16 @@ namespace EasyEnglish_API.Services
                         gradedScore = isCorrect.Value ? perQ : 0;
                         break;
                     case 3:
-                        isCorrect = null;
-                        gradedScore = null;
+                        if (!string.IsNullOrWhiteSpace(q.MetaJson))
+                        {
+                            isCorrect = GradeFillInBlank(q, ans.AnswerText);
+                            gradedScore = isCorrect.Value ? perQ : 0;
+                        }
+                        else
+                        {
+                            isCorrect = null;   
+                            gradedScore = null;
+                        }
                         break;
                     default:
                         isCorrect = false;
@@ -193,17 +201,28 @@ namespace EasyEnglish_API.Services
 
                 if (isCorrect == false)
                 {
+                    // ================= FIX FULL =================
                     if (q.QuestionType == 1)
-                        rd.CorrectOptions = q.Options
-                            .Where(o => o.IsCorrect)
-                            .Select(o => new CorrectOptionDto { OptionId = o.OptionId, Content = o.Content })
-                            .ToList();
-                    else if (q.QuestionType == 2 && !string.IsNullOrWhiteSpace(q.MetaJson))
+                    {
+                        if (isCorrect == false)
+                        {
+                            rd.CorrectOptions = q.Options
+                                .Where(o => o.IsCorrect)
+                                .Select(o => new CorrectOptionDto
+                                {
+                                    OptionId = o.OptionId,
+                                    Content = o.Content
+                                })
+                                .ToList();
+                        }
+                    }
+                    else if ((q.QuestionType == 2 || q.QuestionType == 3) && !string.IsNullOrWhiteSpace(q.MetaJson))
                     {
                         try
                         {
                             using var doc = JsonDocument.Parse(q.MetaJson);
                             var root = doc.RootElement;
+
                             if (root.TryGetProperty("answer", out var s))
                                 rd.CorrectAnswerText = s.GetString();
                             else if (root.TryGetProperty("answers", out var m) && m.ValueKind == JsonValueKind.Array)
@@ -213,7 +232,7 @@ namespace EasyEnglish_API.Services
                     }
                 }
 
-                results.Add(rd);
+                    results.Add(rd);
             }
 
             total = Math.Round(total, 2);

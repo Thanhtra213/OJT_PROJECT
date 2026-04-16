@@ -148,7 +148,7 @@ IMPORTANT: Respond ONLY with a single valid JSON object. No markdown, no code bl
 
                 var json = JsonSerializer.Serialize(payload);
                 var res = await _http.PostAsync(
-                    $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key={_apiKey}",
+                    $"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={_apiKey}",
                     new StringContent(json, Encoding.UTF8, "application/json")
                 );
 
